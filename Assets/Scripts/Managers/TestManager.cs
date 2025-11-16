@@ -55,6 +55,8 @@ public class TestManager : MonoBehaviour
             GameManager.Instance?.Replay();
         if (Input.GetKeyDown(KeyCode.Q))
             GameManager.Instance?.Quit();
+        if (Input.GetKey(KeyCode.L))
+            GameManager.Instance?.ScoreUp();
         #endregion
 
         #region 사운드 테스트
@@ -85,7 +87,7 @@ public class TestManager : MonoBehaviour
             EntityManager.Instance?.ToggleSpawn(spawn);
         }
 
-        if (Input.GetKeyDown(KeyCode.D))
+        if (Input.GetKeyDown(KeyCode.Delete))
             EntityManager.Instance?.DespawnAll();
         #endregion
 

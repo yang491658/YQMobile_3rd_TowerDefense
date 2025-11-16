@@ -1,9 +1,14 @@
+using TMPro;
 using UnityEngine;
 
 public class Monster : Entity
 {
-    [Header("HP")]
-    [SerializeField] private float hp;
+    private Canvas canvas;
+    private static int sorting = 0;
+
+    [Header("Health")]
+    [SerializeField] private int health;
+    [SerializeField] private TextMeshProUGUI healthText;
 
     [Header("Speed")]
     [SerializeField] private float speed;
@@ -12,23 +17,30 @@ public class Monster : Entity
     [SerializeField] private Transform[] path;
     [SerializeField] private int pathIndex;
 
+    protected override void Awake()
+    {
+        base.Awake();
+
+        canvas = GetComponentInChildren<Canvas>();
+        healthText = GetComponentInChildren<TextMeshProUGUI>();
+
+        sr.sortingOrder = sorting;
+        canvas.sortingOrder = sorting--;
+    }
+
     protected override void Start()
     {
         base.Start();
 
         pathIndex = 0;
-        transform.position = path[0].position;
+        healthText.text = health.ToString();
     }
 
     protected override void Update()
     {
         base.Update();
 
-        if (pathIndex >= path.Length)
-        {
-            Move(Vector3.down * speed);
-            return;
-        }
+        if (pathIndex >= path.Length) return;
 
         Transform targetTrans = path[pathIndex];
         Vector3 target = targetTrans.position;
@@ -37,12 +49,7 @@ public class Monster : Entity
         float arrive = Mathf.Max(speed * Time.deltaTime, 0.1f);
         if (delta.sqrMagnitude < arrive * arrive)
         {
-            pathIndex++;
-            if (pathIndex >= path.Length)
-            {
-                Move(Vector3.down * speed);
-                return;
-            }
+            if (++pathIndex >= path.Length) return;
 
             targetTrans = path[pathIndex];
             target = targetTrans.position;
@@ -58,8 +65,18 @@ public class Monster : Entity
         EntityManager.Instance?.Despawn(this);
     }
 
+    public void TakeDamage(int _damage)
+    {
+        health -= _damage;
+        healthText.text = health.ToString();
+    }
+
     #region SET
-    public void SetHP(float _hp) => hp = _hp;
+    public void SetHealth(int _health)
+    {
+        health = _health;
+        healthText.text = health.ToString();
+    }
     public void SetSpeed(float _speed) => speed = _speed;
     public void SetPath(Transform[] _path)
     {

@@ -16,12 +16,7 @@ public class Entity : MonoBehaviour
 
     protected virtual void Start() { }
 
-    protected virtual void Update()
-    {
-        Vector3 v = rb.linearVelocity;
-        if (v.sqrMagnitude > 1e-4f)
-            transform.up = v.normalized;
-    }
+    protected virtual void Update() { }
 
     #region ÀÌµ¿
     public void Move(Vector3 _velocity) => rb.linearVelocity = _velocity;
