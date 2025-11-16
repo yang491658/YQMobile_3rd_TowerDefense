@@ -57,7 +57,7 @@ public class AutoCamera : MonoBehaviour
         cam.orthographicSize = size;
 
         OrthoSize = size;
-        float worldH = cam.orthographicSize * 2f;
+        float worldH = size * 2f;
         float worldW = worldH * cam.aspect;
         Vector3 pos = cam.transform.position;
         WorldRect = new Rect(pos.x - worldW * 0.5f, pos.y - worldH * 0.5f, worldW, worldH);

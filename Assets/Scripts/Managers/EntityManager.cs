@@ -15,6 +15,7 @@ public class EntityManager : MonoBehaviour
 
     [Header("Entities Settings")]
     [SerializeField] private Transform inGame;
+    [SerializeField] private Transform map;
     [SerializeField] private Transform towerTrans;
     [SerializeField] private List<Tower> towers = new List<Tower>();
     [SerializeField] private Transform monsterTrans;
@@ -28,7 +29,7 @@ public class EntityManager : MonoBehaviour
 
     [SerializeField][Min(0.1f)] private float speed = 3f;
     [SerializeField] private Transform[] path;
-    [SerializeField] private Vector2 pathMargin = new Vector2(88f, 68f);
+    [SerializeField] private Vector2 pathMargin = new Vector2(0.88f, 0.68f);
     [SerializeField] private int[] pathNum = { 1, 4, 2, 3, 4, 1, 3, 2, 1, 4 };
 
 #if UNITY_EDITOR
@@ -122,7 +123,7 @@ public class EntityManager : MonoBehaviour
 
             if (timer > delay)
             {
-                Monster monster = Spawn(new Vector3(r.xMin, r.yMin * pathMargin.y / 100f) + Vector3.left);
+                Monster monster = Spawn(monsterPath[0].position + Vector3.left);
 
                 monster.SetHealth(10 + (GameManager.Instance.GetScore() / 100) * 5);
                 monster.SetSpeed(speed);
@@ -156,22 +157,25 @@ public class EntityManager : MonoBehaviour
         delayBase = delay;
 
         if (inGame == null) inGame = GameObject.Find("InGame")?.transform;
+        if (map == null) map = GameObject.Find("Map")?.transform;
         if (towerTrans == null) towerTrans = GameObject.Find("InGame/Towers")?.transform;
         if (monsterTrans == null) monsterTrans = GameObject.Find("InGame/Monsters")?.transform;
 
         Rect r = AutoCamera.WorldRect;
 
-        float left = r.xMin * pathMargin.x / 100f;
-        float right = r.xMax * pathMargin.x / 100f;
-        float bottom = r.yMin * pathMargin.y / 100f;
-        float top = r.yMax * pathMargin.y / 100f;
+        float left = r.xMin * pathMargin.x ;
+        float right = r.xMax * pathMargin.x;
+        float bottom = r.yMin * pathMargin.y;
+        float top = r.yMax * pathMargin.y ;
 
         path[0].position = new Vector3(left, bottom);
         path[1].position = new Vector3(right, bottom);
         path[2].position = new Vector3(left, top);
         path[3].position = new Vector3(right, top);
+
+        map.localScale = new Vector3(right - left, bottom - top);
     }
-    public void ResetEntity() => delay = delayBase;
+    public void ResetDelay() => delay = delayBase;
     #endregion
 
     #region GET
