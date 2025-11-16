@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour
 
         EntityManager.Instance?.ResetDelay();
         EntityManager.Instance?.SetEntity();
-        EntityManager.Instance?.ToggleSpawn(true);
+        EntityManager.Instance?.ToggleSpawnMonster(true);
 
         UIManager.Instance?.ResetPlayTime();
         UIManager.Instance?.OpenUI(false);

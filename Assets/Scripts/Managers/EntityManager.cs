@@ -1,6 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
+using NUnit.Framework.Interfaces;
+using System.Linq;
+using static UnityEditor.Progress;
+
+
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -12,14 +19,19 @@ public class EntityManager : MonoBehaviour
 
     [Header("Data Setting")]
     [SerializeField] private GameObject monsterBase;
+    [SerializeField] private GameObject towerBase;
+    [SerializeField] private TowerData[] towerDatas;
+    private readonly Dictionary<int, TowerData> towerDic = new Dictionary<int, TowerData>();
 
     [Header("Entities Settings")]
     [SerializeField] private Transform inGame;
     [SerializeField] private Transform map;
-    [SerializeField] private Transform towerTrans;
-    [SerializeField] private List<Tower> towers = new List<Tower>();
+    [SerializeField] private Transform mapTile;
+    [SerializeField] private Transform mapRoad;
     [SerializeField] private Transform monsterTrans;
     [SerializeField] private List<Monster> monsters = new List<Monster>();
+    [SerializeField] private Transform towerTrans;
+    [SerializeField] private List<Tower> towers = new List<Tower>();
 
     [Header("Monster Settings")]
     [SerializeField][Min(0.1f)] private float delay = 3f;
@@ -37,18 +49,30 @@ public class EntityManager : MonoBehaviour
     {
         if (monsterBase == null)
             monsterBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Monster.prefab");
+        if (towerBase == null)
+            towerBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Tower.prefab");
 
-        List<Transform> list = new List<Transform>();
+        string[] guids = AssetDatabase.FindAssets("t:TowerData", new[] { "Assets/Scripts/ScriptableObjects" });
+        var tlist = new List<TowerData>(guids.Length);
+        for (int i = 0; i < guids.Length; i++)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guids[i]);
+            var data = AssetDatabase.LoadAssetAtPath<TowerData>(path);
+            if (data != null) tlist.Add(data.Clone());
+        }
+        towerDatas = tlist.OrderBy(d => d.ID).ThenBy(d => d.Name).ToArray();
+
+        List<Transform> plist = new List<Transform>();
         Transform[] all = Resources.FindObjectsOfTypeAll<Transform>();
         for (int i = 0; i < all.Length; i++)
         {
             Transform t = all[i];
             if (t.name.StartsWith("Path ("))
-                list.Add(t);
+                plist.Add(t);
         }
 
-        list.Sort((a, b) => GetPathIndex(a.name).CompareTo(GetPathIndex(b.name)));
-        path = list.ToArray();
+        plist.Sort((a, b) => GetPathIndex(a.name).CompareTo(GetPathIndex(b.name)));
+        path = plist.ToArray();
     }
 
     private int GetPathIndex(string _name)
@@ -58,8 +82,7 @@ public class EntityManager : MonoBehaviour
         if (start >= 0 && end > start)
         {
             string number = _name.Substring(start + 1, end - start - 1);
-            int index;
-            if (int.TryParse(number, out index))
+            if (int.TryParse(number, out int index))
                 return index;
         }
         return 0;
@@ -76,24 +99,72 @@ public class EntityManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        SetTowerDic();
         SetEntity();
     }
 
-    #region 타워
+    #region 타일
+    private Vector3 RandomTile()
+    {
+        Tilemap tilemap = mapTile.GetComponent<Tilemap>();
+        BoundsInt bounds = tilemap.cellBounds;
+
+        HashSet<Vector3Int> tiles = new HashSet<Vector3Int>();
+        for (int i = 0; i < towers.Count; i++)
+        {
+            Vector3Int towerCell = tilemap.WorldToCell(towers[i].transform.position);
+            tiles.Add(towerCell);
+        }
+
+        List<Vector3Int> cells = new List<Vector3Int>();
+        for (int x = bounds.xMin; x < bounds.xMax; x++)
+        {
+            for (int y = bounds.yMin; y < bounds.yMax; y++)
+            {
+                Vector3Int cell = new Vector3Int(x, y, 0);
+                if (tilemap.HasTile(cell) && !tiles.Contains(cell))
+                    cells.Add(cell);
+            }
+        }
+
+        if (cells.Count == 0)
+            return default;
+
+        Vector3Int select = cells[Random.Range(0, cells.Count)];
+        return tilemap.GetCellCenterWorld(select);
+    }
+
+    private void FitTile(Tower _tower, Vector3 _pos)
+    {
+        Tilemap tilemap = mapTile.GetComponent<Tilemap>();
+        Vector3Int cell = tilemap.WorldToCell(_pos);
+
+        if (!tilemap.HasTile(cell)) return;
+
+        Vector3 min = tilemap.CellToWorld(cell);
+        float tileWidth = Mathf.Abs(tilemap.CellToWorld(cell + new Vector3Int(1, 0, 0)).x - min.x);
+        float tileHeight = Mathf.Abs(tilemap.CellToWorld(cell + new Vector3Int(0, 1, 0)).y - min.y);
+
+        Bounds spriteBound = _tower.GetSR().bounds;
+        float factor = Mathf.Max(tileWidth / spriteBound.size.x, tileHeight / spriteBound.size.y);
+
+        Vector3 scale = _tower.transform.localScale * factor;
+        _tower.transform.localScale = new Vector3(scale.x, scale.y, (scale.x + scale.y) * 0.5f);
+    }
     #endregion
 
     #region 몬스터
-    public Monster Spawn(Vector3 _pos)
+    private Monster SpawnMonster(Vector3 _pos)
     {
-        Monster e = Instantiate(monsterBase, _pos, Quaternion.identity, monsterTrans)
+        Monster monster = Instantiate(monsterBase, _pos, Quaternion.identity, monsterTrans)
             .GetComponent<Monster>();
 
-        monsters.Add(e);
+        monsters.Add(monster);
 
-        return e;
+        return monster;
     }
 
-    public void ToggleSpawn(bool _on)
+    public void ToggleSpawnMonster(bool _on)
     {
         if (spawnRoutine != null)
             StopCoroutine(spawnRoutine);
@@ -104,7 +175,7 @@ public class EntityManager : MonoBehaviour
             spawnRoutine = null;
     }
 
-    public IEnumerator SpawnCoroutine()
+    private IEnumerator SpawnCoroutine()
     {
         Transform[] monsterPath = new Transform[pathNum.Length];
         for (int i = 0; i < pathNum.Length; i++)
@@ -113,7 +184,6 @@ public class EntityManager : MonoBehaviour
             monsterPath[i] = path[index];
         }
 
-        Rect r = AutoCamera.WorldRect;
         float timer = delay;
         while (true)
         {
@@ -123,7 +193,7 @@ public class EntityManager : MonoBehaviour
 
             if (timer > delay)
             {
-                Monster monster = Spawn(monsterPath[0].position + Vector3.left);
+                Monster monster = SpawnMonster(monsterPath[0].position + Vector3.left);
 
                 monster.SetHealth(10 + (GameManager.Instance.GetScore() / 100) * 5);
                 monster.SetSpeed(speed);
@@ -136,46 +206,103 @@ public class EntityManager : MonoBehaviour
         }
     }
 
-    public void Despawn(Monster _enemy)
+    public void DespawnMonster(Monster _monster)
     {
-        if (_enemy == null) return;
-
-        monsters.Remove(_enemy);
-        Destroy(_enemy.gameObject);
+        monsters.Remove(_monster);
+        Destroy(_monster.gameObject);
     }
+    #endregion
+
+    #region 타워
+    public Tower SpawnTower(Vector3? _pos = null)
+    {
+        Vector3 pos = _pos.HasValue
+            ? _pos.Value
+            : RandomTile();
+
+        if (!_pos.HasValue && pos == default)
+            return null;
+
+        Tower tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
+            .GetComponent<Tower>();
+
+        towers.Add(tower);
+        FitTile(tower, pos);
+
+        return tower;
+    }
+
+    public void DespawnTower(Tower _tower)
+    {
+        towers.Remove(_tower);
+        Destroy(_tower.gameObject);
+    }
+    #endregion
 
     public void DespawnAll()
     {
         for (int i = monsters.Count - 1; i >= 0; i--)
-            Despawn(monsters[i]);
+            DespawnMonster(monsters[i]);
+        for (int i = towers.Count - 1; i >= 0; i--)
+            DespawnTower(towers[i]);
     }
-    #endregion
 
     #region SET
+    private void SetTowerDic()
+    {
+        towerDic.Clear();
+        for (int i = 0; i < towerDatas.Length; i++)
+        {
+            var d = towerDatas[i];
+            if (d != null && !towerDic.ContainsKey(d.ID))
+                towerDic.Add(d.ID, d);
+        }
+    }
+
+    public void ResetDelay() => delay = delayBase;
     public void SetEntity()
     {
         delayBase = delay;
 
         if (inGame == null) inGame = GameObject.Find("InGame")?.transform;
         if (map == null) map = GameObject.Find("Map")?.transform;
-        if (towerTrans == null) towerTrans = GameObject.Find("InGame/Towers")?.transform;
+        if (mapTile == null) mapTile = GameObject.Find("Tile")?.transform;
+        if (mapRoad == null) mapRoad = GameObject.Find("Road")?.transform;
         if (monsterTrans == null) monsterTrans = GameObject.Find("InGame/Monsters")?.transform;
+        if (towerTrans == null) towerTrans = GameObject.Find("InGame/Towers")?.transform;
 
+        float left, right, bottom, top;
+        SetMap(out left, out right, out bottom, out top);
+        SetPath(left, right, bottom, top);
+    }
+
+    private void SetMap(out float left, out float right, out float bottom, out float top)
+    {
         Rect r = AutoCamera.WorldRect;
+        left = r.xMin * pathMargin.x;
+        right = r.xMax * pathMargin.x;
+        bottom = r.yMin * pathMargin.y;
+        top = r.yMax * pathMargin.y;
 
-        float left = r.xMin * pathMargin.x ;
-        float right = r.xMax * pathMargin.x;
-        float bottom = r.yMin * pathMargin.y;
-        float top = r.yMax * pathMargin.y ;
+        Tilemap tilemap = mapRoad.GetComponent<Tilemap>();
+        BoundsInt bounds = tilemap.cellBounds;
+        Vector3Int cell = new Vector3Int(bounds.xMin + 1, bounds.yMin + 1, 0);
+        Vector3 world = tilemap.GetCellCenterWorld(cell);
 
+        float xScale = (right - left) / Mathf.Abs(world.x * 2f);
+        float yScale = (top - bottom) / Mathf.Abs(world.y * 2f);
+
+        Vector3 scale = new Vector3(xScale, yScale, (xScale + yScale) / 2f);
+        if (scale.magnitude > 0f) map.localScale = scale;
+    }
+
+    private void SetPath(float left, float right, float bottom, float top)
+    {
         path[0].position = new Vector3(left, bottom);
         path[1].position = new Vector3(right, bottom);
         path[2].position = new Vector3(left, top);
         path[3].position = new Vector3(right, top);
-
-        map.localScale = new Vector3(right - left, bottom - top);
     }
-    public void ResetDelay() => delay = delayBase;
     #endregion
 
     #region GET

@@ -70,7 +70,7 @@ public class Monster : Entity
 
     private void OnBecameInvisible()
     {
-        EntityManager.Instance?.Despawn(this);
+        EntityManager.Instance?.DespawnMonster(this);
     }
 
     public void TakeDamage(int _damage)

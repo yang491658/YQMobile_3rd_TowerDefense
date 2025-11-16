@@ -8,7 +8,7 @@ public class HandleManager : MonoBehaviour
     public static HandleManager Instance { private set; get; }
 
     private Camera cam => Camera.main;
-    private LayerMask layer = ~0;
+    private LayerMask layer => LayerMask.GetMask("Tower");
 
     [Header("Click")]
     private const float doubleClick = 0.25f;
@@ -18,6 +18,7 @@ public class HandleManager : MonoBehaviour
     [Header("Drag")]
     [SerializeField][Min(0f)] private float maxDrag = 5f;
     private const float drag = 0.15f;
+    private bool canDrag;
     private bool isDragging;
     private Vector3 dragStart;
     private Vector3 dragCurrent;
@@ -95,18 +96,14 @@ public class HandleManager : MonoBehaviour
     private Vector3 ScreenToWorld(Vector3 _screenPos)
     {
         var p = _screenPos;
-        p.z = -cam.transform.position.z;
+        p.z = Mathf.Max(-cam.transform.position.z, cam.nearClipPlane);
         return cam.ScreenToWorldPoint(p);
     }
 
     private bool CanSelect(Collider2D _col)
     {
         if (layer == 0) return true;
-
-        bool con1 = _col != null;
-        bool con2 = true; // TODO : 추가 조건
-
-        return con1 && con2;
+        return _col != null;
     }
     #endregion
 
@@ -125,6 +122,7 @@ public class HandleManager : MonoBehaviour
 
         if (CanSelect(hit))
         {
+            canDrag = true;
             isDragging = false;
             dragStart = worldPos;
             dragCurrent = dragStart;
@@ -133,11 +131,20 @@ public class HandleManager : MonoBehaviour
             dragPath.Add(dragStart);
 #endif
         }
+        else
+        {
+            canDrag = false;
+            isDragging = false;
+#if UNITY_EDITOR
+            dragPath.Clear();
+#endif
+        }
     }
 
     private void HandleMove(Vector3 _pos)
     {
         if (isOverUI) return;
+        if (!canDrag) return;
 
         Vector3 worldPos = ScreenToWorld(_pos);
         float distance = Vector3.Distance(dragStart, worldPos);
@@ -163,6 +170,21 @@ public class HandleManager : MonoBehaviour
         if (isOverUI)
         {
             isOverUI = false;
+            canDrag = false;
+            isDragging = false;
+#if UNITY_EDITOR
+            dragPath.Clear();
+#endif
+            return;
+        }
+
+        if (!canDrag)
+        {
+            canDrag = false;
+            isDragging = false;
+#if UNITY_EDITOR
+            dragPath.Clear();
+#endif
             return;
         }
 
@@ -196,6 +218,7 @@ public class HandleManager : MonoBehaviour
             StartCoroutine(ClickCoroutine(worldPos));
         }
 
+        canDrag = false;
         isDragging = false;
 #if UNITY_EDITOR
         dragPath.Clear();

@@ -25,4 +25,8 @@ public class Entity : MonoBehaviour
 
     #region SET
     #endregion
+
+    #region GET
+    public SpriteRenderer GetSR() => sr;
+    #endregion
 }

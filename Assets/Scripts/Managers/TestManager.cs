@@ -81,10 +81,12 @@ public class TestManager : MonoBehaviour
             }
         }
 
+        if (Input.GetKeyDown(KeyCode.T))
+            EntityManager.Instance?.SpawnTower();
         if (Input.GetKeyDown(KeyCode.E))
         {
             spawn = !spawn;
-            EntityManager.Instance?.ToggleSpawn(spawn);
+            EntityManager.Instance?.ToggleSpawnMonster(spawn);
         }
 
         if (Input.GetKeyDown(KeyCode.Delete))
