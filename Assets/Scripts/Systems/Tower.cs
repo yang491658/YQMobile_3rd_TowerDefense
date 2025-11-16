@@ -10,7 +10,9 @@ public class Tower : Entity
     public virtual void SetData(TowerData _data)
     {
         data = _data;
+
         gameObject.name = data.Name;
+        sr.color = data.Color;
     }
     #endregion
 }

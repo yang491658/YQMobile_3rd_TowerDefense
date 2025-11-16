@@ -6,6 +6,7 @@ public class TowerData : ScriptableObject
     [Header("Entity")]
     public int ID;
     public string Name;
+    public Color32 Color;
 
 #if UNITY_EDITOR
     protected virtual void OnValidate()
@@ -21,6 +22,7 @@ public class TowerData : ScriptableObject
 
         clone.ID = this.ID;
         clone.Name = this.Name;
+        clone.Color= this.Color;
 
         return clone;
     }

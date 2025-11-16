@@ -214,8 +214,15 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region 타워
-    public Tower SpawnTower(Vector3? _pos = null)
+    public TowerData SearchTower(int _id) => towerDic.TryGetValue(_id, out var _data) ? _data : null;
+    public Tower SpawnTower(int _id = 0, Vector3? _pos = null)
     {
+        TowerData data = (_id == 0)
+            ? towerDatas[Random.Range(0, towerDatas.Length)]
+            : SearchTower(_id);
+
+        if (data == null) return null;
+
         Vector3 pos = _pos.HasValue
             ? _pos.Value
             : RandomTile();
@@ -223,12 +230,14 @@ public class EntityManager : MonoBehaviour
         if (!_pos.HasValue && pos == default)
             return null;
 
+        Debug.Log("asdf");
         Tower tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
             .GetComponent<Tower>();
 
+        tower.SetData(data);
         towers.Add(tower);
-        FitTile(tower, pos);
 
+        FitTile(tower, pos);
         return tower;
     }
 

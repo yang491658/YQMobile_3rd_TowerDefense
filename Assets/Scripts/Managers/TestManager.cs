@@ -77,6 +77,7 @@ public class TestManager : MonoBehaviour
             KeyCode key = (i == 10) ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha0 + i);
             if (Input.GetKeyDown(key))
             {
+                EntityManager.Instance?.SpawnTower(i);
                 break;
             }
         }
