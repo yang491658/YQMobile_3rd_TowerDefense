@@ -1,13 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using NUnit.Framework.Interfaces;
-using System.Linq;
-using static UnityEditor.Progress;
-
-
-
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -82,8 +77,8 @@ public class EntityManager : MonoBehaviour
         if (start >= 0 && end > start)
         {
             string number = _name.Substring(start + 1, end - start - 1);
-            if (int.TryParse(number, out int index))
-                return index;
+            if (int.TryParse(number, out int _index))
+                return _index;
         }
         return 0;
     }
@@ -230,7 +225,6 @@ public class EntityManager : MonoBehaviour
         if (!_pos.HasValue && pos == default)
             return null;
 
-        Debug.Log("asdf");
         Tower tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
             .GetComponent<Tower>();
 
@@ -280,37 +274,35 @@ public class EntityManager : MonoBehaviour
         if (monsterTrans == null) monsterTrans = GameObject.Find("InGame/Monsters")?.transform;
         if (towerTrans == null) towerTrans = GameObject.Find("InGame/Towers")?.transform;
 
-        float left, right, bottom, top;
-        SetMap(out left, out right, out bottom, out top);
-        SetPath(left, right, bottom, top);
+        SetMap(out float _halfX, out float _halfY);
+        SetPath(_halfX, _halfY);
     }
 
-    private void SetMap(out float left, out float right, out float bottom, out float top)
+    private void SetMap(out float _halfX, out float _halfY)
     {
         Rect r = AutoCamera.WorldRect;
-        left = r.xMin * pathMargin.x;
-        right = r.xMax * pathMargin.x;
-        bottom = r.yMin * pathMargin.y;
-        top = r.yMax * pathMargin.y;
+
+        _halfX = r.xMax * pathMargin.x;
+        _halfY = r.yMax * pathMargin.y;
 
         Tilemap tilemap = mapRoad.GetComponent<Tilemap>();
         BoundsInt bounds = tilemap.cellBounds;
         Vector3Int cell = new Vector3Int(bounds.xMin + 1, bounds.yMin + 1, 0);
         Vector3 world = tilemap.GetCellCenterWorld(cell);
 
-        float xScale = (right - left) / Mathf.Abs(world.x * 2f);
-        float yScale = (top - bottom) / Mathf.Abs(world.y * 2f);
+        float xScale = (_halfX * 2f) / Mathf.Abs(world.x * 2f);
+        float yScale = (_halfY * 2f) / Mathf.Abs(world.y * 2f);
 
         Vector3 scale = new Vector3(xScale, yScale, (xScale + yScale) / 2f);
         if (scale.magnitude > 0f) map.localScale = scale;
     }
 
-    private void SetPath(float left, float right, float bottom, float top)
+    private void SetPath(float _halfX, float _halfY)
     {
-        path[0].position = new Vector3(left, bottom);
-        path[1].position = new Vector3(right, bottom);
-        path[2].position = new Vector3(left, top);
-        path[3].position = new Vector3(right, top);
+        path[0].position = new Vector3(-_halfX, -_halfY);
+        path[1].position = new Vector3(_halfX, -_halfY);
+        path[2].position = new Vector3(-_halfX, _halfY);
+        path[3].position = new Vector3(_halfX, _halfY);
     }
     #endregion
 
