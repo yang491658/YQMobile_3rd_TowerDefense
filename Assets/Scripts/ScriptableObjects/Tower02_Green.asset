@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: 2
   Name: Green
-  Image: {fileID: 21300000, guid: 1d97f54f8a796f54c8034b431010acf6, type: 3}
+  Image: {fileID: 21300000, guid: 7c0aaeae5b7d06f45a85e08ccf02e270, type: 3}
   Color:
     serializedVersion: 2
     rgba: 4278255360
