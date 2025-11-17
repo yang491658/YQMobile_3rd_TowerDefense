@@ -128,24 +128,6 @@ public class EntityManager : MonoBehaviour
         Vector3Int select = cells[Random.Range(0, cells.Count)];
         return tilemap.GetCellCenterWorld(select);
     }
-
-    private void FitTile(Tower _tower, Vector3 _pos)
-    {
-        Tilemap tilemap = mapTile.GetComponent<Tilemap>();
-        Vector3Int cell = tilemap.WorldToCell(_pos);
-
-        if (!tilemap.HasTile(cell)) return;
-
-        Vector3 min = tilemap.CellToWorld(cell);
-        float tileWidth = Mathf.Abs(tilemap.CellToWorld(cell + new Vector3Int(1, 0, 0)).x - min.x);
-        float tileHeight = Mathf.Abs(tilemap.CellToWorld(cell + new Vector3Int(0, 1, 0)).y - min.y);
-
-        Bounds spriteBound = _tower.GetSR().bounds;
-        float factor = Mathf.Max(tileWidth / spriteBound.size.x, tileHeight / spriteBound.size.y);
-
-        Vector3 scale = _tower.transform.localScale * factor;
-        _tower.transform.localScale = new Vector3(scale.x, scale.y, (scale.x + scale.y) * 0.5f);
-    }
     #endregion
 
     #region 몬스터
@@ -229,9 +211,9 @@ public class EntityManager : MonoBehaviour
             .GetComponent<Tower>();
 
         tower.SetData(data);
-        towers.Add(tower);
+        tower.transform.localScale = map.transform.localScale;
 
-        FitTile(tower, pos);
+        towers.Add(tower);
         return tower;
     }
 
@@ -262,7 +244,14 @@ public class EntityManager : MonoBehaviour
         }
     }
 
-    public void ResetDelay() => delay = delayBase;
+    public void ResetEntity()
+    {
+        delay = delayBase;
+
+        monsters.RemoveAll(m => m == null);
+        towers.RemoveAll(t => t == null);
+    }
+
     public void SetEntity()
     {
         delayBase = delay;

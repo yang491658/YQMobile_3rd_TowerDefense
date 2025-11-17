@@ -15,3 +15,6 @@ MonoBehaviour:
   ID: 1
   Name: Red
   Image: {fileID: 21300000, guid: cd984b1c3f9468143a02a9c215029b44, type: 3}
+  Color:
+    serializedVersion: 2
+    rgba: 4278190335
