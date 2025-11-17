@@ -30,12 +30,6 @@ public class Tower : Entity
         gameObject.name = data.Name;
         if (data.Image != null) sr.sprite = data.Image;
 
-        sr.color = new Color32(
-            (byte)(data.Color.r / 2),
-            (byte)(data.Color.g / 2),
-            (byte)(data.Color.b / 2),
-            data.Color.a
-        );
         outLine.GetComponent<SpriteRenderer>().color = data.Color;
         symbol.GetComponent<SpriteRenderer>().color = data.Color;
     }
