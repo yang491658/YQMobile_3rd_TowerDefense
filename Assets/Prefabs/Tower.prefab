@@ -342,6 +342,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outLine: {fileID: 6618385927607765839}
-  rank: {fileID: 0}
-  rankCount: 1
+  symbol: {fileID: 6968313113729995}
+  rank: 1
   data: {fileID: 0}

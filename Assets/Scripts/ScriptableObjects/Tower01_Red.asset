@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
   m_Name: Tower01_Red
   m_EditorClassIdentifier: 
-  ID: 2
-  Name: Green
-  Image: {fileID: 21300000, guid: 7c0aaeae5b7d06f45a85e08ccf02e270, type: 3}
+  ID: 1
+  Name: Red
+  Image: {fileID: 21300000, guid: 01f97985223b7ca4ab660643e476d4d7, type: 3}
   Color:
     serializedVersion: 2
     rgba: 4278190335

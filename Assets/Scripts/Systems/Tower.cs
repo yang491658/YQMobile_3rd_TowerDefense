@@ -2,36 +2,42 @@
 
 public class Tower : Entity
 {
-    [SerializeField] private Transform rank;
-    [SerializeField] private int rankCount = 1;
+    [SerializeField] private Transform outLine;
+    [SerializeField] private Transform symbol;
+
+    [SerializeField] private int rank = 1;
 
     [SerializeField] protected TowerData data;
 
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        rank = transform.Find("Rank");
+        outLine = transform.Find("OutLine");
+        symbol = transform.Find("Symbol");
     }
 #endif
 
-    protected override void Start()
-    {
-        base.Start();
-
-        rank.GetComponent<SpriteRenderer>()
-            .color = data.Color;
-    }
+    public virtual void RankUp(int _amount = 1) => rank += _amount;
 
     public virtual void Attack(Monster _monster) { }
 
     #region SET
-    public virtual void SetRank(int _rank) => rankCount = _rank;
+    public virtual void SetRank(int _rank) => rank = _rank;
     public virtual void SetData(TowerData _data)
     {
         data = _data;
 
         gameObject.name = data.Name;
         if (data.Image != null) sr.sprite = data.Image;
+
+        sr.color = new Color32(
+            (byte)(data.Color.r / 2),
+            (byte)(data.Color.g / 2),
+            (byte)(data.Color.b / 2),
+            data.Color.a
+        );
+        outLine.GetComponent<SpriteRenderer>().color = data.Color;
+        symbol.GetComponent<SpriteRenderer>().color = data.Color;
     }
     #endregion
 }
