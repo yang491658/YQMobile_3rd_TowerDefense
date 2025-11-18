@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tower00_Tower
   m_EditorClassIdentifier: 
   ID: 0
-  Name: 
-  Image: {fileID: 0}
+  Name: Tower
+  Image: {fileID: 21300000, guid: 01f97985223b7ca4ab660643e476d4d7, type: 3}
   Color: {r: 0, g: 0, b: 0, a: 1}
   Damage: 1

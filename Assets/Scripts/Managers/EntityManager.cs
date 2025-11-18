@@ -219,7 +219,7 @@ public class EntityManager : MonoBehaviour
             if (GameManager.Instance?.GetGold() < needGold)
                 return null;
 
-            GameManager.Instance?.GoldDown(needGold); // 임시
+            GameManager.Instance?.GoldDown(needGold++);
         }
 
         Tower tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
