@@ -68,6 +68,7 @@ public class TowerData : ScriptableObject
         clone.Name = this.Name;
         clone.Image = this.Image;
         clone.Color = this.Color;
+
         clone.Damage = this.Damage;
         clone.Speed = this.Speed;
         clone.Delay = this.Delay;
