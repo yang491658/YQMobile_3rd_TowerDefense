@@ -339,7 +339,7 @@ public class HandleManager : MonoBehaviour
         Tower tower = hit.GetComponent<Tower>();
         if (tower == null) return;
 
-        EntityManager.Instance.DespawnTower(tower);
+        EntityManager.Instance?.DespawnTower(tower);
     }
 
     private void AddClick(Vector3 _pos, Color _color)

@@ -28,7 +28,7 @@ public class Bullet : Entity
             if (target != null)
                 target.TakeDamage(damage);
 
-            EntityManager.Instance.DespawnBullet(this);
+            EntityManager.Instance?.DespawnBullet(this);
             return;
         }
 
