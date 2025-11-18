@@ -3,20 +3,18 @@
 public class Tower : Entity
 {
     [Header("Default")]
-    private TowerData data;
-    private Transform outLine;
+    [SerializeField] private TowerData data;
+    [SerializeField] private Transform outLine;
 
     [Header("Rank")]
-    private Transform symbol;
-    private int rank = 1;
+    [SerializeField] private Transform symbol;
+    [SerializeField] private int rank;
     private int maxRank = 7;
     private bool isMax = false;
 
     [Header("Battle")]
-    private Monster target;
-    private int damage;
-    private float speed;
-    private float delay;
+    [SerializeField] private Monster target;
+    [SerializeField] private int damage;
     private float timer;
 
     protected override void Awake()
@@ -35,11 +33,7 @@ public class Tower : Entity
     }
 
     #region 랭크
-    public void RankUp(int _amount = 1)
-    {
-        rank = Mathf.Clamp(rank + _amount, 1, maxRank);
-        UpdateRank();
-    }
+    public void RankUp(int _amount = 1) => SetRank(rank + _amount);
 
     private void UpdateRank()
     {
@@ -109,8 +103,8 @@ public class Tower : Entity
     #region 전투
     public virtual void Attack()
     {
-        timer += Time.deltaTime;
-        if (timer < delay) return;
+        timer -= Time.deltaTime;
+        if (timer > 0f) return;
 
         if (target == null)
         {
@@ -119,9 +113,9 @@ public class Tower : Entity
 
             target = nearest;
         }
-        timer = 0f;
-
         EntityManager.Instance?.SpawnBullet(this);
+
+        timer = 3f / rank;
     }
     #endregion
 
@@ -136,6 +130,7 @@ public class Tower : Entity
     public void SetRank(int _rank)
     {
         rank = Mathf.Clamp(_rank, 1, maxRank);
+        damage = data.Damage * rank;
         UpdateRank();
     }
 
@@ -150,22 +145,19 @@ public class Tower : Entity
         symbol.GetComponent<SpriteRenderer>().color = data.Color;
 
         damage = data.Damage;
-        speed = data.Speed;
-        delay = data.Delay;
 
-        UpdateRank();
+        SetRank(1);
     }
     #endregion
 
     #region GET
     public int GetID() => data.ID;
+    public Color GetColor() => data.Color;
 
-    public Transform GetSymbol() => symbol;
     public int GetRank() => rank;
     public bool IsMax() => isMax;
 
     public Monster GetTarget() => target;
     public int GetDamage() => damage;
-    public float GetSpeed() => speed;
     #endregion
 }

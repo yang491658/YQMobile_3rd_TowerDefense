@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -12,30 +13,35 @@ public class TowerData : ScriptableObject
     public int ID;
     public string Name;
     public Sprite Image;
-    public Color32 Color;
+    public Color Color = Color.black;
 
     [Header("Battle")]
     public int Damage = 1;
-    public float Speed = 10f;
-    public float Delay = 1f;
 
 #if UNITY_EDITOR
     private void OnValidate()
     {
         var sprites = Resources.LoadAll<Sprite>("Images/Towers");
-        var used = new System.Collections.Generic.HashSet<string>();
+        var used = new HashSet<string>();
+        var excluded = new HashSet<string> { "OutLine", "Symbol" };
         foreach (var g in AssetDatabase.FindAssets("t:TowerData"))
         {
             var d = AssetDatabase.LoadAssetAtPath<TowerData>(AssetDatabase.GUIDToAssetPath(g));
-            if (d != null && d != this && d.Image != null)
+            if (d != null && d != this && d.Image != null && !excluded.Contains(d.Image.name))
                 used.Add(d.Image.name);
         }
 
         Sprite pick = null;
-        if (Image == null || used.Contains(Image.name))
+        if (Image == null || used.Contains(Image.name) || excluded.Contains(Image.name))
         {
             foreach (var s in sprites)
-                if (!used.Contains(s.name)) { pick = s; break; }
+            {
+                if (used.Contains(s.name)) continue;
+                if (excluded.Contains(s.name)) continue;
+
+                pick = s;
+                break;
+            }
 
             Image = pick;
         }
@@ -70,8 +76,6 @@ public class TowerData : ScriptableObject
         clone.Color = this.Color;
 
         clone.Damage = this.Damage;
-        clone.Speed = this.Speed;
-        clone.Delay = this.Delay;
 
         return clone;
     }

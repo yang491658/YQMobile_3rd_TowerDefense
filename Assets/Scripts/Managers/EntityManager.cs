@@ -38,7 +38,6 @@ public class EntityManager : MonoBehaviour
     private float delayBase;
     private Coroutine spawnRoutine;
 
-    [SerializeField][Min(0.1f)] private float speed = 3f;
     [SerializeField] private Transform[] path;
     [SerializeField] private Vector2 pathMargin = new Vector2(0.88f, 0.68f);
     [SerializeField] private int[] pathNum = { 1, 4, 2, 3, 4, 1, 3, 2, 1, 4 };
@@ -181,8 +180,7 @@ public class EntityManager : MonoBehaviour
             {
                 Monster monster = SpawnMonster(monsterPath[0].position + Vector3.left);
 
-                monster.SetHealth(10 + (GameManager.Instance.GetScore() / 100));
-                monster.SetSpeed(speed);
+                monster.SetHealth(5 + GameManager.Instance.GetScore() / 100);
                 monster.SetPath(monsterPath);
 
                 timer = 0f;
@@ -221,7 +219,7 @@ public class EntityManager : MonoBehaviour
             if (GameManager.Instance?.GetGold() < needGold)
                 return null;
 
-            GameManager.Instance?.GoldDown(needGold++);
+            GameManager.Instance?.GoldDown(needGold); // 임시
         }
 
         Tower tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
@@ -263,10 +261,9 @@ public class EntityManager : MonoBehaviour
         Bullet bullet = Instantiate(bulletBase, _tower.transform.position, Quaternion.identity, bulletTrans)
             .GetComponent<Bullet>();
 
-        bullet.SetBullet(_tower.GetSymbol());
+        bullet.SetColor(_tower.GetColor());
         bullet.SetTarget(_tower.GetTarget());
         bullet.SetDamage(_tower.GetDamage());
-        bullet.SetSpeed(_tower.GetSpeed());
 
         bullets.Add(bullet);
 

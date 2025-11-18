@@ -6,15 +6,13 @@ public class Monster : Entity
     private static int sorting = 0;
 
     [Header("Health")]
-    private int health;
+    [SerializeField] private int health;
     private TextMeshProUGUI healthText;
 
-    [Header("Speed")]
-    private float speed;
-
-    [Header("Path")]
-    private Transform[] path;
-    private int pathIndex;
+    [Header("Move")]
+    [SerializeField] private float speed = 3f;
+    [SerializeField] private int index;
+    [SerializeField] private Transform[] path;
 
     protected override void Awake()
     {
@@ -31,7 +29,7 @@ public class Monster : Entity
     {
         base.Start();
 
-        pathIndex = 0;
+        index = 0;
 
         SetHealth(health);
     }
@@ -40,24 +38,24 @@ public class Monster : Entity
     {
         base.Update();
 
-        if (pathIndex >= path.Length)
+        if (index >= path.Length)
         {
             Move(Vector3.right * speed);
             return;
         }
 
-        Vector3 delta = path[pathIndex].position - transform.position;
+        Vector3 delta = path[index].position - transform.position;
 
         float arrive = Mathf.Max(speed * Time.deltaTime, 0.1f);
         if (delta.sqrMagnitude < arrive * arrive)
         {
-            if (++pathIndex >= path.Length)
+            if (++index >= path.Length)
             {
                 Move(Vector3.right * speed);
                 return;
             }
 
-            delta = path[pathIndex].position - transform.position;
+            delta = path[index].position - transform.position;
         }
 
         Move(delta.normalized * speed);
@@ -91,11 +89,10 @@ public class Monster : Entity
         health = _health;
         healthText.text = health.ToString();
     }
-    public void SetSpeed(float _speed) => speed = _speed;
     public void SetPath(Transform[] _path)
     {
         path = _path;
-        pathIndex = 0;
+        index = 0;
     }
     #endregion
 }

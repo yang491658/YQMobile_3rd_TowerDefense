@@ -10,14 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
-  m_Name: Tower02_Green
+  m_Name: Tower00_Tower
   m_EditorClassIdentifier: 
-  ID: 2
-  Name: Green
-  Image: {fileID: 21300000, guid: 7c0aaeae5b7d06f45a85e08ccf02e270, type: 3}
-  Color:
-    serializedVersion: 2
-    rgba: 4278255360
+  ID: 0
+  Name: 
+  Image: {fileID: 0}
+  Color: {r: 0, g: 0, b: 0, a: 1}
   Damage: 1
-  Speed: 10
-  Delay: 1

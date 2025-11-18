@@ -53,7 +53,7 @@ public class TestManager : MonoBehaviour
         if (isAuto)
         {
             if (GameManager.Instance?.GetGold() >= EntityManager.Instance?.GetNeedGold())
-                EntityManager.Instance?.SpawnTower();
+                if (EntityManager.Instance?.SpawnTower() == null) MergeTower();
             if (GameManager.Instance.IsGameOver && autoRoutine == null)
                 autoRoutine = StartCoroutine(AutoReplay());
         }
@@ -82,7 +82,7 @@ public class TestManager : MonoBehaviour
         for (int i = 1; i <= 10; i++)
         {
             KeyCode key = (i == 10) ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha0 + i);
-            if (Input.GetKeyDown(key))
+            if (Input.GetKey(key))
             {
                 EntityManager.Instance?.SpawnTower(i, null, false);
                 break;
@@ -95,9 +95,9 @@ public class TestManager : MonoBehaviour
             EntityManager.Instance?.ToggleSpawnMonster(spawn);
         }
 
-        if (Input.GetKeyDown(KeyCode.T))
+        if (Input.GetKey(KeyCode.T))
             EntityManager.Instance?.SpawnTower(0, null, false);
-        if (Input.GetKeyDown(KeyCode.Y))
+        if (Input.GetKey(KeyCode.Y))
             MergeTower();
 
         if (Input.GetKeyDown(KeyCode.Delete))

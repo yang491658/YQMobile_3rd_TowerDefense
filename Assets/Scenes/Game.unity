@@ -6341,9 +6341,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   testCount: 1
-  isAutoPlay: 0
-  isAutoReplay: 0
-  replayTime: 1
+  autoDelay: 1
   bgmPause: 0
   spawn: 1
 --- !u!4 &1407473050
@@ -9379,7 +9377,6 @@ MonoBehaviour:
   bullets: []
   delay: 5
   minDelay: 0.1
-  speed: 3
   path: []
   pathMargin: {x: 0.88, y: 0.68}
   pathNum: 01000000040000000200000003000000040000000100000003000000020000000100000004000000

@@ -3,10 +3,10 @@
 public class Bullet : Entity
 {
     [Header("Battle")]
-    private Monster target;
+    [SerializeField] private Monster target;
     private Vector3 targetPos;
-    private float speed;
-    private int damage;
+    [SerializeField] private int damage;
+    [SerializeField] private float speed = 10f;
 
     protected override void Update()
     {
@@ -37,14 +37,9 @@ public class Bullet : Entity
     #endregion
 
     #region SET
-    public void SetBullet(Transform _symbol)
-    {
-        transform.localScale = _symbol.localScale * 3f;
-        sr.color = _symbol.GetComponent<SpriteRenderer>().color;
-    }
+    public void SetColor(Color _color) => sr.color = _color;
     public void SetTarget(Monster _mon) => target = _mon;
     public void SetDamage(int _damage) => damage = _damage;
-    public void SetSpeed(float _speed) => speed = _speed;
     #endregion
 
     #region GET
