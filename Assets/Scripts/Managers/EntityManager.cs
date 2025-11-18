@@ -43,6 +43,9 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private Vector2 pathMargin = new Vector2(0.88f, 0.68f);
     [SerializeField] private int[] pathNum = { 1, 4, 2, 3, 4, 1, 3, 2, 1, 4 };
 
+    [Header("Tower Settings")]
+    [SerializeField] private int needGold = 0;
+
 #if UNITY_EDITOR
     private void OnValidate()
     {
@@ -198,7 +201,7 @@ public class EntityManager : MonoBehaviour
 
     #region 타워
     public TowerData SearchTower(int _id) => towerDic.TryGetValue(_id, out var _data) ? _data : null;
-    public Tower SpawnTower(int _id = 0, Vector3? _pos = null)
+    public Tower SpawnTower(int _id = 0, Vector3? _pos = null, bool _useGold = true)
     {
         TowerData data = (_id == 0)
             ? towerDatas[Random.Range(0, towerDatas.Length)]
@@ -213,6 +216,14 @@ public class EntityManager : MonoBehaviour
         if (!_pos.HasValue && pos == default)
             return null;
 
+        if (_useGold)
+        {
+            if (GameManager.Instance?.GetGold() < needGold)
+                return null;
+
+            GameManager.Instance?.GoldDown(needGold++);
+        }
+
         Tower tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
             .GetComponent<Tower>();
 
@@ -220,6 +231,14 @@ public class EntityManager : MonoBehaviour
         tower.transform.localScale = map.transform.localScale;
 
         towers.Add(tower);
+        return tower;
+    }
+
+    public Tower MergeTower(Tower _select, Tower _target)
+    {
+        Tower tower = SpawnTower(0, _target.transform.position, false);
+        DespawnTower(_target);
+        DespawnTower(_select);
         return tower;
     }
 
@@ -276,10 +295,11 @@ public class EntityManager : MonoBehaviour
 
     public void ResetEntity()
     {
-        delay = delayBase;
-
         monsters.RemoveAll(m => m == null);
         towers.RemoveAll(t => t == null);
+
+        delay = delayBase;
+        needGold = 0;
     }
 
     public void SetEntity()
@@ -353,5 +373,7 @@ public class EntityManager : MonoBehaviour
 
         return nearest;
     }
+    public List<Tower> GetTowers() => towers;
+    public int GetNeedGold() => needGold;
     #endregion
 }

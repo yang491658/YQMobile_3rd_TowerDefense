@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TestManager : MonoBehaviour
@@ -10,13 +11,13 @@ public class TestManager : MonoBehaviour
     [SerializeField] private int testCount = 1;
     [SerializeField] private bool isAutoPlay = false;
     [SerializeField] private bool isAutoReplay = false;
-    [SerializeField][Min(1f)] private float replayTime = 5f;
+    [SerializeField][Min(1f)] private float replayTime = 1f;
     private Coroutine replayRoutine;
 
     [Header("Sound Test")]
     [SerializeField] private bool bgmPause = false;
 
-    [Header("Entity  Test")]
+    [Header("Entity Test")]
     [SerializeField] private bool spawn = true;
 
     private void Awake()
@@ -45,8 +46,8 @@ public class TestManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.O))
         {
+            isAutoPlay = !isAutoPlay;
             isAutoReplay = !isAutoReplay;
-            AutoPlay();
         }
         if (isAutoReplay && GameManager.Instance.IsGameOver && replayRoutine == null)
             replayRoutine = StartCoroutine(AutoReplay());
@@ -77,7 +78,7 @@ public class TestManager : MonoBehaviour
             KeyCode key = (i == 10) ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha0 + i);
             if (Input.GetKeyDown(key))
             {
-                EntityManager.Instance?.SpawnTower(i);
+                EntityManager.Instance?.SpawnTower(i, null, false);
                 break;
             }
         }
@@ -87,8 +88,15 @@ public class TestManager : MonoBehaviour
             spawn = !spawn;
             EntityManager.Instance?.ToggleSpawnMonster(spawn);
         }
+
         if (Input.GetKeyDown(KeyCode.T))
             EntityManager.Instance?.SpawnTower();
+        if (isAutoPlay)
+            if (GameManager.Instance?.GetGold() >= EntityManager.Instance?.GetNeedGold())
+                EntityManager.Instance?.SpawnTower();
+        if (Input.GetKeyDown(KeyCode.Y))
+            MergeTower();
+
         if (Input.GetKeyDown(KeyCode.Delete))
             EntityManager.Instance?.DespawnAll();
         #endregion
@@ -103,18 +111,6 @@ public class TestManager : MonoBehaviour
         #endregion
     }
 
-    private void AutoPlay()
-    {
-        if (!isAutoPlay)
-        {
-            isAutoPlay = true;
-        }
-        else
-        {
-            isAutoPlay = false;
-        }
-    }
-
     private IEnumerator AutoReplay()
     {
         yield return new WaitForSecondsRealtime(replayTime);
@@ -125,5 +121,39 @@ public class TestManager : MonoBehaviour
         }
         replayRoutine = null;
     }
+
+    private void MergeTower()
+    {
+        List<Tower> towers = EntityManager.Instance.GetTowers();
+        int len = towers.Count;
+        if (len < 2) return;
+
+        int start = Random.Range(0, len);
+
+        for (int n = 0; n < len; n++)
+        {
+            int i = (start + n) % len;
+            Tower a = towers[i];
+
+            if (a.IsMax()) continue;
+
+            int id = a.GetID();
+            int rank = a.GetRank();
+
+            for (int j = 0; j < len; j++)
+            {
+                if (i == j) continue;
+
+                Tower b = towers[j];
+
+                if (b.GetID() == id && b.GetRank() == rank)
+                {
+                    EntityManager.Instance.MergeTower(a, b).SetRank(rank + 1);
+                    return;
+                }
+            }
+        }
+    }
+
 }
 #endif

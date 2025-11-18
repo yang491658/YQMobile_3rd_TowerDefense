@@ -303,11 +303,7 @@ public class HandleManager : MonoBehaviour
         }
 
         if (canMerge)
-        {
-            EntityManager.Instance?.SpawnTower(0, target.transform.position).SetRank(target.GetRank() + 1);
-            EntityManager.Instance?.DespawnTower(target);
-            EntityManager.Instance?.DespawnTower(select);
-        }
+            EntityManager.Instance?.MergeTower(select, target).SetRank(target.GetRank() + 1);
         else
             select.transform.position = dragStart + offset;
 

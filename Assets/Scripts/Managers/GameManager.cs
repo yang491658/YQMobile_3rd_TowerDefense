@@ -18,6 +18,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int score = 0;
     public event System.Action<int> OnChangeScore;
 
+    [Header("Gold")]
+    [SerializeField] private int gold = 0;
+    public event System.Action<int> OnChangeGold;
+
     public bool IsPaused { private set; get; } = false;
     public bool IsGameOver { private set; get; } = false;
 
@@ -61,6 +65,7 @@ public class GameManager : MonoBehaviour
         Pause(false);
         IsGameOver = false;
         ResetScore();
+        ResetGold();
 
         SoundManager.Instance?.PlayBGM("Default");
 
@@ -68,7 +73,7 @@ public class GameManager : MonoBehaviour
         EntityManager.Instance?.SetEntity();
         EntityManager.Instance?.ToggleSpawnMonster(true);
 
-        UIManager.Instance?.ResetPlayTime();
+        UIManager.Instance?.ResetUI();
         UIManager.Instance?.OpenUI(false);
     }
 
@@ -83,6 +88,28 @@ public class GameManager : MonoBehaviour
     {
         score = 0;
         OnChangeScore?.Invoke(score);
+    }
+    #endregion
+
+    #region 골드
+    public void GoldUp(int _gold = 1)
+    {
+        gold += _gold;
+        OnChangeGold?.Invoke(gold);
+    }
+
+    public void GoldDown(int _gold )
+    {
+        if (gold < _gold) return;
+
+        gold -= _gold;
+        OnChangeGold?.Invoke(gold);
+    }
+
+    public void ResetGold()
+    {
+        gold = 0;
+        OnChangeGold?.Invoke(gold);
     }
     #endregion
 
@@ -150,5 +177,6 @@ public class GameManager : MonoBehaviour
     public float GetMinSpeed() => minSpeed;
     public float GetMaxSpeed() => maxSpeed;
     public int GetScore() => score;
+    public int GetGold() => gold;
     #endregion
 }

@@ -2,6 +2,8 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using NUnit;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -18,6 +20,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI playTimeText;
     private float playTime = 0f;
     [SerializeField] private TextMeshProUGUI scoreNum;
+    [SerializeField] private Button goldbtn;
+    [SerializeField] private TextMeshProUGUI goldText;
 
     [Header("Setting UI")]
     [SerializeField] private GameObject settingUI;
@@ -50,6 +54,10 @@ public class UIManager : MonoBehaviour
             playTimeText = GameObject.Find("InGameUI/Score/PlayTimeText")?.GetComponent<TextMeshProUGUI>();
         if (scoreNum == null)
             scoreNum = GameObject.Find("InGameUI/Score/ScoreNum")?.GetComponent<TextMeshProUGUI>();
+        if (goldbtn == null)
+            goldbtn = GameObject.Find("InGameUI/GoldBtn")?.GetComponent<Button>();
+        if (goldText == null)
+            goldText = GameObject.Find("InGameUI/GoldBtn/GoldText")?.GetComponent<TextMeshProUGUI>();
 
         if (settingUI == null)
             settingUI = GameObject.Find("SettingUI");
@@ -121,6 +129,7 @@ public class UIManager : MonoBehaviour
     private void Start()
     {
         UpdateScore(GameManager.Instance.GetScore());
+        UpdateGold(GameManager.Instance.GetGold());
     }
 
     private void Update()
@@ -134,6 +143,7 @@ public class UIManager : MonoBehaviour
     private void OnEnable()
     {
         GameManager.Instance.OnChangeScore += UpdateScore;
+        GameManager.Instance.OnChangeGold += UpdateGold;
         speedSlider.minValue = GameManager.Instance.GetMinSpeed();
         speedSlider.maxValue = GameManager.Instance.GetMaxSpeed();
         speedSlider.wholeNumbers = false;
@@ -153,6 +163,7 @@ public class UIManager : MonoBehaviour
     private void OnDisable()
     {
         GameManager.Instance.OnChangeScore -= UpdateScore;
+        GameManager.Instance.OnChangeGold -= UpdateGold;
         speedSlider.onValueChanged.RemoveListener(GameManager.Instance.SetSpeed);
 
         SoundManager.Instance.OnChangeVolume -= UpdateVolume;
@@ -214,7 +225,11 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region 업데이트
-    public void ResetPlayTime() => playTime = 0;
+    public void ResetUI()
+    {
+        playTime = 0;
+        UpdateGold(GameManager.Instance.GetGold());
+    }
 
     public void UpdatePlayTime()
     {
@@ -229,6 +244,12 @@ public class UIManager : MonoBehaviour
         scoreNum.text = s;
         settingScoreNum.text = s;
         resultScoreNum.text = s;
+    }
+
+    public void UpdateGold(int _gold)
+    {
+        goldText.text = _gold.ToString();
+        goldbtn.interactable = _gold >= EntityManager.Instance?.GetNeedGold();
     }
 
     public void UpdateVolume(SoundType _type, float _volume)
@@ -269,9 +290,10 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region 버튼
-    public void OnClickClose() => OpenUI(false);
     public void OnClickSetting() => OpenSetting(true);
+    public void OnClickGold() => EntityManager.Instance?.SpawnTower();
 
+    public void OnClickClose() => OpenUI(false);
     public void OnClickSpeed()
     {
         if (speedSlider.value != 1f)
