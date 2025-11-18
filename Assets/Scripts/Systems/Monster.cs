@@ -6,15 +6,15 @@ public class Monster : Entity
     private static int sorting = 0;
 
     [Header("Health")]
-    [SerializeField] private int health;
-    [SerializeField] private TextMeshProUGUI healthText;
+    private int health;
+    private TextMeshProUGUI healthText;
 
     [Header("Speed")]
-    [SerializeField] private float speed;
+    private float speed;
 
     [Header("Path")]
-    [SerializeField] private Transform[] path;
-    [SerializeField] private int pathIndex;
+    private Transform[] path;
+    private int pathIndex;
 
     protected override void Awake()
     {
@@ -32,7 +32,8 @@ public class Monster : Entity
         base.Start();
 
         pathIndex = 0;
-        healthText.text = health.ToString();
+
+        SetHealth(health);
     }
 
     protected override void Update()
@@ -72,11 +73,20 @@ public class Monster : Entity
         EntityManager.Instance?.DespawnMonster(this);
     }
 
+    #region 전투
     public void TakeDamage(int _damage)
     {
-        health -= _damage;
-        healthText.text = health.ToString();
+        SetHealth(health - _damage);
+
+        if (health <= 0)
+            Die();
     }
+
+    public void Die()
+    {
+        EntityManager.Instance?.DespawnMonster(this);
+    }
+    #endregion
 
     #region SET
     public void SetHealth(int _health)

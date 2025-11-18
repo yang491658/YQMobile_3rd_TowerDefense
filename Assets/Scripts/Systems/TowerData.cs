@@ -14,6 +14,10 @@ public class TowerData : ScriptableObject
     public Sprite Image;
     public Color32 Color;
 
+    [Header("Battle")]
+    public int damage = 1;
+    public float AttackSpeed = 1f;
+
 #if UNITY_EDITOR
     private void OnValidate()
     {
@@ -63,6 +67,8 @@ public class TowerData : ScriptableObject
         clone.Name = this.Name;
         clone.Image = this.Image;
         clone.Color = this.Color;
+        clone.damage = this.damage;
+        clone.AttackSpeed = this.AttackSpeed;
 
         return clone;
     }

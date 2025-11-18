@@ -8984,6 +8984,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   monsterBase: {fileID: 0}
   towerBase: {fileID: 0}
+  bulletBase: {fileID: 0}
   towerDatas: []
   inGame: {fileID: 0}
   map: {fileID: 0}

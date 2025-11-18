@@ -1,47 +1,46 @@
 ﻿using UnityEngine;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 public class Tower : Entity
 {
     [Header("Default")]
-    [SerializeField] private TowerData data;
-    [SerializeField] private Transform outLine;
+    private TowerData data;
+    private Transform outLine;
 
     [Header("Rank")]
-    [SerializeField] private Transform symbol;
-    [SerializeField] private int rank = 1;
-    [SerializeField] private int maxRank = 7;
+    private Transform symbol;
+    private int rank = 1;
+    private int maxRank = 7;
     private bool isMax = false;
 
     [Header("Battle")]
-    [SerializeField] private Monster target;
-    [SerializeField] private Bullet bullet;
+    private Monster target;
+    private int attackDamage;
+    private float attackSpeed = 1f;
+    private float attackTimer;
 
-#if UNITY_EDITOR
-    private void OnValidate()
+    protected override void Awake()
     {
+        base.Awake();
+
         if (outLine == null) outLine = transform.Find("OutLine");
-
         if (symbol == null) symbol = transform.Find("Symbol");
-
-        if (bullet == null)
-            bullet = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Bullet.prefab")?.GetComponent<Bullet>();
     }
-#endif
 
-    public void Attack(Monster _monster) { }
+    protected override void Update()
+    {
+        base.Update();
 
+        Attack();
+    }
+
+    #region 랭크
     public void RankUp(int _amount = 1)
     {
         rank = Mathf.Clamp(rank + _amount, 1, maxRank);
-        UpdateSymbols();
+        UpdateRank();
     }
 
-    #region 심볼
-    private void UpdateSymbols()
+    private void UpdateRank()
     {
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
@@ -106,6 +105,25 @@ public class Tower : Entity
     }
     #endregion
 
+    #region 전투
+    public void Attack()
+    {
+        if (attackSpeed <= 0f) return;
+
+        attackTimer += Time.deltaTime;
+        float interval = 1f / attackSpeed;
+        if (attackTimer < interval) return;
+
+        Monster nearest = EntityManager.Instance?.GetMonster(transform.position);
+        if (nearest == null) return;
+
+        target = nearest;
+        attackTimer = 0f;
+
+        EntityManager.Instance?.SpawnBullet(this);
+    }
+    #endregion
+
     #region SET
     public void IsDragging(bool _on)
     {
@@ -114,10 +132,10 @@ public class Tower : Entity
         symbol.GetComponent<SpriteRenderer>().sortingOrder = !_on ? 2 : 1002;
     }
 
-    public virtual void SetRank(int _rank)
+    public void SetRank(int _rank)
     {
         rank = Mathf.Clamp(_rank, 1, maxRank);
-        UpdateSymbols();
+        UpdateRank();
     }
 
     public virtual void SetData(TowerData _data)
@@ -130,13 +148,21 @@ public class Tower : Entity
         outLine.GetComponent<SpriteRenderer>().color = data.Color;
         symbol.GetComponent<SpriteRenderer>().color = data.Color;
 
-        UpdateSymbols();
+        attackDamage = data.damage;
+        attackSpeed = data.AttackSpeed;
+
+        UpdateRank();
     }
     #endregion
 
     #region GET
     public int GetID() => data.ID;
+
+    public Transform GetSymbol() => symbol;
     public int GetRank() => rank;
     public bool IsMax() => isMax;
+
+    public Monster GetTarget() => target;
+    public int GetAttackDamage() => attackDamage;
     #endregion
 }

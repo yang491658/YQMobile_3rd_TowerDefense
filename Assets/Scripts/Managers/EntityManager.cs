@@ -15,6 +15,8 @@ public class EntityManager : MonoBehaviour
     [Header("Data Setting")]
     [SerializeField] private GameObject monsterBase;
     [SerializeField] private GameObject towerBase;
+    [SerializeField] private GameObject bulletBase;
+
     [SerializeField] private TowerData[] towerDatas;
     private readonly Dictionary<int, TowerData> towerDic = new Dictionary<int, TowerData>();
 
@@ -27,6 +29,8 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private List<Monster> monsters = new List<Monster>();
     [SerializeField] private Transform towerTrans;
     [SerializeField] private List<Tower> towers = new List<Tower>();
+    [SerializeField] private Transform bulletTrans;
+    [SerializeField] private List<Bullet> bullets = new List<Bullet>();
 
     [Header("Monster Settings")]
     [SerializeField][Min(0.1f)] private float delay = 3f;
@@ -46,6 +50,8 @@ public class EntityManager : MonoBehaviour
             monsterBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Monster.prefab");
         if (towerBase == null)
             towerBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Tower.prefab");
+        if (bulletBase == null)
+            bulletBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Bullet.prefab");
 
         string[] guids = AssetDatabase.FindAssets("t:TowerData", new[] { "Assets/Scripts/ScriptableObjects" });
         var tlist = new List<TowerData>(guids.Length);
@@ -224,12 +230,36 @@ public class EntityManager : MonoBehaviour
     }
     #endregion
 
+    #region 불릿
+    public Bullet SpawnBullet(Tower _tower)
+    {
+        Bullet bullet = Instantiate(bulletBase, _tower.transform.position, Quaternion.identity, bulletTrans)
+            .GetComponent<Bullet>();
+
+        bullet.SetBullet(_tower.GetSymbol());
+        bullet.SetTarget(_tower.GetTarget());
+        bullet.SetDamage(_tower.GetAttackDamage());
+
+        bullets.Add(bullet);
+
+        return bullet;
+    }
+
+    public void DespawnBullet(Bullet _bullet)
+    {
+        bullets.Remove(_bullet);
+        Destroy(_bullet.gameObject);
+    }
+    #endregion
+
     public void DespawnAll()
     {
         for (int i = monsters.Count - 1; i >= 0; i--)
             DespawnMonster(monsters[i]);
         for (int i = towers.Count - 1; i >= 0; i--)
             DespawnTower(towers[i]);
+        for (int i = bullets.Count - 1; i >= 0; i--)
+            DespawnBullet(bullets[i]);
     }
 
     #region SET
@@ -262,6 +292,7 @@ public class EntityManager : MonoBehaviour
         if (mapRoad == null) mapRoad = GameObject.Find("Road")?.transform;
         if (monsterTrans == null) monsterTrans = GameObject.Find("InGame/Monsters")?.transform;
         if (towerTrans == null) towerTrans = GameObject.Find("InGame/Towers")?.transform;
+        if (bulletTrans == null) bulletTrans = GameObject.Find("InGame/Bullets")?.transform;
 
         SetMap(out float _halfX, out float _halfY);
         SetPath(_halfX, _halfY);
@@ -296,5 +327,31 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region GET
+    public Monster GetMonster(Vector3? _pos = null)
+    {
+        if (monsters.Count == 0) return null;
+
+        if (!_pos.HasValue)
+            return monsters[Random.Range(0, monsters.Count)];
+
+        Vector3 pos = _pos.Value;
+
+        Monster nearest = monsters[0];
+        float minSqr = (nearest.transform.position - pos).sqrMagnitude;
+
+        for (int i = 1; i < monsters.Count; i++)
+        {
+            Monster monster = monsters[i];
+            Vector3 delta = monster.transform.position - pos;
+            float sqr = delta.sqrMagnitude;
+            if (sqr < minSqr)
+            {
+                minSqr = sqr;
+                nearest = monster;
+            }
+        }
+
+        return nearest;
+    }
     #endregion
 }
