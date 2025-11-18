@@ -33,7 +33,7 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private List<Bullet> bullets = new List<Bullet>();
 
     [Header("Monster Settings")]
-    [SerializeField][Min(0.1f)] private float delay = 3f;
+    [SerializeField][Min(0.1f)] private float delay = 5f;
     [SerializeField][Min(0.1f)] private float minDelay = 0.1f;
     private float delayBase;
     private Coroutine spawnRoutine;

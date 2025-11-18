@@ -111,13 +111,15 @@ public class Tower : Entity
         if (attackSpeed <= 0f) return;
 
         attackTimer += Time.deltaTime;
-        float interval = 1f / attackSpeed;
-        if (attackTimer < interval) return;
+        if (attackTimer < 1f / attackSpeed) return;
 
-        Monster nearest = EntityManager.Instance?.GetMonster(transform.position);
-        if (nearest == null) return;
+        if (target == null)
+        {
+            Monster nearest = EntityManager.Instance?.GetMonster(transform.position);
+            if (nearest == null) return;
 
-        target = nearest;
+            target = nearest;
+        }
         attackTimer = 0f;
 
         EntityManager.Instance?.SpawnBullet(this);

@@ -18,5 +18,5 @@ MonoBehaviour:
   Color:
     serializedVersion: 2
     rgba: 4294901760
-  AttackDamage: 1
+  damage: 1
   AttackSpeed: 1
