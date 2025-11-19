@@ -71,6 +71,7 @@ public class GameManager : MonoBehaviour
         EntityManager.Instance?.ResetEntity();
         EntityManager.Instance?.SetEntity();
         EntityManager.Instance?.ToggleSpawnMonster(true);
+        EntityManager.Instance?.SpawnTower(0, Vector3.up);
 
         UIManager.Instance?.ResetUI();
         UIManager.Instance?.OpenUI(false);

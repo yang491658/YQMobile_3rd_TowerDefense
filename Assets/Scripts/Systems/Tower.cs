@@ -109,7 +109,7 @@ public class Tower : Entity
 
         if (target == null)
         {
-            Monster nearest = EntityManager.Instance?.GetMonster(transform.position);
+            Monster nearest = EntityManager.Instance?.GetMonster(0);
             if (nearest == null) return;
 
             target = nearest;

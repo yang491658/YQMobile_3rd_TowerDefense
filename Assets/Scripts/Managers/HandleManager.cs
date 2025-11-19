@@ -281,6 +281,14 @@ public class HandleManager : MonoBehaviour
 
     private void OnDragEnd(Vector3 _start, Vector3 _end)
     {
+        if (EntityManager.Instance.IsSell(_end))
+        {
+            EntityManager.Instance?.SellTower(select);
+
+            select = null;
+            return;
+        }
+
         Collider2D[] hits = Physics2D.OverlapPointAll(_end, layer);
 
         Tower target = null;
@@ -321,7 +329,7 @@ public class HandleManager : MonoBehaviour
         Tower tower = hit.GetComponent<Tower>();
         if (tower == null) return;
 
-        tower.RankUp();
+        EntityManager.Instance?.SellTower(tower);
     }
 
     private void OnMiddleClick(Vector3 _pos)
@@ -334,7 +342,7 @@ public class HandleManager : MonoBehaviour
         Tower tower = hit.GetComponent<Tower>();
         if (tower == null) return;
 
-        EntityManager.Instance?.DespawnTower(tower);
+        tower.RankUp();
     }
 
     private void AddClick(Vector3 _pos, Color _color)

@@ -22,13 +22,16 @@ public class EntityManager : MonoBehaviour
 
     [Header("Entities Settings")]
     [SerializeField] private Transform inGame;
-    [SerializeField] private Transform map;
-    [SerializeField] private Transform mapTile;
-    [SerializeField] private Transform mapRoad;
     [SerializeField] private Transform monsterTrans;
     [SerializeField] private List<Monster> monsters = new List<Monster>();
     [SerializeField] private Transform towerTrans;
     [SerializeField] private List<Tower> towers = new List<Tower>();
+
+    [Header("Entities Settings")]
+    [SerializeField] private Transform map;
+    [SerializeField] private Transform mapTile;
+    [SerializeField] private Transform mapRoad;
+    [SerializeField] private Transform mapSell;
 
     [Header("Monster Settings")]
     [SerializeField][Min(0.1f)] private float delay = 5f;
@@ -284,6 +287,12 @@ public class EntityManager : MonoBehaviour
         return merge;
     }
 
+    public void SellTower(Tower _tower)
+    {
+        GameManager.Instance?.GoldUp(_tower.GetRank());
+        DespawnTower(_tower);
+    }
+
     public void DespawnTower(Tower _tower)
     {
         towers.Remove(_tower);
@@ -328,6 +337,7 @@ public class EntityManager : MonoBehaviour
         if (map == null) map = GameObject.Find("Map")?.transform;
         if (mapTile == null) mapTile = GameObject.Find("Tile")?.transform;
         if (mapRoad == null) mapRoad = GameObject.Find("Road")?.transform;
+        if (mapSell == null) mapSell = GameObject.Find("Sell")?.transform;
         if (monsterTrans == null) monsterTrans = GameObject.Find("InGame/Monsters")?.transform;
         if (towerTrans == null) towerTrans = GameObject.Find("InGame/Towers")?.transform;
 
@@ -351,6 +361,7 @@ public class EntityManager : MonoBehaviour
         float yScale = (_halfY * 2f) / Mathf.Abs(world.y * 2f);
 
         Vector3 scale = new Vector3(xScale, yScale, (xScale + yScale) / 2f);
+        Debug.Log(scale);
         if (scale.magnitude > 0f) map.localScale = scale;
     }
 
@@ -364,22 +375,36 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region GET
-    public Monster GetMonster(Vector3? _pos = null)
+    public bool IsSell(Vector3 _pos)
+    {
+        Tilemap tilemap = mapSell.GetComponent<Tilemap>();
+        if (tilemap == null) return false;
+
+        Vector3Int cell = tilemap.WorldToCell(_pos);
+        return tilemap.HasTile(cell);
+    }
+
+    public Monster GetMonster()
+    {
+        if (monsters.Count == 0) return null;
+        return monsters[Random.Range(0, monsters.Count)];
+    }
+    public Monster GetMonster(int _index)
+    {
+        if (monsters.Count == 0) return null;
+        return monsters[_index];
+    }
+    public Monster GetMonster(Vector3 _pos )
     {
         if (monsters.Count == 0) return null;
 
-        if (!_pos.HasValue)
-            return monsters[Random.Range(0, monsters.Count)];
-
-        Vector3 pos = _pos.Value;
-
         Monster nearest = monsters[0];
-        float minSqr = (nearest.transform.position - pos).sqrMagnitude;
+        float minSqr = (nearest.transform.position - _pos).sqrMagnitude;
 
         for (int i = 1; i < monsters.Count; i++)
         {
             Monster monster = monsters[i];
-            Vector3 delta = monster.transform.position - pos;
+            Vector3 delta = monster.transform.position - _pos;
             float sqr = delta.sqrMagnitude;
             if (sqr < minSqr)
             {
@@ -390,8 +415,43 @@ public class EntityManager : MonoBehaviour
 
         return nearest;
     }
+
+    public Tower GetTower()
+    {
+        if (towers.Count == 0) return null;
+
+        return towers[Random.Range(0, towers.Count)];
+    }
+    public Tower GetTower(int _index)
+    {
+        if (towers.Count == 0) return null;
+
+        return towers[_index];
+    }
+    public Tower GetTower(Vector3 _pos)
+    {
+        if (towers.Count == 0) return null;
+
+        Tower nearest = towers[0];
+        float minSqr = (nearest.transform.position - _pos).sqrMagnitude;
+
+        for (int i = 1; i < towers.Count; i++)
+        {
+            Tower tower = towers[i];
+            Vector3 delta = tower.transform.position - _pos;
+            float sqr = delta.sqrMagnitude;
+            if (sqr < minSqr)
+            {
+                minSqr = sqr;
+                nearest = tower;
+            }
+        }
+
+        return nearest;
+    }
     public List<Tower> GetTowers() => towers;
     public GameObject GetBulletBase() => bulletBase;
+
     public int GetNeedGold() => needGold;
     #endregion
 }
