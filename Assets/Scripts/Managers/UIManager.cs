@@ -276,7 +276,10 @@ public class UIManager : MonoBehaviour
             {
                 float value = _gold / unit;
                 value = Mathf.Floor(value * 100f) / 100f;
-                return value.ToString("0.00") + units[i - 1];
+                if (value < 10f)
+                    return value.ToString("0.00") + units[i - 1];
+                else
+                    return value.ToString("0.0") + units[i - 1];
             }
         }
 
