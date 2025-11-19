@@ -63,7 +63,7 @@ public class TestManager : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.L))
-            GameManager.Instance?.GoldUp(1000000);
+            GameManager.Instance?.GoldUp(10000);
         #endregion
 
         #region 사운드 테스트
