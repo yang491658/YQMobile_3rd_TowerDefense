@@ -78,7 +78,7 @@ public class Monster : Entity
     public void Die()
     {
         GameManager.Instance?.ScoreUp();
-        //GameManager.Instance?.GoldUp();
+        GameManager.Instance?.GoldUp();
         EntityManager.Instance?.DespawnMonster(this);
     }
     #endregion
