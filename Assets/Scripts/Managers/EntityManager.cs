@@ -361,7 +361,6 @@ public class EntityManager : MonoBehaviour
         float yScale = (_halfY * 2f) / Mathf.Abs(world.y * 2f);
 
         Vector3 scale = new Vector3(xScale, yScale, (xScale + yScale) / 2f);
-        Debug.Log(scale);
         if (scale.magnitude > 0f) map.localScale = scale;
     }
 
