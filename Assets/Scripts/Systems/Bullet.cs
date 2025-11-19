@@ -15,6 +15,20 @@ public class Bullet : Entity
         Chase();
     }
 
+    private void OnTriggerEnter2D(Collider2D _collision)
+    {
+        if (target != null)
+        {
+            if (target.gameObject == _collision.gameObject)
+            {
+                target.TakeDamage(attackDamage);
+
+                Destroy(gameObject);
+                return;
+            }
+        }
+    }
+
     #region 전투
     public virtual void Chase()
     {
@@ -23,13 +37,13 @@ public class Bullet : Entity
 
         Vector3 toTarget = targetPos - transform.position;
 
-        if (toTarget.sqrMagnitude < 0.01f)
+        if (target == null)
         {
-            if (target != null)
-                target.TakeDamage(attackDamage);
-
-            Destroy(gameObject);
-            return;
+            if (toTarget.sqrMagnitude < 0.01f)
+            {
+                Destroy(gameObject);
+                return;
+            }
         }
 
         Move(toTarget.normalized * moveSpeed);
