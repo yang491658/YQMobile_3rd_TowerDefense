@@ -5,15 +5,16 @@ public class Monster : Entity
 {
     private static int sorting = 0;
 
-    [Header("Health")]
-    [SerializeField] private int health = 5;
-    private TextMeshProUGUI healthText;
-
-    [Header("Battle")]
+    [Header("Path")]
     [SerializeField] private float moveSpeed = 3f;
     private Transform[] paths;
     private int pathIndex;
+
+    [Header("Battle")]
+    [SerializeField] private int health = 5;
+    private TextMeshProUGUI healthText;
     [SerializeField] private int dropGold = 1;
+
 
     protected override void Awake()
     {
@@ -30,9 +31,7 @@ public class Monster : Entity
     {
         base.Start();
 
-        pathIndex = 0;
-
-        SetHealth(health);
+        SetMonster(1 + GameManager.Instance.GetScore() / 100);
     }
 
     protected override void Update()
@@ -88,7 +87,9 @@ public class Monster : Entity
     public void SetMonster(int _set)
     {
         SetHealth(health * _set);
-        dropGold = dropGold * _set;
+
+        pathIndex = 0;
+        dropGold *= _set;
     }
 
     public void SetHealth(int _health)

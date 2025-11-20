@@ -29,9 +29,10 @@ public class TestManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    private void Start() // 임시
+    private void Start()
     {
         isAuto = true;
+
         GameManager.Instance?.SetSpeed(GameManager.Instance.GetMaxSpeed());
         SoundManager.Instance?.ToggleBGM();
     }

@@ -329,7 +329,7 @@ public class HandleManager : MonoBehaviour
         Tower tower = hit.GetComponent<Tower>();
         if (tower == null) return;
 
-        EntityManager.Instance?.SellTower(tower);
+        tower.RankUp();
     }
 
     private void OnMiddleClick(Vector3 _pos)
@@ -342,7 +342,7 @@ public class HandleManager : MonoBehaviour
         Tower tower = hit.GetComponent<Tower>();
         if (tower == null) return;
 
-        tower.RankUp();
+        EntityManager.Instance?.SellTower(tower);
     }
 
     private void AddClick(Vector3 _pos, Color _color)

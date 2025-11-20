@@ -35,7 +35,7 @@ public class EntityManager : MonoBehaviour
 
     [Header("Monster Settings")]
     [SerializeField][Min(0.1f)] private float delay = 5f;
-    [SerializeField][Min(0.1f)] private float minDelay = 0.1f;
+    [SerializeField][Min(0.1f)] private float minDelay = 0.3f;
     private float delayBase;
     private Coroutine spawnRoutine;
 
@@ -147,10 +147,8 @@ public class EntityManager : MonoBehaviour
 
             if (timer > delay)
             {
-                Monster monster = SpawnMonster(monsterPath[0].position + Vector3.left);
-
-                monster.SetMonster(1 + GameManager.Instance.GetScore() / 100);
-                monster.SetPath(monsterPath);
+                SpawnMonster(monsterPath[0].position + Vector3.left)
+                    .SetPath(monsterPath);
 
                 timer = 0f;
                 yield return new WaitForSeconds(0.01f);
@@ -320,6 +318,8 @@ public class EntityManager : MonoBehaviour
         }
     }
 
+    public void SetDelay(float _delay) => delay = _delay;
+
     public void ResetEntity()
     {
         monsters.RemoveAll(m => m == null);
@@ -449,8 +449,8 @@ public class EntityManager : MonoBehaviour
         return nearest;
     }
     public List<Tower> GetTowers() => towers;
-    public GameObject GetBulletBase() => bulletBase;
-
     public int GetNeedGold() => needGold;
+
+    public GameObject GetBulletBase() => bulletBase;
     #endregion
 }

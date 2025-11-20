@@ -6,7 +6,6 @@ public class Bullet : Entity
     [SerializeField] private Monster target;
     private Vector3 targetPos;
     [SerializeField] private float moveSpeed = 10f;
-
     [SerializeField] private int attackDamage;
 
     protected override void Update()
@@ -18,37 +17,40 @@ public class Bullet : Entity
 
     private void OnTriggerEnter2D(Collider2D _collision)
     {
-        if (target != null)
+        if (target != null && target.gameObject == _collision.gameObject)
         {
-            if (target.gameObject == _collision.gameObject)
-            {
-                target.TakeDamage(attackDamage);
+            target.TakeDamage(attackDamage);
 
-                Destroy(gameObject);
-                return;
-            }
+            Destroy(gameObject);
+            return;
         }
+    }
+
+    private void OnBecameInvisible()
+    {
+        Destroy(gameObject);
     }
 
     #region 전투
     public virtual void Chase()
     {
+        Vector3 prevPos = transform.position;
+
         if (target != null)
             targetPos = target.transform.position;
 
-        Vector3 toTarget = targetPos - transform.position;
+        Vector3 toBefore = targetPos - prevPos;
+        Vector3 dir = toBefore.normalized;
 
-        if (target == null)
-        {
-            if (toTarget.sqrMagnitude < 0.01f)
-            {
-                Destroy(gameObject);
-                return;
-            }
-        }
+        Move(dir * moveSpeed);
 
-        Move(toTarget.normalized * moveSpeed);
+        Vector3 toAfter = targetPos - transform.position;
+
+        if (toBefore != Vector3.zero && Vector3.Dot(toBefore, toAfter) < 0.1f)
+            Destroy(gameObject);
     }
+
+
     #endregion
 
     #region SET
@@ -64,6 +66,7 @@ public class Bullet : Entity
 
         sr.color = _tower.GetColor();
         target = _tower.GetTarget();
+        targetPos = target.transform.position;
         attackDamage = _tower.GetDamage();
     }
     #endregion

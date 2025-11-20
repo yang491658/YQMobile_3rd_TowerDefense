@@ -2,7 +2,7 @@
 
 public class Tower : Entity
 {
-    [Header("Default")]
+    [Header("Data")]
     [SerializeField] private TowerData data;
     [SerializeField] private Transform outLine;
 
