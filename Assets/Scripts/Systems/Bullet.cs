@@ -34,12 +34,10 @@ public class Bullet : Entity
     #region 전투
     public virtual void Chase()
     {
-        Vector3 prevPos = transform.position;
-
         if (target != null)
             targetPos = target.transform.position;
 
-        Vector3 toBefore = targetPos - prevPos;
+        Vector3 toBefore = targetPos - transform.position;
         Vector3 dir = toBefore.normalized;
 
         Move(dir * moveSpeed);

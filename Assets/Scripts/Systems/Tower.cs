@@ -87,16 +87,16 @@ public class Tower : Entity
 
         Vector2[] grid =
         {
-            Vector3.zero ,
-            new Vector3(    -offset ,   -offset ) ,
-            new Vector3(         0f ,   -offset ) ,
-            new Vector3(    +offset ,   -offset ) ,
-            new Vector3(    -offset ,        0f ) ,
-            new Vector3(         0f ,        0f ) ,
-            new Vector3(    +offset ,        0f ) ,
-            new Vector3(    -offset ,   +offset ) ,
-            new Vector3(         0f ,   +offset ) ,
-            new Vector3(    +offset ,   +offset ) ,
+            Vector2.zero ,
+            new Vector2(    -offset ,   -offset ) ,
+            new Vector2(         0f ,   -offset ) ,
+            new Vector2(    +offset ,   -offset ) ,
+            new Vector2(    -offset ,        0f ) ,
+            new Vector2(         0f ,        0f ) ,
+            new Vector2(    +offset ,        0f ) ,
+            new Vector2(    -offset ,   +offset ) ,
+            new Vector2(         0f ,   +offset ) ,
+            new Vector2(    +offset ,   +offset ) ,
         };
 
         switch (_rank)

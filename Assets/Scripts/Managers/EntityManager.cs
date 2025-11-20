@@ -461,7 +461,6 @@ public class EntityManager : MonoBehaviour
             {
                 hasFirst = true;
                 best = value;
-                candidates.Clear();
                 candidates.Add(entity);
                 continue;
             }
