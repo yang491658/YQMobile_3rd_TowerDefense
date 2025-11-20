@@ -416,4 +416,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   health: 5
+  damageColor: {r: 1, g: 0, b: 0, a: 1}
+  damageDuration: 1
+  damageSpeed: 3
   dropGold: 1

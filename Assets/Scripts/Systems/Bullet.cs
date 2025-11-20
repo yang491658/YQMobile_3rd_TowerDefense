@@ -2,17 +2,20 @@
 
 public class Bullet : Entity
 {
-    [Header("Battle")]
+    [Header("Move")]
     [SerializeField] private Monster target;
     private Vector3 targetPos;
+    [Space]
     [SerializeField] private float moveSpeed = 10f;
+
+    [Header("Battle")]
     [SerializeField] private int attackDamage;
 
     protected override void Update()
     {
         base.Update();
 
-        Chase();
+        UpdateMove();
     }
 
     private void OnTriggerEnter2D(Collider2D _collision)
@@ -31,8 +34,7 @@ public class Bullet : Entity
         Destroy(gameObject);
     }
 
-    #region 전투
-    public virtual void Chase()
+    public virtual void UpdateMove()
     {
         if (target != null)
             targetPos = target.transform.position;
@@ -47,7 +49,6 @@ public class Bullet : Entity
         if (toBefore != Vector3.zero && Vector3.Dot(toBefore, toAfter) < 0.3f)
             Destroy(gameObject);
     }
-    #endregion
 
     #region SET
     public void SetBullet(Tower _tower)

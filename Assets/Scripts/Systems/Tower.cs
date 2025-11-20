@@ -17,6 +17,7 @@ public class Tower : Entity
 
     [Header("Battle")]
     [SerializeField] private Monster target;
+    [Space]
     [SerializeField] private int attackDamage;
     [SerializeField] private float attackSpeed;
     private float attackTimer;

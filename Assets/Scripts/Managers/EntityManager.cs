@@ -12,7 +12,7 @@ public class EntityManager : MonoBehaviour
 {
     public static EntityManager Instance { private set; get; }
 
-    [Header("Data Setting")]
+    [Header("Data")]
     [SerializeField] private GameObject monsterBase;
     [SerializeField] private GameObject towerBase;
     [SerializeField] private GameObject bulletBase;
@@ -20,14 +20,14 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private TowerData[] towerDatas;
     private readonly Dictionary<int, TowerData> towerDic = new Dictionary<int, TowerData>();
 
-    [Header("Entity Settings")]
+    [Header("InGame")]
     [SerializeField] private Transform inGame;
     [SerializeField] private Transform monsterTrans;
     [SerializeField] private List<Monster> monsters = new List<Monster>();
     [SerializeField] private Transform towerTrans;
     [SerializeField] private List<Tower> towers = new List<Tower>();
 
-    [Header("Map Settings")]
+    [Header("Map")]
     [SerializeField] private Transform map;
     [SerializeField] private Transform mapSlot;
     [SerializeField] private Transform mapRoad;
@@ -36,9 +36,9 @@ public class EntityManager : MonoBehaviour
     private Tilemap mapRoadTilemap;
     private Tilemap mapSellTilemap;
 
-    [Header("Monster Settings")]
+    [Header("Monster")]
     [SerializeField][Min(0.1f)] private float delay = 5f;
-    [SerializeField][Min(0.1f)] private float minDelay = 0.1f;
+    [SerializeField][Min(0.1f)] private float minDelay = 0.5f;
     private float delayBase;
     private Coroutine spawnRoutine;
 
@@ -46,7 +46,7 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private Vector2 pathMargin = new Vector2(0.90f, 0.72f);
     [SerializeField] private int[] pathNum = { 1, 4, 2, 3, 4, 1, 3, 2, 1, 4 };
 
-    [Header("Tower Settings")]
+    [Header("Tower")]
     [SerializeField] private int needGold = 0;
 
 #if UNITY_EDITOR

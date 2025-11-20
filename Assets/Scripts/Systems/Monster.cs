@@ -1,25 +1,32 @@
-﻿using TMPro;
+﻿using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class Monster : Entity
 {
     private static int sorting = 0;
 
-    [Header("Path")]
+    [Header("Move")]
     [SerializeField] private float moveSpeed = 3f;
     private Transform[] paths;
     private int pathIndex;
 
     [Header("Battle")]
     [SerializeField] private int health = 5;
+    private Canvas canvas;
     private TextMeshProUGUI healthText;
+    [Space]
+    [SerializeField] private Color damageColor = Color.red;
+    [SerializeField] private float damageDuration = 1f;
+    [SerializeField] private float damageSpeed = 3f;
+    [Space]
     [SerializeField] private int dropGold = 1;
 
     protected override void Awake()
     {
         base.Awake();
 
-        Canvas canvas = GetComponentInChildren<Canvas>();
+        canvas = GetComponentInChildren<Canvas>();
         healthText = GetComponentInChildren<TextMeshProUGUI>();
 
         sr.sortingOrder = sorting;
@@ -37,6 +44,16 @@ public class Monster : Entity
     {
         base.Update();
 
+        UpdateMove();
+    }
+
+    private void OnBecameInvisible()
+    {
+        EntityManager.Instance?.DespawnMonster(this);
+    }
+
+    private void UpdateMove()
+    {
         if (pathIndex >= paths.Length)
         {
             Move(Vector3.right * moveSpeed);
@@ -60,18 +77,43 @@ public class Monster : Entity
         Move(delta.normalized * moveSpeed);
     }
 
-    private void OnBecameInvisible()
-    {
-        EntityManager.Instance?.DespawnMonster(this);
-    }
-
     #region 전투
     public void TakeDamage(int _damage)
     {
         SetHealth(health - _damage);
+        CreateDamage(_damage);
+        if (health <= 0) Die();
+    }
 
-        if (health <= 0)
-            Die();
+    private void CreateDamage(int _damage)
+    {
+        TextMeshProUGUI t = Instantiate(healthText, canvas.transform);
+        t.gameObject.name = "Damage";
+        t.text = _damage.ToString();
+        t.transform.localPosition = healthText.transform.localPosition;
+        StartCoroutine(DamageCoroutine(t));
+    }
+
+    private IEnumerator DamageCoroutine(TextMeshProUGUI _text)
+    {
+        float time = 0f;
+        Vector3 start = _text.transform.localPosition;
+
+        while (time < damageDuration)
+        {
+            time += Time.deltaTime;
+            float t = time / damageDuration;
+
+            _text.transform.localPosition = start + Vector3.up * damageSpeed * time;
+
+            Color c = damageColor;
+            c.a = Mathf.Lerp(1f, 0f, t);
+            _text.color = c;
+
+            yield return null;
+        }
+
+        Destroy(_text.gameObject);
     }
 
     public void Die()
