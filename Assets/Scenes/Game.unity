@@ -3066,12 +3066,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 892690365}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: GameOver
-        m_Mode: 1
+        m_MethodName: GoldUp
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 10000
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -4355,7 +4355,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 1
   minSpeed: 0.5
-  maxSpeed: 2
+  maxSpeed: 3
   score: 0
   gold: 0
 --- !u!4 &892690366
@@ -10127,7 +10127,7 @@ MonoBehaviour:
   mapRoad: {fileID: 0}
   mapSell: {fileID: 0}
   delay: 5
-  minDelay: 0.5
+  minDelay: 0.1
   path: []
   pathMargin: {x: 0.9, y: 0.72}
   pathNum: 01000000040000000200000003000000040000000100000003000000020000000100000004000000

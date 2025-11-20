@@ -5,8 +5,9 @@ public class Bullet : Entity
     [Header("Battle")]
     [SerializeField] private Monster target;
     private Vector3 targetPos;
-    [SerializeField] private int attackDamage;
     [SerializeField] private float moveSpeed = 10f;
+
+    [SerializeField] private int attackDamage;
 
     protected override void Update()
     {

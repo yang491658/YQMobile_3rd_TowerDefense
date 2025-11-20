@@ -35,7 +35,7 @@ public class EntityManager : MonoBehaviour
 
     [Header("Monster Settings")]
     [SerializeField][Min(0.1f)] private float delay = 5f;
-    [SerializeField][Min(0.1f)] private float minDelay = 0.5f;
+    [SerializeField][Min(0.1f)] private float minDelay = 0.1f;
     private float delayBase;
     private Coroutine spawnRoutine;
 
@@ -149,7 +149,7 @@ public class EntityManager : MonoBehaviour
             {
                 Monster monster = SpawnMonster(monsterPath[0].position + Vector3.left);
 
-                monster.SetHealth(5 + GameManager.Instance.GetScore() / 100);
+                monster.SetMonster(1 + GameManager.Instance.GetScore() / 100);
                 monster.SetPath(monsterPath);
 
                 timer = 0f;
@@ -393,7 +393,7 @@ public class EntityManager : MonoBehaviour
         if (monsters.Count == 0) return null;
         return monsters[_index];
     }
-    public Monster GetMonster(Vector3 _pos )
+    public Monster GetMonster(Vector3 _pos)
     {
         if (monsters.Count == 0) return null;
 

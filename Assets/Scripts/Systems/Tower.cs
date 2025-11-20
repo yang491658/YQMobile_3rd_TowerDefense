@@ -140,8 +140,8 @@ public class Tower : Entity
     public void SetRank(int _rank)
     {
         rank = Mathf.Clamp(_rank, 1, maxRank);
-        attackDamage = data.Damage * rank;
-        attackSpeed = 3f / rank;
+        attackDamage = data.AttackDamage * rank;
+        attackSpeed = data.AttackSpeed / rank;
         UpdateRank();
     }
 

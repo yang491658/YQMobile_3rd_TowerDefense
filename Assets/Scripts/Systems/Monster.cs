@@ -6,13 +6,14 @@ public class Monster : Entity
     private static int sorting = 0;
 
     [Header("Health")]
-    [SerializeField] private int health;
+    [SerializeField] private int health = 5;
     private TextMeshProUGUI healthText;
 
-    [Header("Move")]
+    [Header("Battle")]
     [SerializeField] private float moveSpeed = 3f;
-    [SerializeField] private int pathIndex;
-    [SerializeField] private Transform[] paths;
+    private Transform[] paths;
+    private int pathIndex;
+    [SerializeField] private int dropGold = 1;
 
     protected override void Awake()
     {
@@ -78,17 +79,24 @@ public class Monster : Entity
     public void Die()
     {
         GameManager.Instance?.ScoreUp();
-        GameManager.Instance?.GoldUp();
+        GameManager.Instance?.GoldUp(dropGold);
         EntityManager.Instance?.DespawnMonster(this);
     }
     #endregion
 
     #region SET
+    public void SetMonster(int _set)
+    {
+        SetHealth(health * _set);
+        dropGold = dropGold * _set;
+    }
+
     public void SetHealth(int _health)
     {
         health = _health;
         healthText.text = health.ToString();
     }
+
     public void SetPath(Transform[] _path)
     {
         paths = _path;
