@@ -6,6 +6,9 @@ public class Tower : Entity
     [SerializeField] private TowerData data;
     [SerializeField] private Transform outLine;
 
+    private SpriteRenderer outLineSR;
+    private SpriteRenderer symbolSR;
+
     [Header("Rank")]
     [SerializeField] private Transform symbol;
     [SerializeField] private int rank;
@@ -24,6 +27,9 @@ public class Tower : Entity
 
         if (outLine == null) outLine = transform.Find("OutLine");
         if (symbol == null) symbol = transform.Find("Symbol");
+
+        outLineSR = outLine.GetComponent<SpriteRenderer>();
+        symbolSR = symbol.GetComponent<SpriteRenderer>();
     }
 
     protected override void Update()
@@ -133,8 +139,8 @@ public class Tower : Entity
     public void IsDragging(bool _on)
     {
         sr.sortingOrder = !_on ? 0 : 1000;
-        outLine.GetComponent<SpriteRenderer>().sortingOrder = !_on ? 1 : 1001;
-        symbol.GetComponent<SpriteRenderer>().sortingOrder = !_on ? 2 : 1002;
+        outLineSR.sortingOrder = !_on ? 1 : 1001;
+        symbolSR.sortingOrder = !_on ? 2 : 1002;
     }
 
     public void SetRank(int _rank)
@@ -152,8 +158,8 @@ public class Tower : Entity
         gameObject.name = data.Name;
         if (data.Image != null) sr.sprite = data.Image;
 
-        outLine.GetComponent<SpriteRenderer>().color = data.Color;
-        symbol.GetComponent<SpriteRenderer>().color = data.Color;
+        outLineSR.color = data.Color;
+        symbolSR.color = data.Color;
 
         SetRank(1);
     }

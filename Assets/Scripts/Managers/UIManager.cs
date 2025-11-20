@@ -21,6 +21,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button goldbtn;
     [SerializeField] private TextMeshProUGUI currentGoldNum;
     [SerializeField] private TextMeshProUGUI needGoldNum;
+    private static readonly string[] goldUnits = { "K", "M", "B", "T" };
 
     [Header("Setting UI")]
     [SerializeField] private GameObject settingUI;
@@ -43,7 +44,6 @@ public class UIManager : MonoBehaviour
     [Header("Result UI")]
     [SerializeField] private GameObject resultUI;
     [SerializeField] private TextMeshProUGUI resultScoreNum;
-
 #if UNITY_EDITOR
     private void OnValidate()
     {
@@ -267,19 +267,18 @@ public class UIManager : MonoBehaviour
 
     private string FormatGold(int _gold)
     {
-        string[] units = { "K", "M", "B", "T" };
-
-        for (int i = units.Length; i > 0; i--)
+        for (int i = goldUnits.Length; i > 0; i--)
         {
             float unit = Mathf.Pow(1000f, i);
             if (_gold >= unit)
             {
                 float value = _gold / unit;
                 value = Mathf.Floor(value * 100f) / 100f;
+
                 if (value < 10f)
-                    return value.ToString("0.00") + units[i - 1];
+                    return value.ToString("0.00") + goldUnits[i - 1];
                 else
-                    return value.ToString("0.0") + units[i - 1];
+                    return value.ToString("0.0") + goldUnits[i - 1];
             }
         }
 
