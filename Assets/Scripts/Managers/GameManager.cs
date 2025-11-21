@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Life")]
     [SerializeField] private int life = 0;
-    [SerializeField][Min(0)] private int maxLife = 1000;
+    [SerializeField][Min(0)] private int defaultLife = 1000;
     public event System.Action<int> OnChangeLife;
 
     [Header("Gold")]
@@ -168,7 +168,7 @@ public class GameManager : MonoBehaviour
 
     public void ResetLife()
     {
-        life = maxLife;
+        life = defaultLife;
         OnChangeLife?.Invoke(life);
     }
     #endregion
@@ -212,7 +212,7 @@ public class GameManager : MonoBehaviour
     public int GetScore() => score;
 
     public int GetLife() => life;
-    public int GetMaxLife() => maxLife;
+    public int GetMaxLife() => defaultLife;
 
     public int GetGold() => gold;
     #endregion
