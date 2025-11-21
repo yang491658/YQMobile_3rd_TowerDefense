@@ -43,8 +43,8 @@ public class Monster : Entity
     protected override void Update()
     {
         base.Update();
-        
-    if (isDead) return;
+
+        if (isDead) return;
 
         UpdateMove();
     }
@@ -93,7 +93,7 @@ public class Monster : Entity
     private void CreateDamage(int _damage, Color _color)
     {
         TextMeshProUGUI t = Instantiate(healthText, canvas.transform);
-        
+
         t.gameObject.name = "Damage";
         t.transform.localPosition = healthText.transform.localPosition;
         t.text = _damage.ToString();
