@@ -4151,25 +4151,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 834979570}
   m_CullTransparentMesh: 1
---- !u!114 &875030528
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
-  m_Name: Tower
-  m_EditorClassIdentifier: 
-  ID: 1
-  Name: Tower
-  BaseImage: {fileID: 21300000, guid: 4a437629c45d00240b560a584810bae1, type: 3}
-  SymbolImage: {fileID: 21300000, guid: c9268346f2ed937448383b982f7616aa, type: 3}
-  Color: {r: 1, g: 0, b: 0, a: 1}
-  AttackDamage: 1
-  AttackSpeed: 1
 --- !u!1 &877500373
 GameObject:
   m_ObjectHideFlags: 0
@@ -4458,10 +4439,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 1
   minSpeed: 0.5
-  maxSpeed: 3
+  maxSpeed: 10
   score: 0
   life: 0
-  maxLife: 1000
+  defaultLife: 1000
   gold: 0
 --- !u!4 &892690366
 Transform:
@@ -4842,6 +4823,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1044087804}
   m_CullTransparentMesh: 1
+--- !u!114 &1054705958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
+  m_Name: Tower
+  m_EditorClassIdentifier: 
+  ID: 1
+  Name: Tower
+  BaseImage: {fileID: 21300000, guid: 4a437629c45d00240b560a584810bae1, type: 3}
+  SymbolImage: {fileID: 21300000, guid: c9268346f2ed937448383b982f7616aa, type: 3}
+  Color: {r: 1, g: 0, b: 0, a: 1}
+  AttackDamage: 1
+  AttackSpeed: 1
 --- !u!1 &1092585282
 GameObject:
   m_ObjectHideFlags: 0
@@ -6625,7 +6625,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   testCount: 1
-  autoDelay: 1
+  isAuto: 0
+  autoReplay: 1
   bgmPause: 0
   spawn: 1
   rank: 3
@@ -10883,7 +10884,7 @@ MonoBehaviour:
   towerBase: {fileID: 8757814876248671606, guid: cd6b40e57763ae841b4913764f46bea9, type: 3}
   bulletBase: {fileID: 266949680547624416, guid: e50fab4336ffe364a97a106040d6d21d, type: 3}
   towerDatas:
-  - {fileID: 875030528}
+  - {fileID: 1054705958}
   inGame: {fileID: 0}
   monsterTrans: {fileID: 0}
   monsters: []
