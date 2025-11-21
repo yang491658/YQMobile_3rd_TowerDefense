@@ -15,11 +15,11 @@ public class TowerData : ScriptableObject
     public string Name;
     public Sprite BaseImage;
     public Sprite SymbolImage;
-    public Color Color = Color.black;
+    public Color Color = Color.red;
 
     [Header("Battle")]
     public int AttackDamage = 1;
-    public float AttackSpeed = 1;
+    public float AttackSpeed = 1f;
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -86,7 +86,7 @@ public class TowerData : ScriptableObject
             Name = null;
         }
 
-        var symbolSprites = Resources.LoadAll<Sprite>("Images/Towers/Sybol");
+        var symbolSprites = Resources.LoadAll<Sprite>("Images/Towers/Symbol");
         if (ID > 0)
         {
             string prefix = ID.ToString("D2") + ".";

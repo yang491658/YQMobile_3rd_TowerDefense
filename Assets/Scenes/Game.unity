@@ -10649,7 +10649,7 @@ MonoBehaviour:
   mapRoad: {fileID: 0}
   mapSell: {fileID: 0}
   delay: 5
-  minDelay: 0.3
+  minDelay: 0.5
   path: []
   pathMargin: {x: 0.9, y: 0.72}
   pathNum: 01000000040000000200000003000000040000000100000003000000020000000100000004000000

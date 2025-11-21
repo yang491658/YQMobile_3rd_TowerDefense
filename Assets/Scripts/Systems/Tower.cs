@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class Tower : Entity
 {
@@ -21,6 +22,7 @@ public class Tower : Entity
     [SerializeField] private int attackDamage;
     [SerializeField] private float attackSpeed;
     private float attackTimer;
+    [SerializeField] private List<Bullet> bullets = new List<Bullet>();
 
     [Header("Control")]
     private bool isDragging;
@@ -127,7 +129,7 @@ public class Tower : Entity
         }
 
         Shoot();
-        attackTimer = 1f / attackSpeed;
+        attackTimer = 3f / attackSpeed;
     }
 
     public virtual void Shoot()
@@ -137,6 +139,19 @@ public class Tower : Entity
             .GetComponent<Bullet>();
 
         bullet.SetBullet(this);
+    }
+    #endregion
+
+    #region 불릿
+    public void AddBullet(Bullet _bullet) => bullets.Add(_bullet);
+    public void RemoveBullet(Bullet _bullet) => bullets.Remove(_bullet);
+    public void CorrectBullets(Vector3 _delta)
+    {
+        for (int i = 0; i < bullets.Count; i++)
+        {
+            Bullet b = bullets[i];
+            b.transform.position -= _delta;
+        }
     }
     #endregion
 

@@ -9,6 +9,7 @@ public class Bullet : Entity
     [SerializeField] private float moveSpeed = 5f;
 
     [Header("Battle")]
+    private Tower tower;
     [SerializeField] private int attackDamage;
 
     protected override void Update()
@@ -34,6 +35,11 @@ public class Bullet : Entity
         Destroy(gameObject);
     }
 
+    private void OnDestroy()
+    {
+        tower.RemoveBullet(this);
+    }
+
     public virtual void UpdateMove()
     {
         if (target != null)
@@ -53,6 +59,8 @@ public class Bullet : Entity
     #region SET
     public void SetBullet(Tower _tower)
     {
+        tower = _tower;
+
         Vector3 baseScale = transform.localScale;
         Vector3 towerScale = _tower.transform.lossyScale;
         transform.localScale = new Vector3(
@@ -65,6 +73,8 @@ public class Bullet : Entity
         target = _tower.GetTarget();
         targetPos = target.transform.position;
         attackDamage = _tower.GetDamage();
+
+        tower.AddBullet(this);
     }
     #endregion
 

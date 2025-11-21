@@ -10,8 +10,9 @@ public class HandleManager : MonoBehaviour
     private Camera cam => Camera.main;
     private LayerMask layer => LayerMask.GetMask("Tower");
 
-    [Header("Entity")]
+    [Header("Tower")]
     [SerializeField] private Tower select;
+    private Vector3 prevPos;
     private Vector3 offset;
 
     [Header("Click")]
@@ -27,7 +28,7 @@ public class HandleManager : MonoBehaviour
     private Vector3 dragStart;
     private Vector3 dragCurrent;
     private bool isOverUI;
-    
+
     [Header("Slow")]
     [SerializeField] private float slowSpeed = 0.5f;
     private float prevSpeed;
@@ -276,7 +277,8 @@ public class HandleManager : MonoBehaviour
         select = hit.GetComponent<Tower>();
         select.DragOn(true);
 
-        offset = select.transform.position - _pos;
+        prevPos = select.transform.position;
+        offset = prevPos - _pos;
 
         if (!isSlow)
         {
@@ -288,7 +290,12 @@ public class HandleManager : MonoBehaviour
 
     private void OnDragMove(Vector3 _start, Vector3 _current)
     {
-        select.transform.position = _current + offset;
+        Vector3 newPos = _current + offset;
+        Vector3 delta = newPos - prevPos;
+
+        select.transform.position = newPos;
+        select.CorrectBullets(delta);
+        prevPos = newPos;
 
         EntityManager.Instance?.IsSell(_current);
     }
