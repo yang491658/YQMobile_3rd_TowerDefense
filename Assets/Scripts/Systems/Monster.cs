@@ -7,7 +7,7 @@ public class Monster : Entity
     private static int sorting = 0;
 
     [Header("Move")]
-    [SerializeField] private float moveSpeed = 1f;
+    [SerializeField] private float moveSpeed = 3f;
     private Transform[] paths;
     private int pathIndex;
 
@@ -53,6 +53,7 @@ public class Monster : Entity
     {
         if (isDead) return;
 
+        GameManager.Instance?.LifeDown(health);
         EntityManager.Instance?.DespawnMonster(this);
     }
 

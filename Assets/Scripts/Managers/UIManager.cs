@@ -18,6 +18,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI playTimeText;
     private float playTime = 0f;
     [SerializeField] private TextMeshProUGUI scoreNum;
+    [Space]
+    [SerializeField] private TextMeshProUGUI lifeText;
+    [Space]
     [SerializeField] private Button goldbtn;
     [SerializeField] private TextMeshProUGUI currentGoldNum;
     [SerializeField] private TextMeshProUGUI needGoldNum;
@@ -53,6 +56,10 @@ public class UIManager : MonoBehaviour
             playTimeText = GameObject.Find("InGameUI/Score/PlayTimeText")?.GetComponent<TextMeshProUGUI>();
         if (scoreNum == null)
             scoreNum = GameObject.Find("InGameUI/Score/ScoreNum")?.GetComponent<TextMeshProUGUI>();
+
+        if (lifeText == null)
+            lifeText = GameObject.Find("InGameUI/Life/LifeText")?.GetComponent<TextMeshProUGUI>();
+
         if (goldbtn == null)
             goldbtn = GameObject.Find("InGameUI/GoldBtn")?.GetComponent<Button>();
         if (currentGoldNum == null)
@@ -130,6 +137,7 @@ public class UIManager : MonoBehaviour
     private void Start()
     {
         UpdateScore(GameManager.Instance.GetScore());
+        UpdateLife(GameManager.Instance.GetLife());
         UpdateGold(GameManager.Instance.GetGold());
     }
 
@@ -151,6 +159,7 @@ public class UIManager : MonoBehaviour
         speedSlider.onValueChanged.AddListener(GameManager.Instance.SetSpeed);
 
         GameManager.Instance.OnChangeScore += UpdateScore;
+        GameManager.Instance.OnChangeLife += UpdateLife;
         GameManager.Instance.OnChangeGold += UpdateGold;
 
         SoundManager.Instance.OnChangeVolume += UpdateVolume;
@@ -169,6 +178,7 @@ public class UIManager : MonoBehaviour
         speedSlider.onValueChanged.RemoveListener(GameManager.Instance.SetSpeed);
 
         GameManager.Instance.OnChangeScore -= UpdateScore;
+        GameManager.Instance.OnChangeLife -= UpdateLife;
         GameManager.Instance.OnChangeGold -= UpdateGold;
 
         SoundManager.Instance.OnChangeVolume -= UpdateVolume;
@@ -256,6 +266,9 @@ public class UIManager : MonoBehaviour
         settingScoreNum.text = s;
         resultScoreNum.text = s;
     }
+
+    public void UpdateLife(int _life)
+    => lifeText.text = _life.ToString("0000");
 
     public void UpdateGold(int _gold)
     {

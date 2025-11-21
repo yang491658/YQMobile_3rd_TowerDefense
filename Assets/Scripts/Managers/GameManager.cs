@@ -19,6 +19,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int score = 0;
     public event System.Action<int> OnChangeScore;
 
+    [Header("Life")]
+    [SerializeField] private int life = 0;
+    [SerializeField][Min(0)] private int maxLife = 1000;
+    public event System.Action<int> OnChangeLife;
+
     [Header("Gold")]
     [SerializeField] private int gold = 0;
     public event System.Action<int> OnChangeGold;
@@ -77,6 +82,7 @@ public class GameManager : MonoBehaviour
         UIManager.Instance?.OpenUI(false);
 
         ResetScore();
+        ResetLife();
         ResetGold();
     }
 
@@ -145,6 +151,26 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
+    #region 생명
+    public void LifeUp(int _life = 1)
+    {
+        life += _life;
+        OnChangeLife?.Invoke(life);
+    }
+
+    public void LifeDown(int _life = 1)
+    {
+        life -= _life;
+        OnChangeLife?.Invoke(life);
+    }
+
+    public void ResetLife()
+    {
+        life = maxLife;
+        OnChangeLife?.Invoke(life);
+    }
+    #endregion
+
     #region 골드
     public void GoldUp(int _gold = 1)
     {
@@ -152,7 +178,7 @@ public class GameManager : MonoBehaviour
         OnChangeGold?.Invoke(gold);
     }
 
-    public void GoldDown(int _gold)
+    public void GoldDown(int _gold = 1)
     {
         if (gold < _gold) return;
 
@@ -180,7 +206,12 @@ public class GameManager : MonoBehaviour
     public float GetSpeed() => speed;
     public float GetMinSpeed() => minSpeed;
     public float GetMaxSpeed() => maxSpeed;
+
     public int GetScore() => score;
+
+    public int GetLife() => life;
+    public int GetMaxLife() => maxLife;
+
     public int GetGold() => gold;
     #endregion
 }
