@@ -348,3 +348,4 @@ MonoBehaviour:
   target: {fileID: 0}
   attackDamage: 0
   attackSpeed: 0
+  bullets: []
