@@ -32,9 +32,7 @@ public class TestManager : MonoBehaviour
 
     private void Start()
     {
-        isAuto = true;
         SoundManager.Instance?.ToggleBGM();
-        EntityManager.Instance?.SetDelay(0f);
     }
 
     private void Update()
@@ -50,7 +48,12 @@ public class TestManager : MonoBehaviour
             GameManager.Instance?.Quit();
 
         if (Input.GetKeyDown(KeyCode.O))
+        {
             isAuto = !isAuto;
+
+            GameManager.Instance?.SetSpeed(isAuto ? GameManager.Instance.GetMaxSpeed() : 1f);
+            EntityManager.Instance?.SetDelay(0f);
+        }
         if (isAuto && !GameManager.Instance.IsPaused)
         {
             AutoMergeTower();
@@ -212,5 +215,5 @@ public class TestManager : MonoBehaviour
         }
     }
 
-    public void GiveGold() => GameManager.Instance?.GoldUp(1000);
+    public void GiveGold() => GameManager.Instance?.GoldUp(100_0000);
 }
