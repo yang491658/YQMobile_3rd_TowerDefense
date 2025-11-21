@@ -7,7 +7,7 @@ public class Monster : Entity
     private static int sorting = 0;
 
     [Header("Move")]
-    [SerializeField] private float moveSpeed = 3f;
+    [SerializeField] private float moveSpeed = 1f;
     private Transform[] paths;
     private int pathIndex;
 
@@ -16,10 +16,11 @@ public class Monster : Entity
     private Canvas canvas;
     private TextMeshProUGUI healthText;
     [Space]
-    [SerializeField] private float damageDuration = 0.5f;
+    [SerializeField] private float damageDuration = 1f;
     [SerializeField] private float damageSpeed = 3f;
     [Space]
     [SerializeField] private int dropGold = 1;
+    private bool isDead;
 
     protected override void Awake()
     {
@@ -42,12 +43,16 @@ public class Monster : Entity
     protected override void Update()
     {
         base.Update();
+        
+    if (isDead) return;
 
         UpdateMove();
     }
 
     private void OnBecameInvisible()
     {
+        if (isDead) return;
+
         EntityManager.Instance?.DespawnMonster(this);
     }
 
@@ -100,14 +105,14 @@ public class Monster : Entity
     private IEnumerator DamageCoroutine(TextMeshProUGUI _text, Color _color)
     {
         float time = 0f;
-        Vector3 start = _text.transform.localPosition;
+        Vector3 start = _text.transform.position;
 
         while (time < damageDuration)
         {
             time += Time.deltaTime;
             float t = time / damageDuration;
 
-            _text.transform.localPosition = start + Vector3.up * damageSpeed * time;
+            _text.transform.position = start + Vector3.up * damageSpeed * time;
 
             Color c = _color;
             c.a = Mathf.Lerp(1f, 0f, t);
@@ -121,8 +126,21 @@ public class Monster : Entity
 
     public void Die()
     {
+        if (isDead) return;
+        isDead = true;
+
+        sr.enabled = false;
+        healthText.enabled = false;
+
         GameManager.Instance?.ScoreUp();
         GameManager.Instance?.GoldUp(dropGold);
+        EntityManager.Instance?.RemoveMonster(this);
+        StartCoroutine(DieCoroutine());
+    }
+
+    private IEnumerator DieCoroutine()
+    {
+        yield return new WaitForSeconds(damageDuration);
         EntityManager.Instance?.DespawnMonster(this);
     }
     #endregion
@@ -151,5 +169,6 @@ public class Monster : Entity
 
     #region GET
     public int GetHealth() => health;
+    public bool IsDead() => isDead;
     #endregion
 }

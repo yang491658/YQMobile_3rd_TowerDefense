@@ -120,10 +120,10 @@ public class Tower : Entity
         attackTimer -= Time.deltaTime;
         if (attackTimer > 0f) return;
 
-        if (target == null)
+        if (target == null || target.IsDead())
         {
             target = EntityManager.Instance?.GetMonster(transform.position);
-            if (target == null) return;
+            if (target == null || target.IsDead()) return;
         }
 
         Shoot();

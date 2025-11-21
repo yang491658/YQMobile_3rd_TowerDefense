@@ -160,6 +160,8 @@ public class EntityManager : MonoBehaviour
         }
     }
 
+    public void RemoveMonster(Monster _monster) => monsters.Remove(_monster);
+
     public void DespawnMonster(Monster _monster)
     {
         monsters.Remove(_monster);

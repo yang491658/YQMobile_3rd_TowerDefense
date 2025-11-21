@@ -414,8 +414,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8dfdcf3aedd79c44a12f0eb3a98fbb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 3
+  moveSpeed: 1
   health: 5
-  damageDuration: 0.5
+  damageDuration: 1
   damageSpeed: 3
   dropGold: 1
