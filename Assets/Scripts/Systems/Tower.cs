@@ -126,7 +126,7 @@ public class Tower : Entity
 
         if (target == null || target.IsDead())
         {
-            target = EntityManager.Instance?.GetMonster(transform.position);
+            target = EntityManager.Instance?.GetMonster(0);
             if (target == null || target.IsDead()) return;
         }
 
