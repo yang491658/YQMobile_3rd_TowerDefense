@@ -18,4 +18,4 @@ MonoBehaviour:
   SymbolImage: {fileID: 21300000, guid: c9268346f2ed937448383b982f7616aa, type: 3}
   Color: {r: 1, g: 0, b: 0, a: 1}
   AttackDamage: 1
-  AttackSpeed: 1
+  AttackSpeed: 3

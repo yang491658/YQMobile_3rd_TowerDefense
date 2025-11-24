@@ -45,12 +45,6 @@ public class HandleManager : MonoBehaviour
     private readonly List<Vector3> dragPath = new();
 #endif
 
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-    }
-#endif
-
     private void Awake()
     {
         if (Instance != null && Instance != this)
