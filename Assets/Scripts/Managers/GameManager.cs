@@ -71,8 +71,6 @@ public class GameManager : MonoBehaviour
         Pause(false);
         IsGameOver = false;
 
-        SoundManager.Instance?.PlayBGM("Default");
-
         EntityManager.Instance?.ResetEntity();
         EntityManager.Instance?.SetEntity();
         EntityManager.Instance?.ToggleSpawnMonster(true);
