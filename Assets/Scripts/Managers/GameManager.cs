@@ -78,6 +78,7 @@ public class GameManager : MonoBehaviour
 
         UIManager.Instance?.ResetUI();
         UIManager.Instance?.OpenUI(false);
+        UIManager.Instance?.StartCountdown();
 
         ResetScore();
         ResetLife();
