@@ -135,6 +135,14 @@ public static class ManagerEditor
     #endregion
 
     #region 빌드
+    private static void PrepareTest()
+    {
+        SetActive<UIManager>(true, "UI 켜기", "UI 끄기");
+        SetActive<ADManager>(false, "광고 켜기", "광고 끄기");
+        SetTestActive(true);
+        SetQuitActive(true);
+    }
+
     private static void PrepareAndroid()
     {
         SetActive<UIManager>(true, "UI 켜기", "UI 끄기");
@@ -151,14 +159,19 @@ public static class ManagerEditor
         SetQuitActive(false);
     }
 
+    [MenuItem("Tools/Test 빌드 준비", true)]
+    private static bool TestBuildValidate() => IsPlaying();
+    [MenuItem("Tools/Test 빌드 준비", false, 101)]
+    private static void TestBuild() => PrepareTest();
+
     [MenuItem("Tools/Android 빌드 준비", true)]
     private static bool AndroidBuildValidate() => IsPlaying();
-    [MenuItem("Tools/Android 빌드 준비", false, 101)]
+    [MenuItem("Tools/Android 빌드 준비", false, 102)]
     private static void AndroidBuild() => PrepareAndroid();
 
     [MenuItem("Tools/WebGL 빌드 준비", true)]
     private static bool WebGLBuildValidate() => IsPlaying();
-    [MenuItem("Tools/WebGL 빌드 준비", false, 102)]
+    [MenuItem("Tools/WebGL 빌드 준비", false, 103)]
     private static void WebGLBuild() => PrepareWebGL();
     #endregion
 
