@@ -78,7 +78,7 @@ public class Tower : Entity
         for (int i = 0; i < positions.Length; i++)
         {
             if (i == 0)
-                symbol.localPosition = positions[0];
+                symbol.localPosition = positions[i];
             else
             {
                 Transform clone = Instantiate(symbol, transform);
