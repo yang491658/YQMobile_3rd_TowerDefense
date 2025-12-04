@@ -130,6 +130,8 @@ public class TestManager : MonoBehaviour
         autoRoutine = null;
     }
 
+    private void GiveGold() => GameManager.Instance?.GoldUp(100_0000);
+
     private void AutoMergeTower()
     {
         List<Tower> towers = EntityManager.Instance?.GetTowers();
@@ -218,6 +220,4 @@ public class TestManager : MonoBehaviour
             }
         }
     }
-
-    public void GiveGold() => GameManager.Instance?.GoldUp(100_0000);
 }
