@@ -71,18 +71,17 @@ public class GameManager : MonoBehaviour
         Pause(false);
         IsGameOver = false;
 
+        ResetScore();
+        ResetLife();
+        ResetGold();
+
         EntityManager.Instance?.ResetEntity();
         EntityManager.Instance?.SetEntity();
         EntityManager.Instance?.ToggleSpawnMonster(true);
-        EntityManager.Instance?.SpawnTower(0, Vector3.up);
 
         UIManager.Instance?.ResetUI();
         UIManager.Instance?.OpenUI(false);
         UIManager.Instance?.StartCountdown();
-
-        ResetScore();
-        ResetLife();
-        ResetGold();
     }
 
     #region 진행
