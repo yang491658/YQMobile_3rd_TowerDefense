@@ -546,5 +546,4 @@ public class EntityManager : MonoBehaviour
     public Tower GetTowerHighRank(int _minRank = 0)
         => GetByStat(towers, _tower => _tower.GetRank(), false, _minRank, true);
     #endregion
-
 }
