@@ -238,7 +238,6 @@ public class Tower : Entity
                 break;
         }
     }
-
     #endregion
 
     #region GET
