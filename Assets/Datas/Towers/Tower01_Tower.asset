@@ -21,7 +21,7 @@ MonoBehaviour:
   Role: 0
   AttackDamage: 1
   AttackSpeed: 3
-  AttackTarget: 2
+  AttackTarget: 1
   Trigger: 0
   HitType: 0
   DebuffType: 0
