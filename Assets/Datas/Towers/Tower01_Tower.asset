@@ -21,11 +21,9 @@ MonoBehaviour:
   Role: 0
   AttackDamage: 1
   AttackSpeed: 3
-  AttackTarget: 1
-  Trigger: 0
-  HitType: 0
-  DebuffType: 0
-  BuffType: 0
-  Value1: 0
-  Value2: 0
-  Value3: 0
+  AttackTarget: 2
+  Skills:
+  - {fileID: 11400000, guid: 1e30dfc6a662fae498d91ab8f84b9856, type: 2}
+  Values:
+  - {x: 1, y: 1, z: 1}
+  - {x: 1.5, y: 0.25, z: 0}

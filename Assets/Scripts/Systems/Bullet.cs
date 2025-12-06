@@ -9,7 +9,7 @@ public class Bullet : Entity
     [SerializeField] private float moveSpeed = 10f;
 
     [Header("Battle")]
-    private TowerBase tower;
+    private Tower tower;
     [SerializeField] private int attackDamage;
 
     protected override void Update()
@@ -58,7 +58,7 @@ public class Bullet : Entity
     }
 
     #region SET
-    public void SetBullet(TowerBase _tower)
+    public void SetBullet(Tower _tower)
     {
         tower = _tower;
 

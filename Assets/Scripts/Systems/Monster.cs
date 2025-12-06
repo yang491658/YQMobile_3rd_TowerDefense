@@ -16,8 +16,8 @@ public class Monster : Entity
     private Canvas canvas;
     private TextMeshProUGUI healthText;
     [Space]
-    [SerializeField] private float damageDuration = 1f;
-    [SerializeField] private float damageSpeed = 3f;
+    [SerializeField] private float damageDuration = 1.5f;
+    [SerializeField] private float damageSpeed = 3.5f;
     [Space]
     [SerializeField] private int dropGold = 1;
     private bool isDead;
@@ -37,7 +37,7 @@ public class Monster : Entity
     {
         base.Start();
 
-        SetMonster(1 + GameManager.Instance.GetScore() / 100);
+        SetMonster(1 + GameManager.Instance.GetScore() / 30);
     }
 
     protected override void Update()

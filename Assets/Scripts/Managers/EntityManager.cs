@@ -25,7 +25,7 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private Transform monsterTrans;
     [SerializeField] private List<Monster> monsters = new List<Monster>();
     [SerializeField] private Transform towerTrans;
-    [SerializeField] private List<TowerBase> towers = new List<TowerBase>();
+    [SerializeField] private List<Tower> towers = new List<Tower>();
 
     [Header("Map")]
     [SerializeField] private Transform map;
@@ -146,7 +146,7 @@ public class EntityManager : MonoBehaviour
         {
             float dt = Time.deltaTime;
             timer += dt;
-            delay = Mathf.Max(delay - dt / 100f, minDelay);
+            delay = Mathf.Max(delay - dt / 50f, minDelay);
 
             if (timer > delay)
             {
@@ -248,7 +248,7 @@ public class EntityManager : MonoBehaviour
 
     #region 타워
     public TowerData SearchTower(int _id) => towerDic.TryGetValue(_id, out var _data) ? _data : null;
-    public TowerBase SpawnTower(int _id = 0, Vector3? _pos = null, bool _useGold = true)
+    public Tower SpawnTower(int _id = 0, Vector3? _pos = null, bool _useGold = true)
     {
         TowerData data = (_id == 0)
             ? towerDatas[Random.Range(0, towerDatas.Length)]
@@ -261,8 +261,8 @@ public class EntityManager : MonoBehaviour
 
         Vector3 pos = SelectSlot(_pos);
 
-        TowerBase tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
-            .GetComponent<TowerBase>();
+        Tower tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
+            .GetComponent<Tower>();
 
         tower.SetData(data);
         tower.transform.localScale = map.transform.localScale;
@@ -273,7 +273,7 @@ public class EntityManager : MonoBehaviour
         return tower;
     }
 
-    public TowerBase MergeTower(TowerBase _select, TowerBase _target)
+    public Tower MergeTower(Tower _select, Tower _target)
     {
         if (_select == _target
             || _select.GetID() != _target.GetID()
@@ -286,13 +286,13 @@ public class EntityManager : MonoBehaviour
         DespawnTower(_select);
         DespawnTower(_target);
 
-        TowerBase merge = SpawnTower(0, pos, false);
+        Tower merge = SpawnTower(0, pos, false);
         merge.SetRank(rank + 1);
 
         return merge;
     }
 
-    public void DespawnTower(TowerBase _tower)
+    public void DespawnTower(Tower _tower)
     {
         towers.Remove(_tower);
         Destroy(_tower.gameObject);
@@ -396,7 +396,7 @@ public class EntityManager : MonoBehaviour
     }
 
     public GameObject GetBulletBase() => bulletBase;
-    public List<TowerBase> GetTowers() => towers;
+    public List<Tower> GetTowers() => towers;
     public int GetNeedGold() => needGold;
     #endregion
 
@@ -442,6 +442,24 @@ public class EntityManager : MonoBehaviour
         }
 
         if (!found) return null;
+        return result;
+    }
+
+    private List<T> GetInRange<T>(List<T> _list, Vector3 _center, float _range) where T : Component
+    {
+        List<T> result = new List<T>();
+        if (_list.Count == 0) return result;
+
+        float r2 = _range * _range;
+
+        for (int i = 0; i < _list.Count; i++)
+        {
+            T entity = _list[i];
+            Vector3 diff = entity.transform.position - _center;
+            if (diff.sqrMagnitude <= r2)
+                result.Add(entity);
+        }
+
         return result;
     }
 
@@ -517,6 +535,9 @@ public class EntityManager : MonoBehaviour
     public Monster GetMonsterFarthest(Vector3 _pos, int _distance = 0)
         => GetByDistance(monsters, _pos, false, _distance, mapRoadTilemap);
 
+    public List<Monster> GetMonstersInRange(Vector3 _center, float _range)
+    => GetInRange(monsters, _center, _range);
+
     public Monster GetMonsterLowHealth()
         => GetByStat(monsters, _monster => _monster.GetHealth(), true);
 
@@ -525,25 +546,28 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region GET_타워
-    public TowerBase GetTowerRandom()
+    public Tower GetTowerRandom()
         => GetRandom(towers);
 
-    public TowerBase GetTowerFirst()
+    public Tower GetTowerFirst()
         => GetByIndex(towers, 0);
 
-    public TowerBase GetTowerLast()
+    public Tower GetTowerLast()
     => GetByIndex(towers, towers.Count - 1);
 
-    public TowerBase GetTowerClose(Vector3 _pos, int _distance = 0)
+    public Tower GetTowerNearest(Vector3 _pos, int _distance = 0)
         => GetByDistance(towers, _pos, true, _distance, mapSlotTilemap);
 
-    public TowerBase GetTowerFar(Vector3 _pos, int _distance = 0)
+    public Tower GetTowerFarthest(Vector3 _pos, int _distance = 0)
         => GetByDistance(towers, _pos, false, _distance, mapSlotTilemap);
 
-    public TowerBase GetTowerLowRank(int _minRank = 0)
+    public List<Tower> GetTowersInRange(Vector3 _center, float _range)
+    => GetInRange(towers, _center, _range);
+
+    public Tower GetTowerLowRank(int _minRank = 0)
         => GetByStat(towers, _tower => _tower.GetRank(), true, _minRank, true);
 
-    public TowerBase GetTowerHighRank(int _minRank = 0)
+    public Tower GetTowerHighRank(int _minRank = 0)
         => GetByStat(towers, _tower => _tower.GetRank(), false, _minRank, true);
     #endregion
 }

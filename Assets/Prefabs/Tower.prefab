@@ -74,9 +74,9 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1516283247
-  m_SortingLayer: 1
+  m_SortingLayer: 2
   m_SortingOrder: 2
-  m_Sprite: {fileID: 21300000, guid: 996b9b3f0ba1f134ab018ca11873360c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e419aaa4e734e654b9e933f9a7e5adf2, type: 3}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -161,9 +161,9 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1516283247
-  m_SortingLayer: 1
+  m_SortingLayer: 2
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: d67e586d2cd3a734aa3d681335863daf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d34ae15399c293644b150c5c6f802a3b, type: 3}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -253,7 +253,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1516283247
-  m_SortingLayer: 1
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: f757fa99c43327540b26d460d25aea40, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -338,7 +338,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8757814876248671606}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c435541019710dc41b0d5c9fd9642fa1, type: 3}
+  m_Script: {fileID: 11500000, guid: 35150829b9998c04688e78277f69cd98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 0}
@@ -349,3 +349,4 @@ MonoBehaviour:
   attackDamage: 0
   attackSpeed: 0
   bullets: []
+  skills: []

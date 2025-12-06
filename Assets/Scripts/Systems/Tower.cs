@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class TowerBase : Entity
+public class Tower : Entity
 {
-    [Header("Control")]
-    private bool isDragging;
-
     [Header("Data")]
     [SerializeField] private TowerData data;
     [SerializeField] private Transform outLine;
     private SpriteRenderer outLineSR;
     private SpriteRenderer symbolSR;
-    private Vector3 slot;
+
+    [Header("Control")]
+    [SerializeField] private bool isDragging;
+    [SerializeField] private Vector3 slot;
 
     [Header("Rank")]
     [SerializeField] private Transform symbol;
@@ -20,13 +20,15 @@ public class TowerBase : Entity
     private bool isMax = false;
 
     [Header("Battle")]
-    [SerializeField] private Monster target;
-    [Space]
     [SerializeField] private int attackDamage;
     [SerializeField] private float attackSpeed;
+    [SerializeField] private Monster attackTarget;
     private float attackTimer;
-    [SerializeField] private List<TowerSkill> skills = new List<TowerSkill>();
     [SerializeField] private List<Bullet> bullets = new List<Bullet>();
+
+    [Header("Skill")]
+    [SerializeField] private List<TowerSkill> skills = new List<TowerSkill>();
+    [SerializeField] private List<float> values;
 
     protected override void Awake()
     {
@@ -130,7 +132,7 @@ public class TowerBase : Entity
         if (attackTimer > 0f) return;
 
         SetTarget();
-        if (target == null || target.IsDead()) return;
+        if (attackTarget == null || attackTarget.IsDead()) return;
 
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnAttack(this);
@@ -232,28 +234,28 @@ public class TowerBase : Entity
         switch (data.AttackTarget)
         {
             case AttackTarget.None:
-                target = null;
+                attackTarget = null;
                 return;
             case AttackTarget.Random:
-                target = EntityManager.Instance?.GetMonsterRandom();
+                attackTarget = EntityManager.Instance?.GetMonsterRandom();
                 break;
             case AttackTarget.First:
-                target = EntityManager.Instance?.GetMonsterFirst();
+                attackTarget = EntityManager.Instance?.GetMonsterFirst();
                 break;
             case AttackTarget.Last:
-                target = EntityManager.Instance?.GetMonsterLast();
+                attackTarget = EntityManager.Instance?.GetMonsterLast();
                 break;
             case AttackTarget.Near:
-                target = EntityManager.Instance?.GetMonsterNearest(transform.position);
+                attackTarget = EntityManager.Instance?.GetMonsterNearest(transform.position);
                 break;
             case AttackTarget.Far:
-                target = EntityManager.Instance?.GetMonsterFarthest(transform.position);
+                attackTarget = EntityManager.Instance?.GetMonsterFarthest(transform.position);
                 break;
             case AttackTarget.Weak:
-                target = EntityManager.Instance?.GetMonsterLowHealth();
+                attackTarget = EntityManager.Instance?.GetMonsterLowHealth();
                 break;
             case AttackTarget.Strong:
-                target = EntityManager.Instance?.GetMonsterHighHealth();
+                attackTarget = EntityManager.Instance?.GetMonsterHighHealth();
                 break;
             case AttackTarget.NoDebuff:
                 break;
@@ -262,16 +264,30 @@ public class TowerBase : Entity
     #endregion
 
     #region GET
-    public bool IsDragging() => isDragging;
-
     public TowerData GetData() => data;
     public int GetID() => data.ID;
     public Color GetColor() => data.Color;
+    public float GetValue(int index)
+    {
+        Vector3 value = data.Values[index - 1];
+
+        if (value.y != 0f)
+        {
+            if (value.z == 0f)
+                return value.x + value.y * (rank - 1);
+            else if (value.z == 1f)
+                return value.x * rank;
+        }
+
+        return value.x;
+    }
+
+    public bool IsDragging() => isDragging;
     public Vector3 GetSlot() => slot;
 
     public int GetRank() => rank;
     public bool IsMax() => isMax;
-    public Monster GetTarget() => target;
     public int GetDamage() => attackDamage;
+    public Monster GetTarget() => attackTarget;
     #endregion
 }

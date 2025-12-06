@@ -7,7 +7,40 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-[CreateAssetMenu(fileName = "Tower", menuName = "TowerData", order = 1)]
+#region Enum
+public enum TowerGrade
+{
+    Normal,
+    Rare,
+    Hero,
+    Legend,
+}
+
+public enum TowerRole
+{
+    Dealer,
+    Debuff,
+    Buff,
+    Summon,
+    Economy,
+    Control,
+}
+
+public enum AttackTarget
+{
+    None,
+    Random,
+    First,
+    Last,
+    Near,
+    Far,
+    Weak,
+    Strong,
+    NoDebuff,
+}
+#endregion
+
+[CreateAssetMenu(fileName = "Tower", menuName = "TowerData", order = 0)]
 public class TowerData : ScriptableObject
 {
     [Header("Data")]
@@ -16,7 +49,7 @@ public class TowerData : ScriptableObject
     public Sprite BaseImage;
     public Sprite SymbolImage;
     public Color Color = Color.red;
-    
+
     [Header("Type")]
     public TowerGrade Grade;
     public TowerRole Role;
@@ -28,15 +61,7 @@ public class TowerData : ScriptableObject
 
     [Header("Skill")]
     public List<TowerSkill> Skills = new List<TowerSkill>();
-    public TriggerTime Trigger = TriggerTime.None;
-    public HitType HitType = HitType.None;
-    public DebuffType DebuffType = DebuffType.None;
-    public BuffType BuffType = BuffType.None;
-
-    [Header("Value")]
-    public float Value1;
-    public float Value2;
-    public float Value3;
+    public List<Vector3> Values = new List<Vector3>();
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -118,7 +143,32 @@ public class TowerData : ScriptableObject
             }
         }
 
+        for (int i = 0; i < Values.Count; i++)
+        {
+            Values[i] = ValidateValue(Values[i]);
+        }
+
         EditorUtility.SetDirty(this);
+    }
+
+    private Vector3 ValidateValue(Vector3 _value)
+    {
+        _value.x = Mathf.Max(_value.x, 0f);
+
+        if (_value.y == 0f)
+        {
+            _value.y = 0f;
+            _value.z = 0f;
+        }
+
+        if (_value.z > 0f)
+        {
+            _value.y = 1f;
+            _value.z = 1f;
+        }
+        else _value.z = 0f;
+
+        return _value;
     }
 #endif
 
@@ -132,24 +182,15 @@ public class TowerData : ScriptableObject
         clone.SymbolImage = this.SymbolImage;
         clone.Color = this.Color;
 
-        clone.AttackDamage = this.AttackDamage;
-        clone.AttackSpeed = this.AttackSpeed;
-
         clone.Grade = this.Grade;
         clone.Role = this.Role;
 
+        clone.AttackDamage = this.AttackDamage;
+        clone.AttackSpeed = this.AttackSpeed;
         clone.AttackTarget = this.AttackTarget;
-        clone.Trigger = this.Trigger;
 
-        clone.HitType = this.HitType;
-        clone.DebuffType = this.DebuffType;
-        clone.BuffType = this.BuffType;
-
-        clone.Value1 = this.Value1;
-        clone.Value2 = this.Value2;
-        clone.Value3 = this.Value3;
-
-        clone.Skills = new List<TowerSkill>(Skills);
+        clone.Skills = this.Skills;
+        clone.Values = this.Values;
 
         return clone;
     }

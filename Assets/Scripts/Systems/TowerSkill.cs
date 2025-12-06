@@ -2,11 +2,13 @@ using UnityEngine;
 
 public abstract class TowerSkill : ScriptableObject
 {
-    public virtual void Initialize(TowerBase _tower) { }
+    [SerializeField] protected GameObject effect;
 
-    public virtual void OnUpdate(TowerBase _tower, float _deltaTime) { }
+    public virtual void Initialize(Tower _tower) { }
 
-    public virtual void OnAttack(TowerBase _tower) { }
+    public virtual void OnUpdate(Tower _tower, float _deltaTime) { }
 
-    public virtual void OnHit(TowerBase _tower, Monster _target) { }
+    public virtual void OnAttack(Tower _tower) { }
+
+    public virtual void OnHit(Tower _tower, Monster _target) { }
 }

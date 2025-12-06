@@ -1815,7 +1815,7 @@ MonoBehaviour:
   countStart: 3
   countDuration: 1
   countScale: 10
-  countSkip: 0
+  countSkip: 1
   inGameUI: {fileID: 463422171}
   playTimeText: {fileID: 722285320}
   scoreNum: {fileID: 1222573071}
@@ -3168,7 +3168,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &548470386
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6973,7 +6973,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1407473049
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7761,7 +7761,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1638876044
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11318,7 +11318,7 @@ MonoBehaviour:
   towerBase: {fileID: 8757814876248671606, guid: cd6b40e57763ae841b4913764f46bea9, type: 3}
   bulletBase: {fileID: 266949680547624416, guid: e50fab4336ffe364a97a106040d6d21d, type: 3}
   towerDatas:
-  - {fileID: 11400000, guid: ced9a26a4441fd045adabb20a1ee47d9, type: 2}
+  - {fileID: 11400000, guid: 986b52e76dbcf70489e46f6c2de7aaf8, type: 2}
   inGame: {fileID: 0}
   monsterTrans: {fileID: 0}
   monsters: []

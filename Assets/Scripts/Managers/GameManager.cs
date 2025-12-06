@@ -161,7 +161,7 @@ public class GameManager : MonoBehaviour
         life -= _life;
         OnChangeLife?.Invoke(life);
 
-        if (life < 0) GameOver();
+        //if (life < 0) GameOver(); // 임시
     }
 
     public void ResetLife()

@@ -11,7 +11,7 @@ public class HandleManager : MonoBehaviour
     private LayerMask layer => LayerMask.GetMask("Tower");
 
     [Header("Tower")]
-    [SerializeField] private TowerBase select;
+    [SerializeField] private Tower select;
     private Vector3 prevPos;
     private Vector3 offset;
 
@@ -268,7 +268,7 @@ public class HandleManager : MonoBehaviour
     {
         Collider2D hit = Physics2D.OverlapPoint(_pos, layer);
 
-        select = hit.GetComponent<TowerBase>();
+        select = hit.GetComponent<Tower>();
         select.DragOn(true);
 
         prevPos = select.transform.position;
@@ -311,7 +311,7 @@ public class HandleManager : MonoBehaviour
 
         Collider2D[] hits = Physics2D.OverlapPointAll(_end, layer);
 
-        TowerBase target = null;
+        Tower target = null;
         Collider2D selfCol = select.GetCol();
 
         for (int i = 0; i < hits.Length; i++)
@@ -319,7 +319,7 @@ public class HandleManager : MonoBehaviour
             Collider2D otherCol = hits[i];
             if (selfCol == otherCol) continue;
 
-            TowerBase other = otherCol.GetComponent<TowerBase>();
+            Tower other = otherCol.GetComponent<Tower>();
             if (other != null)
             {
                 target = other;
@@ -327,7 +327,7 @@ public class HandleManager : MonoBehaviour
             }
         }
 
-        TowerBase merge = null;
+        Tower merge = null;
         if (target != null)
             merge = EntityManager.Instance?.MergeTower(select, target);
 
@@ -352,7 +352,7 @@ public class HandleManager : MonoBehaviour
         Collider2D hit = Physics2D.OverlapPoint(_pos, layer);
         if (hit == null) return;
 
-        TowerBase tower = hit.GetComponent<TowerBase>();
+        Tower tower = hit.GetComponent<Tower>();
         if (tower == null) return;
 
         tower.RankUp();
@@ -365,7 +365,7 @@ public class HandleManager : MonoBehaviour
         Collider2D hit = Physics2D.OverlapPoint(_pos, layer);
         if (hit == null) return;
 
-        TowerBase tower = hit.GetComponent<TowerBase>();
+        Tower tower = hit.GetComponent<Tower>();
         if (tower == null) return;
 
         tower.Sell();
