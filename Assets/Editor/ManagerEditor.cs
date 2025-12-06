@@ -141,6 +141,8 @@ public static class ManagerEditor
         SetActive<ADManager>(false, "광고 켜기", "광고 끄기");
         SetTestActive(true);
         SetQuitActive(true);
+
+        FindSingle<UIManager>()?.SetCountdown(true);
     }
 
     private static void PrepareAndroid()
@@ -149,6 +151,8 @@ public static class ManagerEditor
         SetActive<ADManager>(true, "광고 켜기", "광고 끄기");
         SetTestActive(false);
         SetQuitActive(true);
+
+        FindSingle<UIManager>()?.SetCountdown(false);
     }
 
     private static void PrepareWebGL()
@@ -157,6 +161,8 @@ public static class ManagerEditor
         SetActive<ADManager>(false, "광고 켜기", "광고 끄기");
         SetTestActive(false);
         SetQuitActive(false);
+
+        FindSingle<UIManager>()?.SetCountdown(false);
     }
 
     [MenuItem("Tools/Test 빌드 준비", true)]
