@@ -25,7 +25,7 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private Transform monsterTrans;
     [SerializeField] private List<Monster> monsters = new List<Monster>();
     [SerializeField] private Transform towerTrans;
-    [SerializeField] private List<Tower> towers = new List<Tower>();
+    [SerializeField] private List<TowerBase> towers = new List<TowerBase>();
 
     [Header("Map")]
     [SerializeField] private Transform map;
@@ -248,7 +248,7 @@ public class EntityManager : MonoBehaviour
 
     #region 타워
     public TowerData SearchTower(int _id) => towerDic.TryGetValue(_id, out var _data) ? _data : null;
-    public Tower SpawnTower(int _id = 0, Vector3? _pos = null, bool _useGold = true)
+    public TowerBase SpawnTower(int _id = 0, Vector3? _pos = null, bool _useGold = true)
     {
         TowerData data = (_id == 0)
             ? towerDatas[Random.Range(0, towerDatas.Length)]
@@ -261,8 +261,8 @@ public class EntityManager : MonoBehaviour
 
         Vector3 pos = SelectSlot(_pos);
 
-        Tower tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
-            .GetComponent<Tower>();
+        TowerBase tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
+            .GetComponent<TowerBase>();
 
         tower.SetData(data);
         tower.transform.localScale = map.transform.localScale;
@@ -273,7 +273,7 @@ public class EntityManager : MonoBehaviour
         return tower;
     }
 
-    public Tower MergeTower(Tower _select, Tower _target)
+    public TowerBase MergeTower(TowerBase _select, TowerBase _target)
     {
         if (_select == _target
             || _select.GetID() != _target.GetID()
@@ -286,13 +286,13 @@ public class EntityManager : MonoBehaviour
         DespawnTower(_select);
         DespawnTower(_target);
 
-        Tower merge = SpawnTower(0, pos, false);
+        TowerBase merge = SpawnTower(0, pos, false);
         merge.SetRank(rank + 1);
 
         return merge;
     }
 
-    public void DespawnTower(Tower _tower)
+    public void DespawnTower(TowerBase _tower)
     {
         towers.Remove(_tower);
         Destroy(_tower.gameObject);
@@ -396,7 +396,7 @@ public class EntityManager : MonoBehaviour
     }
 
     public GameObject GetBulletBase() => bulletBase;
-    public List<Tower> GetTowers() => towers;
+    public List<TowerBase> GetTowers() => towers;
     public int GetNeedGold() => needGold;
     #endregion
 
@@ -525,25 +525,25 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region GET_타워
-    public Tower GetTowerRandom()
+    public TowerBase GetTowerRandom()
         => GetRandom(towers);
 
-    public Tower GetTowerFirst()
+    public TowerBase GetTowerFirst()
         => GetByIndex(towers, 0);
 
-    public Tower GetTowerLast()
+    public TowerBase GetTowerLast()
     => GetByIndex(towers, towers.Count - 1);
 
-    public Tower GetTowerClose(Vector3 _pos, int _distance = 0)
+    public TowerBase GetTowerClose(Vector3 _pos, int _distance = 0)
         => GetByDistance(towers, _pos, true, _distance, mapSlotTilemap);
 
-    public Tower GetTowerFar(Vector3 _pos, int _distance = 0)
+    public TowerBase GetTowerFar(Vector3 _pos, int _distance = 0)
         => GetByDistance(towers, _pos, false, _distance, mapSlotTilemap);
 
-    public Tower GetTowerLowRank(int _minRank = 0)
+    public TowerBase GetTowerLowRank(int _minRank = 0)
         => GetByStat(towers, _tower => _tower.GetRank(), true, _minRank, true);
 
-    public Tower GetTowerHighRank(int _minRank = 0)
+    public TowerBase GetTowerHighRank(int _minRank = 0)
         => GetByStat(towers, _tower => _tower.GetRank(), false, _minRank, true);
     #endregion
 }

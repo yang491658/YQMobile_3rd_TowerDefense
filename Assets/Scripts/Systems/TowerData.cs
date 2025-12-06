@@ -26,7 +26,8 @@ public class TowerData : ScriptableObject
     public float AttackSpeed = 3f;
     public AttackTarget AttackTarget = AttackTarget.First;
 
-    [Header("Effect")]
+    [Header("Skill")]
+    public List<TowerSkill> Skills = new List<TowerSkill>();
     public TriggerTime Trigger = TriggerTime.None;
     public HitType HitType = HitType.None;
     public DebuffType DebuffType = DebuffType.None;
@@ -147,6 +148,8 @@ public class TowerData : ScriptableObject
         clone.Value1 = this.Value1;
         clone.Value2 = this.Value2;
         clone.Value3 = this.Value3;
+
+        clone.Skills = new List<TowerSkill>(Skills);
 
         return clone;
     }

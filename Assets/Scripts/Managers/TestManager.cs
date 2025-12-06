@@ -133,7 +133,7 @@ public class TestManager : MonoBehaviour
 
     private void AutoMergeTower()
     {
-        List<Tower> towers = EntityManager.Instance?.GetTowers();
+        List<TowerBase> towers = EntityManager.Instance?.GetTowers();
         if (towers == null) return;
 
         int len = towers.Count;
@@ -146,7 +146,7 @@ public class TestManager : MonoBehaviour
         {
             for (int i = 0; i < len; i++)
             {
-                Tower a = towers[i];
+                TowerBase a = towers[i];
                 if (a == null || a.IsDragging()) continue;
                 if (a.GetRank() != r) continue;
 
@@ -154,7 +154,7 @@ public class TestManager : MonoBehaviour
                 {
                     if (i == j) continue;
 
-                    Tower b = towers[j];
+                    TowerBase b = towers[j];
                     if (b == null || b.IsDragging()) continue;
                     if (b.GetRank() != r) continue;
 
@@ -167,7 +167,7 @@ public class TestManager : MonoBehaviour
 
     private void MergeTower()
     {
-        List<Tower> towers = EntityManager.Instance?.GetTowers();
+        List<TowerBase> towers = EntityManager.Instance?.GetTowers();
         if (towers == null) return;
 
         int len = towers.Count;
@@ -176,7 +176,7 @@ public class TestManager : MonoBehaviour
         HashSet<int> rankSet = new HashSet<int>();
         for (int i = 0; i < len; i++)
         {
-            Tower t = towers[i];
+            TowerBase t = towers[i];
             if (t == null || t.IsDragging()) continue;
             rankSet.Add(t.GetRank());
         }
@@ -191,7 +191,7 @@ public class TestManager : MonoBehaviour
             List<int> indices = new List<int>();
             for (int i = 0; i < len; i++)
             {
-                Tower t = towers[i];
+                TowerBase t = towers[i];
                 if (t == null || t.IsDragging()) continue;
                 if (t.GetRank() == curRank)
                     indices.Add(i);
@@ -205,14 +205,14 @@ public class TestManager : MonoBehaviour
             for (int n = 0; n < count; n++)
             {
                 int iLocal = indices[(start + n) % count];
-                Tower a = towers[iLocal];
+                TowerBase a = towers[iLocal];
 
                 for (int m = 0; m < count; m++)
                 {
                     if (n == m) continue;
 
                     int jLocal = indices[m];
-                    Tower b = towers[jLocal];
+                    TowerBase b = towers[jLocal];
 
                     if (EntityManager.Instance?.MergeTower(a, b) != null) return;
                 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class Tower : Entity
+public class TowerBase : Entity
 {
     [Header("Control")]
     private bool isDragging;
@@ -25,6 +25,7 @@ public class Tower : Entity
     [SerializeField] private int attackDamage;
     [SerializeField] private float attackSpeed;
     private float attackTimer;
+    [SerializeField] private List<TowerSkill> skills = new List<TowerSkill>();
     [SerializeField] private List<Bullet> bullets = new List<Bullet>();
 
     protected override void Awake()
@@ -43,6 +44,10 @@ public class Tower : Entity
     protected override void Update()
     {
         base.Update();
+
+        float deltaTime = Time.deltaTime;
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnUpdate(this, deltaTime);
 
         Attack();
     }
@@ -119,7 +124,7 @@ public class Tower : Entity
     #endregion
 
     #region 전투
-    public virtual void Attack()
+    public void Attack()
     {
         attackTimer -= Time.deltaTime;
         if (attackTimer > 0f) return;
@@ -127,11 +132,14 @@ public class Tower : Entity
         SetTarget();
         if (target == null || target.IsDead()) return;
 
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnAttack(this);
+
         Shoot();
         attackTimer = attackSpeed;
     }
 
-    public virtual void Shoot()
+    public void Shoot()
     {
         GameObject bulletBase = EntityManager.Instance?.GetBulletBase();
         Bullet bullet = Instantiate(bulletBase, transform.position, Quaternion.identity, transform)
@@ -151,6 +159,11 @@ public class Tower : Entity
             Bullet b = bullets[i];
             b.transform.position -= _delta;
         }
+    }
+    public void HitBullet(Monster _target)
+    {
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnHit(this, _target);
     }
     #endregion
 
@@ -184,7 +197,7 @@ public class Tower : Entity
     #endregion
 
     #region SET
-    public virtual void SetData(TowerData _data)
+    public void SetData(TowerData _data)
     {
         data = _data;
 
@@ -193,6 +206,14 @@ public class Tower : Entity
 
         outLineSR.color = data.Color;
         symbolSR.color = data.Color;
+
+        skills.Clear();
+        for (int i = 0; i < data.Skills.Count; i++)
+        {
+            TowerSkill skill = Instantiate(data.Skills[i]);
+            skill.Initialize(this);
+            skills.Add(skill);
+        }
 
         SetRank(1);
     }
@@ -243,14 +264,13 @@ public class Tower : Entity
     #region GET
     public bool IsDragging() => isDragging;
 
+    public TowerData GetData() => data;
     public int GetID() => data.ID;
     public Color GetColor() => data.Color;
-
     public Vector3 GetSlot() => slot;
 
     public int GetRank() => rank;
     public bool IsMax() => isMax;
-
     public Monster GetTarget() => target;
     public int GetDamage() => attackDamage;
     #endregion
