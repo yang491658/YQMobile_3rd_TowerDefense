@@ -65,7 +65,7 @@ public class EntityManager : MonoBehaviour
         {
             string path = AssetDatabase.GUIDToAssetPath(guids[i]);
             var data = AssetDatabase.LoadAssetAtPath<TowerData>(path);
-            if (data != null) tlist.Add(data.Clone());
+            if (data != null) tlist.Add(data);
         }
         towerDatas = tlist.OrderBy(d => d.ID).ThenBy(d => d.Name).ToArray();
 
@@ -413,14 +413,14 @@ public class EntityManager : MonoBehaviour
         return _list[_index];
     }
 
-    private T GetByDistance<T>(List<T> _list, Vector3 _pos, int _distance, Tilemap _tilemap) where T : Component
+    private T GetByDistance<T>(List<T> _list, Vector3 _pos, bool _near, int _distance, Tilemap _tilemap) where T : Component
     {
         if (_list.Count == 0) return null;
 
         Vector3Int centerCell = _tilemap.WorldToCell(_pos);
         int maxDist = _distance > 0 ? _distance : int.MaxValue;
 
-        T nearest = null;
+        T result = null;
         bool found = false;
         int bestDist = 0;
 
@@ -433,16 +433,16 @@ public class EntityManager : MonoBehaviour
 
             if (dist > maxDist) continue;
 
-            if (!found || dist < bestDist)
+            if (!found || (_near ? dist < bestDist : dist > bestDist))
             {
                 found = true;
                 bestDist = dist;
-                nearest = entity;
+                result = entity;
             }
         }
 
         if (!found) return null;
-        return nearest;
+        return result;
     }
 
     private T GetByStat<T>(List<T> _list, System.Func<T, int> _selector, bool _low, int _min = 0, bool _useMin = false) where T : class
@@ -502,30 +502,49 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region GET_몬스터
-    public Monster GetMonster()
+    public Monster GetMonsterRandom()
         => GetRandom(monsters);
 
-    public Monster GetMonster(int _index)
-        => GetByIndex(monsters, _index);
+    public Monster GetMonsterFirst()
+        => GetByIndex(monsters, 0);
 
-    public Monster GetMonster(Vector3 _pos, int _distance = 0)
-        => GetByDistance(monsters, _pos, _distance, mapRoadTilemap);
+    public Monster GetMonsterLast()
+        => GetByIndex(monsters, monsters.Count - 1);
 
-    public Monster GetMonster(bool _lowHealth)
-        => GetByStat(monsters, _monster => _monster.GetHealth(), _lowHealth);
+    public Monster GetMonsterNearest(Vector3 _pos, int _distance = 0)
+        => GetByDistance(monsters, _pos, true, _distance, mapRoadTilemap);
+
+    public Monster GetMonsterFarthest(Vector3 _pos, int _distance = 0)
+        => GetByDistance(monsters, _pos, false, _distance, mapRoadTilemap);
+
+    public Monster GetMonsterLowHealth()
+        => GetByStat(monsters, _monster => _monster.GetHealth(), true);
+
+    public Monster GetMonsterHighHealth()
+        => GetByStat(monsters, _monster => _monster.GetHealth(), false);
     #endregion
 
     #region GET_타워
-    public Tower GetTower()
+    public Tower GetTowerRandom()
         => GetRandom(towers);
 
-    public Tower GetTower(int _index)
-        => GetByIndex(towers, _index);
+    public Tower GetTowerFirst()
+        => GetByIndex(towers, 0);
 
-    public Tower GetTower(Vector3 _pos, int _distance = 0)
-        => GetByDistance(towers, _pos, _distance, mapSlotTilemap);
+    public Tower GetTowerLast()
+    => GetByIndex(towers, towers.Count - 1);
 
-    public Tower GetTower(bool _lowRank, int _minRank = 0)
-        => GetByStat(towers, _tower => _tower.GetRank(), _lowRank, _minRank, true);
+    public Tower GetTowerClose(Vector3 _pos, int _distance = 0)
+        => GetByDistance(towers, _pos, true, _distance, mapSlotTilemap);
+
+    public Tower GetTowerFar(Vector3 _pos, int _distance = 0)
+        => GetByDistance(towers, _pos, false, _distance, mapSlotTilemap);
+
+    public Tower GetTowerLowRank(int _minRank = 0)
+        => GetByStat(towers, _tower => _tower.GetRank(), true, _minRank, true);
+
+    public Tower GetTowerHighRank(int _minRank = 0)
+        => GetByStat(towers, _tower => _tower.GetRank(), false, _minRank, true);
     #endregion
+
 }

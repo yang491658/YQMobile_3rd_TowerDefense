@@ -16,10 +16,26 @@ public class TowerData : ScriptableObject
     public Sprite BaseImage;
     public Sprite SymbolImage;
     public Color Color = Color.red;
+    
+    [Header("Type")]
+    public TowerGrade Grade;
+    public TowerRole Role;
 
     [Header("Battle")]
     public int AttackDamage = 1;
     public float AttackSpeed = 3f;
+    public AttackTarget AttackTarget = AttackTarget.First;
+
+    [Header("Effect")]
+    public TriggerTime Trigger = TriggerTime.None;
+    public HitType HitType = HitType.None;
+    public DebuffType DebuffType = DebuffType.None;
+    public BuffType BuffType = BuffType.None;
+
+    [Header("Value")]
+    public float Value1;
+    public float Value2;
+    public float Value3;
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -109,8 +125,6 @@ public class TowerData : ScriptableObject
     {
         TowerData clone = CreateInstance<TowerData>();
 
-        clone.name = this.Name;
-
         clone.ID = this.ID;
         clone.Name = this.Name;
         clone.BaseImage = this.BaseImage;
@@ -119,6 +133,20 @@ public class TowerData : ScriptableObject
 
         clone.AttackDamage = this.AttackDamage;
         clone.AttackSpeed = this.AttackSpeed;
+
+        clone.Grade = this.Grade;
+        clone.Role = this.Role;
+
+        clone.AttackTarget = this.AttackTarget;
+        clone.Trigger = this.Trigger;
+
+        clone.HitType = this.HitType;
+        clone.DebuffType = this.DebuffType;
+        clone.BuffType = this.BuffType;
+
+        clone.Value1 = this.Value1;
+        clone.Value2 = this.Value2;
+        clone.Value3 = this.Value3;
 
         return clone;
     }

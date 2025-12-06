@@ -17,5 +17,15 @@ MonoBehaviour:
   BaseImage: {fileID: 21300000, guid: 4a437629c45d00240b560a584810bae1, type: 3}
   SymbolImage: {fileID: 21300000, guid: c9268346f2ed937448383b982f7616aa, type: 3}
   Color: {r: 1, g: 0, b: 0, a: 1}
+  Grade: 0
+  Role: 0
   AttackDamage: 1
   AttackSpeed: 3
+  AttackTarget: 2
+  Trigger: 0
+  HitType: 0
+  DebuffType: 0
+  BuffType: 0
+  Value1: 0
+  Value2: 0
+  Value3: 0

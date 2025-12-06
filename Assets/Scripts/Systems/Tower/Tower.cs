@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class Tower : Entity
 {
+    [Header("Control")]
+    private bool isDragging;
+
     [Header("Data")]
     [SerializeField] private TowerData data;
     [SerializeField] private Transform outLine;
@@ -23,9 +26,6 @@ public class Tower : Entity
     [SerializeField] private float attackSpeed;
     private float attackTimer;
     [SerializeField] private List<Bullet> bullets = new List<Bullet>();
-
-    [Header("Control")]
-    private bool isDragging;
 
     protected override void Awake()
     {
@@ -124,11 +124,8 @@ public class Tower : Entity
         attackTimer -= Time.deltaTime;
         if (attackTimer > 0f) return;
 
-        if (target == null || target.IsDead())
-        {
-            target = EntityManager.Instance?.GetMonster(0);
-            if (target == null || target.IsDead()) return;
-        }
+        SetTarget();
+        if (target == null || target.IsDead()) return;
 
         Shoot();
         attackTimer = attackSpeed;
@@ -187,15 +184,6 @@ public class Tower : Entity
     #endregion
 
     #region SET
-    public void SetRank(int _rank)
-    {
-        rank = Mathf.Clamp(_rank, 1, maxRank);
-        UpdateRank();
-
-        attackDamage = data.AttackDamage * rank;
-        attackSpeed = data.AttackSpeed / rank;
-    }
-
     public virtual void SetData(TowerData _data)
     {
         data = _data;
@@ -208,9 +196,54 @@ public class Tower : Entity
 
         SetRank(1);
     }
+
+    public void SetRank(int _rank)
+    {
+        rank = Mathf.Clamp(_rank, 1, maxRank);
+        UpdateRank();
+
+        attackDamage = data.AttackDamage * rank;
+        attackSpeed = data.AttackSpeed / rank;
+    }
+
+    private void SetTarget()
+    {
+        switch (data.AttackTarget)
+        {
+            case AttackTarget.None:
+                target = null;
+                return;
+            case AttackTarget.Random:
+                target = EntityManager.Instance?.GetMonsterRandom();
+                break;
+            case AttackTarget.First:
+                target = EntityManager.Instance?.GetMonsterFirst();
+                break;
+            case AttackTarget.Last:
+                target = EntityManager.Instance?.GetMonsterLast();
+                break;
+            case AttackTarget.Near:
+                target = EntityManager.Instance?.GetMonsterNearest(transform.position);
+                break;
+            case AttackTarget.Far:
+                target = EntityManager.Instance?.GetMonsterFarthest(transform.position);
+                break;
+            case AttackTarget.Weak:
+                target = EntityManager.Instance?.GetMonsterLowHealth();
+                break;
+            case AttackTarget.Strong:
+                target = EntityManager.Instance?.GetMonsterHighHealth();
+                break;
+            case AttackTarget.NoDebuff:
+                break;
+        }
+    }
+
     #endregion
 
     #region GET
+    public bool IsDragging() => isDragging;
+
     public int GetID() => data.ID;
     public Color GetColor() => data.Color;
 
@@ -221,6 +254,5 @@ public class Tower : Entity
 
     public Monster GetTarget() => target;
     public int GetDamage() => attackDamage;
-    public bool IsDragging() => isDragging;
     #endregion
 }
