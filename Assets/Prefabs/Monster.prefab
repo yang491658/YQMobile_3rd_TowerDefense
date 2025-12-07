@@ -414,8 +414,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8dfdcf3aedd79c44a12f0eb3a98fbb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pathIndex: 0
   moveSpeed: 3
+  moveDir: {x: 0, y: 0, z: 0}
   health: 5
-  damageDuration: 1.5
+  damageDuration: 1
   damageSpeed: 3
   dropGold: 1
+  dotDamage: 0
+  dotDuration: 0
+  dotInterval: 0

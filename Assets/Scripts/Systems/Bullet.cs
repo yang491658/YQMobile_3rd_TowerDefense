@@ -4,9 +4,9 @@ public class Bullet : Entity
 {
     [Header("Move")]
     [SerializeField] private Monster target;
+    private Vector3 targetPos;
     [Space]
     [SerializeField] private float moveSpeed = 10f;
-    private Vector3 moveDir;
 
     [Header("Battle")]
     [SerializeField] private Tower tower;
@@ -41,9 +41,17 @@ public class Bullet : Entity
     public virtual void UpdateMove()
     {
         if (target != null && !target.IsDead)
-            moveDir = (target.transform.position - transform.position).normalized;
+            targetPos = target.transform.position;
 
-        Move(moveDir * moveSpeed);
+        Vector3 toBefore = targetPos - transform.position;
+        Vector3 dir = toBefore.normalized;
+
+        Move(dir * moveSpeed);
+
+        Vector3 toAfter = targetPos - transform.position;
+
+        if (Vector3.Dot(toBefore, toAfter) < 0.3f)
+            Destroy(gameObject);
     }
 
     #region SET
@@ -61,7 +69,7 @@ public class Bullet : Entity
 
         sr.color = _tower.GetColor();
         target = _tower.GetTarget();
-        moveDir = (target.transform.position - transform.position).normalized;
+        targetPos = target.transform.position;
 
         tower.AddBullet(this);
     }

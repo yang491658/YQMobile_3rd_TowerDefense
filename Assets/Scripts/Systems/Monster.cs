@@ -7,17 +7,18 @@ public class Monster : Entity
     private static int sorting = 0;
 
     [Header("Move")]
-    [SerializeField] private float moveSpeed = 3f;
+    [SerializeField] private int pathIndex;
     private Transform[] paths;
-    private int pathIndex;
+    [SerializeField] private float moveSpeed = 3f;
+    [SerializeField] private Vector3 moveDir;
 
     [Header("Battle")]
     [SerializeField] private int health = 5;
     private Canvas canvas;
     private TextMeshProUGUI healthText;
     [Space]
-    [SerializeField] private float damageDuration = 1.5f;
-    [SerializeField] private float damageSpeed = 3.5f;
+    [SerializeField] private float damageDuration = 1f;
+    [SerializeField] private float damageSpeed = 3f;
     [Space]
     [SerializeField] private int dropGold = 1;
     public bool IsDead { private set; get; } = false;
@@ -70,7 +71,8 @@ public class Monster : Entity
     {
         if (pathIndex >= paths.Length)
         {
-            Move(Vector3.right * moveSpeed);
+            moveDir = Vector3.right;
+            Move(moveDir * moveSpeed);
             return;
         }
 
@@ -81,14 +83,16 @@ public class Monster : Entity
         {
             if (++pathIndex >= paths.Length)
             {
-                Move(Vector3.right * moveSpeed);
+                moveDir = Vector3.right;
+                Move(moveDir * moveSpeed);
                 return;
             }
 
             delta = paths[pathIndex].position - transform.position;
         }
 
-        Move(delta.normalized * moveSpeed);
+        moveDir = delta.normalized;
+        Move(moveDir * moveSpeed);
     }
 
     #region 전투_기본
@@ -115,13 +119,21 @@ public class Monster : Entity
     {
         float time = 0f;
         Vector3 start = _text.transform.position;
+        Vector3 dir = Vector3.up;
+        if (Mathf.Abs(moveDir.x) < 0.01f)
+        {
+            if (moveDir.y > 0f)
+                dir = Vector3.right;
+            else if (moveDir.y < 0f)
+                dir = Vector3.left;
+        }
 
         while (time < damageDuration)
         {
             time += Time.deltaTime;
             float t = time / damageDuration;
 
-            _text.transform.position = start + Vector3.up * damageSpeed * time;
+            _text.transform.position = start + dir * damageSpeed * time;
 
             Color c = _text.color;
             c.a = Mathf.Lerp(1f, 0f, t);

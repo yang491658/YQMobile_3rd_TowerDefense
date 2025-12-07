@@ -250,6 +250,7 @@ public class EntityManager : MonoBehaviour
     public TowerData SearchTower(int _id) => towerDic.TryGetValue(_id, out var _data) ? _data : null;
     public Tower SpawnTower(int _id = 0, Vector3? _pos = null, bool _useGold = true)
     {
+        _id = 1; // 임시
         TowerData data = (_id == 0)
             ? towerDatas[Random.Range(0, towerDatas.Length)]
             : SearchTower(_id);
