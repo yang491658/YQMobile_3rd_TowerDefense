@@ -185,8 +185,8 @@ public class TowerData : ScriptableObject
         clone.AttackSpeed = this.AttackSpeed;
         clone.AttackTarget = this.AttackTarget;
 
-        clone.Skills = this.Skills;
-        clone.Values = this.Values;
+        clone.Skills = new List<TowerSkill>(Skills);
+        clone.Values = new List<Vector3>(Values);
 
         return clone;
     }

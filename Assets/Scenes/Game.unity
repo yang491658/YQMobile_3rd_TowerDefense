@@ -1493,7 +1493,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   select: {fileID: 0}
   maxDrag: 0
-  slowSpeed: 0.5
   markDuration: 1
   markRadius: 0.5
   markSegment: 24
