@@ -46,9 +46,8 @@ public class TowerData : ScriptableObject
     [Header("Data")]
     public int ID;
     public string Name;
-    public Sprite BaseImage;
-    public Sprite SymbolImage;
-    public Color Color = Color.red;
+    public Sprite Symbol;
+    public Color Color = Color.black;
 
     [Header("Type")]
     public TowerGrade Grade;
@@ -87,21 +86,21 @@ public class TowerData : ScriptableObject
         foreach (var g in AssetDatabase.FindAssets("t:TowerData"))
         {
             var d = AssetDatabase.LoadAssetAtPath<TowerData>(AssetDatabase.GUIDToAssetPath(g));
-            if (d != null && d != this && d.BaseImage != null)
+            if (d != null && d != this && d.Symbol != null)
             {
-                string path = AssetDatabase.GetAssetPath(d.BaseImage);
+                string path = AssetDatabase.GetAssetPath(d.Symbol);
                 string dir = Path.GetDirectoryName(path);
                 if (string.IsNullOrEmpty(dir)) continue;
 
                 dir = dir.Replace("\\", "/");
                 if (!dir.EndsWith("/Images/Towers")) continue;
 
-                used.Add(d.BaseImage.name);
+                used.Add(d.Symbol.name);
             }
         }
 
         Sprite pick = null;
-        if (BaseImage == null || used.Contains(BaseImage.name))
+        if (Symbol == null || used.Contains(Symbol.name))
         {
             for (int i = 0; i < baseSprites.Count; i++)
             {
@@ -111,36 +110,34 @@ public class TowerData : ScriptableObject
                 pick = s;
                 break;
             }
-            BaseImage = pick;
+
+            if (pick == null)
+            {
+                for (int i = 0; i < baseSprites.Count; i++)
+                {
+                    Sprite s = baseSprites[i];
+                    if (s.name == "Star")
+                    {
+                        pick = s;
+                        break;
+                    }
+                }
+            }
+            Symbol = pick;
         }
 
-        if (BaseImage != null)
+        if (Symbol != null && Symbol.name != "Star")
         {
-            var m = Regex.Match(BaseImage.name, @"^(?<num>\d+)\.");
+            var m = Regex.Match(Symbol.name, @"^(?<num>\d+)\.");
             ID = m.Success ? int.Parse(m.Groups["num"].Value) : ID;
 
-            string rawName = BaseImage.name;
+            string rawName = Symbol.name;
             Name = Regex.Replace(rawName, @"^\d+\.", "");
         }
         else
         {
             ID = 0;
             Name = null;
-        }
-
-        var symbolSprites = Resources.LoadAll<Sprite>("Images/Towers/Symbol");
-        if (ID > 0)
-        {
-            string prefix = ID.ToString("D2") + ".";
-            for (int i = 0; i < symbolSprites.Length; i++)
-            {
-                Sprite s = symbolSprites[i];
-                if (s.name.StartsWith(prefix))
-                {
-                    SymbolImage = s;
-                    break;
-                }
-            }
         }
 
         for (int i = 0; i < Values.Count; i++)
@@ -178,8 +175,7 @@ public class TowerData : ScriptableObject
 
         clone.ID = this.ID;
         clone.Name = this.Name;
-        clone.BaseImage = this.BaseImage;
-        clone.SymbolImage = this.SymbolImage;
+        clone.Symbol = this.Symbol;
         clone.Color = this.Color;
 
         clone.Grade = this.Grade;

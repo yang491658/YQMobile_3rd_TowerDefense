@@ -74,7 +74,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1516283247
-  m_SortingLayer: 2
+  m_SortingLayer: 1
   m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: e419aaa4e734e654b9e933f9a7e5adf2, type: 3}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
@@ -115,7 +115,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 8704282300623313494}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -161,7 +161,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1516283247
-  m_SortingLayer: 2
+  m_SortingLayer: 1
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: d34ae15399c293644b150c5c6f802a3b, type: 3}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
@@ -205,7 +205,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6618385927607765839}
   - {fileID: 6968313113729995}
@@ -253,7 +253,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1516283247
-  m_SortingLayer: 2
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: f757fa99c43327540b26d460d25aea40, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -343,10 +343,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   data: {fileID: 0}
   outLine: {fileID: 0}
+  isDragging: 0
+  slot: {x: 0, y: 0, z: 0}
   symbol: {fileID: 0}
   rank: 0
-  target: {fileID: 0}
   attackDamage: 0
   attackSpeed: 0
+  attackTarget: {fileID: 0}
   bullets: []
   skills: []
+  values: []
