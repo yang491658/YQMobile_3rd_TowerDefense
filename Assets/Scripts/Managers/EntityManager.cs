@@ -543,6 +543,20 @@ public class EntityManager : MonoBehaviour
 
     public Monster GetMonsterHighHealth()
         => GetByStat(monsters, _monster => _monster.GetHealth(), false);
+
+    public Monster GetMonsterNoDebuff()
+    {
+        List<Monster> list = new List<Monster>();
+        for (int i = 0; i < monsters.Count; i++)
+        {
+            Monster monster = monsters[i];
+            if (!monster.HasDebuff())
+                list.Add(monster);
+        }
+        if (list.Count == 0) return null;
+
+        return GetRandom(list);
+    }
     #endregion
 
     #region GET_타워

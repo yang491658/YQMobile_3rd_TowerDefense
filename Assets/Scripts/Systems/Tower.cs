@@ -280,6 +280,8 @@ public class Tower : Entity
                 attackTarget = EntityManager.Instance?.GetMonsterHighHealth();
                 break;
             case AttackTarget.NoDebuff:
+                attackTarget = EntityManager.Instance?.GetMonsterNoDebuff();
+                if (attackTarget == null) attackTarget = EntityManager.Instance?.GetMonsterRandom();
                 break;
         }
     }

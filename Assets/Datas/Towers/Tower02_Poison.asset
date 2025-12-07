@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
+  m_Name: Tower02_Poison
+  m_EditorClassIdentifier: 
+  ID: 2
+  Name: Poison
+  Symbol: {fileID: 21300000, guid: 47e8fc506bce7144bb92c23b78da7323, type: 3}
+  Color: {r: 0, g: 1, b: 0, a: 1}
+  Grade: 0
+  Role: 1
+  AttackDamage: 1
+  AttackSpeed: 3
+  AttackTarget: 1
+  Skills:
+  - {fileID: 11400000, guid: d5a387e8a84441145a4fd0601acc5d16, type: 2}
+  Values:
+  - {x: 1, y: 1, z: 1}
+  - {x: 3, y: 0, z: 0}
+  - {x: 1, y: 0, z: 0}

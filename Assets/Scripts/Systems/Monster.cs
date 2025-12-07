@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -21,6 +22,14 @@ public class Monster : Entity
     [Space]
     [SerializeField] private int dropGold = 1;
     public bool IsDead { private set; get; } = false;
+
+    [Header("Debuff / Dot")]
+    [SerializeField] private float dotDamage;
+    [SerializeField] private float dotDuration;
+    [SerializeField] private float dotInterval;
+    private float dotTimer;
+    private float dotTickTimer;
+    private bool hasDot;
 
     protected override void Awake()
     {
@@ -47,6 +56,7 @@ public class Monster : Entity
         if (IsDead) return;
 
         UpdateMove();
+        UpdateDot(Time.deltaTime);
     }
 
     private void OnBecameInvisible()
@@ -82,16 +92,16 @@ public class Monster : Entity
         Move(delta.normalized * moveSpeed);
     }
 
-    #region 전투
+    #region 전투_기본
     public void TakeDamage(float _damage) => TakeDamage((int)_damage);
     public void TakeDamage(int _damage)
     {
         SetHealth(health - _damage);
-        CreateDamage(_damage);
+        CreateDamageText(_damage);
         if (health <= 0) Die();
     }
 
-    private void CreateDamage(int _damage)
+    private void CreateDamageText(int _damage)
     {
         TextMeshProUGUI t = Instantiate(healthText, canvas.transform);
 
@@ -99,10 +109,10 @@ public class Monster : Entity
         t.transform.localPosition = healthText.transform.localPosition;
         t.text = _damage.ToString();
 
-        StartCoroutine(DamageCoroutine(t));
+        StartCoroutine(DamageTextCoroutine(t));
     }
 
-    private IEnumerator DamageCoroutine(TextMeshProUGUI _text)
+    private IEnumerator DamageTextCoroutine(TextMeshProUGUI _text)
     {
         float time = 0f;
         Vector3 start = _text.transform.position;
@@ -132,6 +142,10 @@ public class Monster : Entity
         sr.enabled = false;
         healthText.enabled = false;
 
+        Effect[] effects = GetComponentsInChildren<Effect>();
+        for (int i = 0; i < effects.Length; i++)
+            Destroy(effects[i].gameObject);
+
         GameManager.Instance?.ScoreUp();
         GameManager.Instance?.GoldUp(dropGold);
         EntityManager.Instance?.RemoveMonster(this);
@@ -145,12 +159,53 @@ public class Monster : Entity
     }
     #endregion
 
+    #region 디버프_도트
+    public void ApplyDot(float _damage, float _duration, float _interval)
+    {
+        dotDamage = _damage;
+        dotDuration = _duration;
+        dotInterval = _interval;
+
+        dotTimer = 0f;
+        dotTickTimer = 0f;
+        hasDot = true;
+    }
+
+    private void UpdateDot(float _deltaTime)
+    {
+        if (!hasDot) return;
+
+        dotTimer += _deltaTime;
+        dotTickTimer += _deltaTime;
+
+        while (dotTickTimer >= dotInterval)
+        {
+            dotTickTimer -= dotInterval;
+
+            int value = Mathf.CeilToInt(dotDamage * dotInterval);
+            TakeDamage(value);
+            if (IsDead)
+            {
+                hasDot = false;
+                return;
+            }
+        }
+
+        if (dotTimer >= dotDuration)
+            hasDot = false;
+    }
+    #endregion
+
     #region SET
+    public void SetPath(Transform[] _path)
+    {
+        paths = _path;
+        pathIndex = 0;
+    }
+
     public void SetMonster(int _set)
     {
         SetHealth(health * _set);
-
-        pathIndex = 0;
         dropGold *= _set;
     }
 
@@ -159,15 +214,10 @@ public class Monster : Entity
         health = _health;
         healthText.text = health.ToString();
     }
-
-    public void SetPath(Transform[] _path)
-    {
-        paths = _path;
-        pathIndex = 0;
-    }
     #endregion
 
     #region GET
     public int GetHealth() => health;
+    public bool HasDebuff() => hasDot;
     #endregion
 }
