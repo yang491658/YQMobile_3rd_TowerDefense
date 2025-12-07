@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
-  m_Name: Tower01_Tower
+  m_Name: Tower01_Red
   m_EditorClassIdentifier: 
   ID: 1
-  Name: Tower
+  Name: Red
   BaseImage: {fileID: 21300000, guid: 4a437629c45d00240b560a584810bae1, type: 3}
   SymbolImage: {fileID: 21300000, guid: c9268346f2ed937448383b982f7616aa, type: 3}
   Color: {r: 1, g: 0, b: 0, a: 1}

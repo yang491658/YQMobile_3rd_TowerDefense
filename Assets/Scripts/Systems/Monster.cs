@@ -83,7 +83,9 @@ public class Monster : Entity
     }
 
     #region 전투
+    public void TakeDamage(float _damage) => TakeDamage((int)_damage);
     public void TakeDamage(int _damage) => TakeDamage(_damage, healthText.color);
+    public void TakeDamage(float _damage, Color _color) => TakeDamage((int)_damage, _color);
     public void TakeDamage(int _damage, Color _color)
     {
         SetHealth(health - _damage);

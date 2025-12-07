@@ -134,7 +134,7 @@ public class TestManager : MonoBehaviour
 
     private void AutoMergeTower()
     {
-        List<Tower> towers = EntityManager.Instance?.GetTowers();
+        var towers = EntityManager.Instance?.GetTowers();
         if (towers == null) return;
 
         int len = towers.Count;

@@ -28,7 +28,7 @@ public class Tower : Entity
 
     [Header("Skill")]
     [SerializeField] private List<TowerSkill> skills = new List<TowerSkill>();
-    [SerializeField] private List<float> values;
+    [SerializeField] private List<float> values = new List<float>();
 
     protected override void Awake()
     {
@@ -213,7 +213,6 @@ public class Tower : Entity
         for (int i = 0; i < data.Skills.Count; i++)
         {
             TowerSkill skill = Instantiate(data.Skills[i]);
-            skill.Initialize(this);
             skills.Add(skill);
         }
 
@@ -227,6 +226,28 @@ public class Tower : Entity
 
         attackDamage = data.AttackDamage * rank;
         attackSpeed = data.AttackSpeed / rank;
+
+        values.Clear();
+        for (int i = 0; i < data.Values.Count; i++)
+            values.Add(SetValue(i));
+
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnChange(this);
+    }
+
+    public float SetValue(int _index)
+    {
+        Vector3 value = data.Values[_index];
+
+        if (value.y != 0f)
+        {
+            if (value.z == 0f)
+                return value.x + value.y * (rank - 1);
+            else if (value.z == 1f)
+                return value.x * rank;
+        }
+
+        return value.x;
     }
 
     private void SetTarget()
@@ -267,20 +288,6 @@ public class Tower : Entity
     public TowerData GetData() => data;
     public int GetID() => data.ID;
     public Color GetColor() => data.Color;
-    public float GetValue(int index)
-    {
-        Vector3 value = data.Values[index - 1];
-
-        if (value.y != 0f)
-        {
-            if (value.z == 0f)
-                return value.x + value.y * (rank - 1);
-            else if (value.z == 1f)
-                return value.x * rank;
-        }
-
-        return value.x;
-    }
 
     public bool IsDragging() => isDragging;
     public Vector3 GetSlot() => slot;
@@ -289,5 +296,6 @@ public class Tower : Entity
     public bool IsMax() => isMax;
     public int GetDamage() => attackDamage;
     public Monster GetTarget() => attackTarget;
+    public float GetValue(int _index) => values[_index];
     #endregion
 }

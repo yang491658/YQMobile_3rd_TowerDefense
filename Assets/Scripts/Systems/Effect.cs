@@ -5,27 +5,21 @@ public class Effect : MonoBehaviour
 {
     private SpriteRenderer sr;
 
-    [SerializeField] private float duration = 0.5f;
-
     private void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
     }
 
     #region SET
-    public void SetEffect(Color _color, float _radius)
+    public void SetEffect(Color _color, float _radius, float _duration)
     {
         Color c = _color;
-        c.a = 30f / 255f;
+        c.a = 0.1f;
         sr.color = c;
 
-        float currentRadius = sr.bounds.extents.x;
-        if (currentRadius <= 0f) return;
+        transform.localScale *= _radius / sr.size.x;
 
-        float scaleFactor = _radius / currentRadius;
-        transform.localScale *= scaleFactor;
-
-        Destroy(gameObject, duration);
+        Destroy(gameObject, _duration);
     }
     #endregion
 }

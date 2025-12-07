@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4172624348471402388}
   - component: {fileID: 2004507560401927890}
   m_Layer: 9
-  m_Name: Effect_Circle
+  m_Name: Splash
   m_TagString: Effect
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
