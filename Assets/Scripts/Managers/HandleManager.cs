@@ -29,8 +29,6 @@ public class HandleManager : MonoBehaviour
     private Vector3 dragCurrent;
     private bool isOverUI;
 
-    [Header("Slow")]
-    [SerializeField] private float slowSpeed = 0.5f;
     private float prevSpeed;
     private bool isSlow;
 
@@ -275,7 +273,7 @@ public class HandleManager : MonoBehaviour
         if (!isSlow)
         {
             prevSpeed = GameManager.Instance.GetSpeed();
-            GameManager.Instance?.SetSpeed(slowSpeed);
+            GameManager.Instance?.SetSpeed(GameManager.Instance.GetMinSpeed());
             isSlow = true;
         }
     }

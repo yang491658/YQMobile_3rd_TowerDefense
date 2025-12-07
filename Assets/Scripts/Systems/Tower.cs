@@ -132,7 +132,7 @@ public class Tower : Entity
         if (attackTimer > 0f) return;
 
         SetTarget();
-        if (attackTarget == null || attackTarget.IsDead()) return;
+        if (attackTarget == null || attackTarget.IsDead) return;
 
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnAttack(this);
@@ -166,6 +166,8 @@ public class Tower : Entity
     {
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnHit(this, _target);
+
+        _target.TakeDamage(attackDamage);
     }
     #endregion
 

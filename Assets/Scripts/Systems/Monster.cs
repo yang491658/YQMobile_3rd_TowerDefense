@@ -20,7 +20,7 @@ public class Monster : Entity
     [SerializeField] private float damageSpeed = 3.5f;
     [Space]
     [SerializeField] private int dropGold = 1;
-    private bool isDead;
+    public bool IsDead { private set; get; } = false;
 
     protected override void Awake()
     {
@@ -44,14 +44,14 @@ public class Monster : Entity
     {
         base.Update();
 
-        if (isDead) return;
+        if (IsDead) return;
 
         UpdateMove();
     }
 
     private void OnBecameInvisible()
     {
-        if (isDead) return;
+        if (IsDead) return;
 
         GameManager.Instance?.LifeDown(health);
         EntityManager.Instance?.DespawnMonster(this);
@@ -84,28 +84,25 @@ public class Monster : Entity
 
     #region 전투
     public void TakeDamage(float _damage) => TakeDamage((int)_damage);
-    public void TakeDamage(int _damage) => TakeDamage(_damage, healthText.color);
-    public void TakeDamage(float _damage, Color _color) => TakeDamage((int)_damage, _color);
-    public void TakeDamage(int _damage, Color _color)
+    public void TakeDamage(int _damage)
     {
         SetHealth(health - _damage);
-        CreateDamage(_damage, _color);
+        CreateDamage(_damage);
         if (health <= 0) Die();
     }
 
-    private void CreateDamage(int _damage, Color _color)
+    private void CreateDamage(int _damage)
     {
         TextMeshProUGUI t = Instantiate(healthText, canvas.transform);
 
         t.gameObject.name = "Damage";
         t.transform.localPosition = healthText.transform.localPosition;
         t.text = _damage.ToString();
-        t.color = _color;
 
-        StartCoroutine(DamageCoroutine(t, _color));
+        StartCoroutine(DamageCoroutine(t));
     }
 
-    private IEnumerator DamageCoroutine(TextMeshProUGUI _text, Color _color)
+    private IEnumerator DamageCoroutine(TextMeshProUGUI _text)
     {
         float time = 0f;
         Vector3 start = _text.transform.position;
@@ -117,7 +114,7 @@ public class Monster : Entity
 
             _text.transform.position = start + Vector3.up * damageSpeed * time;
 
-            Color c = _color;
+            Color c = _text.color;
             c.a = Mathf.Lerp(1f, 0f, t);
             _text.color = c;
 
@@ -129,8 +126,8 @@ public class Monster : Entity
 
     public void Die()
     {
-        if (isDead) return;
-        isDead = true;
+        if (IsDead) return;
+        IsDead = true;
 
         sr.enabled = false;
         healthText.enabled = false;
@@ -172,6 +169,5 @@ public class Monster : Entity
 
     #region GET
     public int GetHealth() => health;
-    public bool IsDead() => isDead;
     #endregion
 }
