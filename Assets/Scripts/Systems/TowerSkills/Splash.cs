@@ -12,9 +12,6 @@ public class Splash : TowerSkill
         range = _tower.GetValue(1);
     }
 
-    public override void OnUpdate(Tower _tower, float _deltaTime) { }
-    public override void OnAttack(Tower _tower) { }
-
     public override void OnHit(Tower _tower, Monster _target)
     {
         Vector3 center = _target.transform.position;
