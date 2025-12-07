@@ -18,7 +18,18 @@ public class TestManager : MonoBehaviour
 
     [Header("Entity Test")]
     [SerializeField] private bool spawn = true;
+    [SerializeField][Min(0)] private int id = 0;
     [SerializeField][Min(1)] private int rank = 3;
+
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if( id < 0) id = 0;
+        if(rank < 1 ) rank = 1;
+        else if (rank > 7) rank = 7;
+    }
+#endif
 
     private void Awake()
     {
@@ -57,7 +68,7 @@ public class TestManager : MonoBehaviour
             AutoMergeTower();
 
             if (GameManager.Instance?.GetGold() >= EntityManager.Instance?.GetNeedGold())
-                if (EntityManager.Instance?.SpawnTower() == null) MergeTower();
+                if (EntityManager.Instance?.SpawnTower(id) == null) MergeTower();
             if (GameManager.Instance.IsGameOver && autoRoutine == null)
                 autoRoutine = StartCoroutine(AutoReplay());
         }
@@ -161,7 +172,7 @@ public class TestManager : MonoBehaviour
                     if (b == null || b.IsDragging()) continue;
                     if (b.GetRank() != r) continue;
 
-                    if (EntityManager.Instance?.MergeTower(a, b) != null)
+                    if (EntityManager.Instance?.MergeTower(a, b, id) != null)
                         return;
                 }
             }
@@ -217,7 +228,7 @@ public class TestManager : MonoBehaviour
                     int jLocal = indices[m];
                     Tower b = towers[jLocal];
 
-                    if (EntityManager.Instance?.MergeTower(a, b) != null) return;
+                    if (EntityManager.Instance?.MergeTower(a, b, id) != null) return;
                 }
             }
         }

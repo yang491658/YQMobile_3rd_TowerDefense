@@ -154,7 +154,7 @@ public class Tower : Entity
     #region 불릿
     public void AddBullet(Bullet _bullet) => bullets.Add(_bullet);
     public void RemoveBullet(Bullet _bullet) => bullets.Remove(_bullet);
-    public void CorrectBullets(Vector3 _delta)
+    public void SortBullets(Vector3 _delta)
     {
         for (int i = 0; i < bullets.Count; i++)
         {
@@ -162,13 +162,23 @@ public class Tower : Entity
             b.transform.position -= _delta;
         }
     }
-    public void HitBullet(Monster _target)
+
+    private void HitBullet(Monster _target, Vector3 _pos)
     {
         for (int i = 0; i < skills.Count; i++)
-            skills[i].OnHit(this, _target);
+        {
+            TowerSkill skill = skills[i];
 
-        _target.TakeDamage(attackDamage);
+            if (_target != null)
+                skill.OnHit(this, _target);
+            else if (skill is SplashDamage _splash)
+                _splash.OnHit(this, _pos);
+        }
+
+        _target?.TakeDamage(attackDamage);
     }
+    public void HitBullet(Monster _target) => HitBullet(_target, _target.transform.position);
+    public void HitBullet(Vector3 _pos) => HitBullet(null, _pos);
     #endregion
 
     #region 조작

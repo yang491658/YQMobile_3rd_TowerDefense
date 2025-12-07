@@ -51,7 +51,12 @@ public class Bullet : Entity
         Vector3 toAfter = targetPos - transform.position;
 
         if (Vector3.Dot(toBefore, toAfter) < 0.3f)
+        {
+            if (target == null || target.IsDead)
+                tower.HitBullet(targetPos);
+
             Destroy(gameObject);
+        }
     }
 
     #region SET

@@ -14,10 +14,10 @@ public class Effect : MonoBehaviour
     public void SetEffect(Color _color, float _scale, float _duration)
     {
         Color c = _color;
-        c.a = 0.1f;
+        c.a = 0.15f;
         sr.color = c;
 
-        transform.localScale *= _scale / sr.size.x;
+        transform.localScale *= _scale;
 
         Destroy(gameObject, _duration);
     }

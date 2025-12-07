@@ -250,7 +250,6 @@ public class EntityManager : MonoBehaviour
     public TowerData SearchTower(int _id) => towerDic.TryGetValue(_id, out var _data) ? _data : null;
     public Tower SpawnTower(int _id = 0, Vector3? _pos = null, bool _useGold = true)
     {
-        _id = 1; // 임시
         TowerData data = (_id == 0)
             ? towerDatas[Random.Range(0, towerDatas.Length)]
             : SearchTower(_id);
@@ -274,7 +273,7 @@ public class EntityManager : MonoBehaviour
         return tower;
     }
 
-    public Tower MergeTower(Tower _select, Tower _target)
+    public Tower MergeTower(Tower _select, Tower _target, int _id = 0)
     {
         if (_select == _target
             || _select.GetID() != _target.GetID()
@@ -287,7 +286,7 @@ public class EntityManager : MonoBehaviour
         DespawnTower(_select);
         DespawnTower(_target);
 
-        Tower merge = SpawnTower(0, pos, false);
+        Tower merge = SpawnTower(_id, pos, false);
         merge.SetRank(rank + 1);
 
         return merge;

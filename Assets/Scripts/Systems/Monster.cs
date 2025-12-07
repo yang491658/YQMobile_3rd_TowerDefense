@@ -46,7 +46,7 @@ public class Monster : Entity
     {
         base.Start();
 
-        SetMonster(1 + GameManager.Instance.GetScore() / 30);
+        SetMonster(GameManager.Instance.GetScore() / 10);
     }
 
     protected override void Update()
@@ -177,8 +177,8 @@ public class Monster : Entity
         dotDuration = _duration;
         dotInterval = _interval;
 
-        dotTimer = 0f;
-        dotTickTimer = 0f;
+        dotTimer = dotDuration;
+        dotTickTimer = dotInterval;
         hasDot = true;
     }
 
@@ -186,12 +186,12 @@ public class Monster : Entity
     {
         if (!hasDot) return;
 
-        dotTimer += _deltaTime;
-        dotTickTimer += _deltaTime;
+        dotTimer -= _deltaTime;
+        dotTickTimer -= _deltaTime;
 
-        while (dotTickTimer >= dotInterval)
+        while (dotTickTimer < 0f)
         {
-            dotTickTimer -= dotInterval;
+            dotTickTimer += dotInterval;
 
             int value = Mathf.CeilToInt(dotDamage * dotInterval);
             TakeDamage(value);
@@ -202,7 +202,7 @@ public class Monster : Entity
             }
         }
 
-        if (dotTimer >= dotDuration)
+        if (dotTimer < 0f)
             hasDot = false;
     }
     #endregion
@@ -216,8 +216,8 @@ public class Monster : Entity
 
     public void SetMonster(int _set)
     {
-        SetHealth(health * _set);
-        dropGold *= _set;
+        SetHealth(Mathf.Max(health * _set, 5));
+        dropGold = Mathf.Max(dropGold * _set, 1);
     }
 
     public void SetHealth(int _health)

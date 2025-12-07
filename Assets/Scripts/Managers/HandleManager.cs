@@ -284,7 +284,7 @@ public class HandleManager : MonoBehaviour
         Vector3 delta = newPos - prevPos;
 
         select.transform.position = newPos;
-        select.CorrectBullets(delta);
+        select.SortBullets(delta);
         prevPos = newPos;
 
         EntityManager.Instance?.IsSell(_current);

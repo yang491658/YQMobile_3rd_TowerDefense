@@ -13,14 +13,19 @@ public class SplashDamage : TowerSkill
     }
 
     public override void OnHit(Tower _tower, Monster _target)
+        => HitSplash(_tower, _target.transform.position, _target);
+
+    public void OnHit(Tower _tower, Vector3 _pos)
+        => HitSplash(_tower, _pos, null);
+
+    private void HitSplash(Tower _tower, Vector3 _center, Monster _target)
     {
-        Vector3 center = _target.transform.position;
+        if (effect != null)
+            Instantiate(effect, _center, Quaternion.identity, _tower.transform)
+                .GetComponent<Effect>()
+                .SetEffect(_tower.GetColor(), range, 0.5f);
 
-        Instantiate(effect, center, Quaternion.identity, _tower.transform)
-            .GetComponent<Effect>()
-            .SetEffect(_tower.GetColor(), range, 0.5f);
-
-        var monsters = EntityManager.Instance.GetMonstersInRange(center, range);
+        var monsters = EntityManager.Instance.GetMonstersInRange(_center, range);
         for (int i = 0; i < monsters.Count; i++)
         {
             Monster m = monsters[i];
