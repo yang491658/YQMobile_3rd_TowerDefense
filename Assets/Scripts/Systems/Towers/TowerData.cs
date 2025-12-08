@@ -27,7 +27,7 @@ public class TowerData : ScriptableObject
 
     [Header("Skill")]
     public List<TowerSkill> Skills = new List<TowerSkill>();
-    public List<Vector3> Values = new List<Vector3>();
+    public List<SkillValue> Values = new List<SkillValue>();
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -115,22 +115,15 @@ public class TowerData : ScriptableObject
         EditorUtility.SetDirty(this);
     }
 
-    private Vector3 ValidateValue(Vector3 _value)
+    private SkillValue ValidateValue(SkillValue _value)
     {
-        _value.x = Mathf.Max(_value.x, 0f);
+        _value.baseValue = Mathf.Max(_value.baseValue, 0f);
 
-        if (_value.y == 0f)
-        {
-            _value.y = 0f;
-            _value.z = 0f;
-        }
-
-        if (_value.z > 0f)
-        {
-            _value.y = 1f;
-            _value.z = 1f;
-        }
-        else _value.z = 0f;
+        if (_value.rankMode == RankApplyMode.None)
+            _value.rankBonus = 0f;
+        else if (_value.rankMode == RankApplyMode.Multiply
+            || _value.rankMode == RankApplyMode.Divide)
+            _value.rankBonus = 1f;
 
         return _value;
     }
@@ -153,7 +146,7 @@ public class TowerData : ScriptableObject
         clone.AttackTarget = this.AttackTarget;
 
         clone.Skills = new List<TowerSkill>(Skills);
-        clone.Values = new List<Vector3>(Values);
+        clone.Values = new List<SkillValue>(Values);
 
         return clone;
     }

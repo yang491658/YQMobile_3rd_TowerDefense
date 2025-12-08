@@ -29,6 +29,7 @@ public class Tower : Entity
     [Header("Skill")]
     [SerializeField] private List<TowerSkill> skills = new List<TowerSkill>();
     [SerializeField] private List<float> values = new List<float>();
+    private Dictionary<ValueType, float> valueDic = new Dictionary<ValueType, float>();
 
     protected override void Awake()
     {
@@ -55,6 +56,7 @@ public class Tower : Entity
     }
 
     #region 심볼
+    private void UpdateSymbol()
     {
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
@@ -238,26 +240,48 @@ public class Tower : Entity
         attackSpeed = data.AttackSpeed / rank;
 
         values.Clear();
+        valueDic.Clear();
         for (int i = 0; i < data.Values.Count; i++)
-            values.Add(SetValue(i));
+        {
+            float v = SetValue(i);
+            values.Add(v);
+
+            SkillValue config = data.Values[i];
+            valueDic[config.type] = v;
+
+        }
 
         for (int i = 0; i < skills.Count; i++)
-            skills[i].OnChange(this);
+            skills[i].SetValues(this);
     }
 
     public float SetValue(int _index)
     {
-        Vector3 value = data.Values[_index];
+        SkillValue value = data.Values[_index];
 
-        if (value.y != 0f)
+        float baseValue = value.baseValue;
+        float bonus = value.rankBonus;
+        int step = rank;
+
+        switch (value.rankMode)
         {
-            if (value.z == 0f)
-                return value.x + value.y * rank;
-            else if (value.z == 1f)
-                return value.x * rank;
+            case RankApplyMode.None:
+                return baseValue;
+
+            case RankApplyMode.Add:
+                return baseValue + bonus * step;
+
+            case RankApplyMode.Subtract:
+                return baseValue - bonus * step;
+
+            case RankApplyMode.Multiply:
+                return baseValue * rank;
+
+            case RankApplyMode.Divide:
+                return baseValue / rank;
         }
 
-        return value.x;
+        return baseValue;
     }
 
     private void SetTarget()
@@ -306,6 +330,6 @@ public class Tower : Entity
     public bool IsMax() => isMax;
     public int GetDamage() => attackDamage;
     public Monster GetTarget() => attackTarget;
-    public float GetValue(int _index) => values[_index];
+    public float GetValue(ValueType _type) => valueDic[_type];
     #endregion
 }

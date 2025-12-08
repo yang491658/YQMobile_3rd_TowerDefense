@@ -24,6 +24,11 @@ MonoBehaviour:
   Skills:
   - {fileID: 11400000, guid: d5a387e8a84441145a4fd0601acc5d16, type: 2}
   Values:
-  - {x: 1, y: 1, z: 1}
-  - {x: 3, y: 1, z: 0}
-  - {x: 1, y: 0, z: 0}
+  - type: 0
+    baseValue: 1
+    rankMode: 3
+    rankBonus: 1
+  - type: 3
+    baseValue: 2
+    rankMode: 1
+    rankBonus: 1

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -17,10 +17,10 @@ public class DOT : TowerSkill
     }
 #endif
 
-    public override void OnChange(Tower _tower)
+    public override void SetValues(Tower _tower)
     {
-        damage = _tower.GetValue(0);
-        duration = _tower.GetValue(1);
+        damage = _tower.GetValue(ValueType.Damage);
+        duration = _tower.GetValue(ValueType.Duration);
     }
 
     public override void OnHit(Tower _tower, Monster _target)
