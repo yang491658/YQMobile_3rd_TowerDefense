@@ -40,6 +40,8 @@ public class Splash : TowerSkill
         for (int i = 0; i < monsters.Count; i++)
         {
             Monster m = monsters[i];
+            if (m == _target) continue;
+
             m.TakeDamage(damage);
         }
     }
