@@ -87,7 +87,7 @@ public class Monster : Entity
     {
         if (IsDead) return;
 
-        GameManager.Instance?.LifeDown(Mathf.Max((int)health, 1));
+        GameManager.Instance?.LifeDown(DisplayText(health));
         EntityManager.Instance?.DespawnMonster(this);
     }
 
@@ -119,6 +119,9 @@ public class Monster : Entity
         Move(moveDir * moveSpeed);
     }
 
+    private int DisplayText(float _value)
+        => _value < 0.5f ? 1 : Mathf.RoundToInt(_value);
+
     #region 전투_기본
     public void TakeDamage(float _damage)
     {
@@ -133,7 +136,7 @@ public class Monster : Entity
 
         t.gameObject.name = "Damage";
         t.transform.localPosition = healthText.transform.localPosition;
-        t.text = Mathf.Max((int)_damage, 1).ToString();
+        t.text = DisplayText(_damage).ToString();
 
         StartCoroutine(DamageTextCoroutine(t));
     }
@@ -289,7 +292,7 @@ public class Monster : Entity
     public void SetHealth(float _health)
     {
         health = _health;
-        healthText.text = Mathf.Max((int)health, 1).ToString();
+        healthText.text = DisplayText(health).ToString();
     }
     #endregion
 
