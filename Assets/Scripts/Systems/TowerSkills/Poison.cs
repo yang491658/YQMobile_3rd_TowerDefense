@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "DotDamage", menuName = "TowerSkill/Dot", order = 2)]
-public class DotDamage : TowerSkill
+[CreateAssetMenu(fileName = "Poison", menuName = "TowerSkill/Poison", order = 2)]
+public class Poison : TowerSkill
 {
     private float damage;
     private float duration;

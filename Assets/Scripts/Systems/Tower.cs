@@ -171,7 +171,7 @@ public class Tower : Entity
 
             if (_target != null)
                 skill.OnHit(this, _target);
-            else if (skill is SplashDamage _splash)
+            else if (skill is Splash _splash)
                 _splash.OnHit(this, _pos);
         }
 

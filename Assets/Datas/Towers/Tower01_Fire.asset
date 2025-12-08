@@ -22,7 +22,7 @@ MonoBehaviour:
   AttackSpeed: 3
   AttackTarget: 2
   Skills:
-  - {fileID: 11400000, guid: 1e30dfc6a662fae498d91ab8f84b9856, type: 2}
+  - {fileID: 0}
   Values:
   - {x: 1, y: 1, z: 1}
   - {x: 1.5, y: 0.25, z: 0}

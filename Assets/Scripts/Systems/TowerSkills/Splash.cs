@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "SplashDamage", menuName = "TowerSkill/Splash", order = 1)]
-public class SplashDamage : TowerSkill
+[CreateAssetMenu(fileName = "Splash", menuName = "TowerSkill/Splash", order = 1)]
+public class Splash : TowerSkill
 {
     private float damage;
     private float range;

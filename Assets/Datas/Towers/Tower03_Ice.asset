@@ -12,14 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
   m_Name: Tower03_Ice
   m_EditorClassIdentifier: 
-  ID: 0
-  Name: 
-  Symbol: {fileID: 0}
-  Color: {r: 0, g: 0, b: 0, a: 1}
+  ID: 3
+  Name: Ice
+  Symbol: {fileID: 21300000, guid: b880150c15f72ec47a3ec568862f7228, type: 3}
+  Color: {r: 0, g: 0, b: 1, a: 1}
   Grade: 0
-  Role: 0
+  Role: 1
   AttackDamage: 1
   AttackSpeed: 3
   AttackTarget: 2
   Skills: []
-  Values: []
+  Values:
+  - {x: 10, y: 1, z: 1}
+  - {x: 3, y: 1, z: 0}
