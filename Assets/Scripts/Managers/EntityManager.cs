@@ -39,7 +39,7 @@ public class EntityManager : MonoBehaviour
     [Header("Monster")]
     [SerializeField][Min(0.1f)] private float delay = 5f;
     [SerializeField][Min(0.1f)] private float minDelay = 0.5f;
-    private float delayBase;
+    private float baseDelay;
     private Coroutine spawnRoutine;
 
     [SerializeField] private Transform[] path;
@@ -326,13 +326,13 @@ public class EntityManager : MonoBehaviour
         monsters.RemoveAll(_monster => _monster == null);
         towers.RemoveAll(_tower => _tower == null);
 
-        delay = delayBase;
+        delay = baseDelay;
         needGold = 0;
     }
 
     public void SetEntity()
     {
-        delayBase = delay;
+        baseDelay = delay;
 
         if (inGame == null) inGame = GameObject.Find("InGame")?.transform;
         if (monsterTrans == null) monsterTrans = GameObject.Find("InGame/Monsters")?.transform;
