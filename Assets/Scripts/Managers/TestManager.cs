@@ -153,16 +153,19 @@ public class TestManager : MonoBehaviour
         int len = towers.Count;
         if (len < 2) return;
 
-        int maxRank = rank;
-        if (maxRank < 1) maxRank = 1;
+        int limitRank = rank;
+        if (limitRank < 1) limitRank = 1;
 
-        for (int r = 1; r < maxRank; r++)
+        for (int r = 1; r < 7; r++)
         {
             for (int i = 0; i < len; i++)
             {
                 Tower a = towers[i];
                 if (a == null || a.IsDragging()) continue;
                 if (a.GetRank() != r) continue;
+
+                bool aIsDebuff = a.GetData().Role == TowerRole.Debuff;
+                if (!aIsDebuff && r >= limitRank) continue;
 
                 for (int j = 0; j < len; j++)
                 {
@@ -171,6 +174,9 @@ public class TestManager : MonoBehaviour
                     Tower b = towers[j];
                     if (b == null || b.IsDragging()) continue;
                     if (b.GetRank() != r) continue;
+
+                    bool bIsDebuff = b.GetData().Role == TowerRole.Debuff;
+                    if (!bIsDebuff && r >= limitRank) continue;
 
                     if (EntityManager.Instance?.MergeTower(a, b, id) != null)
                         return;

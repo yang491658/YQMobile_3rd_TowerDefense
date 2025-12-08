@@ -43,7 +43,7 @@ public class EntityManager : MonoBehaviour
     private Coroutine spawnRoutine;
 
     [SerializeField] private Transform[] path;
-    [SerializeField] private Vector2 pathMargin = new Vector2(0.90f, 0.72f);
+    [SerializeField] private Vector2 pathMargin = new Vector2(86f, 72f) / 100f;
     [SerializeField] private int[] pathNum = { 1, 4, 2, 3, 4, 1, 3, 2, 1, 4 };
 
     [Header("Tower")]
