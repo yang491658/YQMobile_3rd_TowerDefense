@@ -23,7 +23,7 @@ public class Splash : TowerSkill
         if (effect != null)
             Instantiate(effect, _center, Quaternion.identity, _tower.transform)
                 .GetComponent<Effect>()
-                .SetEffect(_tower.GetColor(), range, 0.3f);
+                .SetEffect(_tower, range, 0.3f);
 
         var monsters = EntityManager.Instance.GetMonstersInRange(_center, range);
         for (int i = 0; i < monsters.Count; i++)

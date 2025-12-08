@@ -11,10 +11,12 @@ public class Effect : MonoBehaviour
     }
 
     #region SET
-    public void SetEffect(Color _color, float _scale, float _duration = 0)
+    public void SetEffect(Tower _tower, float _scale, float _duration = 0)
     {
-        Color c = _color;
-        c.a = 0.15f;
+        gameObject.name = _tower.name + "'s Debuff";
+
+        Color c = _tower.GetColor();
+        c.a = 30f/ 255f;
         sr.color = c;
 
         transform.localScale *= _scale;

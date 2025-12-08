@@ -1,17 +1,15 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Poison", menuName = "TowerSkill/Poison", order = 2)]
-public class Poison : TowerSkill
+[CreateAssetMenu(fileName = "Slow", menuName = "TowerSkill/Slow", order = 3)]
+public class Slow : TowerSkill
 {
-    private float damage;
+    private float amount;
     private float duration;
-    private float interval;
 
     public override void OnChange(Tower _tower)
     {
-        damage = _tower.GetValue(0);
+        amount = _tower.GetValue(0);
         duration = _tower.GetValue(1);
-        interval = _tower.GetValue(2);
     }
 
     public override void OnHit(Tower _tower, Monster _target)
@@ -20,6 +18,6 @@ public class Poison : TowerSkill
             .GetComponent<Effect>();
         e.SetEffect(_tower, 1f);
 
-        _target.ApplyDot(damage, duration, interval, e);
+        _target.ApplySlow(amount, duration, e);
     }
 }

@@ -10,6 +10,7 @@ public class Monster : Entity
     [SerializeField] private int pathIndex;
     private Transform[] paths;
     [SerializeField] private float moveSpeed = 3f;
+    private float baseMoveSpeed;
     [SerializeField] private Vector3 moveDir;
 
     [Header("Battle")]
@@ -32,6 +33,13 @@ public class Monster : Entity
     private bool hasDot;
     [SerializeField] private Effect dotEffect;
 
+    [Header("Debuff / Slow")]
+    [SerializeField] private float slowAmount;
+    [SerializeField] private float slowDuration;
+    private float slowTimer;
+    private bool hasSlow;
+    [SerializeField] private Effect slowEffect;
+
     protected override void Awake()
     {
         base.Awake();
@@ -41,6 +49,8 @@ public class Monster : Entity
 
         sr.sortingOrder = sorting;
         canvas.sortingOrder = sorting--;
+
+        baseMoveSpeed = moveSpeed;
     }
 
     protected override void Start()
@@ -58,6 +68,7 @@ public class Monster : Entity
 
         UpdateMove();
         UpdateDot(Time.deltaTime);
+        UpdateSlow(Time.deltaTime);
     }
 
     private void OnBecameInvisible()
@@ -178,6 +189,10 @@ public class Monster : Entity
         dotDuration = Mathf.Max(dotDuration, _duration);
         dotInterval = _interval;
 
+        dotTimer = dotDuration;
+        dotTickTimer = dotInterval;
+        hasDot = true;
+
         if (dotEffect == null)
             dotEffect = _effect;
         else
@@ -185,10 +200,6 @@ public class Monster : Entity
             Destroy(dotEffect.gameObject);
             dotEffect = _effect;
         }
-
-        dotTimer = dotDuration;
-        dotTickTimer = dotInterval;
-        hasDot = true;
     }
 
     private void UpdateDot(float _deltaTime)
@@ -220,6 +231,44 @@ public class Monster : Entity
     }
     #endregion
 
+    #region 디버프_감속
+    public void ApplySlow(float _slow, float _duration, Effect _effect)
+    {
+        slowAmount = Mathf.Max(slowAmount, _slow);
+        slowDuration = Mathf.Max(slowDuration, _duration);
+
+        slowTimer = slowDuration;
+        hasSlow = true;
+        moveSpeed = baseMoveSpeed * Mathf.Max(1f - slowAmount / 100f, 0f);
+
+        if (slowEffect == null)
+            slowEffect = _effect;
+        else
+        {
+            Destroy(slowEffect.gameObject);
+            slowEffect = _effect;
+        }
+    }
+
+    private void UpdateSlow(float _deltaTime)
+    {
+        if (!hasSlow) return;
+
+        slowTimer -= _deltaTime;
+
+        if (slowTimer < 0f)
+        {
+            hasSlow = false;
+            slowAmount = 0f;
+            slowDuration = 0f;
+            moveSpeed = baseMoveSpeed;
+
+            Destroy(slowEffect.gameObject);
+            slowEffect = null;
+        }
+    }
+    #endregion
+
     #region SET
     public void SetPath(Transform[] _path)
     {
@@ -242,6 +291,6 @@ public class Monster : Entity
 
     #region GET
     public int GetHealth() => health;
-    public bool HasDebuff() => hasDot;
+    public bool HasDebuff() => hasDot || hasSlow;
     #endregion
 }
