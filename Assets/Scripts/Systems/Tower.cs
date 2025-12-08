@@ -253,7 +253,7 @@ public class Tower : Entity
         if (value.y != 0f)
         {
             if (value.z == 0f)
-                return value.x + value.y * (rank - 1);
+                return value.x + value.y * rank;
             else if (value.z == 1f)
                 return value.x * rank;
         }

@@ -5,13 +5,11 @@ public class Poison : TowerSkill
 {
     private float damage;
     private float duration;
-    private float interval;
 
     public override void OnChange(Tower _tower)
     {
         damage = _tower.GetValue(0);
         duration = _tower.GetValue(1);
-        interval = _tower.GetValue(2);
     }
 
     public override void OnHit(Tower _tower, Monster _target)
@@ -20,6 +18,6 @@ public class Poison : TowerSkill
             .GetComponent<Effect>();
         e.SetEffect(_tower, 1f);
 
-        _target.ApplyDot(damage, duration, interval, e);
+        _target.ApplyDot(damage, duration, e);
     }
 }

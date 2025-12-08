@@ -27,7 +27,6 @@ public class Monster : Entity
     [Header("Debuff / Dot")]
     [SerializeField] private float dotDamage;
     [SerializeField] private float dotDuration;
-    [SerializeField] private float dotInterval;
     private float dotTimer;
     private float dotTickTimer;
     private bool hasDot;
@@ -183,14 +182,13 @@ public class Monster : Entity
     #endregion
 
     #region 디버프_도트
-    public void ApplyDot(float _damage, float _duration, float _interval, Effect _effect)
+    public void ApplyDot(float _damage, float _duration, Effect _effect)
     {
         dotDamage = Mathf.Max(dotDamage, _damage);
         dotDuration = Mathf.Max(dotDuration, _duration);
-        dotInterval = _interval;
 
         dotTimer = dotDuration;
-        dotTickTimer = dotInterval;
+        dotTickTimer = 1f;
         hasDot = true;
 
         if (dotEffect == null)
@@ -211,9 +209,9 @@ public class Monster : Entity
 
         while (dotTickTimer < 0f)
         {
-            dotTickTimer += dotInterval;
+            dotTickTimer += 1f;
 
-            int value = Mathf.CeilToInt(dotDamage * dotInterval);
+            int value = Mathf.CeilToInt(dotDamage);
             TakeDamage(value);
             if (IsDead)
             {

@@ -16,7 +16,7 @@ public class Effect : MonoBehaviour
         gameObject.name = _tower.name + "'s Debuff";
 
         Color c = _tower.GetColor();
-        c.a = 30f/ 255f;
+        c.a = 30f / 255f;
         sr.color = c;
 
         transform.localScale *= _scale;
