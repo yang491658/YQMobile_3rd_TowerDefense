@@ -11,7 +11,7 @@ public class Effect : MonoBehaviour
     }
 
     #region SET
-    public void SetEffect(Color _color, float _scale, float _duration)
+    public void SetEffect(Color _color, float _scale, float _duration = 0)
     {
         Color c = _color;
         c.a = 0.15f;
@@ -19,7 +19,8 @@ public class Effect : MonoBehaviour
 
         transform.localScale *= _scale;
 
-        Destroy(gameObject, _duration);
+        if (_duration > 0)
+            Destroy(gameObject, _duration);
     }
     #endregion
 }

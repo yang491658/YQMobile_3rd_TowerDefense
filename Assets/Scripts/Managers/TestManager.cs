@@ -25,8 +25,8 @@ public class TestManager : MonoBehaviour
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        if( id < 0) id = 0;
-        if(rank < 1 ) rank = 1;
+        if (id < 0) id = 0;
+        if (rank < 1) rank = 1;
         else if (rank > 7) rank = 7;
     }
 #endif

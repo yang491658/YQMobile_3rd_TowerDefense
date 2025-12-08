@@ -16,10 +16,10 @@ public class DotDamage : TowerSkill
 
     public override void OnHit(Tower _tower, Monster _target)
     {
-        Instantiate(effect, _target.transform.position, Quaternion.identity, _target.transform)
-            .GetComponent<Effect>()
-            .SetEffect(_tower.GetColor(), 1f, duration);
+        Effect e = Instantiate(effect, _target.transform.position, Quaternion.identity, _target.transform)
+            .GetComponent<Effect>();
+        e.SetEffect(_tower.GetColor(), 1f);
 
-        _target.ApplyDot(damage, duration, interval);
+        _target.ApplyDot(damage, duration, interval, e);
     }
 }

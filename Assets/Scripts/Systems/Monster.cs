@@ -30,6 +30,7 @@ public class Monster : Entity
     private float dotTimer;
     private float dotTickTimer;
     private bool hasDot;
+    [SerializeField] private Effect dotEffect;
 
     protected override void Awake()
     {
@@ -171,11 +172,19 @@ public class Monster : Entity
     #endregion
 
     #region 디버프_도트
-    public void ApplyDot(float _damage, float _duration, float _interval)
+    public void ApplyDot(float _damage, float _duration, float _interval, Effect _effect)
     {
-        dotDamage = _damage;
-        dotDuration = _duration;
+        dotDamage = Mathf.Max(dotDamage, _damage);
+        dotDuration = Mathf.Max(dotDuration, _duration);
         dotInterval = _interval;
+
+        if (dotEffect == null)
+            dotEffect = _effect;
+        else
+        {
+            Destroy(dotEffect.gameObject);
+            dotEffect = _effect;
+        }
 
         dotTimer = dotDuration;
         dotTickTimer = dotInterval;
@@ -203,7 +212,11 @@ public class Monster : Entity
         }
 
         if (dotTimer < 0f)
+        {
             hasDot = false;
+            Destroy(dotEffect.gameObject);
+            dotEffect = null;
+        }
     }
     #endregion
 
