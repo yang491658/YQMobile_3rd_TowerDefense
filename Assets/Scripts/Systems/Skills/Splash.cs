@@ -1,10 +1,21 @@
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 [CreateAssetMenu(fileName = "Splash", menuName = "TowerSkill/Splash", order = 1)]
 public class Splash : TowerSkill
 {
     private float damage;
     private float range;
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        effect = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Effects/Splash.prefab");
+    }
+#endif
 
     public override void OnChange(Tower _tower)
     {
@@ -29,8 +40,6 @@ public class Splash : TowerSkill
         for (int i = 0; i < monsters.Count; i++)
         {
             Monster m = monsters[i];
-            if (m == _target) continue;
-
             m.TakeDamage(damage);
         }
     }

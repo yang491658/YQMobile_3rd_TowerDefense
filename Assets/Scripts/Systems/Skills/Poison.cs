@@ -1,10 +1,21 @@
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 [CreateAssetMenu(fileName = "Poison", menuName = "TowerSkill/Poison", order = 2)]
 public class Poison : TowerSkill
 {
     private float damage;
     private float duration;
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        effect = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Effects/Debuff.prefab");
+    }
+#endif
 
     public override void OnChange(Tower _tower)
     {

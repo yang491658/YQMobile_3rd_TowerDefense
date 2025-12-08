@@ -1,10 +1,21 @@
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 [CreateAssetMenu(fileName = "Slow", menuName = "TowerSkill/Slow", order = 3)]
 public class Slow : TowerSkill
 {
     private float amount;
     private float duration;
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        effect = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Effects/Debuff.prefab");
+    }
+#endif
 
     public override void OnChange(Tower _tower)
     {
