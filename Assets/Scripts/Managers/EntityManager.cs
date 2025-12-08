@@ -248,7 +248,7 @@ public class EntityManager : MonoBehaviour
 
     #region 타워
     public TowerData SearchTower(int _id) => towerDic.TryGetValue(_id, out var _data) ? _data : null;
-    public Tower SpawnTower(int _id = 0, Vector3? _pos = null, bool _useGold = true)
+    public Tower SpawnTower(int _id = 0, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
     {
         TowerData data = (_id == 0)
             ? towerDatas[Random.Range(0, towerDatas.Length)]
@@ -265,6 +265,7 @@ public class EntityManager : MonoBehaviour
             .GetComponent<Tower>();
 
         tower.SetData(data);
+        tower.SetRank(_rank);
         tower.transform.localScale = map.transform.localScale;
         towers.Add(tower);
 
@@ -286,8 +287,8 @@ public class EntityManager : MonoBehaviour
         DespawnTower(_select);
         DespawnTower(_target);
 
-        Tower merge = SpawnTower(_id, pos, false);
-        merge.RankUp();
+        Tower merge = SpawnTower(_id, rank,pos, false);
+        merge.RankUp(); ;
 
         return merge;
     }
@@ -463,18 +464,18 @@ public class EntityManager : MonoBehaviour
         return result;
     }
 
-    private T GetByStat<T>(List<T> _list, System.Func<T, int> _selector, bool _low, int _min = 0, bool _useMin = false) where T : class
+    private T GetByStat<T>(List<T> _list, System.Func<T, float> _selector, bool _low, int _min = 0, bool _useMin = false) where T : class
     {
         if (_list.Count == 0) return null;
 
         List<T> candidates = new List<T>();
         bool hasFirst = false;
-        int best = 0;
+        float best = 0;
 
         for (int i = 0; i < _list.Count; i++)
         {
             T entity = _list[i];
-            int value = _selector(entity);
+            float value = _selector(entity);
             if (_useMin && value < _min) continue;
 
             if (!hasFirst)

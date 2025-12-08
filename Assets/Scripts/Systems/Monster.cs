@@ -18,7 +18,7 @@ public class Monster : Entity
     [SerializeField] private Vector3 moveDir;
 
     [Header("Battle")]
-    [SerializeField] private int health = 5;
+    [SerializeField] private float health = 5;
     [SerializeField] private Canvas healthCanvas;
     [SerializeField] private TextMeshProUGUI healthText;
     [Space]
@@ -87,7 +87,7 @@ public class Monster : Entity
     {
         if (IsDead) return;
 
-        GameManager.Instance?.LifeDown(health);
+        GameManager.Instance?.LifeDown(Mathf.Max((int)health, 1));
         EntityManager.Instance?.DespawnMonster(this);
     }
 
@@ -120,21 +120,20 @@ public class Monster : Entity
     }
 
     #region 전투_기본
-    public void TakeDamage(float _damage) => TakeDamage((int)_damage);
-    public void TakeDamage(int _damage)
+    public void TakeDamage(float _damage)
     {
         SetHealth(health - _damage);
         CreateDamageText(_damage);
         if (health <= 0) Die();
     }
 
-    private void CreateDamageText(int _damage)
+    private void CreateDamageText(float _damage)
     {
         TextMeshProUGUI t = Instantiate(healthText, damageCanvas.transform);
 
         t.gameObject.name = "Damage";
         t.transform.localPosition = healthText.transform.localPosition;
-        t.text = _damage.ToString();
+        t.text = Mathf.Max((int)_damage, 1).ToString();
 
         StartCoroutine(DamageTextCoroutine(t));
     }
@@ -287,15 +286,15 @@ public class Monster : Entity
         dropGold = Mathf.Max(dropGold * _set, 1);
     }
 
-    public void SetHealth(int _health)
+    public void SetHealth(float _health)
     {
         health = _health;
-        healthText.text = health.ToString();
+        healthText.text = Mathf.Max((int)health, 1).ToString();
     }
     #endregion
 
     #region GET
-    public int GetHealth() => health;
+    public float GetHealth() => health;
     public bool HasDebuff() => hasDot || hasSlow;
     #endregion
 }
