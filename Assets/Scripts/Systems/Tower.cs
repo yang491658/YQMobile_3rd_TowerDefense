@@ -263,35 +263,33 @@ public class Tower : Entity
 
     private void SetTarget()
     {
+        bool noDebuff = data.Role == TowerRole.Debuff;
+
         switch (data.AttackTarget)
         {
             case AttackTarget.None:
                 attackTarget = null;
                 return;
             case AttackTarget.Random:
-                attackTarget = EntityManager.Instance?.GetMonsterRandom();
+                attackTarget = EntityManager.Instance?.GetMonsterRandom(noDebuff);
                 break;
             case AttackTarget.First:
-                attackTarget = EntityManager.Instance?.GetMonsterFirst();
+                attackTarget = EntityManager.Instance?.GetMonsterFirst(noDebuff);
                 break;
             case AttackTarget.Last:
-                attackTarget = EntityManager.Instance?.GetMonsterLast();
+                attackTarget = EntityManager.Instance?.GetMonsterLast(noDebuff);
                 break;
             case AttackTarget.Near:
-                attackTarget = EntityManager.Instance?.GetMonsterNearest(transform.position);
+                attackTarget = EntityManager.Instance?.GetMonsterNearest(transform.position, 0, noDebuff);
                 break;
             case AttackTarget.Far:
-                attackTarget = EntityManager.Instance?.GetMonsterFarthest(transform.position);
+                attackTarget = EntityManager.Instance?.GetMonsterFarthest(transform.position, 0, noDebuff);
                 break;
             case AttackTarget.Weak:
-                attackTarget = EntityManager.Instance?.GetMonsterLowHealth();
+                attackTarget = EntityManager.Instance?.GetMonsterLowHealth(noDebuff);
                 break;
             case AttackTarget.Strong:
-                attackTarget = EntityManager.Instance?.GetMonsterHighHealth();
-                break;
-            case AttackTarget.NoDebuff:
-                attackTarget = EntityManager.Instance?.GetMonsterNoDebuff();
-                if (attackTarget == null) attackTarget = EntityManager.Instance?.GetMonsterRandom();
+                attackTarget = EntityManager.Instance?.GetMonsterHighHealth(noDebuff);
                 break;
         }
     }

@@ -9,7 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98ea936336e3bda4da1ac3ed915b912c, type: 3}
-  m_Name: Splash
+  m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
+  m_Name: Tower03_Ice
   m_EditorClassIdentifier: 
-  effect: {fileID: 266949680547624416, guid: aa023f00dcdd67b499d297fe16a01d54, type: 3}
+  ID: 0
+  Name: 
+  Symbol: {fileID: 0}
+  Color: {r: 0, g: 0, b: 0, a: 1}
+  Grade: 0
+  Role: 0
+  AttackDamage: 1
+  AttackSpeed: 3
+  AttackTarget: 2
+  Skills: []
+  Values: []

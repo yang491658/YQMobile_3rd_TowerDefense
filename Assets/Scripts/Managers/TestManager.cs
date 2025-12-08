@@ -110,7 +110,7 @@ public class TestManager : MonoBehaviour
         if (Input.GetKey(KeyCode.Y))
             MergeTower();
 
-        if (Input.GetKeyDown(KeyCode.D))
+        if (Input.GetKeyDown(KeyCode.Delete))
             EntityManager.Instance?.DespawnAll();
         #endregion
 

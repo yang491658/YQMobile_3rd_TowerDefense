@@ -520,32 +520,35 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region GET_몬스터
-    public Monster GetMonsterRandom()
-        => GetRandom(monsters);
+    public Monster GetMonsterRandom(bool _noDebuff = false)
+        => GetRandom(GetMonsterList(_noDebuff));
 
-    public Monster GetMonsterFirst()
-        => GetByIndex(monsters, 0);
+    public Monster GetMonsterFirst(bool _noDebuff = false)
+        => GetByIndex(GetMonsterList(_noDebuff), 0);
 
-    public Monster GetMonsterLast()
-        => GetByIndex(monsters, monsters.Count - 1);
+    public Monster GetMonsterLast(bool _noDebuff = false)
+        => GetByIndex(GetMonsterList(_noDebuff), GetMonsterList(_noDebuff).Count - 1);
 
-    public Monster GetMonsterNearest(Vector3 _pos, int _distance = 0)
-        => GetByDistance(monsters, _pos, true, _distance, mapRoadTilemap);
+    public Monster GetMonsterNearest(Vector3 _pos, int _distance = 0, bool _noDebuff = false)
+        => GetByDistance(GetMonsterList(_noDebuff), _pos, true, _distance, mapRoadTilemap);
 
-    public Monster GetMonsterFarthest(Vector3 _pos, int _distance = 0)
-        => GetByDistance(monsters, _pos, false, _distance, mapRoadTilemap);
+    public Monster GetMonsterFarthest(Vector3 _pos, int _distance = 0, bool _noDebuff = false)
+        => GetByDistance(GetMonsterList(_noDebuff), _pos, false, _distance, mapRoadTilemap);
+
+    public Monster GetMonsterLowHealth(bool _noDebuff = false)
+        => GetByStat(GetMonsterList(_noDebuff), _monster => _monster.GetHealth(), true, 0, false);
+
+    public Monster GetMonsterHighHealth(bool _noDebuff = false)
+        => GetByStat(GetMonsterList(_noDebuff), _monster => _monster.GetHealth(), false, 0, false);
 
     public List<Monster> GetMonstersInRange(Vector3 _center, float _range)
-    => GetInRange(monsters, _center, _range);
+        => GetInRange(monsters, _center, _range);
 
-    public Monster GetMonsterLowHealth()
-        => GetByStat(monsters, _monster => _monster.GetHealth(), true);
-
-    public Monster GetMonsterHighHealth()
-        => GetByStat(monsters, _monster => _monster.GetHealth(), false);
-
-    public Monster GetMonsterNoDebuff()
+    private List<Monster> GetMonsterList(bool _noDebuff)
     {
+        if (!_noDebuff)
+            return monsters;
+
         List<Monster> list = new List<Monster>();
         for (int i = 0; i < monsters.Count; i++)
         {
@@ -553,9 +556,9 @@ public class EntityManager : MonoBehaviour
             if (!monster.HasDebuff())
                 list.Add(monster);
         }
-        if (list.Count == 0) return null;
+        if (list.Count == 0) return monsters;
 
-        return GetRandom(list);
+        return list;
     }
     #endregion
 
@@ -567,7 +570,7 @@ public class EntityManager : MonoBehaviour
         => GetByIndex(towers, 0);
 
     public Tower GetTowerLast()
-    => GetByIndex(towers, towers.Count - 1);
+        => GetByIndex(towers, towers.Count - 1);
 
     public Tower GetTowerNearest(Vector3 _pos, int _distance = 0)
         => GetByDistance(towers, _pos, true, _distance, mapSlotTilemap);
@@ -575,13 +578,13 @@ public class EntityManager : MonoBehaviour
     public Tower GetTowerFarthest(Vector3 _pos, int _distance = 0)
         => GetByDistance(towers, _pos, false, _distance, mapSlotTilemap);
 
-    public List<Tower> GetTowersInRange(Vector3 _center, float _range)
-    => GetInRange(towers, _center, _range);
-
     public Tower GetTowerLowRank(int _minRank = 0)
         => GetByStat(towers, _tower => _tower.GetRank(), true, _minRank, true);
 
     public Tower GetTowerHighRank(int _minRank = 0)
         => GetByStat(towers, _tower => _tower.GetRank(), false, _minRank, true);
+
+    public List<Tower> GetTowersInRange(Vector3 _center, float _range)
+        => GetInRange(towers, _center, _range);
     #endregion
 }

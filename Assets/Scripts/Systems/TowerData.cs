@@ -36,7 +36,6 @@ public enum AttackTarget
     Far,
     Weak,
     Strong,
-    NoDebuff,
 }
 #endregion
 
