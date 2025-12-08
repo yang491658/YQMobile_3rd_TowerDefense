@@ -7,38 +7,6 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-#region Enum
-public enum TowerGrade
-{
-    Normal,
-    Rare,
-    Hero,
-    Legend,
-}
-
-public enum TowerRole
-{
-    Dealer,
-    Debuff,
-    Buff,
-    Summon,
-    Economy,
-    Control,
-}
-
-public enum AttackTarget
-{
-    None,
-    Random,
-    First,
-    Last,
-    Near,
-    Far,
-    Weak,
-    Strong,
-}
-#endregion
-
 [CreateAssetMenu(fileName = "Tower", menuName = "TowerData", order = 0)]
 public class TowerData : ScriptableObject
 {

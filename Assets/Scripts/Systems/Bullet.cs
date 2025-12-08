@@ -2,14 +2,13 @@
 
 public class Bullet : Entity
 {
+    [Header("Origin")]
+    [SerializeField] private Tower tower;
+
     [Header("Move")]
     [SerializeField] private Monster target;
     private Vector3 targetPos;
-    [Space]
     [SerializeField] private float moveSpeed = 10f;
-
-    [Header("Battle")]
-    [SerializeField] private Tower tower;
 
     protected override void Update()
     {

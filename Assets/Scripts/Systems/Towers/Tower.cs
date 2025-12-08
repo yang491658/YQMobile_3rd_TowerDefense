@@ -10,8 +10,8 @@ public class Tower : Entity
     private SpriteRenderer symbolSR;
 
     [Header("Control")]
-    [SerializeField] private bool isDragging;
-    [SerializeField] private Vector3 slot;
+    private bool isDragging;
+    private Vector3 slot;
 
     [Header("Rank")]
     [SerializeField] private Transform symbol;
@@ -54,10 +54,7 @@ public class Tower : Entity
         Attack();
     }
 
-    #region 랭크
-    public void RankUp(int _amount = 1) => SetRank(rank + _amount);
-
-    private void UpdateRank()
+    #region 심볼
     {
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
@@ -80,7 +77,7 @@ public class Tower : Entity
 
         isMax = false;
 
-        Vector2[] positions = GetArray(rank);
+        Vector2[] positions = SymbolPos(rank);
 
         for (int i = 0; i < positions.Length; i++)
         {
@@ -94,7 +91,7 @@ public class Tower : Entity
         }
     }
 
-    private Vector2[] GetArray(int _rank)
+    private Vector2[] SymbolPos(int _rank)
     {
         float offset = symbol.localScale.x * 1.2f;
 
@@ -163,6 +160,8 @@ public class Tower : Entity
         }
     }
 
+    public void HitBullet(Monster _target) => HitBullet(_target, _target.transform.position);
+    public void HitBullet(Vector3 _pos) => HitBullet(null, _pos);
     private void HitBullet(Monster _target, Vector3 _pos)
     {
         for (int i = 0; i < skills.Count; i++)
@@ -177,8 +176,6 @@ public class Tower : Entity
 
         _target?.TakeDamage(attackDamage);
     }
-    public void HitBullet(Monster _target) => HitBullet(_target, _target.transform.position);
-    public void HitBullet(Vector3 _pos) => HitBullet(null, _pos);
     #endregion
 
     #region 조작
@@ -201,6 +198,8 @@ public class Tower : Entity
                 r.sortingOrder = baseOrder + 2;
         }
     }
+
+    public void RankUp(int _amount = 1) => SetRank(rank + _amount);
 
     public void Sell()
     {
@@ -233,7 +232,7 @@ public class Tower : Entity
     public void SetRank(int _rank)
     {
         rank = Mathf.Clamp(_rank, 1, maxRank);
-        UpdateRank();
+        UpdateSymbol();
 
         attackDamage = data.AttackDamage * rank;
         attackSpeed = data.AttackSpeed / rank;

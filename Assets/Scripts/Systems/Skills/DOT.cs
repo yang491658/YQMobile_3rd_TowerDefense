@@ -4,8 +4,8 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-[CreateAssetMenu(fileName = "Poison", menuName = "TowerSkill/Poison", order = 2)]
-public class Poison : TowerSkill
+[CreateAssetMenu(fileName = "DOT", menuName = "TowerSkill/DOT", order = 2)]
+public class DOT : TowerSkill
 {
     private float damage;
     private float duration;

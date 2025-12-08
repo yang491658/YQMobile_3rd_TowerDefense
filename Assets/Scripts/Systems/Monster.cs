@@ -2,6 +2,10 @@
 using TMPro;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 public class Monster : Entity
 {
     private static int sorting = 0;
@@ -15,16 +19,17 @@ public class Monster : Entity
 
     [Header("Battle")]
     [SerializeField] private int health = 5;
-    private Canvas canvas;
-    private TextMeshProUGUI healthText;
+    [SerializeField] private Canvas healthCanvas;
+    [SerializeField] private TextMeshProUGUI healthText;
     [Space]
     [SerializeField] private float damageDuration = 1f;
     [SerializeField] private float damageSpeed = 3f;
+    [SerializeField] private Canvas damageCanvas;
     [Space]
     [SerializeField] private int dropGold = 1;
     public bool IsDead { private set; get; } = false;
 
-    [Header("Debuff / Dot")]
+    [Header("Debuff / DOT")]
     [SerializeField] private float dotDamage;
     [SerializeField] private float dotDuration;
     private float dotTimer;
@@ -39,15 +44,23 @@ public class Monster : Entity
     private bool hasSlow;
     [SerializeField] private Effect slowEffect;
 
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        Canvas[] canvases = GetComponentsInChildren<Canvas>();
+        healthCanvas = canvases[0];
+        damageCanvas = canvases[1];
+
+        healthText = healthCanvas.GetComponentInChildren<TextMeshProUGUI>();
+    }
+#endif
+
     protected override void Awake()
     {
         base.Awake();
 
-        canvas = GetComponentInChildren<Canvas>();
-        healthText = GetComponentInChildren<TextMeshProUGUI>();
-
         sr.sortingOrder = sorting;
-        canvas.sortingOrder = sorting--;
+        healthCanvas.sortingOrder = sorting--;
 
         baseMoveSpeed = moveSpeed;
     }
@@ -117,7 +130,7 @@ public class Monster : Entity
 
     private void CreateDamageText(int _damage)
     {
-        TextMeshProUGUI t = Instantiate(healthText, canvas.transform);
+        TextMeshProUGUI t = Instantiate(healthText, damageCanvas.transform);
 
         t.gameObject.name = "Damage";
         t.transform.localPosition = healthText.transform.localPosition;
@@ -129,22 +142,16 @@ public class Monster : Entity
     private IEnumerator DamageTextCoroutine(TextMeshProUGUI _text)
     {
         float time = 0f;
-        Vector3 start = _text.transform.position;
-        Vector3 dir = Vector3.up;
-        if (Mathf.Abs(moveDir.x) < 0.01f)
-        {
-            if (moveDir.y > 0f)
-                dir = Vector3.right;
-            else if (moveDir.y < 0f)
-                dir = Vector3.left;
-        }
+        Vector3 from = _text.transform.position;
+        Vector3 to = new Vector3(0f, AutoCamera.WorldRect.yMax, 0f);
+        Vector3 dir = (to - from).normalized;
 
         while (time < damageDuration)
         {
             time += Time.deltaTime;
             float t = time / damageDuration;
 
-            _text.transform.position = start + dir * damageSpeed * time;
+            _text.transform.position = from + dir * damageSpeed * time;
 
             Color c = _text.color;
             c.a = Mathf.Lerp(1f, 0f, t);

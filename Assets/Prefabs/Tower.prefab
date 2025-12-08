@@ -343,8 +343,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   data: {fileID: 0}
   outLine: {fileID: 0}
-  isDragging: 0
-  slot: {x: 0, y: 0, z: 0}
   symbol: {fileID: 0}
   rank: 0
   attackDamage: 0
