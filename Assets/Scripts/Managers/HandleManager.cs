@@ -328,9 +328,11 @@ public class HandleManager : MonoBehaviour
             merge = select.Merge(target);
 
         if (merge == null)
+        {
             select.transform.position = dragStart + offset;
+            select.DragOn(false);
+        }
 
-        select.DragOn(false);
         select = null;
 
         if (isSlow)

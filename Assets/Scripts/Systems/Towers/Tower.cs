@@ -203,6 +203,8 @@ public class Tower : Entity
 
     public Tower Merge(Tower _target, int _id = 0)
     {
+        if (!EntityManager.Instance.CanMerge(this, _target)) return null;
+
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnMerge(this, _target);
 

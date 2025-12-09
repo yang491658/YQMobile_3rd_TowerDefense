@@ -13,7 +13,8 @@ public class DOT : TowerSkill
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        effect = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Effects/Debuff.prefab");
+        if (effect == null)
+            effect = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Effects/Debuff.prefab");
     }
 #endif
 

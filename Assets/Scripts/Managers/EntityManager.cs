@@ -274,12 +274,15 @@ public class EntityManager : MonoBehaviour
         return tower;
     }
 
+    public bool CanMerge(Tower _select, Tower _target)
+        => _select != null && _target != null && _select != _target &&
+        _select.GetID() == _target.GetID() &&
+        _select.GetRank() == _target.GetRank() &&
+        !_select.IsMax() && !_target.IsMax();
+
     public Tower MergeTower(Tower _select, Tower _target, int _id = 0)
     {
-        if (_select == _target
-            || _select.GetID() != _target.GetID()
-            || _select.GetRank() != _target.GetRank()
-            || _select.IsMax() || _target.IsMax()) return null;
+        if (!CanMerge(_select, _target)) return null;
 
         int rank = _target.GetRank();
         Vector3 pos = _target.transform.position;
@@ -287,7 +290,7 @@ public class EntityManager : MonoBehaviour
         DespawnTower(_select);
         DespawnTower(_target);
 
-        Tower merge = SpawnTower(_id, rank,pos, false);
+        Tower merge = SpawnTower(_id, rank, pos, false);
         merge.RankUp();
 
         return merge;
