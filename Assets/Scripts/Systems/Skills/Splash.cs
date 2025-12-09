@@ -5,7 +5,7 @@ using UnityEditor;
 #endif
 
 [CreateAssetMenu(fileName = "Splash", menuName = "TowerSkill/Splash", order = 1)]
-public class Splash : TowerSkill
+public class Splash : Skill
 {
     private float damage;
     private float range;

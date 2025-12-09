@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public abstract class TowerSkill : ScriptableObject
+public abstract class Skill : ScriptableObject
 {
     [SerializeField] protected GameObject effect;
 
