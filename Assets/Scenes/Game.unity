@@ -9288,15 +9288,15 @@ MonoBehaviour:
     slider: {fileID: 0}
     value: 0
     minValue: 0
-    maxValue: 0
-    format: 
+    maxValue: 10
+    format: "\uAE30\uC900ID : {0}"
   refRank:
     TMP: {fileID: 0}
     slider: {fileID: 0}
-    value: 0
-    minValue: 0
-    maxValue: 0
-    format: 
+    value: 3
+    minValue: 1
+    maxValue: 7
+    format: "\uAE30\uC900\uB7AD\uD06C : {0}"
 --- !u!4 &1407473050
 Transform:
   m_ObjectHideFlags: 0

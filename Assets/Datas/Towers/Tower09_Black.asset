@@ -41,4 +41,4 @@ MonoBehaviour:
   - valueType: 4
     baseValue: 5
     rankType: 3
-    rankBonus: 5
+    rankBonus: 1

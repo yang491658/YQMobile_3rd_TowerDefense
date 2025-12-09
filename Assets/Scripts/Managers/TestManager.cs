@@ -374,9 +374,9 @@ public class TestManager : MonoBehaviour
 
         _config.slider.value = _config.value;
     }
-    public void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, v => Time.timeScale = v);
-    public void ChangeRefID(float _value) => ApplySlider(ref refID, _value);
-    public void ChangeRefRank(float _value) => ApplySlider(ref refRank, _value);
+    private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, v => Time.timeScale = v);
+    private void ChangeRefID(float _value) => ApplySlider(ref refID, _value);
+    private void ChangeRefRank(float _value) => ApplySlider(ref refRank, _value);
 
     private void UpdateTestUI()
     {

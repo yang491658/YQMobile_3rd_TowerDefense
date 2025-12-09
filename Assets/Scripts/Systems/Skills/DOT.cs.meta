@@ -4,7 +4,7 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - effect: {fileID: 266949680547624416, guid: a5200bf9accaeca4384aea6d9af29bcb, type: 3}
+  - effect: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -121,24 +121,31 @@ public class TowerData : ScriptableObject
         EditorUtility.SetDirty(this);
     }
 
-    private T ValidateValue<T>(T _value, ref float _baseValue, RankType _rankType, ref float _rankBonus)
+    private TowerValue ValidateValue(TowerValue _value)
     {
-        _baseValue = Mathf.Max(_baseValue, 0f);
+        _value.baseValue = Mathf.Max(_value.baseValue, 0f);
 
-        if (_rankType == RankType.None)
-            _rankBonus = 0f;
-        else if (_rankType == RankType.Multiply
-            || _rankType == RankType.Divide)
-            _rankBonus = 1f;
+        if (_value.rankType == RankType.None)
+            _value.rankBonus = 0f;
+        else if (_value.rankType == RankType.Multiply
+            || _value.rankType == RankType.Divide)
+            _value.rankBonus = 1f;
 
         return _value;
     }
 
-    private TowerValue ValidateValue(TowerValue _value)
-        => ValidateValue(_value, ref _value.baseValue, _value.rankType, ref _value.rankBonus);
-
     private SkillValue ValidateValue(SkillValue _value)
-        => ValidateValue(_value, ref _value.baseValue, _value.rankType, ref _value.rankBonus);
+    {
+        _value.baseValue = Mathf.Max(_value.baseValue, 0f);
+
+        if (_value.rankType == RankType.None)
+            _value.rankBonus = 0f;
+        else if (_value.rankType == RankType.Multiply
+            || _value.rankType == RankType.Divide)
+            _value.rankBonus = 1f;
+
+        return _value;
+    }
 #endif
 
     public TowerData Clone()
