@@ -1,26 +1,5 @@
 ﻿using UnityEngine;
 
-[System.Serializable]
-public struct TowerValue
-{
-    public float baseValue;
-    public RankType rankType;
-    public float rankBonus;
-
-    public TowerValue(float _bv, RankType _rt, float _rb = 0f)
-    {
-        baseValue = Mathf.Max(_bv, 0f);
-        rankType = _rt;
-
-        if (_rt == RankType.None)
-            rankBonus = 0f;
-        else if (_rt == RankType.Multiply || _rt == RankType.Divide)
-            rankBonus = 1f;
-        else
-            rankBonus = _rb;
-    }
-}
-
 public enum TowerGrade
 {
     [InspectorName("일반")] Normal,
@@ -49,6 +28,27 @@ public enum AttackTarget
     [InspectorName("원거리")] Far,
     [InspectorName("강함")] Strong,
     [InspectorName("약함")] Weak,
+}
+
+[System.Serializable]
+public struct TowerValue
+{
+    public float baseValue;
+    public RankType rankType;
+    public float rankBonus;
+
+    public TowerValue(float _bv, RankType _rt, float _rb = 0f)
+    {
+        baseValue = Mathf.Max(_bv, 0f);
+        rankType = _rt;
+
+        if (_rt == RankType.None)
+            rankBonus = 0f;
+        else if (_rt == RankType.Multiply || _rt == RankType.Divide)
+            rankBonus = 1f;
+        else
+            rankBonus = _rb;
+    }
 }
 
 [System.Serializable]
