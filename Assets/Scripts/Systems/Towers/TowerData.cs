@@ -21,9 +21,9 @@ public class TowerData : ScriptableObject
     public TowerRole Role;
 
     [Header("Battle")]
+    public AttackTarget AttackTarget = AttackTarget.First;
     public TowerValue AttackDamage = new TowerValue(1f, RankType.Multiply);
     public TowerValue AttackSpeed = new TowerValue(3f, RankType.Divide);
-    public AttackTarget AttackTarget = AttackTarget.First;
     [Space]
     public TowerValue CriticalChance = new TowerValue(10f, RankType.Multiply);
     public TowerValue CriticalDamage = new TowerValue(150f, RankType.None);

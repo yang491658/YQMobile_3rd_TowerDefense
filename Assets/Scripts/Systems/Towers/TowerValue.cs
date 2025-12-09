@@ -47,8 +47,8 @@ public enum AttackTarget
     [InspectorName("뒤쪽")] Last,
     [InspectorName("근거리")] Near,
     [InspectorName("원거리")] Far,
-    [InspectorName("약함")] Weak,
     [InspectorName("강함")] Strong,
+    [InspectorName("약함")] Weak,
 }
 
 [System.Serializable]

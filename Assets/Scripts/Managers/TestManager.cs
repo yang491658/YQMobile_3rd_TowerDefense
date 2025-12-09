@@ -46,7 +46,7 @@ public class TestManager : MonoBehaviour
     {
         SoundManager.Instance?.ToggleBGM();
 
-        AutoPlay();
+        //AutoPlay();
     }
 
     private void Update()
@@ -105,10 +105,16 @@ public class TestManager : MonoBehaviour
             EntityManager.Instance?.ToggleSpawnMonster(spawn);
         }
 
-        if (Input.GetKey(KeyCode.T))
-            EntityManager.Instance?.SpawnTower(0, 1, null, false);
-        if (Input.GetKey(KeyCode.Y))
+        if (Input.GetKeyDown(KeyCode.T))
+            EntityManager.Instance?.SpawnTower(id, 1, null, false);
+        if (Input.GetKeyDown(KeyCode.Y))
             MergeTower();
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            var list = EntityManager.Instance?.GetTowers();
+            foreach (var tower in list)
+                tower.RankUp();
+        }
 
         if (Input.GetKeyDown(KeyCode.Delete))
             EntityManager.Instance?.DespawnAll();

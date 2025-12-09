@@ -116,21 +116,21 @@ public class Monster : Entity
     }
 
     #region 전투_기본
-    public void TakeDamage(float _damage, bool _critical = false, float _multiplier = 1f)
+    public void TakeDamage(float _damage, bool _critical = false)
     {
         SetHealth(health - _damage);
-        CreateDamage(_damage, _critical, _multiplier);
+        CreateDamage(_damage, _critical);
         if (health <= 0) Die();
     }
 
-    private void CreateDamage(float _damage, bool _critical = false, float _multiplier = 1f)
+    private void CreateDamage(float _damage, bool _critical = false)
     {
         TextMeshProUGUI t = Instantiate(healthText, damageCanvas.transform);
 
         t.gameObject.name = "Damage";
         t.transform.localPosition = healthText.transform.localPosition;
         t.text = DisplayDamage(_damage).ToString();
-        t.rectTransform.localScale *= Mathf.Max(_multiplier, 1f);
+        if (_critical) t.rectTransform.localScale *= 1.2f;
 
         StartCoroutine(DamageCoroutine(t, _critical));
     }

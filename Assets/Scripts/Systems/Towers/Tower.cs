@@ -20,9 +20,9 @@ public class Tower : Entity
     private bool isMax = false;
 
     [Header("Battle")]
+    [SerializeField] private Monster attackTarget;
     [SerializeField] private float attackDamage;
     [SerializeField] private float attackSpeed;
-    [SerializeField] private Monster attackTarget;
     private float attackTimer;
     [SerializeField] private float criticalChance;
     [SerializeField] private float criticalDamage;
@@ -182,17 +182,15 @@ public class Tower : Entity
 
         float damage = attackDamage;
         bool critical = false;
-        float multiplier = 1f;
 
         if (criticalChance > 0f && criticalDamage > 0f &&
             Random.value < criticalChance / 100f)
         {
             critical = true;
-            multiplier = criticalDamage / 100f;
-            damage *= multiplier;
+            damage *= criticalDamage / 100f;
         }
 
-        _target.TakeDamage(damage, critical, multiplier);
+        _target.TakeDamage(damage, critical);
     }
     #endregion
 
@@ -318,11 +316,11 @@ public class Tower : Entity
             case AttackTarget.Far:
                 attackTarget = EntityManager.Instance?.GetMonsterFarthest(transform.position, 0, noDebuff);
                 break;
-            case AttackTarget.Weak:
-                attackTarget = EntityManager.Instance?.GetMonsterLowHealth(noDebuff);
-                break;
             case AttackTarget.Strong:
                 attackTarget = EntityManager.Instance?.GetMonsterHighHealth(noDebuff);
+                break;
+            case AttackTarget.Weak:
+                attackTarget = EntityManager.Instance?.GetMonsterLowHealth(noDebuff);
                 break;
         }
     }
