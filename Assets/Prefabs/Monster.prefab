@@ -352,6 +352,7 @@ GameObject:
   - component: {fileID: 4960381300770612098}
   - component: {fileID: 8220881740632990379}
   - component: {fileID: 4000508954425461277}
+  - component: {fileID: 121476210895809823}
   m_Layer: 7
   m_Name: Monster
   m_TagString: Monster
@@ -526,6 +527,20 @@ MonoBehaviour:
   damageSpeed: 3
   damageCanvas: {fileID: 2387194200031068653}
   dropGold: 1
+  debuff: {fileID: 121476210895809823}
+--- !u!114 &121476210895809823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8757814876248671606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f1239bbe0c8b3f49af7af84d062da90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  monster: {fileID: 4000508954425461277}
   dotDamage: 0
   dotDuration: 0
   dotEffect: {fileID: 0}
