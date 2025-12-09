@@ -392,6 +392,7 @@ public class EntityManager : MonoBehaviour
         return isSell;
     }
 
+    public int GetFinalID() => towerDatas[towerDatas.Length - 1].ID;
     public GameObject GetBulletBase() => bulletBase;
     public List<Tower> GetTowers() => towers;
     public Transform GetEffectTrans() => effectTrans;

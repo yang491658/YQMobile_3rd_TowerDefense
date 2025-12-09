@@ -139,7 +139,6 @@ public class TowerData : ScriptableObject
 
     private SkillValue ValidateValue(SkillValue _value)
         => ValidateValue(_value, ref _value.baseValue, _value.rankType, ref _value.rankBonus);
-
 #endif
 
     public TowerData Clone()

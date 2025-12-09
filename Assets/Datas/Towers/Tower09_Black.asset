@@ -18,7 +18,7 @@ MonoBehaviour:
   Color: {r: 0, g: 0, b: 0, a: 1}
   Grade: 0
   Role: 1
-  AttackTarget: 6
+  AttackTarget: 7
   AttackDamage:
     baseValue: 1
     rankType: 3
@@ -39,6 +39,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5210997bd7dfaf64cb5a65549431ecb7, type: 2}
   Values:
   - valueType: 4
-    baseValue: 15
-    rankType: 1
+    baseValue: 5
+    rankType: 3
     rankBonus: 5

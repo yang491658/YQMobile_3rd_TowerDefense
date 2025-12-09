@@ -57,6 +57,7 @@ public class UIManager : MonoBehaviour
     [Header("Result UI")]
     [SerializeField] private GameObject resultUI;
     [SerializeField] private TextMeshProUGUI resultScoreNum;
+
 #if UNITY_EDITOR
     private void OnValidate()
     {
