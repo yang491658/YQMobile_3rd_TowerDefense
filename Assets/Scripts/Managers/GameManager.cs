@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Gold")]
     [SerializeField] private int gold = 0;
+    [SerializeField] private int needGold = 0;
     public event System.Action<int> OnChangeGold;
 
     public bool IsPaused { private set; get; } = false;
@@ -189,8 +190,13 @@ public class GameManager : MonoBehaviour
     public void ResetGold()
     {
         gold = 0;
+        needGold = 0;
         OnChangeGold?.Invoke(gold);
     }
+
+    public void UseGold(bool _useGold) => GoldDown(_useGold ? needGold++ : 0);
+
+    public bool EnoughGold() => gold >= needGold;
     #endregion
 
     #region SET
@@ -213,5 +219,6 @@ public class GameManager : MonoBehaviour
     public int GetMaxLife() => defaultLife;
 
     public int GetGold() => gold;
+    public int GetNeedGold() => needGold;
     #endregion
 }

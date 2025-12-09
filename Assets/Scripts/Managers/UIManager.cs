@@ -376,9 +376,9 @@ public class UIManager : MonoBehaviour
     public void UpdateGold(int _gold)
     {
         currentGoldNum.text = FormatNumber(_gold, false);
-        needGoldNum.text = "/ " + FormatNumber(EntityManager.Instance.GetNeedGold(), false);
+        needGoldNum.text = "/ " + FormatNumber(GameManager.Instance.GetNeedGold(), false);
 
-        goldbtn.interactable = EntityManager.Instance.EnoughGold();
+        goldbtn.interactable = GameManager.Instance.EnoughGold();
     }
 
     public void UpdateVolume(SoundType _type, float _volume)

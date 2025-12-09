@@ -32,8 +32,8 @@ MonoBehaviour:
   Values:
   - Type: 0
     BaseValue: 1
-    RankMode: 2
-    RankBonus: 0
+    RankMode: 3
+    RankBonus: 1
   - Type: 3
     BaseValue: 2
     RankMode: 1

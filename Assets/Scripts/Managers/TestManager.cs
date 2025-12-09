@@ -67,7 +67,7 @@ public class TestManager : MonoBehaviour
         {
             AutoMergeTower();
 
-            if (GameManager.Instance?.GetGold() >= EntityManager.Instance?.GetNeedGold())
+            if (GameManager.Instance.EnoughGold())
                 if (EntityManager.Instance?.SpawnTower(id) == null) MergeTower();
             if (GameManager.Instance.IsGameOver && autoRoutine == null)
                 autoRoutine = StartCoroutine(AutoReplay());

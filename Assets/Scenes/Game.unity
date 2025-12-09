@@ -4644,6 +4644,7 @@ MonoBehaviour:
   life: 0
   defaultLife: 1000
   gold: 0
+  needGold: 0
 --- !u!4 &892690366
 Transform:
   m_ObjectHideFlags: 0
@@ -6991,7 +6992,7 @@ MonoBehaviour:
   autoReplay: 1
   bgmPause: 0
   spawn: 1
-  id: 0
+  id: 2
   rank: 3
 --- !u!4 &1407473050
 Transform:
@@ -11331,7 +11332,7 @@ MonoBehaviour:
   mapSlot: {fileID: 0}
   mapRoad: {fileID: 0}
   mapSell: {fileID: 0}
-  delay: 5
+  delay: 0.1
   minDelay: 0.5
   path:
   - {fileID: 1937655796}
@@ -11340,7 +11341,6 @@ MonoBehaviour:
   - {fileID: 890344715}
   pathMargin: {x: 0.86, y: 0.72}
   pathNum: 01000000040000000200000003000000040000000100000003000000020000000100000004000000
-  needGold: 0
 --- !u!4 &2061510342
 Transform:
   m_ObjectHideFlags: 0

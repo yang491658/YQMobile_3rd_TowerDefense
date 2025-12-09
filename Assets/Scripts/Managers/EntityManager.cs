@@ -46,9 +46,6 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private Vector2 pathMargin = new Vector2(86f, 72f) / 100f;
     [SerializeField] private int[] pathNum = { 1, 4, 2, 3, 4, 1, 3, 2, 1, 4 };
 
-    [Header("Tower")]
-    [SerializeField] private int needGold = 0;
-
 #if UNITY_EDITOR
     private void OnValidate()
     {
@@ -235,16 +232,14 @@ public class EntityManager : MonoBehaviour
 
         return tilemap.GetCellCenterWorld(nearestCell);
     }
-
-    public bool CanSpawn(Vector3? _pos = null, bool _useGold = true)
-        => EnoughGold(_useGold) && SelectSlot(_pos) != default;
-
-    public bool EnoughGold(bool _useGold = true)
-        => !(_useGold && GameManager.Instance?.GetGold() < needGold);
     #endregion
 
     #region 타워
     public TowerData SearchTower(int _id) => towerDic.TryGetValue(_id, out var _data) ? _data : null;
+
+    public bool CanSpawn(Vector3? _pos = null, bool _useGold = true)
+        => (!_useGold || GameManager.Instance.EnoughGold()) && SelectSlot(_pos) != default;
+
     public Tower SpawnTower(int _id = 0, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
     {
         TowerData data = (_id == 0)
@@ -266,7 +261,7 @@ public class EntityManager : MonoBehaviour
         tower.transform.localScale = map.transform.localScale;
         towers.Add(tower);
 
-        GameManager.Instance?.GoldDown(_useGold ? needGold++ : 0);
+        GameManager.Instance?.UseGold(_useGold);
 
         return tower;
     }
@@ -328,7 +323,6 @@ public class EntityManager : MonoBehaviour
         towers.RemoveAll(_tower => _tower == null);
 
         delay = baseDelay;
-        needGold = 0;
     }
 
     public void SetEntity()
@@ -398,7 +392,6 @@ public class EntityManager : MonoBehaviour
 
     public GameObject GetBulletBase() => bulletBase;
     public List<Tower> GetTowers() => towers;
-    public int GetNeedGold() => needGold;
     #endregion
 
     #region GET_공통
