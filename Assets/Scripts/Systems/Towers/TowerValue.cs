@@ -1,5 +1,20 @@
 ﻿using UnityEngine;
 
+[System.Serializable]
+public struct TowerValue
+{
+    public float BaseValue;
+    public RankApplyMode RankMode;
+    public float RankBonus;
+
+    public TowerValue(float _value, RankApplyMode _mode, float _bonus)
+    {
+        BaseValue = _value;
+        RankMode = _mode;
+        RankBonus = _bonus;
+    }
+}
+
 public enum TowerGrade
 {
     [InspectorName("일반")] Normal,
@@ -30,6 +45,15 @@ public enum AttackTarget
     [InspectorName("강함")] Strong,
 }
 
+[System.Serializable]
+public struct SkillValue
+{
+    public ValueType Type;
+    public float BaseValue;
+    public RankApplyMode RankMode;
+    public float RankBonus;
+}
+
 public enum ValueType
 {
     [InspectorName("데미지")] Damage,
@@ -45,13 +69,4 @@ public enum RankApplyMode
     [InspectorName("빼기")] Subtract,
     [InspectorName("곱하기")] Multiply,
     [InspectorName("나누기")] Divide,
-}
-
-[System.Serializable]
-public struct SkillValue
-{
-    public ValueType Type;
-    public float BaseValue;
-    public RankApplyMode RankMode;
-    public float RankBonus;
 }

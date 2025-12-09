@@ -21,8 +21,8 @@ public class TowerData : ScriptableObject
     public TowerRole Role;
 
     [Header("Battle")]
-    public int AttackDamage = 1;
-    public float AttackSpeed = 3f;
+    public TowerValue AttackDamage = new TowerValue(1f, RankApplyMode.Multiply, 0f);
+    public TowerValue AttackSpeed = new TowerValue(3f, RankApplyMode.Divide, 0f);
     public AttackTarget AttackTarget = AttackTarget.First;
 
     [Header("Skill")]
@@ -107,12 +107,23 @@ public class TowerData : ScriptableObject
             Name = null;
         }
 
+        AttackDamage = ValidateValue(AttackDamage);
+        AttackSpeed = ValidateValue(AttackSpeed);
+
         for (int i = 0; i < Values.Count; i++)
-        {
             Values[i] = ValidateValue(Values[i]);
-        }
 
         EditorUtility.SetDirty(this);
+    }
+
+    private TowerValue ValidateValue(TowerValue _value)
+    {
+        _value.BaseValue = Mathf.Max(_value.BaseValue, 0f);
+
+        if (_value.RankMode == RankApplyMode.None)
+            _value.RankBonus = 0f;
+
+        return _value;
     }
 
     private SkillValue ValidateValue(SkillValue _value)

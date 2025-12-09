@@ -18,8 +18,14 @@ MonoBehaviour:
   Color: {r: 0, g: 1, b: 0, a: 1}
   Grade: 0
   Role: 1
-  AttackDamage: 1
-  AttackSpeed: 3
+  AttackDamage:
+    BaseValue: 1
+    RankMode: 3
+    RankBonus: 0
+  AttackSpeed:
+    BaseValue: 3
+    RankMode: 4
+    RankBonus: 0
   AttackTarget: 1
   Skills:
   - {fileID: 11400000, guid: d5a387e8a84441145a4fd0601acc5d16, type: 2}

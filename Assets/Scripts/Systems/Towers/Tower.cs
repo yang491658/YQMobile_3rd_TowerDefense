@@ -20,7 +20,7 @@ public class Tower : Entity
     private bool isMax = false;
 
     [Header("Battle")]
-    [SerializeField] private int attackDamage;
+    [SerializeField] private float attackDamage;
     [SerializeField] private float attackSpeed;
     [SerializeField] private Monster attackTarget;
     private float attackTimer;
@@ -258,8 +258,8 @@ public class Tower : Entity
         rank = Mathf.Clamp(_rank, 1, maxRank);
         UpdateSymbol();
 
-        attackDamage = data.AttackDamage * rank;
-        attackSpeed = data.AttackSpeed / rank;
+        attackDamage = Mathf.Max(SetValue(data.AttackDamage), 1f);
+        attackSpeed = Mathf.Max(SetValue(data.AttackSpeed), 0.01f);
 
         values.Clear();
         valueDic.Clear();
@@ -267,19 +267,7 @@ public class Tower : Entity
         {
             SkillValue value = data.Values[i];
 
-            float baseValue = value.BaseValue;
-            float bonus = value.RankBonus;
-            int step = rank;
-            float v;
-            switch (value.RankMode)
-            {
-                case RankApplyMode.Add: v = baseValue + bonus * step; break;
-                case RankApplyMode.Subtract: v = baseValue - bonus * step; break;
-                case RankApplyMode.Multiply: v = baseValue * rank; break;
-                case RankApplyMode.Divide: v = baseValue / rank; break;
-                default: v = baseValue; break;
-            }
-
+            float v = SetValue(value);
             values.Add(v);
             valueDic[value.Type] = v;
         }
@@ -322,6 +310,24 @@ public class Tower : Entity
     }
     #endregion
 
+    #region VALUE
+    private float SetValue(float _base, RankApplyMode _mode, float _bonus, int _step)
+    {
+        switch (_mode)
+        {
+            case RankApplyMode.Add: return _base + _bonus * _step;
+            case RankApplyMode.Subtract: return _base - _bonus * _step;
+            case RankApplyMode.Multiply: return _base * _step;
+            case RankApplyMode.Divide: return _base / _step;
+            default: return _base;
+        }
+    }
+    private float SetValue(TowerValue _value)
+        => SetValue(_value.BaseValue, _value.RankMode, _value.RankBonus, rank);
+    private float SetValue(SkillValue _value)
+        => SetValue(_value.BaseValue, _value.RankMode, _value.RankBonus, rank);
+    #endregion
+
     #region GET
     public TowerData GetData() => data;
     public int GetID() => data.ID;
@@ -332,7 +338,6 @@ public class Tower : Entity
 
     public int GetRank() => rank;
     public bool IsMax() => isMax;
-    public int GetDamage() => attackDamage;
     public Monster GetTarget() => attackTarget;
     public float GetValue(ValueType _type) => valueDic[_type];
     #endregion
