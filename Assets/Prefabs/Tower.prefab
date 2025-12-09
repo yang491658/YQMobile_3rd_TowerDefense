@@ -345,9 +345,11 @@ MonoBehaviour:
   outLine: {fileID: 0}
   symbol: {fileID: 0}
   rank: 0
+  attackTarget: {fileID: 0}
   attackDamage: 0
   attackSpeed: 0
-  attackTarget: {fileID: 0}
+  criticalChance: 0
+  criticalDamage: 0
   bullets: []
   skills: []
   values: []

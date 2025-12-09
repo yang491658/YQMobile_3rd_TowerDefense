@@ -165,6 +165,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da51cf28b8caff64187df33fdeb853a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tower: {fileID: 0}
   target: {fileID: 0}
   moveSpeed: 10
-  attackDamage: 0
