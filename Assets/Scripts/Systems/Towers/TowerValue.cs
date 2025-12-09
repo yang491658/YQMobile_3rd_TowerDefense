@@ -50,8 +50,8 @@ public enum RankApplyMode
 [System.Serializable]
 public struct SkillValue
 {
-    public ValueType type;
-    public float baseValue;
-    public RankApplyMode rankMode;
-    public float rankBonus;
+    public ValueType Type;
+    public float BaseValue;
+    public RankApplyMode RankMode;
+    public float RankBonus;
 }

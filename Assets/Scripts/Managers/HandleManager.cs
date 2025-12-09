@@ -325,7 +325,7 @@ public class HandleManager : MonoBehaviour
 
         Tower merge = null;
         if (target != null)
-            merge = EntityManager.Instance?.MergeTower(select, target);
+            merge = select.Merge(target);
 
         if (merge == null)
             select.transform.position = dragStart + offset;

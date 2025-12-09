@@ -117,13 +117,13 @@ public class TowerData : ScriptableObject
 
     private SkillValue ValidateValue(SkillValue _value)
     {
-        _value.baseValue = Mathf.Max(_value.baseValue, 0f);
+        _value.BaseValue = Mathf.Max(_value.BaseValue, 0f);
 
-        if (_value.rankMode == RankApplyMode.None)
-            _value.rankBonus = 0f;
-        else if (_value.rankMode == RankApplyMode.Multiply
-            || _value.rankMode == RankApplyMode.Divide)
-            _value.rankBonus = 1f;
+        if (_value.RankMode == RankApplyMode.None)
+            _value.RankBonus = 0f;
+        else if (_value.RankMode == RankApplyMode.Multiply
+            || _value.RankMode == RankApplyMode.Divide)
+            _value.RankBonus = 1f;
 
         return _value;
     }

@@ -106,7 +106,7 @@ public class TestManager : MonoBehaviour
         }
 
         if (Input.GetKey(KeyCode.T))
-            EntityManager.Instance?.SpawnTower(0, rank,null, false);
+            EntityManager.Instance?.SpawnTower(0, rank, null, false);
         if (Input.GetKey(KeyCode.Y))
             MergeTower();
 
@@ -178,7 +178,7 @@ public class TestManager : MonoBehaviour
                     bool bIsDebuff = b.GetData().Role == TowerRole.Debuff;
                     if (!bIsDebuff && r >= limitRank) continue;
 
-                    if (EntityManager.Instance?.MergeTower(a, b, id) != null)
+                    if (a.Merge(b, id) != null)
                         return;
                 }
             }
@@ -234,7 +234,7 @@ public class TestManager : MonoBehaviour
                     int jLocal = indices[m];
                     Tower b = towers[jLocal];
 
-                    if (EntityManager.Instance?.MergeTower(a, b, id) != null) return;
+                    if (a.Merge(b, id) != null) return;
                 }
             }
         }

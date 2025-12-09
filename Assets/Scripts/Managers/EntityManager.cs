@@ -288,7 +288,7 @@ public class EntityManager : MonoBehaviour
         DespawnTower(_target);
 
         Tower merge = SpawnTower(_id, rank,pos, false);
-        merge.RankUp(); ;
+        merge.RankUp();
 
         return merge;
     }

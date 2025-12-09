@@ -201,10 +201,27 @@ public class Tower : Entity
         }
     }
 
-    public void RankUp(int _amount = 1) => SetRank(rank + _amount);
+    public Tower Merge(Tower _target, int _id = 0)
+    {
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnMerge(this, _target);
+
+        return EntityManager.Instance?.MergeTower(this, _target, _id);
+    }
+
+    public void RankUp(int _amount = 1)
+    {
+        SetRank(rank + _amount);
+
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnRankUp(this, _amount);
+    }
 
     public void Sell()
     {
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnSell(this);
+
         GameManager.Instance?.GoldUp(GetRank());
         EntityManager.Instance?.IsSell(Vector3.one);
         EntityManager.Instance?.DespawnTower(this);
@@ -229,6 +246,9 @@ public class Tower : Entity
         }
 
         SetRank(1);
+
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnGenerate(this);
     }
 
     public void SetRank(int _rank)
@@ -243,45 +263,27 @@ public class Tower : Entity
         valueDic.Clear();
         for (int i = 0; i < data.Values.Count; i++)
         {
-            float v = SetValue(i);
+            SkillValue value = data.Values[i];
+
+            float baseValue = value.BaseValue;
+            float bonus = value.RankBonus;
+            int step = rank;
+            float v;
+            switch (value.RankMode)
+            {
+                case RankApplyMode.Add: v = baseValue + bonus * step; break;
+                case RankApplyMode.Subtract: v = baseValue - bonus * step; break;
+                case RankApplyMode.Multiply: v = baseValue * rank; break;
+                case RankApplyMode.Divide: v = baseValue / rank; break;
+                default: v = baseValue; break;
+            }
+
             values.Add(v);
-
-            SkillValue config = data.Values[i];
-            valueDic[config.type] = v;
-
+            valueDic[value.Type] = v;
         }
 
         for (int i = 0; i < skills.Count; i++)
             skills[i].SetValues(this);
-    }
-
-    public float SetValue(int _index)
-    {
-        SkillValue value = data.Values[_index];
-
-        float baseValue = value.baseValue;
-        float bonus = value.rankBonus;
-        int step = rank;
-
-        switch (value.rankMode)
-        {
-            case RankApplyMode.None:
-                return baseValue;
-
-            case RankApplyMode.Add:
-                return baseValue + bonus * step;
-
-            case RankApplyMode.Subtract:
-                return baseValue - bonus * step;
-
-            case RankApplyMode.Multiply:
-                return baseValue * rank;
-
-            case RankApplyMode.Divide:
-                return baseValue / rank;
-        }
-
-        return baseValue;
     }
 
     private void SetTarget()
