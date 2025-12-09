@@ -87,7 +87,7 @@ public class Monster : Entity
     {
         if (IsDead) return;
 
-        GameManager.Instance?.LifeDown(DisplayText(health));
+        GameManager.Instance?.LifeDown(DisplayDamage(health));
         EntityManager.Instance?.DespawnMonster(this);
     }
 
@@ -119,29 +119,27 @@ public class Monster : Entity
         Move(moveDir * moveSpeed);
     }
 
-    private int DisplayText(float _value)
-        => _value < 0.5f ? 1 : Mathf.RoundToInt(_value);
-
     #region 전투_기본
-    public void TakeDamage(float _damage)
+    public void TakeDamage(float _damage, bool _critical = false, float _multiplier = 1f)
     {
         SetHealth(health - _damage);
-        CreateDamageText(_damage);
+        CreateDamage(_damage, _critical, _multiplier);
         if (health <= 0) Die();
     }
 
-    private void CreateDamageText(float _damage)
+    private void CreateDamage(float _damage, bool _critical = false, float _multiplier = 1f)
     {
         TextMeshProUGUI t = Instantiate(healthText, damageCanvas.transform);
 
         t.gameObject.name = "Damage";
         t.transform.localPosition = healthText.transform.localPosition;
-        t.text = DisplayText(_damage).ToString();
+        t.text = DisplayDamage(_damage).ToString();
+        t.rectTransform.localScale *= Mathf.Max(_multiplier, 1f);
 
-        StartCoroutine(DamageTextCoroutine(t));
+        StartCoroutine(DamageCoroutine(t, _critical));
     }
 
-    private IEnumerator DamageTextCoroutine(TextMeshProUGUI _text)
+    private IEnumerator DamageCoroutine(TextMeshProUGUI _text, bool _critical = false)
     {
         float time = 0f;
         Vector3 from = _text.transform.position;
@@ -155,7 +153,7 @@ public class Monster : Entity
 
             _text.transform.position = from + dir * damageSpeed * time;
 
-            Color c = _text.color;
+            Color c = _critical ? Color.red : Color.black;
             c.a = Mathf.Lerp(1f, 0f, t);
             _text.color = c;
 
@@ -164,6 +162,9 @@ public class Monster : Entity
 
         Destroy(_text.gameObject);
     }
+
+    private int DisplayDamage(float _value)
+        => _value < 0.5f ? 1 : Mathf.RoundToInt(_value);
 
     public void Die()
     {
@@ -238,7 +239,7 @@ public class Monster : Entity
     }
     #endregion
 
-    #region 디버프_감속
+    #region 디버프_슬로우
     public void ApplySlow(float _slow, float _duration, Effect _effect)
     {
         slowAmount = Mathf.Max(slowAmount, _slow);
@@ -292,7 +293,7 @@ public class Monster : Entity
     public void SetHealth(float _health)
     {
         health = _health;
-        healthText.text = DisplayText(health).ToString();
+        healthText.text = DisplayDamage(health).ToString();
     }
     #endregion
 

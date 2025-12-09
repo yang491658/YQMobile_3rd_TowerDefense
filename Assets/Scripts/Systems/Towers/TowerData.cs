@@ -21,9 +21,12 @@ public class TowerData : ScriptableObject
     public TowerRole Role;
 
     [Header("Battle")]
-    public TowerValue AttackDamage = new TowerValue(1f, RankApplyMode.Multiply, 0f);
-    public TowerValue AttackSpeed = new TowerValue(3f, RankApplyMode.Divide, 0f);
+    public TowerValue AttackDamage = new TowerValue(1f, RankType.Multiply);
+    public TowerValue AttackSpeed = new TowerValue(3f, RankType.Divide);
     public AttackTarget AttackTarget = AttackTarget.First;
+    [Space]
+    public TowerValue CriticalChance = new TowerValue(10f, RankType.Multiply);
+    public TowerValue CriticalDamage = new TowerValue(150f, RankType.None);
 
     [Header("Skill")]
     public List<TowerSkill> Skills = new List<TowerSkill>();
@@ -109,6 +112,8 @@ public class TowerData : ScriptableObject
 
         AttackDamage = ValidateValue(AttackDamage);
         AttackSpeed = ValidateValue(AttackSpeed);
+        CriticalChance = ValidateValue(CriticalChance);
+        CriticalDamage = ValidateValue(CriticalDamage);
 
         for (int i = 0; i < Values.Count; i++)
             Values[i] = ValidateValue(Values[i]);
@@ -116,28 +121,25 @@ public class TowerData : ScriptableObject
         EditorUtility.SetDirty(this);
     }
 
-    private TowerValue ValidateValue(TowerValue _value)
+    private T ValidateValue<T>(T _value, ref float _baseValue, RankType _rankType, ref float _rankBonus)
     {
-        _value.BaseValue = Mathf.Max(_value.BaseValue, 0f);
+        _baseValue = Mathf.Max(_baseValue, 0f);
 
-        if (_value.RankMode == RankApplyMode.None)
-            _value.RankBonus = 0f;
+        if (_rankType == RankType.None)
+            _rankBonus = 0f;
+        else if (_rankType == RankType.Multiply
+            || _rankType == RankType.Divide)
+            _rankBonus = 1f;
 
         return _value;
     }
+
+    private TowerValue ValidateValue(TowerValue _value)
+        => ValidateValue(_value, ref _value.baseValue, _value.rankType, ref _value.rankBonus);
 
     private SkillValue ValidateValue(SkillValue _value)
-    {
-        _value.BaseValue = Mathf.Max(_value.BaseValue, 0f);
+        => ValidateValue(_value, ref _value.baseValue, _value.rankType, ref _value.rankBonus);
 
-        if (_value.RankMode == RankApplyMode.None)
-            _value.RankBonus = 0f;
-        else if (_value.RankMode == RankApplyMode.Multiply
-            || _value.RankMode == RankApplyMode.Divide)
-            _value.RankBonus = 1f;
-
-        return _value;
-    }
 #endif
 
     public TowerData Clone()
@@ -155,6 +157,8 @@ public class TowerData : ScriptableObject
         clone.AttackDamage = this.AttackDamage;
         clone.AttackSpeed = this.AttackSpeed;
         clone.AttackTarget = this.AttackTarget;
+        clone.CriticalChance = this.CriticalChance;
+        clone.CriticalDamage = this.CriticalDamage;
 
         clone.Skills = new List<TowerSkill>(Skills);
         clone.Values = new List<SkillValue>(Values);

@@ -24,6 +24,8 @@ public class Tower : Entity
     [SerializeField] private float attackSpeed;
     [SerializeField] private Monster attackTarget;
     private float attackTimer;
+    [SerializeField] private float criticalChance;
+    [SerializeField] private float criticalDamage;
     [SerializeField] private List<Bullet> bullets = new List<Bullet>();
 
     [Header("Skill")]
@@ -176,7 +178,21 @@ public class Tower : Entity
                 _splash.OnHit(this, _pos);
         }
 
-        _target?.TakeDamage(attackDamage);
+        if (_target == null) return;
+
+        float damage = attackDamage;
+        bool critical = false;
+        float multiplier = 1f;
+
+        if (criticalChance > 0f && criticalDamage > 0f &&
+            Random.value < criticalChance / 100f)
+        {
+            critical = true;
+            multiplier = criticalDamage / 100f;
+            damage *= multiplier;
+        }
+
+        _target.TakeDamage(damage, critical, multiplier);
     }
     #endregion
 
@@ -260,6 +276,8 @@ public class Tower : Entity
 
         attackDamage = Mathf.Max(SetValue(data.AttackDamage), 1f);
         attackSpeed = Mathf.Max(SetValue(data.AttackSpeed), 0.01f);
+        criticalChance = Mathf.Clamp(SetValue(data.CriticalChance), 0f, 100f);
+        criticalDamage = Mathf.Max(SetValue(data.CriticalDamage), 100f);
 
         values.Clear();
         valueDic.Clear();
@@ -269,7 +287,7 @@ public class Tower : Entity
 
             float v = SetValue(value);
             values.Add(v);
-            valueDic[value.Type] = v;
+            valueDic[value.valueType] = v;
         }
 
         for (int i = 0; i < skills.Count; i++)
@@ -311,21 +329,21 @@ public class Tower : Entity
     #endregion
 
     #region VALUE
-    private float SetValue(float _base, RankApplyMode _mode, float _bonus, int _step)
+    private float SetValue(float _base, RankType _mode, float _bonus, int _step)
     {
         switch (_mode)
         {
-            case RankApplyMode.Add: return _base + _bonus * _step;
-            case RankApplyMode.Subtract: return _base - _bonus * _step;
-            case RankApplyMode.Multiply: return _base * _step;
-            case RankApplyMode.Divide: return _base / _step;
+            case RankType.Add: return _base + _bonus * _step;
+            case RankType.Subtract: return _base - _bonus * _step;
+            case RankType.Multiply: return _base * _step;
+            case RankType.Divide: return _base / _step;
             default: return _base;
         }
     }
     private float SetValue(TowerValue _value)
-        => SetValue(_value.BaseValue, _value.RankMode, _value.RankBonus, rank);
+        => SetValue(_value.baseValue, _value.rankType, _value.rankBonus, rank);
     private float SetValue(SkillValue _value)
-        => SetValue(_value.BaseValue, _value.RankMode, _value.RankBonus, rank);
+        => SetValue(_value.baseValue, _value.rankType, _value.rankBonus, rank);
     #endregion
 
     #region GET

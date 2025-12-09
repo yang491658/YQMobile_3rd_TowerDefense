@@ -3,15 +3,21 @@
 [System.Serializable]
 public struct TowerValue
 {
-    public float BaseValue;
-    public RankApplyMode RankMode;
-    public float RankBonus;
+    public float baseValue;
+    public RankType rankType;
+    public float rankBonus;
 
-    public TowerValue(float _value, RankApplyMode _mode, float _bonus)
+    public TowerValue(float _bv, RankType _rt, float _rb = 0f)
     {
-        BaseValue = _value;
-        RankMode = _mode;
-        RankBonus = _bonus;
+        baseValue = Mathf.Max(_bv, 0f);
+        rankType = _rt;
+
+        if (_rt == RankType.None)
+            rankBonus = 0f;
+        else if (_rt == RankType.Multiply || _rt == RankType.Divide)
+            rankBonus = 1f;
+        else
+            rankBonus = _rb;
     }
 }
 
@@ -48,10 +54,24 @@ public enum AttackTarget
 [System.Serializable]
 public struct SkillValue
 {
-    public ValueType Type;
-    public float BaseValue;
-    public RankApplyMode RankMode;
-    public float RankBonus;
+    public ValueType valueType;
+    public float baseValue;
+    public RankType rankType;
+    public float rankBonus;
+
+    public SkillValue(ValueType _vt, float _bv, RankType _rt, float _rb = 0f)
+    {
+        valueType = _vt;
+        baseValue = Mathf.Max(_bv, 0f);
+        rankType = _rt;
+
+        if (_rt == RankType.None)
+            rankBonus = 0f;
+        else if (_rt == RankType.Multiply || _rt == RankType.Divide)
+            rankBonus = 1f;
+        else
+            rankBonus = _rb;
+    }
 }
 
 public enum ValueType
@@ -62,7 +82,7 @@ public enum ValueType
     [InspectorName("지속시간")] Duration,
 }
 
-public enum RankApplyMode
+public enum RankType
 {
     [InspectorName("미적용")] None,
     [InspectorName("더하기")] Add,
