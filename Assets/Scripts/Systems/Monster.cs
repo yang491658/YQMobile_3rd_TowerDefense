@@ -231,7 +231,6 @@ public class Monster : Entity
         if (dotTimer < 0f)
         {
             hasDot = false;
-            Destroy(dotEffect.gameObject);
             dotEffect = null;
         }
     }
@@ -269,7 +268,6 @@ public class Monster : Entity
             slowDuration = 0f;
             moveSpeed = baseMoveSpeed;
 
-            Destroy(slowEffect.gameObject);
             slowEffect = null;
         }
     }

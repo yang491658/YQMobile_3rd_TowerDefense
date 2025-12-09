@@ -28,7 +28,7 @@ public class DOT : TowerSkill
     {
         Effect e = Instantiate(effect, _target.transform.position, Quaternion.identity, _target.transform)
             .GetComponent<Effect>();
-        e.SetEffect(_tower, 1f);
+        e.SetEffect(_tower, _duration: duration);
 
         _target.ApplyDot(damage, duration, e);
     }

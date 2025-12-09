@@ -32,9 +32,9 @@ public class Splash : TowerSkill
 
     private void HitSplash(Tower _tower, Vector3 _center, Monster _target)
     {
-        Instantiate(effect, _center, Quaternion.identity, _tower.transform)
-            .GetComponent<Effect>()
-            .SetEffect(_tower, range, 0.3f);
+        Effect e = Instantiate(effect, _center, Quaternion.identity, EntityManager.Instance?.GetEffectTrans())
+            .GetComponent<Effect>();
+        e.SetEffect(_tower, 0.3f, range);
 
         var monsters = EntityManager.Instance.GetMonstersInRange(_center, range);
         for (int i = 0; i < monsters.Count; i++)

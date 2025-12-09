@@ -46,7 +46,7 @@ public class TestManager : MonoBehaviour
     {
         SoundManager.Instance?.ToggleBGM();
 
-        //AutoPlay();
+        AutoPlay();
     }
 
     private void Update()
@@ -132,9 +132,11 @@ public class TestManager : MonoBehaviour
 
     private void AutoPlay()
     {
-        isAuto = !isAuto;
+        //isAuto = !isAuto;
 
-        GameManager.Instance?.SetSpeed(isAuto ? GameManager.Instance.GetMaxSpeed() : 1f);
+        //GameManager.Instance?.SetSpeed(isAuto ? GameManager.Instance.GetMaxSpeed() : 1f);
+        GameManager.Instance?.ScoreUp(1000);
+        EntityManager.Instance?.SetDelay(0f);
     }
 
     private IEnumerator AutoReplay()

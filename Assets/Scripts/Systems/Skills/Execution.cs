@@ -28,7 +28,7 @@ public class Execution : TowerSkill
         {
             Effect e = Instantiate(effect, _target.transform.position, Quaternion.identity, EntityManager.Instance?.GetEffectTrans())
                 .GetComponent<Effect>();
-            e.SetEffect(_tower, 1.2f, 0.3f);
+            e.SetEffect(_tower, 1f, 1.2f);
 
             _target.Die();
         }
