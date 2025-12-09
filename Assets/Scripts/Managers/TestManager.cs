@@ -94,7 +94,7 @@ public class TestManager : MonoBehaviour
             KeyCode key = (i == 10) ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha0 + i);
             if (Input.GetKeyDown(key))
             {
-                EntityManager.Instance?.SpawnTower(i, rank, null, false);
+                EntityManager.Instance?.SpawnTower(i, 1, null, false);
                 break;
             }
         }
@@ -106,7 +106,7 @@ public class TestManager : MonoBehaviour
         }
 
         if (Input.GetKey(KeyCode.T))
-            EntityManager.Instance?.SpawnTower(0, rank, null, false);
+            EntityManager.Instance?.SpawnTower(0, 1, null, false);
         if (Input.GetKey(KeyCode.Y))
             MergeTower();
 

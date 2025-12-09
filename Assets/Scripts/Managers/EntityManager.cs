@@ -237,13 +237,10 @@ public class EntityManager : MonoBehaviour
     }
 
     public bool CanSpawn(Vector3? _pos = null, bool _useGold = true)
-    {
-        if (_useGold)
-            if (GameManager.Instance?.GetGold() < needGold)
-                return false;
+        => EnoughGold(_useGold) && SelectSlot(_pos) != default;
 
-        return SelectSlot(_pos) != default;
-    }
+    public bool EnoughGold(bool _useGold = true)
+        => !(_useGold && GameManager.Instance?.GetGold() < needGold);
     #endregion
 
     #region 타워

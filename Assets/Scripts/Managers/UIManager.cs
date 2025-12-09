@@ -378,7 +378,7 @@ public class UIManager : MonoBehaviour
         currentGoldNum.text = FormatNumber(_gold, false);
         needGoldNum.text = "/ " + FormatNumber(EntityManager.Instance.GetNeedGold(), false);
 
-        goldbtn.interactable = EntityManager.Instance.CanSpawn();
+        goldbtn.interactable = EntityManager.Instance.EnoughGold();
     }
 
     public void UpdateVolume(SoundType _type, float _volume)
