@@ -238,7 +238,7 @@ public class Tower : Entity
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnSell(this);
 
-        GameManager.Instance?.GoldUp(GetRank());
+        GameManager.Instance?.GoldUp(GameManager.Instance.GetNeedGold() * rank);
         EntityManager.Instance?.IsSell(Vector3.one);
         EntityManager.Instance?.DespawnTower(this);
     }

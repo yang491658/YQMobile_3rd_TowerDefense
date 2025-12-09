@@ -118,6 +118,8 @@ public class Monster : Entity
     #region 전투_기본
     public void TakeDamage(float _damage, bool _critical = false)
     {
+        if (IsDead) return;
+
         SetHealth(health - _damage);
         CreateDamage(_damage, _critical);
         if (health <= 0) Die();

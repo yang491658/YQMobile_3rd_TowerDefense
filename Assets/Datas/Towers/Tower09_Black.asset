@@ -17,8 +17,8 @@ MonoBehaviour:
   Symbol: {fileID: 21300000, guid: 445c9f3e8cf511541869149507e1a1a5, type: 3}
   Color: {r: 0, g: 0, b: 0, a: 1}
   Grade: 0
-  Role: 0
-  AttackTarget: 2
+  Role: 1
+  AttackTarget: 6
   AttackDamage:
     baseValue: 1
     rankType: 3
@@ -35,5 +35,10 @@ MonoBehaviour:
     baseValue: 150
     rankType: 0
     rankBonus: 0
-  Skills: []
-  Values: []
+  Skills:
+  - {fileID: 11400000, guid: 5210997bd7dfaf64cb5a65549431ecb7, type: 2}
+  Values:
+  - valueType: 4
+    baseValue: 15
+    rankType: 1
+    rankBonus: 5

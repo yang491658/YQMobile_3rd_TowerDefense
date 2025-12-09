@@ -26,6 +26,7 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private List<Monster> monsters = new List<Monster>();
     [SerializeField] private Transform towerTrans;
     [SerializeField] private List<Tower> towers = new List<Tower>();
+    [SerializeField] private Transform effectTrans;
 
     [Header("Map")]
     [SerializeField] private Transform map;
@@ -332,6 +333,7 @@ public class EntityManager : MonoBehaviour
         if (inGame == null) inGame = GameObject.Find("InGame")?.transform;
         if (monsterTrans == null) monsterTrans = GameObject.Find("InGame/Monsters")?.transform;
         if (towerTrans == null) towerTrans = GameObject.Find("InGame/Towers")?.transform;
+        if (effectTrans == null) effectTrans = GameObject.Find("InGame/Effects")?.transform;
 
         if (map == null) map = GameObject.Find("Map")?.transform;
         if (mapSlot == null) mapSlot = GameObject.Find("Slot")?.transform;
@@ -392,6 +394,7 @@ public class EntityManager : MonoBehaviour
 
     public GameObject GetBulletBase() => bulletBase;
     public List<Tower> GetTowers() => towers;
+    public Transform GetEffectTrans() => effectTrans;
     #endregion
 
     #region GET_공통

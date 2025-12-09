@@ -116,7 +116,7 @@ public class TestManager : MonoBehaviour
                 tower.RankUp();
         }
 
-        if (Input.GetKeyDown(KeyCode.Delete))
+        if (Input.GetKeyDown(KeyCode.D))
             EntityManager.Instance?.DespawnAll();
         #endregion
 

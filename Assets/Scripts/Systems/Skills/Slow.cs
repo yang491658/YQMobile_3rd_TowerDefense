@@ -7,7 +7,7 @@ using UnityEditor;
 [CreateAssetMenu(fileName = "Slow", menuName = "TowerSkill/Slow", order = 3)]
 public class Slow : TowerSkill
 {
-    private float amount;
+    private float percent;
     private float duration;
 
 #if UNITY_EDITOR
@@ -20,7 +20,7 @@ public class Slow : TowerSkill
 
     public override void SetValues(Tower _tower)
     {
-        amount = _tower.GetValue(ValueType.Percent);
+        percent = _tower.GetValue(ValueType.Percent);
         duration = _tower.GetValue(ValueType.Duration);
     }
 
@@ -30,6 +30,6 @@ public class Slow : TowerSkill
             .GetComponent<Effect>();
         e.SetEffect(_tower, 1f);
 
-        _target.ApplySlow(amount, duration, e);
+        _target.ApplySlow(percent, duration, e);
     }
 }
