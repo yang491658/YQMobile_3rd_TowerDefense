@@ -2,10 +2,6 @@
 using TMPro;
 using UnityEngine;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 public class Monster : Entity
 {
     private static int sorting = 0;
