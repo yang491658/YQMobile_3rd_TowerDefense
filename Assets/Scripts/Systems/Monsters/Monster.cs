@@ -14,24 +14,24 @@ public class Monster : Entity
 
     [Header("Battle")]
     [SerializeField] private int health = 50;
+    [SerializeField] private int dropGold = 1;
+    public bool IsDead { private set; get; } = false;
+    [SerializeField] private MonsterDebuff debuff;
+
+    [Header("Text UI")]
     [SerializeField] private Canvas healthCanvas;
     [SerializeField] private TextMeshProUGUI healthText;
     [Space]
-    [SerializeField] private float damageDuration = 1f;
-    [SerializeField] private float damageSpeed = 3f;
-    [SerializeField] private Canvas damageCanvas;
-    [Space]
-    [SerializeField] private int dropGold = 1;
-    public bool IsDead { private set; get; } = false;
-    [Space]
-    [SerializeField] private MonsterDebuff debuff;
+    [SerializeField] private float textDuration = 1f;
+    [SerializeField] private float textSpeed = 3f;
+    [SerializeField] private Canvas textCanvas;
 
 #if UNITY_EDITOR
     private void OnValidate()
     {
         Canvas[] canvases = GetComponentsInChildren<Canvas>();
         if (healthCanvas == null) healthCanvas = canvases[0];
-        if (damageCanvas == null) damageCanvas = canvases[1];
+        if (textCanvas == null) textCanvas = canvases[1];
         if (healthText == null)
             healthText = healthCanvas.GetComponentInChildren<TextMeshProUGUI>();
 
@@ -112,42 +112,6 @@ public class Monster : Entity
         if (health <= 0) Die();
     }
 
-    private void CreateDamage(int _damage, bool _critical = false)
-    {
-        TextMeshProUGUI t = Instantiate(healthText, damageCanvas.transform);
-
-        t.gameObject.name = "Damage";
-        t.transform.localPosition = healthText.transform.localPosition;
-        t.text = _damage.ToString();
-        if (_critical) t.rectTransform.localScale *= 1.2f;
-
-        StartCoroutine(DamageCoroutine(t, _critical));
-    }
-
-    private IEnumerator DamageCoroutine(TextMeshProUGUI _text, bool _critical = false)
-    {
-        float time = 0f;
-        Vector3 from = _text.transform.position;
-        Vector3 to = new Vector3(0f, AutoCamera.WorldRect.yMax, 0f);
-        Vector3 dir = (to - from).normalized;
-
-        while (time < damageDuration)
-        {
-            time += Time.deltaTime;
-            float t = time / damageDuration;
-
-            _text.transform.position = from + dir * damageSpeed * time;
-
-            Color c = _critical ? Color.red : Color.black;
-            c.a = Mathf.Lerp(1f, 0f, t);
-            _text.color = c;
-
-            yield return null;
-        }
-
-        Destroy(_text.gameObject);
-    }
-
     public void Die()
     {
         if (IsDead) return;
@@ -168,8 +132,46 @@ public class Monster : Entity
 
     private IEnumerator DieCoroutine()
     {
-        yield return new WaitForSeconds(damageDuration);
+        yield return new WaitForSeconds(textDuration);
         EntityManager.Instance?.DespawnMonster(this);
+    }
+    #endregion
+
+    #region 텍스트 UI
+    private void CreateDamage(int _damage, bool _critical = false)
+    {
+        TextMeshProUGUI t = Instantiate(healthText, textCanvas.transform);
+
+        t.gameObject.name = "Damage";
+        t.transform.localPosition = healthText.transform.localPosition;
+        t.text = _damage.ToString();
+        if (_critical) t.rectTransform.localScale *= 1.2f;
+
+        StartCoroutine(DamageCoroutine(t, _critical));
+    }
+
+    private IEnumerator DamageCoroutine(TextMeshProUGUI _text, bool _critical = false)
+    {
+        float time = 0f;
+        Vector3 from = _text.transform.position;
+        Vector3 to = new Vector3(0f, AutoCamera.WorldRect.yMax, 0f);
+        Vector3 dir = (to - from).normalized;
+
+        while (time < textDuration)
+        {
+            time += Time.deltaTime;
+            float t = time / textDuration;
+
+            _text.transform.position = from + dir * textSpeed * time;
+
+            Color c = _critical ? Color.red : Color.black;
+            c.a = Mathf.Lerp(1f, 0f, t);
+            _text.color = c;
+
+            yield return null;
+        }
+
+        Destroy(_text.gameObject);
     }
     #endregion
 
