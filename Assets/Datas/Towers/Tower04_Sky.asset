@@ -18,7 +18,7 @@ MonoBehaviour:
   Color: {r: 0, g: 1, b: 1, a: 1}
   Grade: 0
   Role: 0
-  AttackTarget: 2
+  AttackTarget: 6
   AttackDamage: 10
   AttackSpeed: 1
   CriticalChance: 5

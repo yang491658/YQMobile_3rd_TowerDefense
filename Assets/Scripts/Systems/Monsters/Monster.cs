@@ -225,7 +225,8 @@ public class Monster : Entity
     #region GET
     public float GetSpeed() => moveSpeed;
     public int GetHealth() => health;
-    public bool ExcludeTarget() => IsDead || health <= reservedDamage;
+
+    public bool CanTarget() => !IsDead && health > reservedDamage;
     public bool HasDebuff() => debuff.HasDebuff();
     #endregion
 }

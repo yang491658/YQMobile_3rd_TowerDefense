@@ -30,7 +30,7 @@ MonoBehaviour:
     baseValue: 5
     rankType: 3
     rankBonus: 1
-  - valueType: 2
+  - valueType: 4
     baseValue: 2
     rankType: 1
     rankBonus: 1
