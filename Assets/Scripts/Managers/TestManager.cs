@@ -401,8 +401,6 @@ public class TestManager : MonoBehaviour
         averageScore = 0;
 
         gameSpeed.value = gameSpeed.minValue;
-        refID.value = refID.minValue;
-        refRank.value = refRank.minValue;
 
         UpdateTestUI();
     }
