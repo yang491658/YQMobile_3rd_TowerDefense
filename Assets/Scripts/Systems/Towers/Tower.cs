@@ -132,7 +132,7 @@ public class Tower : Entity
         attackTimer -= Time.deltaTime;
         if (attackTimer > 0f) return;
 
-        SetTarget();
+        FindTarget();
         if (attackTarget == null || attackTarget.IsDead) return;
 
         for (int i = 0; i < skills.Count; i++)
@@ -149,6 +149,41 @@ public class Tower : Entity
             .GetComponent<Bullet>();
 
         bullet.SetBullet(this);
+    }
+    #endregion
+
+    #region 타겟
+    private void FindTarget()
+    {
+        bool noDebuff = data.Role == TowerRole.Debuff;
+
+        switch (data.AttackTarget)
+        {
+            case AttackTarget.None:
+                attackTarget = null;
+                return;
+            case AttackTarget.Random:
+                attackTarget = EntityManager.Instance?.GetMonsterRandom(noDebuff);
+                break;
+            case AttackTarget.First:
+                attackTarget = EntityManager.Instance?.GetMonsterFirst(noDebuff);
+                break;
+            case AttackTarget.Last:
+                attackTarget = EntityManager.Instance?.GetMonsterLast(noDebuff);
+                break;
+            case AttackTarget.Near:
+                attackTarget = EntityManager.Instance?.GetMonsterNearest(transform.position, 0, noDebuff);
+                break;
+            case AttackTarget.Far:
+                attackTarget = EntityManager.Instance?.GetMonsterFarthest(transform.position, 0, noDebuff);
+                break;
+            case AttackTarget.Strong:
+                attackTarget = EntityManager.Instance?.GetMonsterHighHealth(noDebuff);
+                break;
+            case AttackTarget.Weak:
+                attackTarget = EntityManager.Instance?.GetMonsterLowHealth(noDebuff);
+                break;
+        }
     }
     #endregion
 
@@ -292,39 +327,6 @@ public class Tower : Entity
 
         for (int i = 0; i < skills.Count; i++)
             skills[i].SetValues(this);
-    }
-
-    private void SetTarget()
-    {
-        bool noDebuff = data.Role == TowerRole.Debuff;
-
-        switch (data.AttackTarget)
-        {
-            case AttackTarget.None:
-                attackTarget = null;
-                return;
-            case AttackTarget.Random:
-                attackTarget = EntityManager.Instance?.GetMonsterRandom(noDebuff);
-                break;
-            case AttackTarget.First:
-                attackTarget = EntityManager.Instance?.GetMonsterFirst(noDebuff);
-                break;
-            case AttackTarget.Last:
-                attackTarget = EntityManager.Instance?.GetMonsterLast(noDebuff);
-                break;
-            case AttackTarget.Near:
-                attackTarget = EntityManager.Instance?.GetMonsterNearest(transform.position, 0, noDebuff);
-                break;
-            case AttackTarget.Far:
-                attackTarget = EntityManager.Instance?.GetMonsterFarthest(transform.position, 0, noDebuff);
-                break;
-            case AttackTarget.Strong:
-                attackTarget = EntityManager.Instance?.GetMonsterHighHealth(noDebuff);
-                break;
-            case AttackTarget.Weak:
-                attackTarget = EntityManager.Instance?.GetMonsterLowHealth(noDebuff);
-                break;
-        }
     }
 
     private float SetValue(SkillValue _value)
