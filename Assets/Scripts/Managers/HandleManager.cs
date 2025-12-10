@@ -34,9 +34,9 @@ public class HandleManager : MonoBehaviour
 
 #if UNITY_EDITOR
     [Header("Mark")]
-    [SerializeField] private float markDuration = 1f;
-    [SerializeField] private float markRadius = 0.5f;
-    [SerializeField] private int markSegment = 24;
+    private float markDuration = 1f;
+    private float markRadius = 0.5f;
+    private int markSegment = 24;
     private readonly List<Vector3> marks = new();
     private readonly List<float> markTimes = new();
     private readonly List<Color> markColors = new();

@@ -430,6 +430,7 @@ public class EntityManager : MonoBehaviour
     private T GetByIndex<T>(List<T> _list, int _index) where T : class
     {
         if (_list.Count == 0) return null;
+        if (_index < 0 || _index >= _list.Count) return null;
         return _list[_index];
     }
 
@@ -536,6 +537,9 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region GET_몬스터
+    public int GetMonsterCount() => monsters.Count;
+    public int GetMonsterNum(Monster _target) => monsters.IndexOf(_target);
+    public Monster GetMonsterByIndex(int _index) => monsters[_index];
     public List<Monster> GetMonsters(bool _noDebuff = false)
     {
         List<Monster> list = new List<Monster>();
@@ -548,7 +552,6 @@ public class EntityManager : MonoBehaviour
 
             list.Add(monster);
         }
-        if (list.Count == 0) return null;
 
         return list;
     }

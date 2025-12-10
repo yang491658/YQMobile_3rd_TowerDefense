@@ -10,23 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
-  m_Name: Tower04_Sky
+  m_Name: Tower06_Black
   m_EditorClassIdentifier: 
-  ID: 4
-  Name: Sky
-  Symbol: {fileID: 21300000, guid: 08cd50e40b4edee43b326880e3bd6908, type: 3}
-  Color: {r: 0, g: 1, b: 1, a: 1}
+  ID: 6
+  Name: Black
+  Symbol: {fileID: 21300000, guid: 445c9f3e8cf511541869149507e1a1a5, type: 3}
+  Color: {r: 0, g: 0, b: 0, a: 1}
   Grade: 0
   Role: 0
-  AttackTarget: 6
+  AttackTarget: 7
   AttackDamage: 10
-  AttackSpeed: 1
+  AttackSpeed: 3
   CriticalChance: 5
   CriticalDamage: 150
   Skills:
-  - {fileID: 11400000, guid: 209178d46fdddbb499301d4ebbb38b9e, type: 2}
+  - {fileID: 11400000, guid: 5210997bd7dfaf64cb5a65549431ecb7, type: 2}
   Values:
-  - valueType: 1
-    baseValue: 10
-    rankType: 2
+  - valueType: 5
+    baseValue: 5
+    rankType: 3
     rankBonus: 1

@@ -4,8 +4,8 @@
 public class Splash : Skill
 {
     [Header("Skill")]
-    [SerializeField] private int damage;
-    [SerializeField] private float range;
+    [SerializeField][Min(0)] private int damage;
+    [SerializeField][Min(0f)] private float range;
 
     public override void SetValues(Tower _tower)
     {

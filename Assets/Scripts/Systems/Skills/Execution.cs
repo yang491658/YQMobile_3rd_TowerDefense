@@ -4,7 +4,7 @@ using UnityEngine;
 public class Execution : Skill
 {
     [Header("Skill")]
-    [SerializeField] private int chance;
+    [SerializeField][Min(0)] private int chance;
 
     public override void SetValues(Tower _tower)
     {

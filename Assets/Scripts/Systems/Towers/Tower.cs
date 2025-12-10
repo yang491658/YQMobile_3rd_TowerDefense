@@ -15,17 +15,17 @@ public class Tower : Entity
 
     [Header("Rank")]
     [SerializeField] private Transform symbol;
-    [SerializeField] private int rank;
+    [SerializeField][Min(0)] private int rank;
     private int maxRank = 7;
     private bool isMax = false;
 
     [Header("Battle")]
     [SerializeField] private Monster attackTarget;
-    [SerializeField] private int attackDamage;
-    [SerializeField] private float attackSpeed;
+    [SerializeField][Min(0)] private int attackDamage;
+    [SerializeField][Min(0f)] private float attackSpeed;
     private float attackTimer;
-    [SerializeField] private int criticalChance;
-    [SerializeField] private int criticalDamage;
+    [SerializeField][Min(0)] private int criticalChance;
+    [SerializeField][Min(0)] private int criticalDamage;
     [SerializeField] private List<Bullet> bullets = new List<Bullet>();
 
     [Header("Skill")]

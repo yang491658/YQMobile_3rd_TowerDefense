@@ -4,8 +4,8 @@
 public class Slow : Skill
 {
     [Header("Skill")]
-    [SerializeField] private int percent;
-    [SerializeField] private float duration;
+    [SerializeField][Min(0)] private int percent;
+    [SerializeField][Min(0f)] private float duration;
 
     public override void SetValues(Tower _tower)
     {

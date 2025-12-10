@@ -4,8 +4,8 @@
 public class DOT : Skill
 {
     [Header("Skill")]
-    [SerializeField] private int damage;
-    [SerializeField] private float duration;
+    [SerializeField][Min(0)] private int damage;
+    [SerializeField][Min(0)] private float duration;
 
     public override void SetValues(Tower _tower)
     {

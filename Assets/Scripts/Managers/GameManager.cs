@@ -10,9 +10,9 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { private set; get; }
 
     [Header("Speed")]
-    [SerializeField] private float speed = 1f;
-    [SerializeField] private float minSpeed = 0.5f;
-    [SerializeField] private float maxSpeed = 3f;
+    [SerializeField][Min(0f)] private float speed = 1f;
+    [SerializeField][Min(0f)] private float minSpeed = 0.5f;
+    [SerializeField][Min(0f)] private float maxSpeed = 3f;
     public event System.Action<float> OnChangeSpeed;
 
     [Header("Score")]
@@ -21,12 +21,12 @@ public class GameManager : MonoBehaviour
 
     [Header("Life")]
     [SerializeField] private int life = 0;
-    [SerializeField][Min(0)] private int defaultLife = 1000;
+    [SerializeField][Min(0)] private int defaultLife = 0; // 임시
     public event System.Action<int> OnChangeLife;
 
     [Header("Gold")]
     [SerializeField] private int gold = 0;
-    [SerializeField] private int needGold = 0;
+    [SerializeField][Min(0)] private int needGold = 0;
     public event System.Action<int> OnChangeGold;
 
     public bool IsPaused { private set; get; } = false;
@@ -226,7 +226,6 @@ public class GameManager : MonoBehaviour
     public int GetScore() => score;
 
     public int GetLife() => life;
-    public int GetMaxLife() => defaultLife;
 
     public int GetGold() => gold;
     public int GetNeedGold() => needGold;

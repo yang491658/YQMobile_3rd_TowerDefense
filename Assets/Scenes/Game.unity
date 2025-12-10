@@ -2012,9 +2012,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   select: {fileID: 0}
   maxDrag: 0
-  markDuration: 1
-  markRadius: 0.5
-  markSegment: 24
 --- !u!4 &198834868
 Transform:
   m_ObjectHideFlags: 0
@@ -6741,7 +6738,7 @@ MonoBehaviour:
   maxSpeed: 3
   score: 0
   life: 0
-  defaultLife: 1000
+  defaultLife: 0
   gold: 0
   needGold: 0
 --- !u!4 &892690366

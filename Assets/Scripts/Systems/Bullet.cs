@@ -6,7 +6,7 @@ public class Bullet : Entity
     [SerializeField] private Tower tower;
 
     [Header("Battle")]
-    [SerializeField] private int damage;
+    [SerializeField][Min(0)] private int damage;
     private bool isHit;
 
     [Header("Move")]

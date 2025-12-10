@@ -18,9 +18,9 @@ public class UIManager : MonoBehaviour
     [Header("Count UI")]
     [SerializeField] private TextMeshProUGUI countText;
     private Coroutine countRoutine;
-    [SerializeField] private int countStart = 3;
-    [SerializeField] private float countDuration = 1f;
-    [SerializeField] private float countScale = 10f;
+    [SerializeField][Min(0)] private int countStart = 3;
+    [SerializeField][Min(0f)] private float countDuration = 1f;
+    [SerializeField][Min(1f)] private float countScale = 10f;
     [SerializeField] private bool countSkip = true;
 
     [Header("InGame UI")]

@@ -6,7 +6,7 @@ public class Rapid : Skill
     private int hitCount = 0;
 
     [Header("Skill")]
-    [SerializeField] private int count;
+    [SerializeField][Min(0)] private int count;
 
     public override void SetValues(Tower _tower)
     {
