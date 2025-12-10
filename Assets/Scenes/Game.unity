@@ -9750,7 +9750,7 @@ MonoBehaviour:
     slider: {fileID: 1426485945}
     value: 1
     minValue: 1
-    maxValue: 20
+    maxValue: 10
     format: "\uBC30\uC18D \xD7 {0}"
   testCountNum: {fileID: 396571802}
   maxScoreNum: {fileID: 721513245}
