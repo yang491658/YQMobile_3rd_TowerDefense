@@ -6,16 +6,16 @@ public class MonsterDebuff : MonoBehaviour
     [SerializeField] private Monster monster;
 
     [Header("Debuff / DOT")]
-    [SerializeField] private int dotDamage;
-    [SerializeField] private float dotDuration;
+    [SerializeField][Min(0)] private int dotDamage;
+    [SerializeField][Min(0f)] private float dotDuration;
     private float dotTimer;
     private float dotTickTimer;
     private bool hasDot;
     [SerializeField] private Effect dotEffect;
 
     [Header("Debuff / Slow")]
-    [SerializeField] private int slowPercent;
-    [SerializeField] private float slowDuration;
+    [SerializeField][Min(0)] private int slowPercent;
+    [SerializeField][Min(0f)] private float slowDuration;
     private float slowTimer;
     private float baseMoveSpeed;
     private bool hasSlow;
@@ -72,7 +72,7 @@ public class MonsterDebuff : MonoBehaviour
         {
             dotTickTimer += 1f;
 
-            monster.TakeDamage(dotDamage);
+            monster.TakeDamage(dotDamage, _direct: true);
             if (monster.IsDead)
             {
                 hasDot = false;

@@ -6,25 +6,27 @@ public class Monster : Entity
 {
     private static int sorting = 0;
 
-    [Header("Move")]
-    [SerializeField] private int pathIndex;
-    private Transform[] paths;
-    [SerializeField] private float moveSpeed = 3f;
-    [SerializeField] private Vector3 moveDir;
-
-    [Header("Battle")]
-    [SerializeField] private int health = 50;
-    [SerializeField] private int dropGold = 1;
-    public bool IsDead { private set; get; } = false;
-    [SerializeField] private MonsterDebuff debuff;
-
     [Header("Text UI")]
     [SerializeField] private Canvas healthCanvas;
     [SerializeField] private TextMeshProUGUI healthText;
     [Space]
-    [SerializeField] private float textDuration = 1f;
-    [SerializeField] private float textSpeed = 3f;
+    [SerializeField][Min(0f)] private float textDuration = 1f;
+    [SerializeField][Min(0f)] private float textSpeed = 3f;
     [SerializeField] private Canvas textCanvas;
+
+    [Header("Move")]
+    [SerializeField] private int pathIndex;
+    private Transform[] paths;
+    [SerializeField][Min(0f)] private float moveSpeed = 3f;
+    [SerializeField] private Vector3 moveDir;
+
+    [Header("Battle")]
+    [SerializeField][Min(0)] private int health = 50;
+    [SerializeField][Min(0)] private int reservedDamage = 0;
+    public bool IsDead { private set; get; } = false;
+    [SerializeField][Min(0)] private int dropGold = 1;
+    [Space]
+    [SerializeField] private MonsterDebuff debuff;
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -68,7 +70,7 @@ public class Monster : Entity
     {
         if (IsDead) return;
 
-        GameManager.Instance?.LifeDown(health);
+        GameManager.Instance?.LifeDown(Mathf.Max(health / 10, 1));
         EntityManager.Instance?.DespawnMonster(this);
     }
 
@@ -103,13 +105,31 @@ public class Monster : Entity
     #endregion
 
     #region 전투
-    public void TakeDamage(int _damage, bool _critical = false)
+    public void TakeDamage(int _damage, bool _critical = false, bool _direct = false)
     {
         if (IsDead) return;
+
+        if (!_direct)
+        {
+            reservedDamage -= _damage;
+            if (reservedDamage < 0) reservedDamage = 0;
+        }
 
         SetHealth(health - _damage);
         CreateDamage(_damage, _critical);
         if (health <= 0) Die();
+    }
+
+    public void ReservedUp(int _damage)
+    {
+        if (_damage < 0) return;
+        reservedDamage += _damage;
+    }
+
+    public void ReservedDown(int _damage)
+    {
+        if (_damage < 0) return;
+        reservedDamage -= _damage;
     }
 
     public void Die()
@@ -126,7 +146,6 @@ public class Monster : Entity
 
         GameManager.Instance?.ScoreUp();
         GameManager.Instance?.GoldUp(dropGold);
-        EntityManager.Instance?.RemoveMonster(this);
         StartCoroutine(DieCoroutine());
     }
 
@@ -206,6 +225,7 @@ public class Monster : Entity
     #region GET
     public float GetSpeed() => moveSpeed;
     public int GetHealth() => health;
+    public bool ExcludeTarget() => IsDead || health <= reservedDamage;
     public bool HasDebuff() => debuff.HasDebuff();
     #endregion
 }

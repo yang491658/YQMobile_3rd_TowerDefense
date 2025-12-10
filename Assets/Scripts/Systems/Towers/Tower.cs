@@ -357,6 +357,7 @@ public class Tower : Entity
     public int GetRank() => rank;
     public bool IsMax() => isMax;
     public Monster GetTarget() => attackTarget;
+    public int GetDamage() => attackDamage;
     public float GetValue(ValueType _type) => valueDic[_type];
     public int GetValueInt(ValueType _type) => Mathf.RoundToInt(valueDic[_type]);
     #endregion

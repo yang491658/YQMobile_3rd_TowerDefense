@@ -5,10 +5,14 @@ public class Bullet : Entity
     [Header("Origin")]
     [SerializeField] private Tower tower;
 
+    [Header("Battle")]
+    [SerializeField] private int damage;
+    private bool isHit;
+
     [Header("Move")]
     [SerializeField] private Monster target;
     private Vector3 targetPos;
-    [SerializeField] private float moveSpeed = 10f;
+    [SerializeField][Min(0f)] private float moveSpeed = 10f;
 
     protected override void Update()
     {
@@ -21,6 +25,7 @@ public class Bullet : Entity
     {
         if (target != null && !target.IsDead && target.gameObject == _collision.gameObject)
         {
+            isHit = true;
             tower.HitBullet(target);
             Destroy(gameObject);
             return;
@@ -35,6 +40,9 @@ public class Bullet : Entity
     private void OnDestroy()
     {
         tower.RemoveBullet(this);
+
+        if (!isHit && target != null && damage > 0)
+            target.ReservedDown(damage);
     }
 
     public virtual void UpdateMove()
@@ -70,10 +78,12 @@ public class Bullet : Entity
             baseScale.y / towerScale.y,
             baseScale.z / towerScale.z
         );
-
         sr.color = _tower.GetColor();
+
+        damage = _tower.GetDamage();
         target = _tower.GetTarget();
         targetPos = target.transform.position;
+        target.ReservedUp(damage);
 
         tower.AddBullet(this);
     }

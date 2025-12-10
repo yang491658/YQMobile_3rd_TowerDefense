@@ -29,7 +29,7 @@ public class Splash : Skill
             Monster m = monsters[i];
             if (m == _target) continue;
 
-            m.TakeDamage(damage);
+            m.TakeDamage(damage, _direct: true);
         }
     }
 }

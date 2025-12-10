@@ -162,8 +162,6 @@ public class EntityManager : MonoBehaviour
         }
     }
 
-    public void RemoveMonster(Monster _monster) => monsters.Remove(_monster);
-
     public void DespawnMonster(Monster _monster)
     {
         monsters.Remove(_monster);
@@ -566,15 +564,15 @@ public class EntityManager : MonoBehaviour
 
     private List<Monster> GetMonsterList(bool _noDebuff)
     {
-        if (!_noDebuff)
-            return monsters;
-
         List<Monster> list = new List<Monster>();
         for (int i = 0; i < monsters.Count; i++)
         {
             Monster monster = monsters[i];
-            if (!monster.HasDebuff())
-                list.Add(monster);
+
+            if (monster.ExcludeTarget()) continue;
+            if (_noDebuff && monster.HasDebuff()) continue;
+
+            list.Add(monster);
         }
         if (list.Count == 0) return monsters;
 

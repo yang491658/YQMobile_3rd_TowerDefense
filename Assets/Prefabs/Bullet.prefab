@@ -166,5 +166,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tower: {fileID: 0}
+  damage: 0
   target: {fileID: 0}
   moveSpeed: 10
