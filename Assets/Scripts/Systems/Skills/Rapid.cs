@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "Rapid", menuName = "TowerSkill/Rapid", order = 2)]
 public class Rapid : Skill
