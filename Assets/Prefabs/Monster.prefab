@@ -115,7 +115,7 @@ GameObject:
   - component: {fileID: 9074123227843146772}
   - component: {fileID: 1305469726758643851}
   m_Layer: 5
-  m_Name: DamageCanvas
+  m_Name: TextCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -523,9 +523,9 @@ MonoBehaviour:
   health: 50
   healthCanvas: {fileID: 4377407481415714818}
   healthText: {fileID: 5014821189341486892}
-  damageDuration: 1
-  damageSpeed: 3
-  damageCanvas: {fileID: 2387194200031068653}
+  textDuration: 1
+  textSpeed: 3
+  textCanvas: {fileID: 2387194200031068653}
   dropGold: 1
   debuff: {fileID: 121476210895809823}
 --- !u!114 &121476210895809823
