@@ -53,7 +53,7 @@ public class TestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI maxScoreNum;
     [SerializeField] private TextMeshProUGUI averageScoreNum;
     [Space]
-    [SerializeField] private SliderConfig refID = new SliderConfig(0, 0, 10, "기준ID : {0}");
+    [SerializeField] private SliderConfig refID = new SliderConfig(0, 0, 1, "기준ID : {0}");
     [SerializeField] private SliderConfig refRank = new SliderConfig(3, 1, 7, "기준랭크 : {0}");
 
 #if UNITY_EDITOR
@@ -315,6 +315,7 @@ public class TestManager : MonoBehaviour
     private void OnEnable()
     {
         InitSlider(gameSpeed, ChangeGameSpeed);
+        refID.maxValue = EntityManager.Instance.GetFinalID();
         InitSlider(refID, ChangeRefID);
         InitSlider(refRank, ChangeRefRank);
     }

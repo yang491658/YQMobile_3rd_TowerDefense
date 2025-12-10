@@ -272,10 +272,10 @@ public class Tower : Entity
         rank = Mathf.Clamp(_rank, 1, maxRank);
         UpdateSymbol();
 
-        attackDamage = Mathf.Max(SetValue(data.AttackDamage), 1f);
-        attackSpeed = Mathf.Max(SetValue(data.AttackSpeed), 0.01f);
-        criticalChance = Mathf.Clamp(SetValue(data.CriticalChance), 0f, 100f);
-        criticalDamage = Mathf.Max(SetValue(data.CriticalDamage), 100f);
+        attackDamage = data.AttackDamage * rank;
+        attackSpeed = data.AttackSpeed / rank;
+        criticalChance = data.CriticalChance * rank;
+        criticalDamage = data.CriticalDamage;
 
         values.Clear();
         valueDic.Clear();
@@ -324,24 +324,21 @@ public class Tower : Entity
                 break;
         }
     }
-    #endregion
 
-    #region VALUE
-    private float SetValue(float _base, RankType _mode, float _bonus, int _step)
+    private float SetValue(SkillValue _value)
     {
-        switch (_mode)
+        float value = _value.baseValue;
+        float bonus = _value.rankBonus;
+
+        switch (_value.rankType)
         {
-            case RankType.Add: return _base + _bonus * _step;
-            case RankType.Subtract: return _base - _bonus * _step;
-            case RankType.Multiply: return _base * _step;
-            case RankType.Divide: return _base / _step;
-            default: return _base;
+            case RankType.Add: return value + bonus * rank;
+            case RankType.Subtract: return value - bonus * rank;
+            case RankType.Multiply: return value * rank;
+            case RankType.Divide: return value / Mathf.Max(rank, 1);
+            default: return value;
         }
     }
-    private float SetValue(TowerValue _value)
-        => SetValue(_value.baseValue, _value.rankType, _value.rankBonus, rank);
-    private float SetValue(SkillValue _value)
-        => SetValue(_value.baseValue, _value.rankType, _value.rankBonus, rank);
     #endregion
 
     #region GET

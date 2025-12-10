@@ -236,16 +236,15 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region 타워
-    public TowerData SearchTower(int _id) => towerDic.TryGetValue(_id, out var _data) ? _data : null;
+    public TowerData SearchTower(int _id)
+        => towerDic.TryGetValue(_id, out var _data) ? _data : towerDatas[Random.Range(0, towerDatas.Length)];
 
     public bool CanSpawn(Vector3? _pos = null, bool _useGold = true)
         => (!_useGold || GameManager.Instance.EnoughGold()) && SelectSlot(_pos) != default;
 
     public Tower SpawnTower(int _id = 0, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
     {
-        TowerData data = (_id == 0)
-            ? towerDatas[Random.Range(0, towerDatas.Length)]
-            : SearchTower(_id);
+        TowerData data = SearchTower(_id);
 
         if (data == null) return null;
 

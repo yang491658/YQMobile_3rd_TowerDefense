@@ -10,31 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
-  m_Name: Tower05_Blue
+  m_Name: Tower03_Blue
   m_EditorClassIdentifier: 
-  ID: 5
+  ID: 3
   Name: Blue
   Symbol: {fileID: 21300000, guid: b880150c15f72ec47a3ec568862f7228, type: 3}
   Color: {r: 0, g: 0, b: 1, a: 1}
   Grade: 0
   Role: 1
   AttackTarget: 2
-  AttackDamage:
-    baseValue: 1
-    rankType: 3
-    rankBonus: 1
-  AttackSpeed:
-    baseValue: 3
-    rankType: 4
-    rankBonus: 1
-  CriticalChance:
-    baseValue: 10
-    rankType: 3
-    rankBonus: 1
-  CriticalDamage:
-    baseValue: 150
-    rankType: 0
-    rankBonus: 0
+  AttackDamage: 1
+  AttackSpeed: 3
+  CriticalChance: 10
+  CriticalDamage: 150
   Skills:
   - {fileID: 11400000, guid: 19bb69e5c69b31b45bec831caa28dc6a, type: 2}
   Values:

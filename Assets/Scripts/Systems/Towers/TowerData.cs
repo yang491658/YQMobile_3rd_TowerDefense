@@ -22,11 +22,10 @@ public class TowerData : ScriptableObject
 
     [Header("Battle")]
     public AttackTarget AttackTarget = AttackTarget.First;
-    public TowerValue AttackDamage = new TowerValue(1f, RankType.Multiply);
-    public TowerValue AttackSpeed = new TowerValue(3f, RankType.Divide);
-    [Space]
-    public TowerValue CriticalChance = new TowerValue(10f, RankType.Multiply);
-    public TowerValue CriticalDamage = new TowerValue(150f, RankType.None);
+    public float AttackDamage = 1f;
+    public float AttackSpeed = 3f;
+    public int CriticalChance = 10;
+    public int CriticalDamage = 150;
 
     [Header("Skill")]
     public List<Skill> Skills = new List<Skill>();
@@ -80,23 +79,10 @@ public class TowerData : ScriptableObject
                 pick = s;
                 break;
             }
-
-            if (pick == null)
-            {
-                for (int i = 0; i < baseSprites.Count; i++)
-                {
-                    Sprite s = baseSprites[i];
-                    if (s.name == "Star")
-                    {
-                        pick = s;
-                        break;
-                    }
-                }
-            }
             Symbol = pick;
         }
 
-        if (Symbol != null && Symbol.name != "Star")
+        if (Symbol != null)
         {
             var m = Regex.Match(Symbol.name, @"^(?<num>\d+)\.");
             ID = m.Success ? int.Parse(m.Groups["num"].Value) : ID;
@@ -110,28 +96,15 @@ public class TowerData : ScriptableObject
             Name = null;
         }
 
-        AttackDamage = ValidateValue(AttackDamage);
-        AttackSpeed = ValidateValue(AttackSpeed);
-        CriticalChance = ValidateValue(CriticalChance);
-        CriticalDamage = ValidateValue(CriticalDamage);
+        AttackDamage = Mathf.Max(AttackDamage, 0f);
+        AttackSpeed = Mathf.Max(AttackSpeed, 0f);
+        CriticalChance = Mathf.Max(CriticalChance, 0);
+        CriticalDamage = Mathf.Max(CriticalDamage, 0);
 
         for (int i = 0; i < Values.Count; i++)
             Values[i] = ValidateValue(Values[i]);
 
         EditorUtility.SetDirty(this);
-    }
-
-    private TowerValue ValidateValue(TowerValue _value)
-    {
-        _value.baseValue = Mathf.Max(_value.baseValue, 0f);
-
-        if (_value.rankType == RankType.None)
-            _value.rankBonus = 0f;
-        else if (_value.rankType == RankType.Multiply
-            || _value.rankType == RankType.Divide)
-            _value.rankBonus = 1f;
-
-        return _value;
     }
 
     private SkillValue ValidateValue(SkillValue _value)

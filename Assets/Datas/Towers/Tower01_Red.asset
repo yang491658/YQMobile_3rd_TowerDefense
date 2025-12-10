@@ -19,22 +19,10 @@ MonoBehaviour:
   Grade: 0
   Role: 0
   AttackTarget: 2
-  AttackDamage:
-    baseValue: 1
-    rankType: 3
-    rankBonus: 1
-  AttackSpeed:
-    baseValue: 3
-    rankType: 4
-    rankBonus: 1
-  CriticalChance:
-    baseValue: 10
-    rankType: 3
-    rankBonus: 1
-  CriticalDamage:
-    baseValue: 150
-    rankType: 0
-    rankBonus: 0
+  AttackDamage: 1
+  AttackSpeed: 3
+  CriticalChance: 10
+  CriticalDamage: 150
   Skills:
   - {fileID: 11400000, guid: 1e30dfc6a662fae498d91ab8f84b9856, type: 2}
   Values:
