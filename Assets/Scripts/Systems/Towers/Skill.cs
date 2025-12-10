@@ -2,8 +2,6 @@
 
 public abstract class Skill : ScriptableObject
 {
-    [SerializeField] protected GameObject effect;
-
     public virtual void SetValues(Tower _tower) { }
 
     public virtual void OnGenerate(Tower _tower) { }

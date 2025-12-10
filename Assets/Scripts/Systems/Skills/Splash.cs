@@ -1,22 +1,10 @@
 ﻿using UnityEngine;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 [CreateAssetMenu(fileName = "Splash", menuName = "TowerSkill/Splash", order = 1)]
 public class Splash : Skill
 {
     private float damage;
     private float range;
-
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        if (effect == null)
-            effect = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Effects/Splash.prefab");
-    }
-#endif
 
     public override void SetValues(Tower _tower)
     {
@@ -32,9 +20,7 @@ public class Splash : Skill
 
     private void HitSplash(Tower _tower, Vector3 _center, Monster _target)
     {
-        Effect e = Instantiate(effect, _center, Quaternion.identity, EntityManager.Instance?.GetEffectTrans())
-            .GetComponent<Effect>();
-        e.SetEffect(_tower, 0.3f, range);
+        EntityManager.Instance.MakeEffect(_tower, _center, range);
 
         var monsters = EntityManager.Instance.GetMonstersInRange(_center, range);
         for (int i = 0; i < monsters.Count; i++)

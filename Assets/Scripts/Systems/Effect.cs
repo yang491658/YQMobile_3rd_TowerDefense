@@ -12,34 +12,17 @@ public class Effect : MonoBehaviour
     }
 
     #region SET
-    public void SetEffect(Tower _tower, float _alpha = 0.5f, float _scale = 1f, float _duration = 0f)
+    public void SetEffect(Tower _tower, float _scale = 1f, float _duration = 0f)
     {
-        gameObject.name = _tower.name + "'s Debuff";
-
-        Color c = _tower.GetColor();
-        c.a = _alpha;
-        sr.color = c;
+        sr.color = _tower.GetColor();
+        sr.sprite = _tower.GetSymbol();
 
         transform.localScale *= _scale;
 
-        float startAlpha;
-        float fadeDuration;
+        float startAlpha = sr.color.a;
+        float duration = _duration > 0f ? _duration : 0.3f;
 
-        if (_duration > 0f)
-        {
-            startAlpha = 0.5f;
-            fadeDuration = _duration;
-
-            c.a = startAlpha;
-            sr.color = c;
-        }
-        else
-        {
-            startAlpha = _alpha;
-            fadeDuration = 0.3f;
-        }
-
-        StartCoroutine(EffectCoroutine(startAlpha, fadeDuration));
+        StartCoroutine(EffectCoroutine(startAlpha, duration));
     }
     #endregion
 

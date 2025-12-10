@@ -16,17 +16,19 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private GameObject monsterBase;
     [SerializeField] private GameObject towerBase;
     [SerializeField] private GameObject bulletBase;
-
+    [SerializeField] private GameObject effectBase;
+    [Space]
     [SerializeField] private TowerData[] towerDatas;
     private readonly Dictionary<int, TowerData> towerDic = new Dictionary<int, TowerData>();
 
     [Header("InGame")]
     [SerializeField] private Transform inGame;
     [SerializeField] private Transform monsterTrans;
-    [SerializeField] private List<Monster> monsters = new List<Monster>();
     [SerializeField] private Transform towerTrans;
-    [SerializeField] private List<Tower> towers = new List<Tower>();
     [SerializeField] private Transform effectTrans;
+    [Space]
+    [SerializeField] private List<Monster> monsters = new List<Monster>();
+    [SerializeField] private List<Tower> towers = new List<Tower>();
 
     [Header("Map")]
     [SerializeField] private Transform map;
@@ -56,6 +58,8 @@ public class EntityManager : MonoBehaviour
             towerBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Tower.prefab");
         if (bulletBase == null)
             bulletBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Bullet.prefab");
+        if (effectBase == null)
+            effectBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Effect.prefab");
 
         string[] guids = AssetDatabase.FindAssets("t:TowerData", new[] { "Assets/Datas/Towers" });
         var tlist = new List<TowerData>(guids.Length);
@@ -295,6 +299,30 @@ public class EntityManager : MonoBehaviour
     }
     #endregion
 
+    #region 이펙트
+    public Effect MakeEffect(Tower _tower, Transform _parent, float _scale = 1f, float _duration = 0f)
+    {
+        if (_parent == null) _parent = effectTrans;
+
+        Effect effect = Instantiate(effectBase, _parent.position, Quaternion.identity, _parent)
+            .GetComponent<Effect>();
+
+        effect.SetEffect(_tower, _scale, _duration);
+
+        return effect;
+    }
+
+    public Effect MakeEffect(Tower _tower, Vector3 _pos, float _scale = 1f, float _duration = 0f)
+    {
+        Effect effect = Instantiate(effectBase, _pos, Quaternion.identity, effectTrans)
+            .GetComponent<Effect>();
+
+        effect.SetEffect(_tower, _scale, _duration);
+
+        return effect;
+    }
+    #endregion
+
     public void DespawnAll()
     {
         for (int i = monsters.Count - 1; i >= 0; i--)
@@ -394,7 +422,6 @@ public class EntityManager : MonoBehaviour
     public int GetFinalID() => towerDatas[towerDatas.Length - 1].ID;
     public GameObject GetBulletBase() => bulletBase;
     public List<Tower> GetTowers() => towers;
-    public Transform GetEffectTrans() => effectTrans;
     #endregion
 
     #region GET_공통

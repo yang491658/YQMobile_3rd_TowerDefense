@@ -345,6 +345,7 @@ public class Tower : Entity
     public TowerData GetData() => data;
     public int GetID() => data.ID;
     public Color GetColor() => data.Color;
+    public Sprite GetSymbol() => data.Symbol;
 
     public bool IsDragging() => isDragging;
     public Vector3 GetSlot() => slot;
