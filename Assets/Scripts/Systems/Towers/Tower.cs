@@ -21,11 +21,11 @@ public class Tower : Entity
 
     [Header("Battle")]
     [SerializeField] private Monster attackTarget;
-    [SerializeField] private float attackDamage;
+    [SerializeField] private int attackDamage;
     [SerializeField] private float attackSpeed;
     private float attackTimer;
-    [SerializeField] private float criticalChance;
-    [SerializeField] private float criticalDamage;
+    [SerializeField] private int criticalChance;
+    [SerializeField] private int criticalDamage;
     [SerializeField] private List<Bullet> bullets = new List<Bullet>();
 
     [Header("Skill")]
@@ -180,13 +180,13 @@ public class Tower : Entity
 
         if (_target == null) return;
 
-        float damage = attackDamage;
+        int damage = attackDamage;
         bool critical = false;
 
         if (Random.value < criticalChance / 100f)
         {
             critical = true;
-            damage *= criticalDamage / 100f;
+            damage = damage * criticalDamage / 100;
         }
 
         for (int i = 0; i < skills.Count; i++)
@@ -356,5 +356,6 @@ public class Tower : Entity
     public bool IsMax() => isMax;
     public Monster GetTarget() => attackTarget;
     public float GetValue(ValueType _type) => valueDic[_type];
+    public int GetValueInt(ValueType _type) => Mathf.RoundToInt(valueDic[_type]);
     #endregion
 }

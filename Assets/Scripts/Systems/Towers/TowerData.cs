@@ -22,9 +22,9 @@ public class TowerData : ScriptableObject
 
     [Header("Battle")]
     public AttackTarget AttackTarget = AttackTarget.First;
-    public float AttackDamage = 1f;
-    public float AttackSpeed = 3f;
-    public int CriticalChance = 10;
+    public int AttackDamage = 10;
+    public float AttackSpeed = 3;
+    public int CriticalChance = 5;
     public int CriticalDamage = 150;
 
     [Header("Skill")]
@@ -96,7 +96,7 @@ public class TowerData : ScriptableObject
             Name = null;
         }
 
-        AttackDamage = Mathf.Max(AttackDamage, 0f);
+        AttackDamage = Mathf.Max(AttackDamage, 0);
         AttackSpeed = Mathf.Max(AttackSpeed, 0f);
         CriticalChance = Mathf.Max(CriticalChance, 0);
         CriticalDamage = Mathf.Max(CriticalDamage, 0);

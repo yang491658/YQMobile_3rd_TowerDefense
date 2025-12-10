@@ -13,7 +13,7 @@ public class Monster : Entity
     [SerializeField] private Vector3 moveDir;
 
     [Header("Battle")]
-    [SerializeField] private float health = 5f;
+    [SerializeField] private int health = 50;
     [SerializeField] private Canvas healthCanvas;
     [SerializeField] private TextMeshProUGUI healthText;
     [Space]
@@ -68,7 +68,7 @@ public class Monster : Entity
     {
         if (IsDead) return;
 
-        GameManager.Instance?.LifeDown(DisplayDamage(health));
+        GameManager.Instance?.LifeDown(health);
         EntityManager.Instance?.DespawnMonster(this);
     }
 
@@ -103,7 +103,7 @@ public class Monster : Entity
     #endregion
 
     #region 전투
-    public void TakeDamage(float _damage, bool _critical = false)
+    public void TakeDamage(int _damage, bool _critical = false)
     {
         if (IsDead) return;
 
@@ -112,13 +112,13 @@ public class Monster : Entity
         if (health <= 0) Die();
     }
 
-    private void CreateDamage(float _damage, bool _critical = false)
+    private void CreateDamage(int _damage, bool _critical = false)
     {
         TextMeshProUGUI t = Instantiate(healthText, damageCanvas.transform);
 
         t.gameObject.name = "Damage";
         t.transform.localPosition = healthText.transform.localPosition;
-        t.text = DisplayDamage(_damage).ToString();
+        t.text = _damage.ToString();
         if (_critical) t.rectTransform.localScale *= 1.2f;
 
         StartCoroutine(DamageCoroutine(t, _critical));
@@ -148,9 +148,6 @@ public class Monster : Entity
         Destroy(_text.gameObject);
     }
 
-    private int DisplayDamage(float _value)
-        => Mathf.Max(Mathf.RoundToInt(_value), 1);
-
     public void Die()
     {
         if (IsDead) return;
@@ -177,17 +174,17 @@ public class Monster : Entity
     #endregion
 
     #region 디버프 적용
-    public void ApplyDot(float _damage, float _duration, Effect _effect)
+    public void ApplyDot(int _damage, float _duration, Effect _effect)
         => debuff?.ApplyDot(_damage, _duration, _effect);
 
-    public void ApplySlow(float _slow, float _duration, Effect _effect)
+    public void ApplySlow(int _slow, float _duration, Effect _effect)
         => debuff?.ApplySlow(_slow, _duration, _effect);
     #endregion
 
     #region SET
     public void SetMonster(int _set)
     {
-        SetHealth(Mathf.Max(health * _set, 5));
+        SetHealth(Mathf.Max(health * _set, health));
         dropGold = Mathf.Max(dropGold * _set, 1);
     }
 
@@ -197,16 +194,16 @@ public class Monster : Entity
         pathIndex = 0;
     }
     public float SetSpeed(float _speed) => moveSpeed = _speed;
-    public void SetHealth(float _health)
+    public void SetHealth(int _health)
     {
         health = _health;
-        healthText.text = DisplayDamage(health).ToString();
+        healthText.text = health.ToString();
     }
     #endregion
 
     #region GET
     public float GetSpeed() => moveSpeed;
-    public float GetHealth() => health;
+    public int GetHealth() => health;
     public bool HasDebuff() => debuff.HasDebuff();
     #endregion
 }

@@ -14,7 +14,7 @@ public abstract class Skill : ScriptableObject
 
     public virtual void OnHit(Tower _tower, Monster _target) { }
 
-    public virtual void OnTakeDamage(Tower _tower, Monster _target, ref float _damage, ref bool _critical) { }
+    public virtual void OnTakeDamage(Tower _tower, Monster _target, ref int _damage, ref bool _critical) { }
 
     public virtual void OnMerge(Tower _tower, Tower _target) { }
 

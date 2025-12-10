@@ -10,10 +10,10 @@ public class Rapid : Skill
 
     public override void SetValues(Tower _tower)
     {
-        count = Mathf.Max(Mathf.RoundToInt(_tower.GetValue(ValueType.Count)), 1);
+        count = _tower.GetValueInt(ValueType.Count);
     }
 
-    public override void OnTakeDamage(Tower _tower, Monster _target, ref float _damage, ref bool _critical)
+    public override void OnTakeDamage(Tower _tower, Monster _target, ref int _damage, ref bool _critical)
     {
         hitCount++;
         if (hitCount < count) return;
@@ -21,8 +21,8 @@ public class Rapid : Skill
         hitCount = 0;
 
         TowerData data = _tower.GetData();
-        float baseDamage = data.AttackDamage * _tower.GetRank();
-        float damage = baseDamage * data.CriticalDamage / 100f;
+        int baseDamage = data.AttackDamage * _tower.GetRank();
+        int damage = baseDamage * data.CriticalDamage / 100;
 
         _damage = damage;
         _critical = true;

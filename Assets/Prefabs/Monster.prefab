@@ -520,7 +520,7 @@ MonoBehaviour:
   pathIndex: 0
   moveSpeed: 3
   moveDir: {x: 0, y: 0, z: 0}
-  health: 5
+  health: 50
   healthCanvas: {fileID: 4377407481415714818}
   healthText: {fileID: 5014821189341486892}
   damageDuration: 1
@@ -544,6 +544,6 @@ MonoBehaviour:
   dotDamage: 0
   dotDuration: 0
   dotEffect: {fileID: 0}
-  slowAmount: 0
+  slowPercent: 0
   slowDuration: 0
   slowEffect: {fileID: 0}

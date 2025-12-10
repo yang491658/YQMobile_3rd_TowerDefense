@@ -6,7 +6,7 @@ public class MonsterDebuff : MonoBehaviour
     [SerializeField] private Monster monster;
 
     [Header("Debuff / DOT")]
-    [SerializeField] private float dotDamage;
+    [SerializeField] private int dotDamage;
     [SerializeField] private float dotDuration;
     private float dotTimer;
     private float dotTickTimer;
@@ -14,7 +14,7 @@ public class MonsterDebuff : MonoBehaviour
     [SerializeField] private Effect dotEffect;
 
     [Header("Debuff / Slow")]
-    [SerializeField] private float slowPercent;
+    [SerializeField] private int slowPercent;
     [SerializeField] private float slowDuration;
     private float slowTimer;
     private float baseMoveSpeed;
@@ -43,7 +43,7 @@ public class MonsterDebuff : MonoBehaviour
     }
 
     #region 도트
-    public void ApplyDot(float _damage, float _duration, Effect _effect)
+    public void ApplyDot(int _damage, float _duration, Effect _effect)
     {
         dotDamage = Mathf.Max(dotDamage, _damage);
         dotDuration = Mathf.Max(dotDuration, _duration);
@@ -72,8 +72,7 @@ public class MonsterDebuff : MonoBehaviour
         {
             dotTickTimer += 1f;
 
-            int value = Mathf.CeilToInt(dotDamage);
-            monster.TakeDamage(value);
+            monster.TakeDamage(dotDamage);
             if (monster.IsDead)
             {
                 hasDot = false;
@@ -90,14 +89,14 @@ public class MonsterDebuff : MonoBehaviour
     #endregion
 
     #region 슬로우
-    public void ApplySlow(float _slow, float _duration, Effect _effect)
+    public void ApplySlow(int _slow, float _duration, Effect _effect)
     {
         slowPercent = Mathf.Max(slowPercent, _slow);
         slowDuration = Mathf.Max(slowDuration, _duration);
 
         slowTimer = slowDuration;
         hasSlow = true;
-        monster.SetSpeed(baseMoveSpeed * Mathf.Max(1f - slowPercent / 100f, 0f));
+        monster.SetSpeed(baseMoveSpeed * Mathf.Max(1 - slowPercent / 100f, 0f));
 
         if (slowEffect == null)
             slowEffect = _effect;
@@ -117,7 +116,7 @@ public class MonsterDebuff : MonoBehaviour
         if (slowTimer < 0f)
         {
             hasSlow = false;
-            slowPercent = 0f;
+            slowPercent = 0;
             slowDuration = 0f;
             monster.SetSpeed(baseMoveSpeed);
 

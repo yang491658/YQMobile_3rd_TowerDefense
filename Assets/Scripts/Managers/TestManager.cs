@@ -151,7 +151,7 @@ public class TestManager : MonoBehaviour
             KeyCode key = (i == 10) ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha0 + i);
             if (Input.GetKeyDown(key))
             {
-                EntityManager.Instance?.SpawnTower(i, 1, null, false);
+                EntityManager.Instance?.SpawnTower(i, 1, _useGold: false);
                 break;
             }
         }
@@ -163,7 +163,7 @@ public class TestManager : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.T))
-            EntityManager.Instance?.SpawnTower(refID.value, 1, null, false);
+            EntityManager.Instance?.SpawnTower(refID.value, 1, _useGold: false);
         if (Input.GetKeyDown(KeyCode.Y))
             MergeTower();
         if (Input.GetKeyDown(KeyCode.U))
@@ -194,6 +194,7 @@ public class TestManager : MonoBehaviour
         //isAuto = !isAuto;
 
         //GameManager.Instance?.SetSpeed(isAuto ? GameManager.Instance.GetMaxSpeed() : 1f);
+        EntityManager.Instance?.SetDelay(0f);
     }
 
     private IEnumerator AutoReplay()

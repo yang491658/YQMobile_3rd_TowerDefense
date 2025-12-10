@@ -4,11 +4,11 @@ using UnityEngine;
 public class Execution : Skill
 {
     [Header("Skill")]
-    [SerializeField] private float chance;
+    [SerializeField] private int chance;
 
     public override void SetValues(Tower _tower)
     {
-        chance = _tower.GetValue(ValueType.Chance);
+        chance = _tower.GetValueInt(ValueType.Chance);
     }
 
     public override void OnHit(Tower _tower, Monster _target)

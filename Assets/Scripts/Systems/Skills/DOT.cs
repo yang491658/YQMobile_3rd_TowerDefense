@@ -4,18 +4,18 @@
 public class DOT : Skill
 {
     [Header("Skill")]
-    [SerializeField] private float damage;
+    [SerializeField] private int damage;
     [SerializeField] private float duration;
 
     public override void SetValues(Tower _tower)
     {
-        damage = _tower.GetValue(ValueType.Damage);
+        damage = _tower.GetValueInt(ValueType.Damage);
         duration = _tower.GetValue(ValueType.Duration);
     }
 
     public override void OnHit(Tower _tower, Monster _target)
     {
-        Effect e = EntityManager.Instance.MakeEffect(_tower, _target.transform, 1f, duration);
+        Effect e = EntityManager.Instance.MakeEffect(_tower, _target.transform, _duration: duration);
         _target.ApplyDot(damage, duration, e);
     }
 }

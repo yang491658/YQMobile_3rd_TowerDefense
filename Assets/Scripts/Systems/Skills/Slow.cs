@@ -4,18 +4,18 @@
 public class Slow : Skill
 {
     [Header("Skill")]
-    [SerializeField] private float percent;
+    [SerializeField] private int percent;
     [SerializeField] private float duration;
 
     public override void SetValues(Tower _tower)
     {
-        percent = _tower.GetValue(ValueType.Percent);
+        percent = _tower.GetValueInt(ValueType.Percent);
         duration = _tower.GetValue(ValueType.Duration);
     }
 
     public override void OnHit(Tower _tower, Monster _target)
     {
-        Effect e = EntityManager.Instance.MakeEffect(_tower, _target.transform, 1f, duration);
+        Effect e = EntityManager.Instance.MakeEffect(_tower, _target.transform, _duration: duration);
         _target.ApplySlow(percent, duration, e);
     }
 }

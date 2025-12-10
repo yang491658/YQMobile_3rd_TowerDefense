@@ -4,12 +4,12 @@
 public class Splash : Skill
 {
     [Header("Skill")]
-    [SerializeField] private float damage;
+    [SerializeField] private int damage;
     [SerializeField] private float range;
 
     public override void SetValues(Tower _tower)
     {
-        damage = _tower.GetValue(ValueType.Damage);
+        damage = _tower.GetValueInt(ValueType.Damage);
         range = _tower.GetValue(ValueType.Range);
     }
 
