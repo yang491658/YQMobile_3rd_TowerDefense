@@ -56,9 +56,9 @@ public enum ValueType
 {
     [InspectorName("데미지")] Damage,
     [InspectorName("횟수")] Count,
-    [InspectorName("지속시간")] Duration,
-    [InspectorName("범위")] Range,
     [InspectorName("퍼센트")] Percent,
+    [InspectorName("범위")] Range,
+    [InspectorName("지속시간")] Duration,
     [InspectorName("확률")] Chance,
 }
 

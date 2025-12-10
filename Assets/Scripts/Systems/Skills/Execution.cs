@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Execution", menuName = "TowerSkill/Execution", order = 5)]
+[CreateAssetMenu(fileName = "Execution", menuName = "TowerSkill/Execution", order = 33)]
 public class Execution : Skill
 {
     [Header("Skill")]

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "Splash", menuName = "TowerSkill/Splash", order = 1)]
+[CreateAssetMenu(fileName = "Splash", menuName = "TowerSkill/Splash", order = 11)]
 public class Splash : Skill
 {
     [Header("Skill")]
