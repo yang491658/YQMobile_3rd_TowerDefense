@@ -206,6 +206,16 @@ public class GameManager : MonoBehaviour
         if (!IsPaused) Time.timeScale = speed;
         OnChangeSpeed?.Invoke(speed);
     }
+    public void SetSpeed(float _speed, bool _force)
+    {
+        if (_force)
+        {
+            speed = _speed;
+            if (!IsPaused) Time.timeScale = speed;
+            OnChangeSpeed?.Invoke(speed);
+        }
+        else SetSpeed(_speed);
+    }
     #endregion
 
     #region GET
