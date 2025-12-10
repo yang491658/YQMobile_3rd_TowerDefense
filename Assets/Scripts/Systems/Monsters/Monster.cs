@@ -13,7 +13,7 @@ public class Monster : Entity
     [SerializeField] private Vector3 moveDir;
 
     [Header("Battle")]
-    [SerializeField] private float health = 5;
+    [SerializeField] private float health = 5f;
     [SerializeField] private Canvas healthCanvas;
     [SerializeField] private TextMeshProUGUI healthText;
     [Space]
@@ -149,7 +149,7 @@ public class Monster : Entity
     }
 
     private int DisplayDamage(float _value)
-        => _value < 0.5f ? 1 : Mathf.RoundToInt(_value);
+        => Mathf.Max(Mathf.RoundToInt(_value), 1);
 
     public void Die()
     {

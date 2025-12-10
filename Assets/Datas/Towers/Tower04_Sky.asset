@@ -23,5 +23,10 @@ MonoBehaviour:
   AttackSpeed: 1
   CriticalChance: 10
   CriticalDamage: 150
-  Skills: []
-  Values: []
+  Skills:
+  - {fileID: 11400000, guid: 209178d46fdddbb499301d4ebbb38b9e, type: 2}
+  Values:
+  - valueType: 1
+    baseValue: 10
+    rankType: 2
+    rankBonus: 1

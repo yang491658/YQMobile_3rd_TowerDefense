@@ -183,12 +183,14 @@ public class Tower : Entity
         float damage = attackDamage;
         bool critical = false;
 
-        if (criticalChance > 0f && criticalDamage > 0f &&
-            Random.value < criticalChance / 100f)
+        if (Random.value < criticalChance / 100f)
         {
             critical = true;
             damage *= criticalDamage / 100f;
         }
+
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnTakeDamage(this, _target, ref damage, ref critical);
 
         _target.TakeDamage(damage, critical);
     }

@@ -3,8 +3,9 @@
 [CreateAssetMenu(fileName = "Splash", menuName = "TowerSkill/Splash", order = 1)]
 public class Splash : Skill
 {
-    private float damage;
-    private float range;
+    [Header("Skill")]
+    [SerializeField] private float damage;
+    [SerializeField] private float range;
 
     public override void SetValues(Tower _tower)
     {

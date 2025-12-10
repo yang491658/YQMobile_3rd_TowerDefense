@@ -1,9 +1,10 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Execution", menuName = "TowerSkill/Execution", order = 4)]
+[CreateAssetMenu(fileName = "Execution", menuName = "TowerSkill/Execution", order = 5)]
 public class Execution : Skill
 {
-    private float chance;
+    [Header("Skill")]
+    [SerializeField] private float chance;
 
     public override void SetValues(Tower _tower)
     {

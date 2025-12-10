@@ -2528,36 +2528,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4f4d91872bc35d4eac4704e3f89e2cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  countText: {fileID: 507647089}
+  countText: {fileID: 0}
   countStart: 3
   countDuration: 1
   countScale: 10
   countSkip: 1
-  inGameUI: {fileID: 463422171}
-  playTimeText: {fileID: 722285320}
-  scoreNum: {fileID: 1222573071}
-  lifeText: {fileID: 1606229171}
-  goldbtn: {fileID: 760205060}
-  currentGoldNum: {fileID: 92295099}
-  needGoldNum: {fileID: 1236182572}
-  settingUI: {fileID: 565046922}
-  settingScoreNum: {fileID: 79075885}
-  speedSlider: {fileID: 1326418691}
-  bgmSlider: {fileID: 1367106577}
-  sfxSlider: {fileID: 892183346}
-  bgmIcon: {fileID: 185723935}
-  sfxIcon: {fileID: 1928568704}
-  bgmIcons:
-  - {fileID: 21300000, guid: 06a16cb520d0f2449a999572cae2cf97, type: 3}
-  - {fileID: 21300000, guid: cabad5b87dec1fd4e8749fa9f8936e63, type: 3}
-  sfxIcons:
-  - {fileID: 21300000, guid: fd30afab859581246b9ba7593ee3c10c, type: 3}
-  - {fileID: 21300000, guid: 2896697aee29fec4eae8809b364feeb0, type: 3}
-  - {fileID: 21300000, guid: d7f4f52e0d03f214b8b9ff47d92ab909, type: 3}
-  confirmUI: {fileID: 1922433877}
-  confirmTitle: {fileID: 137781734}
-  resultUI: {fileID: 578179199}
-  resultScoreNum: {fileID: 180508595}
+  inGameUI: {fileID: 0}
+  playTimeText: {fileID: 0}
+  scoreNum: {fileID: 0}
+  lifeText: {fileID: 0}
+  goldbtn: {fileID: 0}
+  currentGoldNum: {fileID: 0}
+  needGoldNum: {fileID: 0}
+  settingUI: {fileID: 0}
+  settingScoreNum: {fileID: 0}
+  speedSlider: {fileID: 0}
+  bgmSlider: {fileID: 0}
+  sfxSlider: {fileID: 0}
+  bgmIcon: {fileID: 0}
+  sfxIcon: {fileID: 0}
+  bgmIcons: []
+  sfxIcons: []
+  confirmUI: {fileID: 0}
+  confirmTitle: {fileID: 0}
+  resultUI: {fileID: 0}
+  resultScoreNum: {fileID: 0}
 --- !u!4 &264004223
 Transform:
   m_ObjectHideFlags: 0
@@ -9744,27 +9739,27 @@ MonoBehaviour:
   autoReplay: 1
   bgmPause: 0
   spawn: 1
-  testUI: {fileID: 226721620}
+  testUI: {fileID: 0}
   gameSpeed:
-    TMP: {fileID: 749630922}
-    slider: {fileID: 1426485945}
+    TMP: {fileID: 0}
+    slider: {fileID: 0}
     value: 1
     minValue: 1
     maxValue: 10
     format: "\uBC30\uC18D \xD7 {0}"
-  testCountNum: {fileID: 396571802}
-  maxScoreNum: {fileID: 721513245}
-  averageScoreNum: {fileID: 731691110}
+  testCountNum: {fileID: 0}
+  maxScoreNum: {fileID: 0}
+  averageScoreNum: {fileID: 0}
   refID:
-    TMP: {fileID: 1643808504}
-    slider: {fileID: 169119741}
+    TMP: {fileID: 0}
+    slider: {fileID: 0}
     value: 0
     minValue: 0
     maxValue: 1
     format: "\uAE30\uC900ID : {0}"
   refRank:
-    TMP: {fileID: 329162808}
-    slider: {fileID: 137509037}
+    TMP: {fileID: 0}
+    slider: {fileID: 0}
     value: 3
     minValue: 1
     maxValue: 7
@@ -10874,13 +10869,8 @@ MonoBehaviour:
   bgmVol: 1
   sfxVol: 1
   soundClips:
-    bgmClips:
-    - {fileID: 8300000, guid: d76ecd11a0b575847ba2a1c53dea9f05, type: 3}
-    - {fileID: 8300000, guid: 49731314153f00046b85f50fdc038198, type: 3}
-    sfxClips:
-    - {fileID: 8300000, guid: 2bd74fec26584e646adfcee5d63449bd, type: 3}
-    - {fileID: 8300000, guid: 26fe5ca8ffd011e45ac774191127e3cd, type: 3}
-    - {fileID: 8300000, guid: ceebd236cb9506b488ca55c45d0c9580, type: 3}
+    bgmClips: []
+    sfxClips: []
 --- !u!4 &1640530186
 Transform:
   m_ObjectHideFlags: 0
@@ -14962,16 +14952,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8757234db11563c478a55d79795ecf2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  monsterBase: {fileID: 8757814876248671606, guid: a25fd6c75451e3b4e837ccfdde33535e, type: 3}
-  towerBase: {fileID: 8757814876248671606, guid: cd6b40e57763ae841b4913764f46bea9, type: 3}
-  bulletBase: {fileID: 266949680547624416, guid: e50fab4336ffe364a97a106040d6d21d, type: 3}
-  effectBase: {fileID: 266949680547624416, guid: 521e03e570012bb429bd61b39cfae1b6, type: 3}
-  towerDatas:
-  - {fileID: 11400000, guid: 38201c1538eb8bd42827d4f93f67bd6f, type: 2}
-  - {fileID: 11400000, guid: a714c5287deb86d4b82408f0c30959df, type: 2}
-  - {fileID: 11400000, guid: 905e9e7be128b784d827ea415df1a619, type: 2}
-  - {fileID: 11400000, guid: 310b135269f70994cb655376ac695460, type: 2}
-  - {fileID: 11400000, guid: 776c1d2d001d522429793175c043f4fe, type: 2}
+  monsterBase: {fileID: 0}
+  towerBase: {fileID: 0}
+  bulletBase: {fileID: 0}
+  effectBase: {fileID: 0}
+  towerDatas: []
   inGame: {fileID: 0}
   monsterTrans: {fileID: 0}
   towerTrans: {fileID: 0}
@@ -14984,11 +14969,7 @@ MonoBehaviour:
   mapSell: {fileID: 0}
   delay: 5
   minDelay: 0.5
-  path:
-  - {fileID: 1937655796}
-  - {fileID: 1147032451}
-  - {fileID: 1539624494}
-  - {fileID: 890344715}
+  path: []
   pathMargin: {x: 0.86, y: 0.72}
   pathNum: 01000000040000000200000003000000040000000100000003000000020000000100000004000000
 --- !u!4 &2061510342

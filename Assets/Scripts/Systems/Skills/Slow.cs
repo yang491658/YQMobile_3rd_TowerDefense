@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "Slow", menuName = "TowerSkill/Slow", order = 3)]
+[CreateAssetMenu(fileName = "Slow", menuName = "TowerSkill/Slow", order = 4)]
 public class Slow : Skill
 {
-    private float percent;
-    private float duration;
+    [Header("Skill")]
+    [SerializeField] private float percent;
+    [SerializeField] private float duration;
 
     public override void SetValues(Tower _tower)
     {

@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "DOT", menuName = "TowerSkill/DOT", order = 2)]
+[CreateAssetMenu(fileName = "DOT", menuName = "TowerSkill/DOT", order = 3)]
 public class DOT : Skill
 {
-    private float damage;
-    private float duration;
+    [Header("Skill")]
+    [SerializeField] private float damage;
+    [SerializeField] private float duration;
 
     public override void SetValues(Tower _tower)
     {
