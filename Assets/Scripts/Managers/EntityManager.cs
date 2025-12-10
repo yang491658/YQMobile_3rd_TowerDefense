@@ -518,9 +518,7 @@ public class EntityManager : MonoBehaviour
                     candidates.Add(entity);
                 }
                 else if (value == best)
-                {
                     candidates.Add(entity);
-                }
             }
             else
             {
@@ -531,9 +529,7 @@ public class EntityManager : MonoBehaviour
                     candidates.Add(entity);
                 }
                 else if (value == best)
-                {
                     candidates.Add(entity);
-                }
             }
         }
 
