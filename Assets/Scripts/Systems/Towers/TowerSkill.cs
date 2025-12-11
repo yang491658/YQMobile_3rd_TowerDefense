@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public abstract class Skill : ScriptableObject
+public abstract class TowerSkill : ScriptableObject
 {
     public virtual void SetValues(Tower _tower) { }
 

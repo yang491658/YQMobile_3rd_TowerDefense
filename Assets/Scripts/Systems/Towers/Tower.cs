@@ -29,7 +29,7 @@ public class Tower : Entity
     [SerializeField] private List<Bullet> bullets = new List<Bullet>();
 
     [Header("Skill")]
-    [SerializeField] private List<Skill> skills = new List<Skill>();
+    [SerializeField] private List<TowerSkill> skills = new List<TowerSkill>();
     [SerializeField] private List<float> values = new List<float>();
     private Dictionary<ValueType, float> valueDic = new Dictionary<ValueType, float>();
 
@@ -205,7 +205,7 @@ public class Tower : Entity
     {
         for (int i = 0; i < skills.Count; i++)
         {
-            Skill skill = skills[i];
+            TowerSkill skill = skills[i];
 
             if (_target != null)
                 skill.OnHit(this, _target);
@@ -294,7 +294,7 @@ public class Tower : Entity
         skills.Clear();
         for (int i = 0; i < data.Skills.Count; i++)
         {
-            Skill skill = Instantiate(data.Skills[i]);
+            TowerSkill skill = Instantiate(data.Skills[i]);
             skills.Add(skill);
         }
 

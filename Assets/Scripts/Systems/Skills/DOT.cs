@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "DOT", menuName = "TowerSkill/DOT", order = 31)]
-public class DOT : Skill
+public class DOT : TowerSkill
 {
     [Header("Skill")]
     [SerializeField][Min(0)] private int damage;

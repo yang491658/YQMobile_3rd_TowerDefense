@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Chain", menuName = "TowerSkill/Chain", order = 12)]
-public class Chain : Skill
+public class Chain : TowerSkill
 {
     private float interval = 0.1f;
 

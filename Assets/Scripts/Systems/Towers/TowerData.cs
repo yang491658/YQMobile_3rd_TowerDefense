@@ -28,7 +28,7 @@ public class TowerData : ScriptableObject
     [Min(0)] public int CriticalDamage = 150;
 
     [Header("Skill")]
-    public List<Skill> Skills = new List<Skill>();
+    public List<TowerSkill> Skills = new List<TowerSkill>();
     public List<SkillValue> Values = new List<SkillValue>();
 
 #if UNITY_EDITOR
@@ -139,7 +139,7 @@ public class TowerData : ScriptableObject
         clone.CriticalChance = this.CriticalChance;
         clone.CriticalDamage = this.CriticalDamage;
 
-        clone.Skills = new List<Skill>(Skills);
+        clone.Skills = new List<TowerSkill>(Skills);
         clone.Values = new List<SkillValue>(Values);
 
         return clone;

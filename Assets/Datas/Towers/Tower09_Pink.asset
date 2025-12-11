@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
-  m_Name: Tower02_Orange
+  m_Name: Tower09_Pink
   m_EditorClassIdentifier: 
-  ID: 2
-  Name: Orange
-  Symbol: {fileID: 21300000, guid: 945ef9c745c963d4297e19113ab23e6c, type: 3}
-  Color: {r: 1, g: 0.64705884, b: 0, a: 1}
+  ID: 9
+  Name: Pink
+  Symbol: {fileID: 21300000, guid: f5b8cfcc3de3af04dbd85bfaab67fe4a, type: 3}
+  Color: {r: 1, g: 0.4117647, b: 0.7058824, a: 1}
   Grade: 0
   Role: 2
   AttackTarget: 0
@@ -26,9 +26,9 @@ MonoBehaviour:
   Skills: []
   Values:
   - valueType: 301
-    baseValue: 1
-    rankType: 3
-    rankBonus: 1
+    baseValue: 0
+    rankType: 0
+    rankBonus: 0
   - valueType: 202
     baseValue: 0
     rankType: 0

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "Rapid", menuName = "TowerSkill/Rapid", order = 21)]
-public class Rapid : Skill
+public class Rapid : TowerSkill
 {
     private int hitCount = 0;
 

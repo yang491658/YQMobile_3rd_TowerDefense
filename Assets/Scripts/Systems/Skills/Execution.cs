@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Execution", menuName = "TowerSkill/Execution", order = 33)]
-public class Execution : Skill
+public class Execution : TowerSkill
 {
     [Header("Skill")]
     [SerializeField][Min(0)] private int chance;

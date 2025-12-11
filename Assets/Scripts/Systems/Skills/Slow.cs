@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "Slow", menuName = "TowerSkill/Slow", order = 32)]
-public class Slow : Skill
+public class Slow : TowerSkill
 {
     [Header("Skill")]
     [SerializeField][Min(0)] private int percent;

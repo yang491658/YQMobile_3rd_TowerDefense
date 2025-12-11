@@ -4,11 +4,11 @@ using UnityEditor;
 using UnityEngine;
 
 [InitializeOnLoad]
-public static class SkillGenerator
+public static class TowerSkillGenerator
 {
     private const string assetFolder = "Assets/Datas/Skills";
 
-    static SkillGenerator()
+    static TowerSkillGenerator()
     {
         EditorApplication.delayCall += GenerateAssets;
     }
@@ -17,7 +17,7 @@ public static class SkillGenerator
     {
         EnsureFolder(assetFolder);
 
-        var types = TypeCache.GetTypesDerivedFrom<Skill>();
+        var types = TypeCache.GetTypesDerivedFrom<TowerSkill>();
         for (int i = 0; i < types.Count; i++)
         {
             Type t = types[i];
@@ -25,10 +25,10 @@ public static class SkillGenerator
 
             string path = assetFolder + "/" + t.Name + ".asset";
 
-            Skill asset = AssetDatabase.LoadAssetAtPath<Skill>(path);
+            TowerSkill asset = AssetDatabase.LoadAssetAtPath<TowerSkill>(path);
             if (asset != null) continue;
 
-            Skill instance = ScriptableObject.CreateInstance(t) as Skill;
+            TowerSkill instance = ScriptableObject.CreateInstance(t) as TowerSkill;
             if (instance == null) continue;
 
             AssetDatabase.CreateAsset(instance, path);
