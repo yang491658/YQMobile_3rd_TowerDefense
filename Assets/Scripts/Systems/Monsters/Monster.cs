@@ -70,8 +70,7 @@ public class Monster : Entity
     {
         if (IsDead) return;
 
-        //GameManager.Instance?.LifeDown(Mathf.Max(health / 10, 1)); // 임시
-        GameManager.Instance?.LifeUp();
+        GameManager.Instance?.LifeDown();
         EntityManager.Instance?.DespawnMonster(this);
     }
 

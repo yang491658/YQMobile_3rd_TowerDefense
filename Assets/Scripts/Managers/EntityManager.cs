@@ -563,7 +563,10 @@ public class EntityManager : MonoBehaviour
         => GetByIndex(GetMonsters(_noDebuff), 0);
 
     public Monster GetMonsterLast(bool _noDebuff = false)
-        => GetByIndex(GetMonsters(_noDebuff), GetMonsters(_noDebuff).Count - 1);
+    {
+        List<Monster> list = GetMonsters(_noDebuff);
+        return GetByIndex(list, list.Count - 1);
+    }
 
     public Monster GetMonsterNearest(Vector3 _pos, int _distance = 0, bool _noDebuff = false)
         => GetByDistance(GetMonsters(_noDebuff), _pos, true, _distance, mapRoadTilemap);
