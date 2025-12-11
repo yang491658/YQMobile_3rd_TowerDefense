@@ -23,10 +23,11 @@ public static class TowerSkillGenerator
             Type t = types[i];
             if (t.IsAbstract) continue;
 
-            string path = assetFolder + "/" + t.Name + ".asset";
+            string[] guids = AssetDatabase.FindAssets($"t:{t.Name}", new[] { assetFolder });
+            if (guids != null && guids.Length > 0)
+                continue;
 
-            TowerSkill asset = AssetDatabase.LoadAssetAtPath<TowerSkill>(path);
-            if (asset != null) continue;
+            string path = $"{assetFolder}/{t.Name}.asset";
 
             TowerSkill instance = ScriptableObject.CreateInstance(t) as TowerSkill;
             if (instance == null) continue;

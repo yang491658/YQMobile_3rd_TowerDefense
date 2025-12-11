@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+ï»¿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 
@@ -45,12 +45,12 @@ public class ValueTypeDrawer : PropertyDrawer
 
     private string GetCategoryName(int code)
     {
-        if (code >= 100 && code < 200) return "¼öÄ¡";
-        if (code >= 200 && code < 300) return "ºñÀ²";
-        if (code >= 300 && code < 400) return "°ø°£";
-        if (code >= 400 && code < 500) return "½Ã°£";
-        if (code >= 500 && code < 600) return "½ºÅÃ";
-        if (code >= 600 && code < 700) return "ÀÚ¿ø";
+        if (code >= 100 && code < 200) return "ìˆ˜ì¹˜";
+        if (code >= 200 && code < 300) return "ë¹„ìœ¨";
+        if (code >= 300 && code < 400) return "ê³µê°„";
+        if (code >= 400 && code < 500) return "ì‹œê°„";
+        if (code >= 500 && code < 600) return "ìŠ¤íƒ";
+        if (code >= 600 && code < 700) return "ìžì›";
         return string.Empty;
     }
 

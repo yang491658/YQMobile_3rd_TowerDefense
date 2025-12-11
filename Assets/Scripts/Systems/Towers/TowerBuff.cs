@@ -1,25 +1,50 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class TowerBuff : MonoBehaviour
 {
     [Header("Damage Buff")]
     [SerializeField][Min(0)] private int damagePercent;
-    [SerializeField][Min(0f)] private float damageDuration;
+    [SerializeField][Min(0)] private int speedPercent;
+    [SerializeField][Min(0)] private int chanceBonus;
+    [SerializeField][Min(0)] private int criticalBonus;
     [SerializeField] private Effect buffEffect;
 
-    private readonly List<DamageBuff> buffs = new List<DamageBuff>();
+    private readonly List<Buff> buffs = new List<Buff>();
 
-    private sealed class DamageBuff
+    private sealed class Buff
     {
-        public int percent;
+        public int damagePercent;
+        public int speedPercent;
+        public int chanceBonus;
+        public int criticalBonus;
         public float timer;
 
-        public DamageBuff(int _percent, float _duration)
+        public Buff(
+            int _damagePercent = 0,
+            int _speedPercent = 0,
+            int _chanceBonus = 0,
+            int _criticalBonus = 0,
+            float _duration = 0f)
         {
-            percent = _percent;
+            damagePercent = _damagePercent;
+            speedPercent = _speedPercent;
+            chanceBonus = _chanceBonus;
+            criticalBonus = _criticalBonus;
             timer = _duration;
         }
+
+        public static Buff Damage(int _percent, float _duration)
+            => new Buff(_percent, 0, 0, 0, _duration);
+
+        public static Buff Speed(int _percent, float _duration)
+            => new Buff(0, _percent, 0, 0, _duration);
+
+        public static Buff CriticalChance(int _bonus, float _duration)
+            => new Buff(0, 0, _bonus, 0, _duration);
+
+        public static Buff CriticalDamage(int _bonus, float _duration)
+            => new Buff(0, 0, 0, _bonus, _duration);
     }
 
     private void Update()
@@ -30,7 +55,7 @@ public class TowerBuff : MonoBehaviour
 
         for (int i = buffs.Count - 1; i >= 0; i--)
         {
-            DamageBuff buff = buffs[i];
+            Buff buff = buffs[i];
             buff.timer -= dt;
 
             if (buff.timer <= 0f)
@@ -40,12 +65,45 @@ public class TowerBuff : MonoBehaviour
         UpdateSummary();
     }
 
-    public void ApplyDamageBuff(int _percent, float _duration, Effect _effect)
+    private void UpdateSummary()
     {
-        if (_percent <= 0 || _duration <= 0f) return;
+        int sumDamage = 0;
+        int sumSpeed = 0;
+        int sumCritChance = 0;
+        int sumCritDamage = 0;
 
-        buffs.Add(new DamageBuff(_percent, _duration));
+        for (int i = 0; i < buffs.Count; i++)
+        {
+            Buff buff = buffs[i];
+            sumDamage += buff.damagePercent;
+            sumSpeed += buff.speedPercent;
+            sumCritChance += buff.chanceBonus;
+            sumCritDamage += buff.criticalBonus;
+        }
+
+        damagePercent = sumDamage;
+        speedPercent = sumSpeed;
+        chanceBonus = sumCritChance;
+        criticalBonus = sumCritDamage;
+    }
+
+    #region 적용
+    private void Apply(Buff _buff, Effect _effect)
+    {
+        if (_buff == null || _buff.timer <= 0f) return;
+
+        bool hasValue =
+            _buff.damagePercent != 0 ||
+            _buff.speedPercent != 0 ||
+            _buff.chanceBonus != 0 ||
+            _buff.criticalBonus != 0;
+
+        if (!hasValue) return;
+
+        buffs.Add(_buff);
         UpdateSummary();
+
+        if (_effect == null) return;
 
         if (buffEffect == null)
             buffEffect = _effect;
@@ -56,28 +114,37 @@ public class TowerBuff : MonoBehaviour
         }
     }
 
-    public int GetBuffDamage(int _damage)
+    public void ApplyDamageBuff(int _percent, float _duration, Effect _effect)
+        => Apply(Buff.Damage(_percent, _duration), _effect);
+
+    public void ApplySpeedBuff(int _percent, float _duration, Effect _effect)
+        => Apply(Buff.Speed(_percent, _duration), _effect);
+
+    public void ApplyChanceBuff(int _bonus, float _duration, Effect _effect)
+        => Apply(Buff.CriticalChance(_bonus, _duration), _effect);
+
+    public void ApplyCriticalBuff(int _bonus, float _duration, Effect _effect)
+        => Apply(Buff.CriticalDamage(_bonus, _duration), _effect);
+    #endregion
+
+    #region 계산
+    private int CalcStat(int _base, int _buff, bool _isPercent)
     {
-        if (buffs.Count == 0 || damagePercent <= 0) return _damage;
+        if (buffs.Count == 0 || _buff <= 0) return _base;
 
-        float ratio = 1f + damagePercent / 100f;
-        return Mathf.RoundToInt(_damage * ratio);
-    }
-
-    private void UpdateSummary()
-    {
-        int sumPercent = 0;
-        float maxTime = 0f;
-
-        for (int i = 0; i < buffs.Count; i++)
+        if (_isPercent)
         {
-            DamageBuff buff = buffs[i];
-            sumPercent += buff.percent;
-            if (buff.timer > maxTime)
-                maxTime = buff.timer;
+            float ratio = 1f + _buff / 100f;
+            return Mathf.RoundToInt(_base * ratio);
         }
 
-        damagePercent = sumPercent;
-        damageDuration = maxTime;
+        int value = _base + _buff;
+        return Mathf.Max(value, 0);
     }
+
+    public int CalcDamage(int _damage) => CalcStat(_damage, damagePercent, true);
+    public int CalcSpeed(int _speed) => CalcStat(_speed, speedPercent, true);
+    public int CalcChance(int _chance) => CalcStat(_chance, chanceBonus, false);
+    public int CalcCritical(int _critical) => CalcStat(_critical, criticalBonus, false);
+    #endregion
 }

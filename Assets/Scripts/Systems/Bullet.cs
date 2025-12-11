@@ -45,7 +45,7 @@ public class Bullet : Entity
             target.ReservedDown(damage);
     }
 
-    public virtual void UpdateMove()
+    private void UpdateMove()
     {
         if (target != null && !target.IsDead)
             targetPos = target.transform.position;

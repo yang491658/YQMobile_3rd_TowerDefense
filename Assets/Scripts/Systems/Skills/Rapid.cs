@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "Rapid", menuName = "TowerSkill/Dealer/Rapid", order = 103)]
+[CreateAssetMenu(fileName = "Rapid", menuName = "TowerSkill/Dealing/Rapid", order = 103)]
 public class Rapid : TowerSkill
 {
     private int hitCount = 0;

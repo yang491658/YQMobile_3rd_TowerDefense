@@ -368,5 +368,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damagePercent: 0
-  damageDuration: 0
+  speedPercent: 0
+  chanceBonus: 0
+  criticalBonus: 0
   buffEffect: {fileID: 0}

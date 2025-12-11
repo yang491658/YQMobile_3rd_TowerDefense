@@ -20,7 +20,7 @@ MonoBehaviour:
   Role: 0
   AttackTarget: 6
   AttackDamage: 10
-  AttackSpeed: 1
+  AttackSpeed: 60
   CriticalChance: 5
   CriticalDamage: 150
   Skills:

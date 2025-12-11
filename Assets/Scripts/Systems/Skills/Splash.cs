@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "Splash", menuName = "TowerSkill/Dealer/Splash", order = 101)]
+[CreateAssetMenu(fileName = "Splash", menuName = "TowerSkill/Dealing/Splash", order = 101)]
 public class Splash : TowerSkill
 {
     [Header("Skill Value")]
@@ -29,7 +29,7 @@ public class Splash : TowerSkill
             Monster m = monsters[i];
             if (m == _target) continue;
 
-            m.TakeDamage(_tower.GetBuffDamage(damage), _direct: true);
+            m.TakeDamage(_tower.CalcDamage(damage), _direct: true);
         }
     }
 }

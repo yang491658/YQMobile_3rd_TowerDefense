@@ -23,7 +23,7 @@ public class TowerData : ScriptableObject
     [Header("Battle")]
     public AttackTarget AttackTarget = AttackTarget.First;
     [Min(0)] public int AttackDamage = 10;
-    [Min(0)] public float AttackSpeed = 3;
+    [Min(0)] public int AttackSpeed = 20;
     [Min(0)] public int CriticalChance = 5;
     [Min(0)] public int CriticalDamage = 150;
 
@@ -102,13 +102,13 @@ public class TowerData : ScriptableObject
         if (AttackTarget == AttackTarget.None)
         {
             AttackDamage = 0;
-            AttackSpeed = 0f;
+            AttackSpeed = 0;
             CriticalChance = 0;
             CriticalDamage = 0;
         }
 
         AttackDamage = Mathf.Max(AttackDamage, 0);
-        AttackSpeed = Mathf.Max(AttackSpeed, 0f);
+        AttackSpeed = Mathf.Max(AttackSpeed, 0);
         CriticalChance = Mathf.Max(CriticalChance, 0);
         CriticalDamage = Mathf.Max(CriticalDamage, 0);
 

@@ -10,8 +10,8 @@ public class Tower : Entity
     private SpriteRenderer symbolSR;
 
     [Header("Control")]
-    public bool IsDragging { private set; get; } = false;
     private Vector3 slot;
+    public bool IsDragging { private set; get; } = false;
 
     [Header("Rank")]
     [SerializeField] private Transform symbol;
@@ -22,7 +22,7 @@ public class Tower : Entity
     [Header("Battle")]
     [SerializeField] private Monster attackTarget;
     [SerializeField][Min(0)] private int attackDamage;
-    [SerializeField][Min(0f)] private float attackSpeed;
+    [SerializeField][Min(0)] private int attackSpeed;
     private float attackTimer;
     [SerializeField][Min(0)] private int criticalChance;
     [SerializeField][Min(0)] private int criticalDamage;
@@ -64,7 +64,8 @@ public class Tower : Entity
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnUpdate(this, deltaTime);
 
-        Attack();
+        UpdateStat();
+        if (attackSpeed > 0) Attack();
     }
 
     #region 심볼
@@ -251,7 +252,7 @@ public class Tower : Entity
 
         if (_target == null) return;
 
-        int damage = buff.GetBuffDamage(attackDamage);
+        int damage = attackDamage;
         bool critical = false;
 
         if (Random.value < criticalChance / 100f)
@@ -268,7 +269,7 @@ public class Tower : Entity
     #endregion
 
     #region 전투
-    public void Attack()
+    private void Attack()
     {
         attackTimer -= Time.deltaTime;
         if (attackTimer > 0f) return;
@@ -280,10 +281,10 @@ public class Tower : Entity
             skills[i].OnAttack(this);
 
         Shoot();
-        attackTimer = attackSpeed;
+        attackTimer = 60f / attackSpeed;
     }
 
-    public void Shoot()
+    private void Shoot()
     {
         GameObject bulletBase = EntityManager.Instance?.GetBulletBase();
         Bullet bullet = Instantiate(bulletBase, transform.position, Quaternion.identity, transform)
@@ -294,11 +295,35 @@ public class Tower : Entity
     #endregion
 
     #region 버프
+    private void UpdateStat()
+    {
+        int damage = data.AttackDamage * rank;
+        int speed = data.AttackSpeed * rank;
+        int chance = data.CriticalChance * rank;
+        int critical = data.CriticalDamage;
+
+        attackDamage = buff.CalcDamage(damage);
+        attackSpeed = buff.CalcSpeed(speed);
+        criticalChance = buff.CalcChance(chance);
+        criticalDamage = buff.CalcCritical(critical);
+    }
+
     public void ApplyDamageBuff(int _percent, float _duration, Effect _effect)
         => buff.ApplyDamageBuff(_percent, _duration, _effect);
 
-    public int GetBuffDamage(int _damage)
-        => buff.GetBuffDamage(_damage);
+    public void ApplySpeedBuff(int _percent, float _duration, Effect _effect)
+        => buff.ApplySpeedBuff(_percent, _duration, _effect);
+
+    public void ApplyChanceBuff(int _bonus, float _duration, Effect _effect)
+        => buff.ApplyChanceBuff(_bonus, _duration, _effect);
+
+    public void ApplyCriticalBuff(int _bonus, float _duration, Effect _effect)
+        => buff.ApplyCriticalBuff(_bonus, _duration, _effect);
+
+    public int CalcDamage(int _damage) => buff.CalcDamage(_damage);
+    public int CalcSpeed(int _speed) => buff.CalcSpeed(_speed);
+    public int CalcChance(int _chance) => buff.CalcChance(_chance);
+    public int CalcCritical(int _critical) => buff.CalcCritical(_critical);
     #endregion
 
     #region SET
@@ -327,12 +352,9 @@ public class Tower : Entity
     public void SetRank(int _rank)
     {
         rank = Mathf.Clamp(_rank, 1, maxRank);
-        UpdateSymbol();
 
-        attackDamage = data.AttackDamage * rank;
-        attackSpeed = data.AttackSpeed / rank;
-        criticalChance = data.CriticalChance * rank;
-        criticalDamage = data.CriticalDamage;
+        UpdateSymbol();
+        UpdateStat();
 
         values.Clear();
         valueDic.Clear();
