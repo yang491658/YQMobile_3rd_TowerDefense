@@ -232,7 +232,7 @@ public class TestManager : MonoBehaviour
             for (int i = 0; i < len; i++)
             {
                 Tower a = towers[i];
-                if (a == null || a.IsDragging()) continue;
+                if (a == null || a.IsDragging) continue;
                 if (a.GetRank() != r) continue;
 
                 bool aIsDebuff = a.GetData().Role == TowerRole.Debuff;
@@ -243,7 +243,7 @@ public class TestManager : MonoBehaviour
                     if (i == j) continue;
 
                     Tower b = towers[j];
-                    if (b == null || b.IsDragging()) continue;
+                    if (b == null || b.IsDragging) continue;
                     if (b.GetRank() != r) continue;
 
                     bool bIsDebuff = b.GetData().Role == TowerRole.Debuff;
@@ -268,7 +268,7 @@ public class TestManager : MonoBehaviour
         for (int i = 0; i < len; i++)
         {
             Tower t = towers[i];
-            if (t == null || t.IsDragging()) continue;
+            if (t == null || t.IsDragging) continue;
             rankSet.Add(t.GetRank());
         }
 
@@ -283,7 +283,7 @@ public class TestManager : MonoBehaviour
             for (int i = 0; i < len; i++)
             {
                 Tower t = towers[i];
-                if (t == null || t.IsDragging()) continue;
+                if (t == null || t.IsDragging) continue;
                 if (t.GetRank() == curRank)
                     indices.Add(i);
             }

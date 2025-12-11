@@ -272,7 +272,7 @@ public class EntityManager : MonoBehaviour
         => _select != null && _target != null && _select != _target &&
         _select.GetID() == _target.GetID() &&
         _select.GetRank() == _target.GetRank() &&
-        !_select.IsMax() && !_target.IsMax();
+        !_select.IsMax && !_target.IsMax;
 
     public Tower MergeTower(Tower _select, Tower _target, int _id = 0)
     {
@@ -298,11 +298,9 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region 이펙트
-    public Effect MakeEffect(Tower _tower, Transform _parent, float _scale = 1f, float _duration = 0f)
+    public Effect MakeEffect(Tower _tower, Vector3 _pos, float _scale = 1f, float _duration = 0f)
     {
-        if (_parent == null) _parent = effectTrans;
-
-        Effect effect = Instantiate(effectBase, _parent.position, Quaternion.identity, _parent)
+        Effect effect = Instantiate(effectBase, _pos, Quaternion.identity, effectTrans)
             .GetComponent<Effect>();
 
         effect.SetEffect(_tower, _scale, _duration);
@@ -310,9 +308,12 @@ public class EntityManager : MonoBehaviour
         return effect;
     }
 
-    public Effect MakeEffect(Tower _tower, Vector3 _pos, float _scale = 1f, float _duration = 0f)
+    public Effect MakeEffect(Tower _tower, Entity _entity, Vector3 _offset = default, float _scale = 1f, float _duration = 0f)
     {
-        Effect effect = Instantiate(effectBase, _pos, Quaternion.identity, effectTrans)
+        Transform parent = _entity.transform;
+        Vector3 pos = parent.position + _offset;
+
+        Effect effect = Instantiate(effectBase, pos, Quaternion.identity, parent)
             .GetComponent<Effect>();
 
         effect.SetEffect(_tower, _scale, _duration);
@@ -581,8 +582,34 @@ public class EntityManager : MonoBehaviour
 
     #region GET_타워
     public int GetFinalID() => towerDatas[towerDatas.Length - 1].ID;
-    public int GetTowerCount() => towers.Count;
     public List<Tower> GetTowers() => towers;
+
+    public List<Tower> GetAttackTowers(int _count = 0)
+    {
+        List<Tower> candidates = new List<Tower>();
+        for (int i = 0; i < towers.Count; i++)
+        {
+            Tower tower = towers[i];
+            if (tower == null) continue;
+            if (tower.GetDamage() <= 0) continue;
+
+            candidates.Add(tower);
+        }
+
+        int total = candidates.Count;
+        if (total == 0) return candidates;
+        if (_count <= 0 || _count >= total) return candidates;
+
+        List<Tower> result = new List<Tower>();
+        for (int i = 0; i < _count && candidates.Count > 0; i++)
+        {
+            int index = Random.Range(0, candidates.Count);
+            result.Add(candidates[index]);
+            candidates.RemoveAt(index);
+        }
+
+        return result;
+    }
 
     public Tower GetTowerRandom()
         => GetRandom(towers);

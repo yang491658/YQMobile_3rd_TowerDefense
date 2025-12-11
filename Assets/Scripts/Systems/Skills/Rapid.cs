@@ -20,11 +20,12 @@ public class Rapid : TowerSkill
 
         hitCount = 0;
 
-        TowerData data = _tower.GetData();
-        int baseDamage = data.AttackDamage * _tower.GetRank();
-        int damage = baseDamage * data.CriticalDamage / 100;
+        if (_critical) return;
 
-        _damage = damage;
+        TowerData data = _tower.GetData();
+        int critDamage = data.CriticalDamage;
+
+        _damage = _damage * critDamage / 100;
         _critical = true;
     }
 }

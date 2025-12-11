@@ -7,7 +7,7 @@ public class Bullet : Entity
 
     [Header("Battle")]
     [SerializeField][Min(0)] private int damage;
-    private bool isHit;
+    public bool IsHit { private set; get; } = false;
 
     [Header("Move")]
     [SerializeField] private Monster target;
@@ -25,7 +25,7 @@ public class Bullet : Entity
     {
         if (target != null && !target.IsDead && target.gameObject == _collision.gameObject)
         {
-            isHit = true;
+            IsHit = true;
             tower.HitBullet(target);
             Destroy(gameObject);
             return;
@@ -41,7 +41,7 @@ public class Bullet : Entity
     {
         tower.RemoveBullet(this);
 
-        if (!isHit && target != null && damage > 0)
+        if (!IsHit && target != null && damage > 0)
             target.ReservedDown(damage);
     }
 

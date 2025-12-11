@@ -10,14 +10,14 @@ public class Tower : Entity
     private SpriteRenderer symbolSR;
 
     [Header("Control")]
-    private bool isDragging;
+    public bool IsDragging { private set; get; } = false;
     private Vector3 slot;
 
     [Header("Rank")]
     [SerializeField] private Transform symbol;
     [SerializeField][Min(0)] private int rank;
     private int maxRank = 7;
-    private bool isMax = false;
+    public bool IsMax { private set; get; } = false;
 
     [Header("Battle")]
     [SerializeField] private Monster attackTarget;
@@ -80,16 +80,16 @@ public class Tower : Entity
         if (rank == maxRank)
         {
             symbol.localPosition = Vector3.zero;
-            if (!isMax)
+            if (!IsMax)
             {
                 symbol.localScale = Vector3.one * 0.65f;
                 symbolSR.sprite = data.Symbol;
-                isMax = true;
+                IsMax = true;
             }
             return;
         }
 
-        isMax = false;
+        IsMax = false;
 
         Vector2[] positions = SymbolPos(rank);
 
@@ -139,7 +139,7 @@ public class Tower : Entity
     #region 조작
     public void DragOn(bool _on)
     {
-        isDragging = _on;
+        IsDragging = _on;
 
         int baseOrder = _on ? 1000 : 0;
 
@@ -169,6 +169,8 @@ public class Tower : Entity
 
     public void RankUp(int _amount = 1)
     {
+        if (IsMax) return;
+
         SetRank(rank + _amount);
 
         for (int i = 0; i < skills.Count; i++)
@@ -292,8 +294,8 @@ public class Tower : Entity
     #endregion
 
     #region 버프
-    public void ApplyDamageBuff(int _percent, float _duration)
-        => buff.ApplyDamageBuff(_percent, _duration);
+    public void ApplyDamageBuff(int _percent, float _duration, Effect _effect)
+        => buff.ApplyDamageBuff(_percent, _duration, _effect);
     #endregion
 
     #region SET
@@ -366,11 +368,8 @@ public class Tower : Entity
     public Color GetColor() => data.Color;
     public Sprite GetSymbol() => data.Symbol;
 
-    public bool IsDragging() => isDragging;
     public Vector3 GetSlot() => slot;
-
     public int GetRank() => rank;
-    public bool IsMax() => isMax;
     public Monster GetTarget() => attackTarget;
     public int GetDamage() => attackDamage;
     public float GetValue(ValueType _type) => valueDic[_type];
