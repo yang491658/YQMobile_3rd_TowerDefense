@@ -488,9 +488,9 @@ public class EntityManager : MonoBehaviour
     {
         if (_list.Count == 0) return null;
 
-        List<T> candidates = new List<T>();
-        bool hasFirst = false;
-        float best = 0;
+        bool hasBest = false;
+        float bestValue = 0f;
+        T bestEntity = null;
 
         for (int i = 0; i < _list.Count; i++)
         {
@@ -498,41 +498,35 @@ public class EntityManager : MonoBehaviour
             float value = _selector(entity);
             if (_useMin && value < _min) continue;
 
-            if (!hasFirst)
+            if (!hasBest)
             {
-                hasFirst = true;
-                best = value;
-                candidates.Add(entity);
+                hasBest = true;
+                bestValue = value;
+                bestEntity = entity;
                 continue;
             }
 
             if (_low)
             {
-                if (value < best)
+                if (value < bestValue)
                 {
-                    best = value;
-                    candidates.Clear();
-                    candidates.Add(entity);
+                    bestValue = value;
+                    bestEntity = entity;
                 }
-                else if (value == best)
-                    candidates.Add(entity);
             }
             else
             {
-                if (value > best)
+                if (value > bestValue)
                 {
-                    best = value;
-                    candidates.Clear();
-                    candidates.Add(entity);
+                    bestValue = value;
+                    bestEntity = entity;
                 }
-                else if (value == best)
-                    candidates.Add(entity);
             }
         }
 
-        if (!hasFirst) return null;
+        if (!hasBest) return null;
 
-        return candidates[Random.Range(0, candidates.Count)];
+        return bestEntity;
     }
     #endregion
 

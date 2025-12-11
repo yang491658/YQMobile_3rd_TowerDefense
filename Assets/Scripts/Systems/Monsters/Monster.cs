@@ -15,7 +15,7 @@ public class Monster : Entity
     [SerializeField] private Canvas textCanvas;
 
     [Header("Move")]
-    [SerializeField] private int pathIndex;
+    [SerializeField][Min(0)] private int pathIndex;
     private Transform[] paths;
     [SerializeField][Min(0f)] private float moveSpeed = 3f;
     [SerializeField] private Vector3 moveDir;
@@ -70,7 +70,7 @@ public class Monster : Entity
     {
         if (IsDead) return;
 
-        GameManager.Instance?.LifeDown();
+        GameManager.Instance?.LifeDown(Mathf.Max(health / 10, 1));
         EntityManager.Instance?.DespawnMonster(this);
     }
 

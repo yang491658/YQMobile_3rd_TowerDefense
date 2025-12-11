@@ -10,27 +10,27 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
-  m_Name: Tower02_Yellow
+  m_Name: Tower06_Cyan
   m_EditorClassIdentifier: 
-  ID: 2
-  Name: Yellow
-  Symbol: {fileID: 21300000, guid: ac08cf17d2fe6d14aa613006be654592, type: 3}
-  Color: {r: 1, g: 1, b: 0, a: 1}
+  ID: 6
+  Name: Cyan
+  Symbol: {fileID: 21300000, guid: b880150c15f72ec47a3ec568862f7228, type: 3}
+  Color: {r: 0, g: 1, b: 1, a: 1}
   Grade: 0
-  Role: 0
+  Role: 1
   AttackTarget: 2
   AttackDamage: 10
   AttackSpeed: 3
   CriticalChance: 5
   CriticalDamage: 150
   Skills:
-  - {fileID: 11400000, guid: 02ae369662fbed545b3a634d0b414bc4, type: 2}
+  - {fileID: 11400000, guid: 19bb69e5c69b31b45bec831caa28dc6a, type: 2}
   Values:
-  - valueType: 0
-    baseValue: 5
+  - valueType: 202
+    baseValue: 10
     rankType: 3
     rankBonus: 1
-  - valueType: 1
-    baseValue: 2
+  - valueType: 401
+    baseValue: 2.5
     rankType: 1
-    rankBonus: 1
+    rankBonus: 0.5

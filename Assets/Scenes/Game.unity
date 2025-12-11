@@ -6738,7 +6738,7 @@ MonoBehaviour:
   maxSpeed: 3
   score: 0
   life: 0
-  defaultLife: 0
+  defaultLife: 1000
   gold: 0
   needGold: 0
 --- !u!4 &892690366

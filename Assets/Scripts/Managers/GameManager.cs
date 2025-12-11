@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Life")]
     [SerializeField] private int life = 0;
-    [SerializeField][Min(0)] private int defaultLife = 20;
+    [SerializeField][Min(0)] private int defaultLife = 1000;
     public event System.Action<int> OnChangeLife;
 
     [Header("Gold")]

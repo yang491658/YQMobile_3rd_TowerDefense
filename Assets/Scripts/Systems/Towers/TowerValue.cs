@@ -15,6 +15,9 @@ public enum TowerRole
     [InspectorName("딜러")] Dealer,
     [InspectorName("디버프")] Debuff,
     [InspectorName("버프")] Buff,
+    [InspectorName("경제")] Economy,
+    [InspectorName("소환")] Summon,
+    [InspectorName("빌드")] Build,
 }
 
 public enum AttackTarget
@@ -54,12 +57,26 @@ public struct SkillValue
 
 public enum ValueType
 {
-    [InspectorName("데미지")] Damage,
-    [InspectorName("횟수")] Count,
-    [InspectorName("퍼센트")] Percent,
-    [InspectorName("범위")] Range,
-    [InspectorName("지속시간")] Duration,
-    [InspectorName("확률")] Chance,
+    [InspectorName("데미지")] Damage = 101,
+    [InspectorName("횟수")] Count = 102,
+    [InspectorName("수치")] Amount = 103,
+
+    [InspectorName("계수")] Factor = 201,
+    [InspectorName("비율")] Percent = 202,
+    [InspectorName("확률")] Chance = 203,
+
+    [InspectorName("범위")] Range = 301,
+    [InspectorName("속도")] Speed = 302,
+
+    [InspectorName("지속")] Duration = 401,
+    [InspectorName("간격")] Interval = 402,
+    [InspectorName("쿨다운")] Cooldown = 403,
+
+    [InspectorName("중첩")] Stack = 501,
+    [InspectorName("제한")] Limit = 502,
+
+    [InspectorName("생산")] Production = 601,
+    [InspectorName("변동")] Delta = 602,
 }
 
 public enum RankType

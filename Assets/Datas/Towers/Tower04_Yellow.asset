@@ -10,23 +10,27 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
-  m_Name: Tower06_Black
+  m_Name: Tower04_Yellow
   m_EditorClassIdentifier: 
-  ID: 6
-  Name: Black
-  Symbol: {fileID: 21300000, guid: 445c9f3e8cf511541869149507e1a1a5, type: 3}
-  Color: {r: 0, g: 0, b: 0, a: 1}
+  ID: 4
+  Name: Yellow
+  Symbol: {fileID: 21300000, guid: ac08cf17d2fe6d14aa613006be654592, type: 3}
+  Color: {r: 1, g: 1, b: 0, a: 1}
   Grade: 0
   Role: 0
-  AttackTarget: 7
+  AttackTarget: 2
   AttackDamage: 10
   AttackSpeed: 3
   CriticalChance: 5
   CriticalDamage: 150
   Skills:
-  - {fileID: 11400000, guid: 5210997bd7dfaf64cb5a65549431ecb7, type: 2}
+  - {fileID: 11400000, guid: 02ae369662fbed545b3a634d0b414bc4, type: 2}
   Values:
-  - valueType: 5
+  - valueType: 101
     baseValue: 5
     rankType: 3
+    rankBonus: 1
+  - valueType: 102
+    baseValue: 2
+    rankType: 1
     rankBonus: 1

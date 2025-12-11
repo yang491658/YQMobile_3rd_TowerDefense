@@ -35,6 +35,7 @@ public class Chain : Skill
         {
             if (index >= EntityManager.Instance.GetMonsterCount())
                 yield break;
+
             Monster m = EntityManager.Instance?.GetMonsterByIndex(index++);
 
             EntityManager.Instance.MakeEffect(_tower, m.transform);
