@@ -354,7 +354,7 @@ MonoBehaviour:
   bullets: []
   skills: []
   values: []
-  buff: {fileID: 0}
+  buff: {fileID: 42063976141560269}
 --- !u!114 &42063976141560269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -367,5 +367,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b080fe7aff7541e4a83ac803ef5cfe90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 0
-  duration: 0
+  damagePercent: 0
+  damageDuration: 0
+  buffEffect: {fileID: 0}

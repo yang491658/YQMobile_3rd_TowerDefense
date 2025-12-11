@@ -296,6 +296,9 @@ public class Tower : Entity
     #region 버프
     public void ApplyDamageBuff(int _percent, float _duration, Effect _effect)
         => buff.ApplyDamageBuff(_percent, _duration, _effect);
+
+    public int GetBuffDamage(int _damage)
+        => buff.GetBuffDamage(_damage);
     #endregion
 
     #region SET

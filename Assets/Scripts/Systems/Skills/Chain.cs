@@ -39,7 +39,7 @@ public class Chain : TowerSkill
             Monster mon = EntityManager.Instance?.GetMonsterByIndex(index++);
 
             EntityManager.Instance?.MakeEffect(_tower, mon, _duration: 0.3f);
-            mon.TakeDamage(damage, _direct: true);
+            mon.TakeDamage(_tower.GetBuffDamage(damage), _direct: true);
 
             yield return new WaitForSeconds(interval);
         }

@@ -29,7 +29,7 @@ public class Splash : TowerSkill
             Monster m = monsters[i];
             if (m == _target) continue;
 
-            m.TakeDamage(damage, _direct: true);
+            m.TakeDamage(_tower.GetBuffDamage(damage), _direct: true);
         }
     }
 }
