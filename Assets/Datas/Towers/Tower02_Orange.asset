@@ -15,7 +15,7 @@ MonoBehaviour:
   ID: 2
   Name: Orange
   Symbol: {fileID: 21300000, guid: 945ef9c745c963d4297e19113ab23e6c, type: 3}
-  Color: {r: 1, g: 0.64705884, b: 0, a: 1}
+  Color: {r: 1, g: 0.5882353, b: 0, a: 1}
   Grade: 0
   Role: 2
   AttackTarget: 0
@@ -24,12 +24,4 @@ MonoBehaviour:
   CriticalChance: 0
   CriticalDamage: 0
   Skills: []
-  Values:
-  - valueType: 301
-    baseValue: 1
-    rankType: 3
-    rankBonus: 1
-  - valueType: 202
-    baseValue: 0
-    rankType: 0
-    rankBonus: 0
+  Values: []

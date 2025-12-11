@@ -1,12 +1,12 @@
 using System.Collections;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Chain", menuName = "TowerSkill/Chain", order = 12)]
+[CreateAssetMenu(fileName = "Chain", menuName = "TowerSkill/Dealer/Chain", order = 102)]
 public class Chain : TowerSkill
 {
     private float interval = 0.1f;
 
-    [Header("Skill")]
+    [Header("Skill Value")]
     [SerializeField][Min(0)] private int damage;
     [SerializeField][Min(0)] private int count;
 

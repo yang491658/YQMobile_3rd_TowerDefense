@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "Slow", menuName = "TowerSkill/Slow", order = 32)]
+[CreateAssetMenu(fileName = "Slow", menuName = "TowerSkill/Debuff/Slow", order = 202)]
 public class Slow : TowerSkill
 {
-    [Header("Skill")]
+    [Header("Skill Value")]
     [SerializeField][Min(0)] private int percent;
     [SerializeField][Min(0f)] private float duration;
 

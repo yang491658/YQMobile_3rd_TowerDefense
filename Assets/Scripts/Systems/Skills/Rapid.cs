@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "Rapid", menuName = "TowerSkill/Rapid", order = 21)]
+[CreateAssetMenu(fileName = "Rapid", menuName = "TowerSkill/Dealer/Rapid", order = 103)]
 public class Rapid : TowerSkill
 {
     private int hitCount = 0;
 
-    [Header("Skill")]
+    [Header("Skill Value")]
     [SerializeField][Min(0)] private int count;
 
     public override void SetValues(Tower _tower)

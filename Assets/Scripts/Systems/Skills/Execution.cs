@@ -1,9 +1,9 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Execution", menuName = "TowerSkill/Execution", order = 33)]
+[CreateAssetMenu(fileName = "Execution", menuName = "TowerSkill/Debuff/Execution", order = 203)]
 public class Execution : TowerSkill
 {
-    [Header("Skill")]
+    [Header("Skill Value")]
     [SerializeField][Min(0)] private int chance;
 
     public override void SetValues(Tower _tower)

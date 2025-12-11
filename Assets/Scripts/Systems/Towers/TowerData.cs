@@ -96,6 +96,15 @@ public class TowerData : ScriptableObject
             Name = null;
         }
 
+        if (Role == TowerRole.Buff)
+        {
+            AttackTarget = AttackTarget.None;
+            AttackDamage = 0;
+            AttackSpeed = 0f;
+            CriticalChance = 0;
+            CriticalDamage = 0;
+        }
+
         AttackDamage = Mathf.Max(AttackDamage, 0);
         AttackSpeed = Mathf.Max(AttackSpeed, 0f);
         CriticalChance = Mathf.Max(CriticalChance, 0);

@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "Splash", menuName = "TowerSkill/Splash", order = 11)]
+[CreateAssetMenu(fileName = "Splash", menuName = "TowerSkill/Dealer/Splash", order = 101)]
 public class Splash : TowerSkill
 {
-    [Header("Skill")]
+    [Header("Skill Value")]
     [SerializeField][Min(0)] private int damage;
     [SerializeField][Min(0f)] private float range;
 

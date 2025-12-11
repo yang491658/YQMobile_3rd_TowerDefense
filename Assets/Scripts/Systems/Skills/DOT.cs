@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "DOT", menuName = "TowerSkill/DOT", order = 31)]
+[CreateAssetMenu(fileName = "DOT", menuName = "TowerSkill/Debuff/DOT", order = 201)]
 public class DOT : TowerSkill
 {
-    [Header("Skill")]
+    [Header("Skill Value")]
     [SerializeField][Min(0)] private int damage;
     [SerializeField][Min(0)] private float duration;
 

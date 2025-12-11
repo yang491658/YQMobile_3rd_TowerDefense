@@ -187,6 +187,7 @@ GameObject:
   - component: {fileID: 6840645617624245298}
   - component: {fileID: 8220881740632990379}
   - component: {fileID: 3524249544882942684}
+  - component: {fileID: 42063976141560269}
   m_Layer: 6
   m_Name: Tower
   m_TagString: Tower
@@ -353,3 +354,15 @@ MonoBehaviour:
   bullets: []
   skills: []
   values: []
+--- !u!114 &42063976141560269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8757814876248671606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b080fe7aff7541e4a83ac803ef5cfe90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
