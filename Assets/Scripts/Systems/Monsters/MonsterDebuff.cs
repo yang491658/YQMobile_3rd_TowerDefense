@@ -96,7 +96,14 @@ public class MonsterDebuff : MonoBehaviour
 
         slowTimer = slowDuration;
         hasSlow = true;
-        monster.SetSpeed(baseMoveSpeed * Mathf.Max(1 - slowPercent / 100f, 0f));
+
+        if (slowDuration > 0f)
+        {
+            float slow = slowPercent * Mathf.Clamp01(slowTimer / slowDuration);
+            float ratio = Mathf.Max(1f - slow / 100f, 0f);
+            monster.SetSpeed(baseMoveSpeed * ratio);
+        }
+        else monster.SetSpeed(baseMoveSpeed);
 
         if (slowEffect == null)
             slowEffect = _effect;
@@ -121,7 +128,16 @@ public class MonsterDebuff : MonoBehaviour
             monster.SetSpeed(baseMoveSpeed);
 
             slowEffect = null;
+            return;
         }
+
+        if (slowDuration > 0f)
+        {
+            float slow = slowPercent * Mathf.Clamp01(slowTimer / slowDuration);
+            float ratio = Mathf.Max(1f - slow / 100f, 0f);
+            monster.SetSpeed(baseMoveSpeed * ratio);
+        }
+        else monster.SetSpeed(baseMoveSpeed);
     }
     #endregion
 
