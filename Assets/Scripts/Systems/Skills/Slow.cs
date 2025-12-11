@@ -15,7 +15,7 @@ public class Slow : TowerSkill
 
     public override void OnHit(Tower _tower, Monster _target)
     {
-        Effect e = EntityManager.Instance.MakeEffect(_tower, _target.transform, _duration: duration);
+        Effect e = EntityManager.Instance?.MakeEffect(_tower, _target.transform, _duration: duration);
         _target.ApplySlow(percent, duration, e);
     }
 }

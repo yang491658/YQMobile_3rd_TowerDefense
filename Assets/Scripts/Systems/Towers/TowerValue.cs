@@ -58,7 +58,7 @@ public struct SkillValue
 public enum ValueType
 {
     [InspectorName("데미지")] Damage = 101,
-    [InspectorName("횟수")] Count = 102,
+    [InspectorName("개수")] Count = 102,
     [InspectorName("수치")] Amount = 103,
 
     [InspectorName("계수")] Factor = 201,

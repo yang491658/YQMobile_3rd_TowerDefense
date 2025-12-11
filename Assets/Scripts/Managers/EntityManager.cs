@@ -532,8 +532,9 @@ public class EntityManager : MonoBehaviour
 
     #region GET_몬스터
     public int GetMonsterCount() => monsters.Count;
-    public int GetMonsterNum(Monster _target) => monsters.IndexOf(_target);
+    public int GetMonsterNumber(Monster _target) => monsters.IndexOf(_target);
     public Monster GetMonsterByIndex(int _index) => monsters[_index];
+
     public List<Monster> GetMonsters(bool _noDebuff = false)
     {
         List<Monster> list = new List<Monster>();
@@ -580,6 +581,7 @@ public class EntityManager : MonoBehaviour
 
     #region GET_타워
     public int GetFinalID() => towerDatas[towerDatas.Length - 1].ID;
+    public int GetTowerCount() => towers.Count;
     public List<Tower> GetTowers() => towers;
 
     public Tower GetTowerRandom()

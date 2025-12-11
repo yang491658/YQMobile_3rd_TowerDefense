@@ -156,7 +156,7 @@ public class Monster : Entity
     }
     #endregion
 
-    #region 텍스트 UI
+    #region 데미지 UI
     private void CreateDamage(int _damage, bool _critical = false)
     {
         TextMeshProUGUI t = Instantiate(healthText, textCanvas.transform);
@@ -194,12 +194,12 @@ public class Monster : Entity
     }
     #endregion
 
-    #region 디버프 적용
+    #region 디버프
     public void ApplyDot(int _damage, float _duration, Effect _effect)
-        => debuff?.ApplyDot(_damage, _duration, _effect);
+        => debuff.ApplyDot(_damage, _duration, _effect);
 
     public void ApplySlow(int _slow, float _duration, Effect _effect)
-        => debuff?.ApplySlow(_slow, _duration, _effect);
+        => debuff.ApplySlow(_slow, _duration, _effect);
     #endregion
 
     #region SET

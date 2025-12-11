@@ -45,8 +45,8 @@ public class MonsterDebuff : MonoBehaviour
     #region 도트
     public void ApplyDot(int _damage, float _duration, Effect _effect)
     {
-        dotDamage = Mathf.Max(dotDamage, _damage);
-        dotDuration = Mathf.Max(dotDuration, _duration);
+        dotDamage = Mathf.Max(_damage, dotDamage);
+        dotDuration = Mathf.Max(_duration, dotDuration);
 
         dotTimer = dotDuration;
         dotTickTimer = 1f;
@@ -91,8 +91,8 @@ public class MonsterDebuff : MonoBehaviour
     #region 슬로우
     public void ApplySlow(int _slow, float _duration, Effect _effect)
     {
-        slowPercent = Mathf.Max(slowPercent, _slow);
-        slowDuration = Mathf.Max(slowDuration, _duration);
+        slowPercent = Mathf.Max(_slow, slowPercent);
+        slowDuration = Mathf.Max(_duration, slowDuration);
 
         slowTimer = slowDuration;
         hasSlow = true;

@@ -32,6 +32,16 @@ public class Tower : Entity
     [SerializeField] private List<TowerSkill> skills = new List<TowerSkill>();
     [SerializeField] private List<float> values = new List<float>();
     private Dictionary<ValueType, float> valueDic = new Dictionary<ValueType, float>();
+    [Space]
+    [SerializeField] private TowerBuff buff;
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (buff == null)
+            buff = GetComponent<TowerBuff>();
+    }
+#endif
 
     protected override void Awake()
     {
@@ -126,29 +136,53 @@ public class Tower : Entity
     }
     #endregion
 
-    #region 전투
-    public void Attack()
+    #region 조작
+    public void DragOn(bool _on)
     {
-        attackTimer -= Time.deltaTime;
-        if (attackTimer > 0f) return;
+        isDragging = _on;
 
-        FindTarget();
-        if (attackTarget == null || attackTarget.IsDead) return;
+        int baseOrder = _on ? 1000 : 0;
 
-        for (int i = 0; i < skills.Count; i++)
-            skills[i].OnAttack(this);
+        SpriteRenderer[] renderers = GetComponentsInChildren<SpriteRenderer>();
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            SpriteRenderer r = renderers[i];
 
-        Shoot();
-        attackTimer = attackSpeed;
+            if (r == sr)
+                r.sortingOrder = baseOrder;
+            else if (r == outLineSR)
+                r.sortingOrder = baseOrder + 1;
+            else
+                r.sortingOrder = baseOrder + 2;
+        }
     }
 
-    public void Shoot()
+    public Tower Merge(Tower _target, int _id = 0)
     {
-        GameObject bulletBase = EntityManager.Instance?.GetBulletBase();
-        Bullet bullet = Instantiate(bulletBase, transform.position, Quaternion.identity, transform)
-            .GetComponent<Bullet>();
+        if (!EntityManager.Instance.CanMerge(this, _target)) return null;
 
-        bullet.SetBullet(this);
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnMerge(this, _target);
+
+        return EntityManager.Instance?.MergeTower(this, _target, _id);
+    }
+
+    public void RankUp(int _amount = 1)
+    {
+        SetRank(rank + _amount);
+
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnRankUp(this, _amount);
+    }
+
+    public void Sell()
+    {
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnSell(this);
+
+        GameManager.Instance?.GoldUp(GameManager.Instance.GetNeedGold() * rank);
+        EntityManager.Instance?.IsSell(Vector3.one);
+        EntityManager.Instance?.DespawnTower(this);
     }
     #endregion
 
@@ -215,7 +249,7 @@ public class Tower : Entity
 
         if (_target == null) return;
 
-        int damage = attackDamage;
+        int damage = buff.GetBuffDamage(attackDamage);
         bool critical = false;
 
         if (Random.value < criticalChance / 100f)
@@ -231,54 +265,35 @@ public class Tower : Entity
     }
     #endregion
 
-    #region 조작
-    public void DragOn(bool _on)
+    #region 전투
+    public void Attack()
     {
-        isDragging = _on;
+        attackTimer -= Time.deltaTime;
+        if (attackTimer > 0f) return;
 
-        int baseOrder = _on ? 1000 : 0;
-
-        SpriteRenderer[] renderers = GetComponentsInChildren<SpriteRenderer>();
-        for (int i = 0; i < renderers.Length; i++)
-        {
-            SpriteRenderer r = renderers[i];
-
-            if (r == sr)
-                r.sortingOrder = baseOrder;
-            else if (r == outLineSR)
-                r.sortingOrder = baseOrder + 1;
-            else
-                r.sortingOrder = baseOrder + 2;
-        }
-    }
-
-    public Tower Merge(Tower _target, int _id = 0)
-    {
-        if (!EntityManager.Instance.CanMerge(this, _target)) return null;
+        FindTarget();
+        if (attackTarget == null || attackTarget.IsDead) return;
 
         for (int i = 0; i < skills.Count; i++)
-            skills[i].OnMerge(this, _target);
+            skills[i].OnAttack(this);
 
-        return EntityManager.Instance?.MergeTower(this, _target, _id);
+        Shoot();
+        attackTimer = attackSpeed;
     }
 
-    public void RankUp(int _amount = 1)
+    public void Shoot()
     {
-        SetRank(rank + _amount);
+        GameObject bulletBase = EntityManager.Instance?.GetBulletBase();
+        Bullet bullet = Instantiate(bulletBase, transform.position, Quaternion.identity, transform)
+            .GetComponent<Bullet>();
 
-        for (int i = 0; i < skills.Count; i++)
-            skills[i].OnRankUp(this, _amount);
+        bullet.SetBullet(this);
     }
+    #endregion
 
-    public void Sell()
-    {
-        for (int i = 0; i < skills.Count; i++)
-            skills[i].OnSell(this);
-
-        GameManager.Instance?.GoldUp(GameManager.Instance.GetNeedGold() * rank);
-        EntityManager.Instance?.IsSell(Vector3.one);
-        EntityManager.Instance?.DespawnTower(this);
-    }
+    #region 버프
+    public void ApplyDamageBuff(int _percent, float _duration)
+        => buff.ApplyDamageBuff(_percent, _duration);
     #endregion
 
     #region SET

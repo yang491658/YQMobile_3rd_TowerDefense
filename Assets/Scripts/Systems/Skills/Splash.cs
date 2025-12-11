@@ -21,7 +21,7 @@ public class Splash : TowerSkill
 
     private void HitSplash(Tower _tower, Vector3 _center, Monster _target)
     {
-        EntityManager.Instance.MakeEffect(_tower, _center, range);
+        EntityManager.Instance.MakeEffect(_tower, _center, range, 0.3f);
 
         var monsters = EntityManager.Instance.GetMonstersInRange(_center, range);
         for (int i = 0; i < monsters.Count; i++)

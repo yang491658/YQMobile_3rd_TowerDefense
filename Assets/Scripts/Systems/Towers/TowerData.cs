@@ -96,9 +96,11 @@ public class TowerData : ScriptableObject
             Name = null;
         }
 
-        if (Role == TowerRole.Buff)
-        {
+        if (Role == TowerRole.Buff || Role == TowerRole.Economy)
             AttackTarget = AttackTarget.None;
+
+        if (AttackTarget == AttackTarget.None)
+        {
             AttackDamage = 0;
             AttackSpeed = 0f;
             CriticalChance = 0;

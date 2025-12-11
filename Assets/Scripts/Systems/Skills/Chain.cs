@@ -18,9 +18,9 @@ public class Chain : TowerSkill
 
     public override void OnHit(Tower _tower, Monster _target)
     {
-        int start = EntityManager.Instance.GetMonsterNum(_target);
+        int start = EntityManager.Instance.GetMonsterNumber(_target);
 
-        EntityManager.Instance.MakeEffect(_tower, _target.transform);
+        EntityManager.Instance?.MakeEffect(_tower, _target.transform);
         _tower.StartCoroutine(ChainRoutine(_tower, start, count - 1));
     }
 
@@ -38,7 +38,7 @@ public class Chain : TowerSkill
 
             Monster m = EntityManager.Instance?.GetMonsterByIndex(index++);
 
-            EntityManager.Instance.MakeEffect(_tower, m.transform);
+            EntityManager.Instance?.MakeEffect(_tower, m.transform, _duration: 0.3f);
             m.TakeDamage(damage, _direct: true);
 
             yield return new WaitForSeconds(interval);
