@@ -14,23 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: 6
   Name: Cyan
-  Symbol: {fileID: 21300000, guid: b880150c15f72ec47a3ec568862f7228, type: 3}
+  Symbol: {fileID: 21300000, guid: 63d553b0a882ab247b44057e6a82ff51, type: 3}
   Color: {r: 0, g: 1, b: 1, a: 1}
   Grade: 0
-  Role: 1
-  AttackTarget: 2
+  Role: 0
+  AttackTarget: 6
   AttackDamage: 10
-  AttackSpeed: 3
+  AttackSpeed: 1
   CriticalChance: 5
   CriticalDamage: 150
   Skills:
-  - {fileID: 11400000, guid: 19bb69e5c69b31b45bec831caa28dc6a, type: 2}
+  - {fileID: 11400000, guid: 209178d46fdddbb499301d4ebbb38b9e, type: 2}
   Values:
-  - valueType: 202
+  - valueType: 102
     baseValue: 10
-    rankType: 3
+    rankType: 2
     rankBonus: 1
-  - valueType: 401
-    baseValue: 2.5
-    rankType: 1
-    rankBonus: 0.5
