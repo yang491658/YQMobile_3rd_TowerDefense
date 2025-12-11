@@ -191,9 +191,9 @@ public class TestManager : MonoBehaviour
 
     private void AutoPlay()
     {
-        //isAuto = !isAuto;
+        isAuto = !isAuto;
 
-        //GameManager.Instance?.SetSpeed(isAuto ? GameManager.Instance.GetMaxSpeed() : 1f);
+        GameManager.Instance?.SetSpeed(isAuto ? GameManager.Instance.GetMaxSpeed() : 1f);
     }
 
     private IEnumerator AutoReplay()
@@ -373,7 +373,7 @@ public class TestManager : MonoBehaviour
 
         _config.slider.value = _config.value;
     }
-    private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, v => GameManager.Instance.SetSpeed(v, true));
+    private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, v => GameManager.Instance?.SetSpeed(v, true));
     private void ChangeRefID(float _value) => ApplySlider(ref refID, _value);
     private void ChangeRefRank(float _value) => ApplySlider(ref refRank, _value);
 

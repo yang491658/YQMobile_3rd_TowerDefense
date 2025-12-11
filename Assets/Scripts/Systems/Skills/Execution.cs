@@ -15,7 +15,7 @@ public class Execution : TowerSkill
     {
         if (Random.value < chance / 100f)
         {
-            EntityManager.Instance.MakeEffect(_tower, _target.transform.position, _duration: 0f);
+            EntityManager.Instance?.MakeEffect(_tower, _target.transform.position, _duration: 0f);
             _target.Die();
         }
     }

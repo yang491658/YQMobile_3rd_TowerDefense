@@ -35,13 +35,13 @@ public class DamageUp : TowerSkill
 
     private void ApplyBuff(Tower _tower)
     {
-        List<Tower> targets = EntityManager.Instance.GetAttackTowers(count);
+        List<Tower> targets = EntityManager.Instance?.GetAttackTowers(count);
 
         for (int i = 0; i < targets.Count; i++)
         {
             Tower target = targets[i];
 
-            Effect e = EntityManager.Instance.MakeEffect(_tower, target, _scale: 0.5f, _duration: duration);
+            Effect e = EntityManager.Instance?.MakeEffect(_tower, target, _scale: 0.5f, _duration: duration);
             target.ApplyDamageBuff(percent, duration, e);
         }
 

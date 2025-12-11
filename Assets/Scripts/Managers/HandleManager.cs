@@ -299,7 +299,7 @@ public class HandleManager : MonoBehaviour
 
             if (isSlow)
             {
-                GameManager.Instance.SetSpeed(prevSpeed);
+                GameManager.Instance?.SetSpeed(prevSpeed);
                 isSlow = false;
             }
             return;
@@ -337,7 +337,7 @@ public class HandleManager : MonoBehaviour
 
         if (isSlow)
         {
-            GameManager.Instance.SetSpeed(prevSpeed);
+            GameManager.Instance?.SetSpeed(prevSpeed);
             isSlow = false;
         }
     }
