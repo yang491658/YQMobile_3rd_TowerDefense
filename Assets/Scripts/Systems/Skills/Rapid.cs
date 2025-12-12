@@ -15,8 +15,7 @@ public class Rapid : TowerSkill
 
     public override void OnTakeDamage(Tower _tower, Monster _target, ref int _damage, ref bool _critical)
     {
-        hitCount++;
-        if (hitCount < count) return;
+        if (++hitCount < count) return;
 
         hitCount = 0;
 
