@@ -9,10 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8825e2dd8cb1857468851dafbbbed8e7, type: 3}
-  m_Name: 01.DamageUp
+  m_Script: {fileID: 11500000, guid: 67661367b1fd9a640a5eebac39e0b959, type: 3}
+  m_Name: 101.Splash
   m_EditorClassIdentifier: 
-  percent: 0
-  count: 0
-  duration: 0
-  cooldown: 0
+  ID: 101
+  damage: 0
+  range: 0

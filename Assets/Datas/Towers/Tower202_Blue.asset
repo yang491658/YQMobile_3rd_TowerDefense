@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
   m_Name: Tower202_Blue
   m_EditorClassIdentifier: 
-  ID: 6
+  ID: 202
   Name: Blue
   Symbol: {fileID: 21300000, guid: b880150c15f72ec47a3ec568862f7228, type: 3}
   Color: {r: 0, g: 0, b: 1, a: 1}

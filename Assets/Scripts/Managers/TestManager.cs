@@ -7,401 +7,395 @@ using UnityEngine.UI;
 [System.Serializable]
 public struct SliderConfig
 {
-	public TextMeshProUGUI TMP;
-	public Slider slider;
-	public int value;
-	public int minValue;
-	public int maxValue;
-	public string format;
+    public TextMeshProUGUI TMP;
+    public Slider slider;
+    public int value;
+    public int minValue;
+    public int maxValue;
+    public string format;
 
-	public SliderConfig(int _value, int _min, int _max, string _format)
-	{
-		TMP = null;
-		slider = null;
-		value = _value;
-		minValue = _min;
-		maxValue = _max;
-		format = _format;
-	}
+    public SliderConfig(int _value, int _min, int _max, string _format)
+    {
+        TMP = null;
+        slider = null;
+        value = _value;
+        minValue = _min;
+        maxValue = _max;
+        format = _format;
+    }
 }
 
 public class TestManager : MonoBehaviour
 {
-	public static TestManager Instance { private set; get; }
+    public static TestManager Instance { private set; get; }
 
-	[Header("Game Test")]
-	[SerializeField][Min(0)] private int testCount = 0;
-	[SerializeField][Min(0)] private int maxScore = 0;
-	private int totalScore = 0;
-	[SerializeField][Min(0)] private int averageScore = 0;
-	[SerializeField] private bool isAuto = false;
-	[SerializeField][Min(1f)] private float autoReplay = 1f;
-	private Coroutine autoRoutine;
+    [Header("Game Test")]
+    [SerializeField][Min(0)] private int testCount = 0;
+    [SerializeField][Min(0)] private int maxScore = 0;
+    private int totalScore = 0;
+    [SerializeField][Min(0)] private int averageScore = 0;
+    [SerializeField] private bool isAuto = false;
+    [SerializeField][Min(1f)] private float autoReplay = 1f;
+    private Coroutine autoRoutine;
 
-	[Header("Sound Test")]
-	[SerializeField] private bool bgmPause = false;
+    [Header("Sound Test")]
+    [SerializeField] private bool bgmPause = false;
 
-	[Header("Entity Test")]
-	[SerializeField] private bool spawn = true;
+    [Header("Entity Test")]
+    [SerializeField] private bool spawn = true;
 
-	[Header("Test UI")]
-	[SerializeField] private GameObject testUI;
-	[Space]
-	[SerializeField] private SliderConfig gameSpeed = new SliderConfig(1, 1, 10, "배속 × {0}");
-	[Space]
-	[SerializeField] private TextMeshProUGUI testCountNum;
-	[SerializeField] private TextMeshProUGUI maxScoreNum;
-	[SerializeField] private TextMeshProUGUI averageScoreNum;
-	[Space]
-	[SerializeField] private SliderConfig refID = new SliderConfig(0, 0, 1, "기준ID : {0}");
-	[SerializeField] private SliderConfig refRank = new SliderConfig(3, 1, 7, "기준랭크 : {0}");
+    [Header("Test UI")]
+    [SerializeField] private GameObject testUI;
+    [Space]
+    [SerializeField] private SliderConfig gameSpeed = new SliderConfig(1, 1, 10, "배속 × {0}");
+    [Space]
+    [SerializeField] private TextMeshProUGUI testCountNum;
+    [SerializeField] private TextMeshProUGUI maxScoreNum;
+    [SerializeField] private TextMeshProUGUI averageScoreNum;
+    [Space]
+    [SerializeField] private SliderConfig refID = new SliderConfig(0, 0, 1, "기준ID : {0}");
+    [SerializeField] private SliderConfig refRank = new SliderConfig(3, 1, 7, "기준랭크 : {0}");
 
 #if UNITY_EDITOR
-	private void OnValidate()
-	{
-		if (testUI == null)
-			testUI = GameObject.Find("TestUI");
+    private void OnValidate()
+    {
+        if (testUI == null)
+            testUI = GameObject.Find("TestUI");
 
-		if (gameSpeed.TMP == null)
-			gameSpeed.TMP = GameObject.Find("TestUI/GameSpeed/TestText")?.GetComponent<TextMeshProUGUI>();
-		if (gameSpeed.slider == null)
-			gameSpeed.slider = GameObject.Find("TestUI/GameSpeed/TestSlider")?.GetComponent<Slider>();
+        if (gameSpeed.TMP == null)
+            gameSpeed.TMP = GameObject.Find("TestUI/GameSpeed/TestText")?.GetComponent<TextMeshProUGUI>();
+        if (gameSpeed.slider == null)
+            gameSpeed.slider = GameObject.Find("TestUI/GameSpeed/TestSlider")?.GetComponent<Slider>();
 
-		if (testCountNum == null)
-			testCountNum = GameObject.Find("TestUI/TestCount/TestNum")?.GetComponent<TextMeshProUGUI>();
-		if (maxScoreNum == null)
-			maxScoreNum = GameObject.Find("TestUI/MaxScore/TestNum")?.GetComponent<TextMeshProUGUI>();
-		if (averageScoreNum == null)
-			averageScoreNum = GameObject.Find("TestUI/AverageScore/TestNum")?.GetComponent<TextMeshProUGUI>();
+        if (testCountNum == null)
+            testCountNum = GameObject.Find("TestUI/TestCount/TestNum")?.GetComponent<TextMeshProUGUI>();
+        if (maxScoreNum == null)
+            maxScoreNum = GameObject.Find("TestUI/MaxScore/TestNum")?.GetComponent<TextMeshProUGUI>();
+        if (averageScoreNum == null)
+            averageScoreNum = GameObject.Find("TestUI/AverageScore/TestNum")?.GetComponent<TextMeshProUGUI>();
 
-		if (refID.TMP == null)
-			refID.TMP = GameObject.Find("TestUI/RefID/TestText")?.GetComponent<TextMeshProUGUI>();
-		if (refID.slider == null)
-			refID.slider = GameObject.Find("TestUI/RefID/TestSlider")?.GetComponent<Slider>();
-		if (refRank.TMP == null)
-			refRank.TMP = GameObject.Find("TestUI/RefRank/TestText")?.GetComponent<TextMeshProUGUI>();
-		if (refRank.slider == null)
-			refRank.slider = GameObject.Find("TestUI/RefRank/TestSlider")?.GetComponent<Slider>();
-	}
+        if (refID.TMP == null)
+            refID.TMP = GameObject.Find("TestUI/RefID/TestText")?.GetComponent<TextMeshProUGUI>();
+        if (refID.slider == null)
+            refID.slider = GameObject.Find("TestUI/RefID/TestSlider")?.GetComponent<Slider>();
+        if (refRank.TMP == null)
+            refRank.TMP = GameObject.Find("TestUI/RefRank/TestText")?.GetComponent<TextMeshProUGUI>();
+        if (refRank.slider == null)
+            refRank.slider = GameObject.Find("TestUI/RefRank/TestSlider")?.GetComponent<Slider>();
+    }
 #endif
 
-	private void Awake()
-	{
-		if (Instance != null && Instance != this)
-		{
-			Destroy(gameObject);
-			return;
-		}
-		Instance = this;
-		DontDestroyOnLoad(gameObject);
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
 
-		testUI.SetActive(false);
-	}
+        testUI.SetActive(false);
+    }
 
-	private void Start()
-	{
-		SoundManager.Instance?.ToggleBGM();
+    private void Start()
+    {
+        SoundManager.Instance?.ToggleBGM();
 
-		AutoPlay();
-		UpdateTestUI();
-	}
+        AutoPlay();
+        UpdateTestUI();
+    }
 
-	private void Update()
-	{
-		#region 게임 테스트
-		if (Input.GetKeyDown(KeyCode.P))
-			GameManager.Instance?.Pause(!GameManager.Instance.IsPaused);
-		if (Input.GetKeyDown(KeyCode.G))
-			GameManager.Instance?.GameOver();
-		if (Input.GetKeyDown(KeyCode.R))
-			GameManager.Instance?.Replay();
-		if (Input.GetKeyDown(KeyCode.Q))
-			GameManager.Instance?.Quit();
+    private void Update()
+    {
+        #region 게임 테스트
+        if (Input.GetKeyDown(KeyCode.P))
+            GameManager.Instance?.Pause(!GameManager.Instance.IsPaused);
+        if (Input.GetKeyDown(KeyCode.G))
+            GameManager.Instance?.GameOver();
+        if (Input.GetKeyDown(KeyCode.R))
+            GameManager.Instance?.Replay();
+        if (Input.GetKeyDown(KeyCode.Q))
+            GameManager.Instance?.Quit();
 
-		if (Input.GetKeyDown(KeyCode.O))
-			AutoPlay();
-		if (isAuto)
-		{
-			AutoMergeTower();
+        if (Input.GetKeyDown(KeyCode.O))
+            AutoPlay();
+        if (isAuto)
+        {
+            AutoMergeTower();
 
-			if (GameManager.Instance.EnoughGold())
-				if (EntityManager.Instance?.SpawnTower(refID.value) == null) MergeTower();
-			if (GameManager.Instance.IsGameOver && autoRoutine == null)
-				autoRoutine = StartCoroutine(AutoReplay());
-		}
+            if (GameManager.Instance.EnoughGold())
+                if (EntityManager.Instance?.SpawnTower(refID.value) == null) MergeTower();
+            if (GameManager.Instance.IsGameOver && autoRoutine == null)
+                autoRoutine = StartCoroutine(AutoReplay());
+        }
 
-		if (Input.GetKeyDown(KeyCode.L)) GiveGold();
-		#endregion
+        if (Input.GetKeyDown(KeyCode.L)) GiveGold();
+        #endregion
 
-		#region 사운드 테스트
-		if (Input.GetKeyDown(KeyCode.B))
-		{
-			bgmPause = !bgmPause;
-			SoundManager.Instance?.PauseSound(bgmPause);
-		}
-		if (Input.GetKeyDown(KeyCode.M))
-			SoundManager.Instance?.ToggleBGM();
-		if (Input.GetKeyDown(KeyCode.N))
-			SoundManager.Instance?.ToggleSFX();
-		#endregion
+        #region 사운드 테스트
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            bgmPause = !bgmPause;
+            SoundManager.Instance?.PauseSound(bgmPause);
+        }
+        if (Input.GetKeyDown(KeyCode.M))
+            SoundManager.Instance?.ToggleBGM();
+        if (Input.GetKeyDown(KeyCode.N))
+            SoundManager.Instance?.ToggleSFX();
+        #endregion
 
-		#region 엔티티 테스트
-		for (int i = 1; i <= 10; i++)
-		{
-			KeyCode key = (i == 10) ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha0 + i);
-			if (Input.GetKey(key))
-			{
-				EntityManager.Instance?.SpawnTower(i, 1, _useGold: false);
-				break;
-			}
-		}
+        #region 엔티티 테스트
+        for (int i = 1; i <= 10; i++)
+        {
+            KeyCode key = (i == 10) ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha0 + i);
+            if (Input.GetKey(key))
+            {
+                EntityManager.Instance?.SpawnTower(i, 1, _useGold: false);
+                break;
+            }
+        }
 
-		if (Input.GetKeyDown(KeyCode.E))
-		{
-			spawn = !spawn;
-			EntityManager.Instance?.ToggleSpawnMonster(spawn);
-		}
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            spawn = !spawn;
+            EntityManager.Instance?.ToggleSpawnMonster(spawn);
+        }
 
-		if (Input.GetKeyDown(KeyCode.T))
-			EntityManager.Instance?.SpawnTower(refID.value, 1, _useGold: false);
-		if (Input.GetKeyDown(KeyCode.Y))
-			MergeTower();
-		if (Input.GetKeyDown(KeyCode.U))
-		{
-			var list = EntityManager.Instance?.GetTowers();
-			foreach (var tower in list)
-				tower.RankUp();
-		}
+        if (Input.GetKeyDown(KeyCode.T))
+            EntityManager.Instance?.SpawnTower(refID.value, 1, _useGold: false);
+        if (Input.GetKeyDown(KeyCode.Y))
+            MergeTower();
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            var list = EntityManager.Instance?.GetTowers();
+            foreach (var tower in list)
+                tower.RankUp();
+        }
 
-		if (Input.GetKeyDown(KeyCode.Delete))
-			EntityManager.Instance?.DespawnAll();
-		#endregion
+        if (Input.GetKeyDown(KeyCode.Delete))
+            EntityManager.Instance?.DespawnAll();
+        #endregion
 
-		#region UI 테스트
-		if (Input.GetKeyDown(KeyCode.Z))
-			UIManager.Instance?.OpenSetting(!UIManager.Instance.GetOnSetting());
-		if (Input.GetKeyDown(KeyCode.X))
-			UIManager.Instance?.OpenConfirm(!UIManager.Instance.GetOnConfirm());
-		if (Input.GetKeyDown(KeyCode.C))
-			UIManager.Instance?.OpenResult(!UIManager.Instance.GetOnResult());
-		if (Input.GetKeyDown(KeyCode.BackQuote))
-			OnClickTest();
-		#endregion
-	}
+        #region UI 테스트
+        if (Input.GetKeyDown(KeyCode.Z))
+            UIManager.Instance?.OpenSetting(!UIManager.Instance.GetOnSetting());
+        if (Input.GetKeyDown(KeyCode.X))
+            UIManager.Instance?.OpenConfirm(!UIManager.Instance.GetOnConfirm());
+        if (Input.GetKeyDown(KeyCode.C))
+            UIManager.Instance?.OpenResult(!UIManager.Instance.GetOnResult());
+        if (Input.GetKeyDown(KeyCode.BackQuote))
+            OnClickTest();
+        #endregion
+    }
 
-	private void AutoPlay()
-	{
-		//isAuto = !isAuto;
+    private void AutoPlay()
+    {
+        //isAuto = !isAuto;
 
-		//GameManager.Instance?.SetSpeed(isAuto ? GameManager.Instance.GetMaxSpeed() : 1f);
-	}
+        //GameManager.Instance?.SetSpeed(isAuto ? GameManager.Instance.GetMaxSpeed() : 1f);
+    }
 
-	private IEnumerator AutoReplay()
-	{
-		yield return new WaitForSecondsRealtime(autoReplay);
-		if (GameManager.Instance.IsGameOver)
-		{
-			int score = GameManager.Instance.GetScore();
+    private IEnumerator AutoReplay()
+    {
+        yield return new WaitForSecondsRealtime(autoReplay);
+        if (GameManager.Instance.IsGameOver)
+        {
+            int score = GameManager.Instance.GetScore();
 
-			totalScore += score;
-			maxScore = Mathf.Max(score, maxScore);
-			averageScore = totalScore / ++testCount;
+            totalScore += score;
+            maxScore = Mathf.Max(score, maxScore);
+            averageScore = totalScore / ++testCount;
 
-			UpdateTestUI();
+            UpdateTestUI();
 
-			GameManager.Instance?.Replay();
-		}
-		autoRoutine = null;
-	}
+            GameManager.Instance?.Replay();
+        }
+        autoRoutine = null;
+    }
 
-	private void GiveGold() => GameManager.Instance?.GoldUp(100_0000);
+    private void GiveGold() => GameManager.Instance?.GoldUp(100_0000);
 
-	private void AutoMergeTower()
-	{
-		var towers = EntityManager.Instance?.GetTowers();
-		if (towers == null) return;
+    private void AutoMergeTower()
+    {
+        var towers = EntityManager.Instance?.GetTowers();
+        if (towers == null) return;
 
-		int len = towers.Count;
-		if (len < 2) return;
+        int len = towers.Count;
+        if (len < 2) return;
 
-		int limitRank = refRank.value;
-		if (limitRank < 1) limitRank = 1;
+        int limitRank = refRank.value;
+        if (limitRank < 1) limitRank = 1;
 
-		for (int r = 1; r < 7; r++)
-		{
-			for (int i = 0; i < len; i++)
-			{
-				Tower a = towers[i];
-				if (a == null || a.IsDragging) continue;
-				if (a.GetRank() != r) continue;
+        for (int r = 1; r < 7; r++)
+        {
+            for (int i = 0; i < len; i++)
+            {
+                Tower a = towers[i];
+                if (a == null || a.IsDragging) continue;
+                if (a.GetRank() != r) continue;
 
-				bool aIsDebuff = a.GetData().Role == TowerRole.Debuff;
-				if (!aIsDebuff && r >= limitRank) continue;
+                for (int j = 0; j < len; j++)
+                {
+                    if (i == j) continue;
 
-				for (int j = 0; j < len; j++)
-				{
-					if (i == j) continue;
+                    Tower b = towers[j];
+                    if (b == null || b.IsDragging) continue;
+                    if (b.GetRank() != r) continue;
 
-					Tower b = towers[j];
-					if (b == null || b.IsDragging) continue;
-					if (b.GetRank() != r) continue;
+                    if (a.Merge(b, refID.value) != null)
+                        return;
+                }
+            }
+        }
+    }
 
-					bool bIsDebuff = b.GetData().Role == TowerRole.Debuff;
-					if (!bIsDebuff && r >= limitRank) continue;
+    private void MergeTower()
+    {
+        List<Tower> towers = EntityManager.Instance?.GetTowers();
+        if (towers == null) return;
 
-					if (a.Merge(b, refID.value) != null)
-						return;
-				}
-			}
-		}
-	}
+        int len = towers.Count;
+        if (len < 2) return;
 
-	private void MergeTower()
-	{
-		List<Tower> towers = EntityManager.Instance?.GetTowers();
-		if (towers == null) return;
+        HashSet<int> rankSet = new HashSet<int>();
+        for (int i = 0; i < len; i++)
+        {
+            Tower t = towers[i];
+            if (t == null || t.IsDragging) continue;
+            rankSet.Add(t.GetRank());
+        }
 
-		int len = towers.Count;
-		if (len < 2) return;
+        List<int> ranks = new List<int>(rankSet);
+        ranks.Sort();
 
-		HashSet<int> rankSet = new HashSet<int>();
-		for (int i = 0; i < len; i++)
-		{
-			Tower t = towers[i];
-			if (t == null || t.IsDragging) continue;
-			rankSet.Add(t.GetRank());
-		}
+        for (int r = 0; r < ranks.Count; r++)
+        {
+            int curRank = ranks[r];
 
-		List<int> ranks = new List<int>(rankSet);
-		ranks.Sort();
+            List<int> indices = new List<int>();
+            for (int i = 0; i < len; i++)
+            {
+                Tower t = towers[i];
+                if (t == null || t.IsDragging) continue;
+                if (t.GetRank() == curRank)
+                    indices.Add(i);
+            }
 
-		for (int r = 0; r < ranks.Count; r++)
-		{
-			int curRank = ranks[r];
+            int count = indices.Count;
+            if (count < 2) continue;
 
-			List<int> indices = new List<int>();
-			for (int i = 0; i < len; i++)
-			{
-				Tower t = towers[i];
-				if (t == null || t.IsDragging) continue;
-				if (t.GetRank() == curRank)
-					indices.Add(i);
-			}
+            int start = Random.Range(0, count);
 
-			int count = indices.Count;
-			if (count < 2) continue;
+            for (int n = 0; n < count; n++)
+            {
+                int iLocal = indices[(start + n) % count];
+                Tower a = towers[iLocal];
 
-			int start = Random.Range(0, count);
+                for (int m = 0; m < count; m++)
+                {
+                    if (n == m) continue;
 
-			for (int n = 0; n < count; n++)
-			{
-				int iLocal = indices[(start + n) % count];
-				Tower a = towers[iLocal];
+                    int jLocal = indices[m];
+                    Tower b = towers[jLocal];
 
-				for (int m = 0; m < count; m++)
-				{
-					if (n == m) continue;
+                    if (a.Merge(b, refID.value) != null) return;
+                }
+            }
+        }
+    }
 
-					int jLocal = indices[m];
-					Tower b = towers[jLocal];
+    #region 테스트 UI
+    private void OnEnable()
+    {
+        InitSlider(gameSpeed, ChangeGameSpeed);
+        refID.maxValue = EntityManager.Instance.GetFinalID();
+        InitSlider(refID, ChangeRefID);
+        InitSlider(refRank, ChangeRefRank);
+    }
 
-					if (a.Merge(b, refID.value) != null) return;
-				}
-			}
-		}
-	}
+    private void OnDisable()
+    {
+        gameSpeed.slider.onValueChanged.RemoveListener(ChangeGameSpeed);
+        refID.slider.onValueChanged.RemoveListener(ChangeRefID);
+        refRank.slider.onValueChanged.RemoveListener(ChangeRefRank);
+    }
 
-	#region 테스트 UI
-	private void OnEnable()
-	{
-		InitSlider(gameSpeed, ChangeGameSpeed);
-		refID.maxValue = EntityManager.Instance.GetFinalID();
-		InitSlider(refID, ChangeRefID);
-		InitSlider(refRank, ChangeRefRank);
-	}
+    private void InitSlider(SliderConfig _config, UnityEngine.Events.UnityAction<float> _action)
+    {
+        if (_config.slider == null) return;
 
-	private void OnDisable()
-	{
-		gameSpeed.slider.onValueChanged.RemoveListener(ChangeGameSpeed);
-		refID.slider.onValueChanged.RemoveListener(ChangeRefID);
-		refRank.slider.onValueChanged.RemoveListener(ChangeRefRank);
-	}
+        _config.slider.minValue = _config.minValue;
+        _config.slider.maxValue = _config.maxValue;
+        _config.slider.wholeNumbers = true;
 
-	private void InitSlider(SliderConfig _config, UnityEngine.Events.UnityAction<float> _action)
-	{
-		if (_config.slider == null) return;
+        float v = _config.value;
+        if (v < _config.minValue) v = _config.minValue;
+        else if (v > _config.maxValue) v = _config.maxValue;
+        _config.slider.value = v;
 
-		_config.slider.minValue = _config.minValue;
-		_config.slider.maxValue = _config.maxValue;
-		_config.slider.wholeNumbers = true;
+        _action.Invoke(_config.slider.value);
+        _config.slider.onValueChanged.AddListener(_action);
+    }
 
-		float v = _config.value;
-		if (v < _config.minValue) v = _config.minValue;
-		else if (v > _config.maxValue) v = _config.maxValue;
-		_config.slider.value = v;
+    private int ChangeSlider(float _value, SliderConfig _config)
+    {
+        int v = Mathf.RoundToInt(_value);
+        if (v < _config.minValue) v = _config.minValue;
+        else if (v > _config.maxValue) v = _config.maxValue;
+        return v;
+    }
 
-		_action.Invoke(_config.slider.value);
-		_config.slider.onValueChanged.AddListener(_action);
-	}
+    private void ApplySlider(ref SliderConfig _config, float _value, System.Action<int> _afterAction = null)
+    {
+        _config.value = ChangeSlider(_value, _config);
 
-	private int ChangeSlider(float _value, SliderConfig _config)
-	{
-		int v = Mathf.RoundToInt(_value);
-		if (v < _config.minValue) v = _config.minValue;
-		else if (v > _config.maxValue) v = _config.maxValue;
-		return v;
-	}
+        if (string.IsNullOrEmpty(_config.format))
+            _config.TMP.text = _config.value.ToString();
+        else
+            _config.TMP.text = string.Format(_config.format, _config.value);
 
-	private void ApplySlider(ref SliderConfig _config, float _value, System.Action<int> _afterAction = null)
-	{
-		_config.value = ChangeSlider(_value, _config);
+        _afterAction?.Invoke(_config.value);
+    }
 
-		if (string.IsNullOrEmpty(_config.format))
-			_config.TMP.text = _config.value.ToString();
-		else
-			_config.TMP.text = string.Format(_config.format, _config.value);
+    private void UpdateSliderUI(SliderConfig _config)
+    {
+        if (string.IsNullOrEmpty(_config.format))
+            _config.TMP.text = _config.value.ToString();
+        else
+            _config.TMP.text = string.Format(_config.format, _config.value);
 
-		_afterAction?.Invoke(_config.value);
-	}
+        _config.slider.value = _config.value;
+    }
+    private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, v => GameManager.Instance?.SetSpeed(v, true));
+    private void ChangeRefID(float _value) => ApplySlider(ref refID, _value);
+    private void ChangeRefRank(float _value) => ApplySlider(ref refRank, _value);
 
-	private void UpdateSliderUI(SliderConfig _config)
-	{
-		if (string.IsNullOrEmpty(_config.format))
-			_config.TMP.text = _config.value.ToString();
-		else
-			_config.TMP.text = string.Format(_config.format, _config.value);
+    private void UpdateTestUI()
+    {
+        testCountNum.text = testCount.ToString();
+        maxScoreNum.text = maxScore.ToString();
+        averageScoreNum.text = averageScore.ToString();
 
-		_config.slider.value = _config.value;
-	}
-	private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, v => GameManager.Instance?.SetSpeed(v, true));
-	private void ChangeRefID(float _value) => ApplySlider(ref refID, _value);
-	private void ChangeRefRank(float _value) => ApplySlider(ref refRank, _value);
+        UpdateSliderUI(gameSpeed);
+        UpdateSliderUI(refID);
+        UpdateSliderUI(refRank);
+    }
 
-	private void UpdateTestUI()
-	{
-		testCountNum.text = testCount.ToString();
-		maxScoreNum.text = maxScore.ToString();
-		averageScoreNum.text = averageScore.ToString();
+    public void OnClickTest()
+    {
+        testUI.SetActive(!testUI.activeSelf);
+        UpdateTestUI();
+    }
+    public void OnClickReset()
+    {
+        testCount = 0;
+        maxScore = 0;
+        totalScore = 0;
+        averageScore = 0;
 
-		UpdateSliderUI(gameSpeed);
-		UpdateSliderUI(refID);
-		UpdateSliderUI(refRank);
-	}
-
-	public void OnClickTest()
-	{
-		testUI.SetActive(!testUI.activeSelf);
-		UpdateTestUI();
-	}
-	public void OnClickReset()
-	{
-		testCount = 0;
-		maxScore = 0;
-		totalScore = 0;
-		averageScore = 0;
-
-		UpdateTestUI();
-	}
-	public void OnClickReplay() => GameManager.Instance?.Replay();
-	#endregion
+        UpdateTestUI();
+    }
+    public void OnClickReplay() => GameManager.Instance?.Replay();
+    #endregion
 }

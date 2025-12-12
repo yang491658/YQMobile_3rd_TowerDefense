@@ -2,6 +2,14 @@
 
 public abstract class TowerSkill : ScriptableObject
 {
+    [SerializeField] private int ID;
+
+    public int GetID() => ID;
+
+#if UNITY_EDITOR
+    public void SetID(int _id) => ID = _id;
+#endif
+
     public virtual void SetValues(Tower _tower) { }
 
     public virtual void OnGenerate(Tower _tower) { }

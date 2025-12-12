@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
   m_Name: Tower104_Black
   m_EditorClassIdentifier: 
-  ID: 10
+  ID: 104
   Name: Black
   Symbol: {fileID: 21300000, guid: 445c9f3e8cf511541869149507e1a1a5, type: 3}
   Color: {r: 0, g: 0, b: 0, a: 1}

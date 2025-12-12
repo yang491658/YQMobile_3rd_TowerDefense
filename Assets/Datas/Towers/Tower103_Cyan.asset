@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
   m_Name: Tower103_Cyan
   m_EditorClassIdentifier: 
-  ID: 5
+  ID: 103
   Name: Cyan
   Symbol: {fileID: 21300000, guid: 63d553b0a882ab247b44057e6a82ff51, type: 3}
   Color: {r: 0, g: 1, b: 1, a: 1}

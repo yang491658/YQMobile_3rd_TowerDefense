@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
   m_Name: Tower102_Yellow
   m_EditorClassIdentifier: 
-  ID: 3
+  ID: 102
   Name: Yellow
   Symbol: {fileID: 21300000, guid: ac08cf17d2fe6d14aa613006be654592, type: 3}
   Color: {r: 1, g: 1, b: 0, a: 1}
