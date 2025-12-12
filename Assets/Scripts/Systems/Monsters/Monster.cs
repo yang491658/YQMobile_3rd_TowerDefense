@@ -196,8 +196,8 @@ public class Monster : Entity
     #endregion
 
     #region 디버프
-    public void ApplyDot(int _damage, float _duration, Effect _effect)
-        => debuff.ApplyDot(_damage, _duration, _effect);
+    public void ApplyDOT(int _damage, float _duration, Effect _effect)
+        => debuff.ApplyDOT(_damage, _duration, _effect);
 
     public void ApplySlow(int _slow, float _duration, Effect _effect)
         => debuff.ApplySlow(_slow, _duration, _effect);

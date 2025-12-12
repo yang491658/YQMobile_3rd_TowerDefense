@@ -20,7 +20,7 @@ public class Chain : TowerSkill
     {
         int start = EntityManager.Instance.GetMonsterNumber(_target);
 
-        EntityManager.Instance?.MakeEffect(_tower, _target);
+        EntityManager.Instance?.MakeEffect(_tower, _target, _duration: 0.3f);
         _tower.StartCoroutine(ChainRoutine(_tower, start, count - 1));
     }
 

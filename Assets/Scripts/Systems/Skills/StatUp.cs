@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "StatUp", menuName = "TowerSkill/Buff/StatUp", order = 301)]
@@ -21,6 +22,7 @@ public class StatUp : TowerSkill
     [SerializeField][Min(0f)] private float cooldown;
 
     private float timer;
+    private Coroutine cooldownRoutine;
 
     public override void SetValues(Tower _tower)
     {
@@ -47,6 +49,8 @@ public class StatUp : TowerSkill
     {
         List<Tower> targets = EntityManager.Instance?.GetAttackTowers(count);
 
+        if (targets.Count == 0) return;
+
         for (int i = 0; i < targets.Count; i++)
         {
             Tower target = targets[i];
@@ -69,6 +73,30 @@ public class StatUp : TowerSkill
             }
         }
 
-        timer = duration + cooldown;
+        timer = cooldown;
+
+        if (cooldownRoutine != null)
+            _tower.StopCoroutine(cooldownRoutine);
+
+        cooldownRoutine = _tower.StartCoroutine(CooldownCoroutine(_tower, cooldown));
+    }
+
+    private IEnumerator CooldownCoroutine(Tower _tower, float _cooldown)
+    {
+        SpriteRenderer sr = _tower.GetSR();
+        sr.color = Color.gray;
+
+        float time = 0f;
+        while (time < _cooldown)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / _cooldown);
+
+            sr.color = Color.Lerp(Color.gray, Color.white, t);
+            yield return null;
+        }
+
+        sr.color = Color.white;
+        cooldownRoutine = null;
     }
 }

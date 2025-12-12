@@ -241,6 +241,15 @@ public class EntityManager : MonoBehaviour
     public TowerData SearchTower(int _id)
         => towerDic.TryGetValue(_id, out var _data) ? _data : towerDatas[Random.Range(0, towerDatas.Length)];
 
+    public Tower SpawnTowerByOrder(int _order, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
+    {
+        int index = _order - 1;
+        if (index < 0 || index >= towerDatas.Length)
+            return SpawnTower(0, _rank, _pos, _useGold);
+
+        return SpawnTower(towerDatas[index].ID, _rank, _pos, _useGold);
+    }
+
     public Tower SpawnTower(int _id = 0, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
     {
         TowerData data = SearchTower(_id);
@@ -580,7 +589,7 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region GET_타워
-    public int GetFinalID() => towerDatas[towerDatas.Length - 1].ID;
+    public int GetTowerDataCount() => towerDatas.Length;
     public List<Tower> GetTowers() => towers;
 
     public List<Tower> GetAttackTowers(int _count = 0)

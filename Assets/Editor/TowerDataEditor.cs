@@ -10,7 +10,7 @@ public class TowerDataEditor : Editor
 
         TowerData data = (TowerData)target;
 
-        string idStr = data.ID.ToString("D2");
+        string idStr = data.ID.ToString("D3");
         string newName = $"Tower{idStr}_{data.Name}";
 
         string path = AssetDatabase.GetAssetPath(data);

@@ -19,10 +19,8 @@ public class Effect : MonoBehaviour
 
         transform.localScale *= _scale;
 
-        float startAlpha = sr.color.a;
-        float duration = _duration > 0f ? _duration : 0.3f;
-
-        StartCoroutine(EffectCoroutine(startAlpha, duration));
+        if (_duration > 0f)
+            StartCoroutine(EffectCoroutine(sr.color.a, _duration));
     }
     #endregion
 

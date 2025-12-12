@@ -10,7 +10,7 @@ public class MonsterDebuff : MonoBehaviour
     [SerializeField][Min(0f)] private float dotDuration;
     private float dotTimer;
     private float dotTickTimer;
-    private bool hasDot;
+    private bool hasDOT;
     [SerializeField] private Effect dotEffect;
 
     [Header("Debuff / Slow")]
@@ -38,19 +38,19 @@ public class MonsterDebuff : MonoBehaviour
     {
         if (monster.IsDead) return;
 
-        UpdateDot(Time.deltaTime);
+        UpdateDOT(Time.deltaTime);
         UpdateSlow(Time.deltaTime);
     }
 
     #region 도트
-    public void ApplyDot(int _damage, float _duration, Effect _effect)
+    public void ApplyDOT(int _damage, float _duration, Effect _effect)
     {
         dotDamage = Mathf.Max(_damage, dotDamage);
         dotDuration = Mathf.Max(_duration, dotDuration);
 
         dotTimer = dotDuration;
         dotTickTimer = 1f;
-        hasDot = true;
+        hasDOT = true;
 
         if (dotEffect == null)
             dotEffect = _effect;
@@ -61,9 +61,9 @@ public class MonsterDebuff : MonoBehaviour
         }
     }
 
-    private void UpdateDot(float _deltaTime)
+    private void UpdateDOT(float _deltaTime)
     {
-        if (!hasDot) return;
+        if (!hasDOT) return;
 
         dotTimer -= _deltaTime;
         dotTickTimer -= _deltaTime;
@@ -75,14 +75,14 @@ public class MonsterDebuff : MonoBehaviour
             monster.TakeDamage(dotDamage, _direct: true);
             if (monster.IsDead)
             {
-                hasDot = false;
+                hasDOT = false;
                 return;
             }
         }
 
         if (dotTimer < 0f)
         {
-            hasDot = false;
+            hasDOT = false;
             dotEffect = null;
         }
     }
@@ -142,6 +142,6 @@ public class MonsterDebuff : MonoBehaviour
     #endregion
 
     #region GET
-    public bool HasDebuff() => hasDot || hasSlow;
+    public bool HasDebuff() => hasDOT || hasSlow;
     #endregion
 }

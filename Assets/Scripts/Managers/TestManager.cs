@@ -54,7 +54,7 @@ public class TestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI averageScoreNum;
     [Space]
     [SerializeField] private SliderConfig refID = new SliderConfig(0, 0, 1, "기준ID : {0}");
-    [SerializeField] private SliderConfig refRank = new SliderConfig(3, 1, 7, "기준랭크 : {0}");
+    [SerializeField] private SliderConfig refRank = new SliderConfig(4, 1, 7, "기준랭크 : {0}");
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -128,6 +128,9 @@ public class TestManager : MonoBehaviour
                 if (EntityManager.Instance?.SpawnTower(refID.value) == null) MergeTower();
             if (GameManager.Instance.IsGameOver && autoRoutine == null)
                 autoRoutine = StartCoroutine(AutoReplay());
+
+            if (EntityManager.Instance?.GetAttackTowers(0).Count <= 0)
+                GameManager.Instance?.Replay();
         }
 
         if (Input.GetKeyDown(KeyCode.L)) GiveGold();
@@ -151,7 +154,7 @@ public class TestManager : MonoBehaviour
             KeyCode key = (i == 10) ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha0 + i);
             if (Input.GetKey(key))
             {
-                EntityManager.Instance?.SpawnTower(i, 1, _useGold: false);
+                EntityManager.Instance?.SpawnTowerByOrder(i, 1, _useGold: false);
                 break;
             }
         }
@@ -163,7 +166,7 @@ public class TestManager : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.T))
-            EntityManager.Instance?.SpawnTower(refID.value, 1, _useGold: false);
+            EntityManager.Instance?.SpawnTowerByOrder(refID.value, 1, _useGold: false);
         if (Input.GetKeyDown(KeyCode.Y))
             MergeTower();
         if (Input.GetKeyDown(KeyCode.U))
@@ -191,9 +194,9 @@ public class TestManager : MonoBehaviour
 
     private void AutoPlay()
     {
-        //isAuto = !isAuto;
+        isAuto = !isAuto;
 
-        //GameManager.Instance?.SetSpeed(isAuto ? GameManager.Instance.GetMaxSpeed() : 1f);
+        GameManager.Instance?.SetSpeed(isAuto ? GameManager.Instance.GetMaxSpeed() : 1f);
     }
 
     private IEnumerator AutoReplay()
@@ -309,7 +312,7 @@ public class TestManager : MonoBehaviour
     private void OnEnable()
     {
         InitSlider(gameSpeed, ChangeGameSpeed);
-        refID.maxValue = EntityManager.Instance.GetFinalID();
+        refID.maxValue = EntityManager.Instance.GetTowerDataCount();
         InitSlider(refID, ChangeRefID);
         InitSlider(refRank, ChangeRefRank);
     }

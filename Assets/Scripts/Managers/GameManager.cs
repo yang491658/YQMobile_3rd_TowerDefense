@@ -159,10 +159,14 @@ public class GameManager : MonoBehaviour
 
     public void LifeDown(int _life = 1)
     {
-        life -= _life;
+        if (life > 0)
+            life = Mathf.Max(life - _life, 0);
+        else
+            life -= 1;
+
         OnChangeLife?.Invoke(life);
 
-        //if (life < 0) GameOver(); // 임시
+        if (life < 0) GameOver();
     }
 
     public void ResetLife()

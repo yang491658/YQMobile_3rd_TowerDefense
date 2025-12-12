@@ -28,15 +28,15 @@ MonoBehaviour:
   - {fileID: 11400000, guid: dd11ee93bd0fbf1448b09416648d0808, type: 2}
   Values:
   - valueType: 202
-    baseValue: 10
+    baseValue: 5
     rankType: 3
     rankBonus: 1
   - valueType: 102
     baseValue: 1
-    rankType: 1
-    rankBonus: 2
+    rankType: 3
+    rankBonus: 1
   - valueType: 401
-    baseValue: 3
+    baseValue: 1.5
     rankType: 3
     rankBonus: 1
   - valueType: 403
