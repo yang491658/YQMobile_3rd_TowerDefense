@@ -12,11 +12,15 @@ public static class TowerSkillGenerator
     private const string assetFolder = "Assets/Datas/Skills";
     private static readonly Regex idPrefixRegex = new Regex(@"^(?<id>\d+)\.(?<name>.+)$", RegexOptions.Compiled);
 
+    private static Dictionary<string, int> categoryOrderMap = new Dictionary<string, int>();
+
     static TowerSkillGenerator() => EditorApplication.delayCall += GenerateAssets;
 
     private static void GenerateAssets()
     {
         EnsureFolder(assetFolder);
+
+        BuildCategoryOrderMap();
 
         var types = TypeCache.GetTypesDerivedFrom<TowerSkill>();
         for (int i = 0; i < types.Count; i++)
@@ -99,6 +103,48 @@ public static class TowerSkillGenerator
         AssetDatabase.Refresh();
     }
 
+    private static void BuildCategoryOrderMap()
+    {
+        categoryOrderMap.Clear();
+
+        var types = TypeCache.GetTypesDerivedFrom<TowerSkill>();
+        for (int i = 0; i < types.Count; i++)
+        {
+            Type type = types[i];
+            if (type == null || type.IsAbstract) continue;
+
+            CreateAssetMenuAttribute menuAttr = GetCreateAssetMenu(type);
+            if (menuAttr == null || string.IsNullOrEmpty(menuAttr.menuName)) continue;
+
+            string category = ExtractFirstCategory(menuAttr.menuName);
+            if (string.IsNullOrEmpty(category)) continue;
+
+            int order = menuAttr.order;
+            if (order <= 0) continue;
+
+            if (!categoryOrderMap.ContainsKey(category) || categoryOrderMap[category] > order)
+            {
+                categoryOrderMap[category] = order;
+            }
+        }
+    }
+
+    private static string ExtractFirstCategory(string menuName)
+    {
+        if (string.IsNullOrEmpty(menuName)) return string.Empty;
+
+        string menu = menuName.Replace('\\', '/').Trim('/');
+
+        if (menu.StartsWith("TowerSkill/", StringComparison.Ordinal))
+            menu = menu.Substring("TowerSkill/".Length);
+
+        int slashIndex = menu.IndexOf('/');
+        if (slashIndex > 0)
+            return menu.Substring(0, slashIndex);
+
+        return menu;
+    }
+
     private static bool HasAssetWithID(Type _type, int _id)
     {
         List<string> paths = FindAssetsOfExactType(_type);
@@ -135,20 +181,27 @@ public static class TowerSkillGenerator
 
         string[] parts = categoryPath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
         for (int i = 0; i < parts.Length; i++)
-            parts[i] = PrefixCategory(parts[i]);
+            parts[i] = PrefixCategory(parts[i], _attr.order);
 
         return string.Join("/", parts);
     }
 
-    private static string PrefixCategory(string _name)
+    private static string PrefixCategory(string _name, int _order)
     {
         if (string.IsNullOrEmpty(_name)) return _name;
 
-        if (string.Equals(_name, "Dealing", StringComparison.Ordinal)) return "01.Dealing";
-        if (string.Equals(_name, "Debuff", StringComparison.Ordinal)) return "02.Debuff";
-        if (string.Equals(_name, "Buff", StringComparison.Ordinal)) return "03.Buff";
+        if (categoryOrderMap.TryGetValue(_name, out int categoryOrder))
+        {
+            _order = categoryOrder;
+        }
 
-        return _name;
+        if (_order <= 0) return _name;
+
+        int prefix = _order / 100;
+        if (prefix <= 0) return _name;
+
+        string prefixStr = prefix.ToString("D2");
+        return $"{prefixStr}.{_name}";
     }
 
     private static List<string> FindAssetsOfExactType(Type _type)
