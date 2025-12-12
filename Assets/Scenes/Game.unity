@@ -9738,7 +9738,7 @@ MonoBehaviour:
   maxScore: 0
   averageScore: 0
   isAuto: 0
-  autoReplay: 1
+  autoReplay: 0
   bgmPause: 0
   spawn: 1
   testUI: {fileID: 226721620}
