@@ -36,10 +36,10 @@ MonoBehaviour:
     rankType: 1
     rankBonus: 2
   - valueType: 401
-    baseValue: 1
+    baseValue: 3
     rankType: 3
     rankBonus: 1
   - valueType: 403
     baseValue: 3
-    rankType: 4
-    rankBonus: 1
+    rankType: 0
+    rankBonus: 0
