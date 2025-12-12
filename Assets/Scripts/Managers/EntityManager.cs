@@ -241,7 +241,7 @@ public class EntityManager : MonoBehaviour
     public TowerData SearchTower(int _id)
         => towerDic.TryGetValue(_id, out var _data) ? _data : towerDatas[Random.Range(0, towerDatas.Length)];
 
-    public Tower SpawnTowerByOrder(int _order, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
+    public Tower SpawnTowerByIndex(int _order, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
     {
         int index = _order - 1;
         if (index < 0 || index >= towerDatas.Length)
@@ -282,7 +282,7 @@ public class EntityManager : MonoBehaviour
         _select.GetRank() == _target.GetRank() &&
         !_select.IsMax && !_target.IsMax;
 
-    public Tower MergeTower(Tower _select, Tower _target, int _id = 0)
+    public Tower MergeTower(Tower _select, Tower _target, int _id = 0, int _index = 0)
     {
         if (!CanMerge(_select, _target)) return null;
 
@@ -292,7 +292,10 @@ public class EntityManager : MonoBehaviour
         DespawnTower(_select);
         DespawnTower(_target);
 
-        Tower merge = SpawnTower(_id, rank, pos, false);
+        Tower merge = (_index > 0)
+            ? SpawnTowerByIndex(_index, rank, pos, false)
+            : SpawnTower(_id, rank, pos, false);
+
         merge.RankUp();
 
         return merge;

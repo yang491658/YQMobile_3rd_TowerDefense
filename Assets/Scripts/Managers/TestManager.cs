@@ -53,7 +53,7 @@ public class TestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI maxScoreNum;
     [SerializeField] private TextMeshProUGUI averageScoreNum;
     [Space]
-    [SerializeField] private SliderConfig refID = new SliderConfig(0, 0, 1, "기준ID : {0}");
+    [SerializeField] private SliderConfig refTower = new SliderConfig(0, 0, 1, "기준타워 : {0}");
     [SerializeField] private SliderConfig refRank = new SliderConfig(4, 1, 7, "기준랭크 : {0}");
 
 #if UNITY_EDITOR
@@ -74,10 +74,10 @@ public class TestManager : MonoBehaviour
         if (averageScoreNum == null)
             averageScoreNum = GameObject.Find("TestUI/AverageScore/TestNum")?.GetComponent<TextMeshProUGUI>();
 
-        if (refID.TMP == null)
-            refID.TMP = GameObject.Find("TestUI/RefID/TestText")?.GetComponent<TextMeshProUGUI>();
-        if (refID.slider == null)
-            refID.slider = GameObject.Find("TestUI/RefID/TestSlider")?.GetComponent<Slider>();
+        if (refTower.TMP == null)
+            refTower.TMP = GameObject.Find("TestUI/RefID/TestText")?.GetComponent<TextMeshProUGUI>();
+        if (refTower.slider == null)
+            refTower.slider = GameObject.Find("TestUI/RefID/TestSlider")?.GetComponent<Slider>();
         if (refRank.TMP == null)
             refRank.TMP = GameObject.Find("TestUI/RefRank/TestText")?.GetComponent<TextMeshProUGUI>();
         if (refRank.slider == null)
@@ -125,7 +125,7 @@ public class TestManager : MonoBehaviour
             AutoMergeTower();
 
             if (GameManager.Instance.EnoughGold())
-                if (EntityManager.Instance?.SpawnTower(refID.value) == null) MergeTower();
+                if (EntityManager.Instance?.SpawnTowerByIndex(refTower.value) == null) MergeTower();
             if (GameManager.Instance.IsGameOver && autoRoutine == null)
                 autoRoutine = StartCoroutine(AutoReplay());
 
@@ -154,7 +154,7 @@ public class TestManager : MonoBehaviour
             KeyCode key = (i == 10) ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha0 + i);
             if (Input.GetKey(key))
             {
-                EntityManager.Instance?.SpawnTowerByOrder(i, 1, _useGold: false);
+                EntityManager.Instance?.SpawnTowerByIndex(i, 1, _useGold: false);
                 break;
             }
         }
@@ -166,7 +166,7 @@ public class TestManager : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.T))
-            EntityManager.Instance?.SpawnTowerByOrder(refID.value, 1, _useGold: false);
+            EntityManager.Instance?.SpawnTowerByIndex(refTower.value, 1, _useGold: false);
         if (Input.GetKeyDown(KeyCode.Y))
             MergeTower();
         if (Input.GetKeyDown(KeyCode.U))
@@ -217,7 +217,7 @@ public class TestManager : MonoBehaviour
         autoRoutine = null;
     }
 
-    private void GiveGold() => GameManager.Instance?.GoldUp(100_0000);
+    private void GiveGold() => GameManager.Instance?.GoldUp(1_0000);
 
     private void AutoMergeTower()
     {
@@ -246,8 +246,7 @@ public class TestManager : MonoBehaviour
                     if (b == null || b.IsDragging) continue;
                     if (b.GetRank() != r) continue;
 
-                    if (a.Merge(b, refID.value) != null)
-                        return;
+                    if (a.Merge(b, _index: refTower.value) != null) return;
                 }
             }
         }
@@ -302,7 +301,7 @@ public class TestManager : MonoBehaviour
                     int jLocal = indices[m];
                     Tower b = towers[jLocal];
 
-                    if (a.Merge(b, refID.value) != null) return;
+                    if (a.Merge(b, _index: refTower.value) != null) return;
                 }
             }
         }
@@ -312,15 +311,15 @@ public class TestManager : MonoBehaviour
     private void OnEnable()
     {
         InitSlider(gameSpeed, ChangeGameSpeed);
-        refID.maxValue = EntityManager.Instance.GetTowerDataCount();
-        InitSlider(refID, ChangeRefID);
+        refTower.maxValue = EntityManager.Instance.GetTowerDataCount();
+        InitSlider(refTower, ChangeRefTower);
         InitSlider(refRank, ChangeRefRank);
     }
 
     private void OnDisable()
     {
         gameSpeed.slider.onValueChanged.RemoveListener(ChangeGameSpeed);
-        refID.slider.onValueChanged.RemoveListener(ChangeRefID);
+        refTower.slider.onValueChanged.RemoveListener(ChangeRefTower);
         refRank.slider.onValueChanged.RemoveListener(ChangeRefRank);
     }
 
@@ -371,7 +370,7 @@ public class TestManager : MonoBehaviour
         _config.slider.value = _config.value;
     }
     private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, v => GameManager.Instance?.SetSpeed(v, true));
-    private void ChangeRefID(float _value) => ApplySlider(ref refID, _value);
+    private void ChangeRefTower(float _value) => ApplySlider(ref refTower, _value);
     private void ChangeRefRank(float _value) => ApplySlider(ref refRank, _value);
 
     private void UpdateTestUI()
@@ -381,7 +380,7 @@ public class TestManager : MonoBehaviour
         averageScoreNum.text = averageScore.ToString();
 
         UpdateSliderUI(gameSpeed);
-        UpdateSliderUI(refID);
+        UpdateSliderUI(refTower);
         UpdateSliderUI(refRank);
     }
 

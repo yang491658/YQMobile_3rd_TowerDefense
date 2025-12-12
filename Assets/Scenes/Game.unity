@@ -9752,13 +9752,13 @@ MonoBehaviour:
   testCountNum: {fileID: 396571802}
   maxScoreNum: {fileID: 721513245}
   averageScoreNum: {fileID: 731691110}
-  refID:
+  refTower:
     TMP: {fileID: 1643808504}
     slider: {fileID: 169119741}
     value: 0
     minValue: 0
     maxValue: 1
-    format: "\uAE30\uC900ID : {0}"
+    format: "\uAE30\uC900\uD0C0\uC6CC : {0}"
   refRank:
     TMP: {fileID: 329162808}
     slider: {fileID: 137509037}
@@ -10958,7 +10958,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uAE30\uC900ID : 0"
+  m_text: "\uAE30\uC900\uD0C0\uC6CC : 0"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8283177e01ffdb84594dec0572ce325c, type: 2}
   m_sharedMaterial: {fileID: 4134973234589648991, guid: 8283177e01ffdb84594dec0572ce325c, type: 2}
@@ -10985,7 +10985,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
+  m_fontSize: 64.3
   m_fontSizeBase: 60
   m_fontWeight: 400
   m_enableAutoSizing: 1
