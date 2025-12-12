@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Execution", menuName = "TowerSkill/Debuff/Execution", order = 203)]
+[CreateAssetMenu(fileName = "Execution", menuName = "TowerSkill/Dealing/Execution", order = 104)]
 public class Execution : TowerSkill
 {
     [Header("Skill Value")]

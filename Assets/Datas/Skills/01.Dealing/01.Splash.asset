@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df86c6e31d6cbf5498bb2ad61fa37547, type: 3}
-  m_Name: DOT
+  m_Script: {fileID: 11500000, guid: 67661367b1fd9a640a5eebac39e0b959, type: 3}
+  m_Name: 01.Splash
   m_EditorClassIdentifier: 
-  effect: {fileID: 266949680547624416, guid: a5200bf9accaeca4384aea6d9af29bcb, type: 3}
+  effect: {fileID: 266949680547624416, guid: aa023f00dcdd67b499d297fe16a01d54, type: 3}

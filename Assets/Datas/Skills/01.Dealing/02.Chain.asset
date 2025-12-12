@@ -9,7 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 475886f5a91ca374a9d0aa9ed3d2dd54, type: 3}
-  m_Name: Slow
+  m_Script: {fileID: 11500000, guid: d533c573cc58980438a4bbb1bb9c5fbf, type: 3}
+  m_Name: 02.Chain
   m_EditorClassIdentifier: 
-  effect: {fileID: 266949680547624416, guid: a5200bf9accaeca4384aea6d9af29bcb, type: 3}
+  damage: 0
+  count: 0

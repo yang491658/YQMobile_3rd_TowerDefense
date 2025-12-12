@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d533c573cc58980438a4bbb1bb9c5fbf, type: 3}
-  m_Name: Chain
+  m_Script: {fileID: 11500000, guid: d75863e19c3407f488bad07d7a64b2c7, type: 3}
+  m_Name: 03.Rapid
   m_EditorClassIdentifier: 
-  damage: 0
   count: 0
+  percent: 0

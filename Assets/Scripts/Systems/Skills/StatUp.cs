@@ -9,7 +9,7 @@ public class StatUp : TowerSkill
         [InspectorName("공격력")] Damage,
         [InspectorName("공격속도")] Speed,
         [InspectorName("치명타 확률")] Chance,
-        [InspectorName("치명타 데미지")] Critical,
+        [InspectorName("치명타 피해")] Critical,
     }
 
     [SerializeField] private BuffType buffType = BuffType.Damage;
