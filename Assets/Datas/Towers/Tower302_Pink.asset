@@ -25,7 +25,7 @@ MonoBehaviour:
   CriticalDamage: 0
   Skills:
   - {fileID: 11400000, guid: e026d8117f17cb042ad89dc79c8ddca1, type: 2}
-  - {fileID: 11400000, guid: 2caa253a7db8151499199438d133fb7d, type: 2}
+  - {fileID: 11400000, guid: dd11ee93bd0fbf1448b09416648d0808, type: 2}
   Values:
   - valueType: 202
     baseValue: 10

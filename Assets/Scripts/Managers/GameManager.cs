@@ -194,7 +194,11 @@ public class GameManager : MonoBehaviour
         OnChangeGold?.Invoke(gold);
     }
 
-    public void UseGold(bool _useGold) => GoldDown(_useGold ? needGold++ : 0);
+    public void UseGold(bool _useGold)
+    {
+        if (!_useGold) return;
+        GoldDown(needGold++);
+    }
 
     public bool EnoughGold() => gold >= needGold;
     #endregion

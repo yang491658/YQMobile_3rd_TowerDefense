@@ -1,31 +1,35 @@
 ﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 [CustomPropertyDrawer(typeof(ValueType))]
 public class ValueTypeDrawer : PropertyDrawer
 {
-    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-    {
-        EditorGUI.BeginProperty(position, label, property);
+    private static readonly ValueType[] values = (ValueType[])System.Enum.GetValues(typeof(ValueType));
+    private static readonly Dictionary<ValueType, string> displayNameCache = new Dictionary<ValueType, string>();
 
-        ValueType current = (ValueType)property.intValue;
+    public override void OnGUI(Rect _position, SerializedProperty _property, GUIContent _label)
+    {
+        EditorGUI.BeginProperty(_position, _label, _property);
+
+        ValueType current = (ValueType)_property.intValue;
         string currentLabel = GetDisplayName(current);
 
-        if (EditorGUI.DropdownButton(position, new GUIContent(currentLabel), FocusType.Keyboard))
+        if (EditorGUI.DropdownButton(_position, new GUIContent(currentLabel), FocusType.Keyboard))
         {
             GenericMenu menu = new GenericMenu();
 
-            foreach (ValueType v in System.Enum.GetValues(typeof(ValueType)))
+            for (int i = 0; i < values.Length; i++)
             {
+                ValueType v = values[i];
                 int code = (int)v;
+
                 string category = GetCategoryName(code);
                 if (string.IsNullOrEmpty(category))
-                {
                     continue;
-                }
 
-                bool on = property.intValue == code;
+                bool on = _property.intValue == code;
                 string name = GetDisplayName(v);
                 string path = category + "/" + name;
 
@@ -33,62 +37,73 @@ public class ValueTypeDrawer : PropertyDrawer
                     new GUIContent(path),
                     on,
                     OnSelect,
-                    new MenuData(property, code)
+                    new MenuData(_property, code)
                 );
             }
 
-            menu.DropDown(position);
+            menu.DropDown(_position);
         }
 
         EditorGUI.EndProperty();
     }
 
-    private string GetCategoryName(int code)
+    private string GetCategoryName(int _code)
     {
-        if (code >= 100 && code < 200) return "수치";
-        if (code >= 200 && code < 300) return "비율";
-        if (code >= 300 && code < 400) return "공간";
-        if (code >= 400 && code < 500) return "시간";
-        if (code >= 500 && code < 600) return "스택";
-        if (code >= 600 && code < 700) return "자원";
+        if (_code >= 100 && _code < 200) return "수치";
+        if (_code >= 200 && _code < 300) return "비율";
+        if (_code >= 300 && _code < 400) return "공간";
+        if (_code >= 400 && _code < 500) return "시간";
+        if (_code >= 500 && _code < 600) return "스택";
+        if (_code >= 600 && _code < 700) return "자원";
         return string.Empty;
     }
 
     private sealed class MenuData
     {
-        public SerializedProperty property;
+        public SerializedObject serializedObject;
+        public string propertyPath;
         public int value;
 
         public MenuData(SerializedProperty _property, int _value)
         {
-            property = _property;
+            serializedObject = _property.serializedObject;
+            propertyPath = _property.propertyPath;
             value = _value;
         }
     }
 
-    private void OnSelect(object userData)
+    private void OnSelect(object _userData)
     {
-        MenuData data = (MenuData)userData;
-        data.property.serializedObject.Update();
-        data.property.intValue = data.value;
-        data.property.serializedObject.ApplyModifiedProperties();
+        MenuData data = (MenuData)_userData;
+
+        data.serializedObject.Update();
+        SerializedProperty prop = data.serializedObject.FindProperty(data.propertyPath);
+        prop.intValue = data.value;
+        data.serializedObject.ApplyModifiedProperties();
     }
 
-    private string GetDisplayName(ValueType value)
+    private string GetDisplayName(ValueType _value)
     {
+        if (displayNameCache.TryGetValue(_value, out string cached))
+            return cached;
+
         System.Type type = typeof(ValueType);
-        System.Reflection.FieldInfo fi = type.GetField(value.ToString());
+        System.Reflection.FieldInfo fi = type.GetField(_value.ToString());
         if (fi != null)
         {
             InspectorNameAttribute[] attrs =
                 (InspectorNameAttribute[])fi.GetCustomAttributes(typeof(InspectorNameAttribute), false);
             if (attrs != null && attrs.Length > 0)
             {
-                return attrs[0].displayName;
+                string name = attrs[0].displayName;
+                displayNameCache[_value] = name;
+                return name;
             }
         }
 
-        return value.ToString();
+        string fallback = _value.ToString();
+        displayNameCache[_value] = fallback;
+        return fallback;
     }
 }
 #endif

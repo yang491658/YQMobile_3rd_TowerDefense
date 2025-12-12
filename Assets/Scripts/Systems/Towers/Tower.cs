@@ -31,8 +31,8 @@ public class Tower : Entity
 	[Header("Skill")]
 	[SerializeField] private List<TowerSkill> skills = new List<TowerSkill>();
 	[SerializeField] private List<float> values = new List<float>();
-	private Dictionary<ValueType, float> valueDic = new Dictionary<ValueType, float>();
-	[Space]
+    private readonly Dictionary<ValueType, float> valueDic = new Dictionary<ValueType, float>();
+    [Space]
 	[SerializeField] private TowerBuff buff;
 
 #if UNITY_EDITOR
@@ -336,7 +336,7 @@ public class Tower : Entity
 		outLineSR.color = data.Color;
 		symbolSR.color = data.Color;
 
-		skills.Clear();
+        skills.Clear();
 		for (int i = 0; i < data.Skills.Count; i++)
 		{
 			TowerSkill skill = Instantiate(data.Skills[i]);

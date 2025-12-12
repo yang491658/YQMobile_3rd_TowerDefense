@@ -15,7 +15,7 @@ MonoBehaviour:
   ID: 101
   Name: Red
   Symbol: {fileID: 21300000, guid: 48a566e858f196047b77fc637b574fc2, type: 3}
-  Color: {r: 0, g: 0, b: 0, a: 1}
+  Color: {r: 1, g: 0, b: 0, a: 1}
   Grade: 0
   Role: 0
   AttackTarget: 2
@@ -23,5 +23,14 @@ MonoBehaviour:
   AttackSpeed: 20
   CriticalChance: 5
   CriticalDamage: 150
-  Skills: []
-  Values: []
+  Skills:
+  - {fileID: 11400000, guid: 1e30dfc6a662fae498d91ab8f84b9856, type: 2}
+  Values:
+  - valueType: 101
+    baseValue: 5
+    rankType: 3
+    rankBonus: 1
+  - valueType: 301
+    baseValue: 1.25
+    rankType: 1
+    rankBonus: 0.25

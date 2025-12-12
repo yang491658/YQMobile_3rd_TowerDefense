@@ -130,6 +130,7 @@ public class Monster : Entity
     {
         if (_damage < 0) return;
         reservedDamage -= _damage;
+        if (reservedDamage < 0) reservedDamage = 0;
     }
 
     public void Die()

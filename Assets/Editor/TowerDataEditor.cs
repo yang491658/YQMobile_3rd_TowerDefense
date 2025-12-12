@@ -18,8 +18,9 @@ public class TowerDataEditor : Editor
 
         if (currentName != newName)
         {
-            AssetDatabase.RenameAsset(path, newName);
-            AssetDatabase.SaveAssets();
+            string error = AssetDatabase.RenameAsset(path, newName);
+            if (error == string.Empty)
+                AssetDatabase.SaveAssets();
         }
     }
 }

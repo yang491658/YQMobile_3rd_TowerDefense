@@ -12,95 +12,102 @@ public static class TowerSkillGenerator
     private const string assetFolder = "Assets/Datas/Skills";
     private static readonly Regex idPrefixRegex = new Regex(@"^(?<id>\d+)\.(?<name>.+)$", RegexOptions.Compiled);
 
-    private static Dictionary<string, int> categoryOrderMap = new Dictionary<string, int>();
+    private static readonly Dictionary<string, int> categoryOrderMap = new Dictionary<string, int>();
 
     static TowerSkillGenerator() => EditorApplication.delayCall += GenerateAssets;
 
     private static void GenerateAssets()
     {
-        EnsureFolder(assetFolder);
-
-        BuildCategoryOrderMap();
-
-        var types = TypeCache.GetTypesDerivedFrom<TowerSkill>();
-        for (int i = 0; i < types.Count; i++)
+        AssetDatabase.StartAssetEditing();
+        try
         {
-            Type type = types[i];
-            if (type == null || type.IsAbstract) continue;
+            EnsureFolder(assetFolder);
 
-            CreateAssetMenuAttribute menuAttr = GetCreateAssetMenu(type);
-            int defaultID = menuAttr != null ? menuAttr.order : 0;
-            string defaultBaseName = (menuAttr != null && !string.IsNullOrEmpty(menuAttr.fileName)) ? menuAttr.fileName : type.Name;
+            BuildCategoryOrderMap();
 
-            string relativeFolder = GetRelativeFolder(menuAttr);
-            string targetFolder = CombinePath(assetFolder, relativeFolder);
-            EnsureFolder(targetFolder);
-
-            List<string> paths = FindAssetsOfExactType(type);
-
-            for (int p = 0; p < paths.Count; p++)
+            var types = TypeCache.GetTypesDerivedFrom<TowerSkill>();
+            for (int i = 0; i < types.Count; i++)
             {
-                string path = NormalizeSlashes(paths[p]);
-                TowerSkill skill = AssetDatabase.LoadAssetAtPath(path, type) as TowerSkill;
-                if (skill == null) continue;
+                Type type = types[i];
+                if (type == null || type.IsAbstract) continue;
 
-                string fileNoExt = Path.GetFileNameWithoutExtension(path);
+                CreateAssetMenuAttribute menuAttr = GetCreateAssetMenu(type);
+                int defaultID = menuAttr != null ? menuAttr.order : 0;
+                string defaultBaseName = (menuAttr != null && !string.IsNullOrEmpty(menuAttr.fileName)) ? menuAttr.fileName : type.Name;
 
-                int id = skill.GetID();
-                if (id <= 0 && TryParseIDFromFileName(fileNoExt, out int parsedID))
+                string relativeFolder = GetRelativeFolder(menuAttr);
+                string targetFolder = CombinePath(assetFolder, relativeFolder);
+                EnsureFolder(targetFolder);
+
+                List<string> paths = FindAssetsOfExactType(type);
+
+                bool hasDefault = false;
+
+                for (int p = 0; p < paths.Count; p++)
                 {
-                    skill.SetID(parsedID);
-                    EditorUtility.SetDirty(skill);
-                    id = parsedID;
-                }
+                    string path = NormalizeSlashes(paths[p]);
+                    TowerSkill skill = AssetDatabase.LoadAssetAtPath(path, type) as TowerSkill;
+                    if (skill == null) continue;
 
-                string baseName = GetBaseName(skill, fileNoExt, defaultBaseName);
+                    string fileNoExt = Path.GetFileNameWithoutExtension(path);
 
-                string desiredPath = path;
-                bool canRenameByID = id > 0;
+                    int id = skill.GetID();
+                    if (id <= 0 && TryParseIDFromFileName(fileNoExt, out int parsedID))
+                    {
+                        skill.SetID(parsedID);
+                        EditorUtility.SetDirty(skill);
+                        id = parsedID;
+                    }
 
-                if (canRenameByID)
-                {
-                    string desiredFile = $"{id}.{baseName}.asset";
-                    string candidatePath = $"{targetFolder}/{desiredFile}";
+                    if (id == defaultID) hasDefault = true;
 
-                    UnityEngine.Object occupant = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(candidatePath);
-                    if (occupant == null || occupant == skill)
-                        desiredPath = candidatePath;
+                    string baseName = GetBaseName(skill, fileNoExt, defaultBaseName);
+
+                    string desiredPath = path;
+                    bool canRenameByID = id > 0;
+
+                    if (canRenameByID)
+                    {
+                        string desiredFile = $"{id}.{baseName}.asset";
+                        string candidatePath = $"{targetFolder}/{desiredFile}";
+
+                        UnityEngine.Object occupant = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(candidatePath);
+                        if (occupant == null || occupant == skill)
+                            desiredPath = candidatePath;
+                        else
+                            desiredPath = $"{targetFolder}/{Path.GetFileName(path)}";
+                    }
                     else
+                    {
                         desiredPath = $"{targetFolder}/{Path.GetFileName(path)}";
+                    }
+
+                    string currentDir = NormalizeSlashes(Path.GetDirectoryName(path));
+                    string desiredDir = NormalizeSlashes(Path.GetDirectoryName(desiredPath));
+
+                    bool needMoveFolder = !PathsEqual(currentDir, desiredDir);
+                    bool needRenameFile = !PathsEqual(path, desiredPath);
+
+                    if (needMoveFolder || needRenameFile)
+                    {
+                        string finalPath = MoveAssetToPath(path, desiredPath);
+                        paths[p] = finalPath;
+                    }
                 }
-                else
-                {
-                    desiredPath = $"{targetFolder}/{Path.GetFileName(path)}";
-                }
 
-                string currentDir = NormalizeSlashes(Path.GetDirectoryName(path));
-                string desiredDir = NormalizeSlashes(Path.GetDirectoryName(desiredPath));
-
-                bool needMoveFolder = !PathsEqual(currentDir, desiredDir);
-                bool needRenameFile = !PathsEqual(path, desiredPath);
-
-                if (needMoveFolder || needRenameFile)
-                {
-                    string finalPath = MoveAssetToPath(path, desiredPath);
-                    paths[p] = finalPath;
-                }
-            }
-
-            if (defaultID > 0)
-            {
-                bool hasDefault = HasAssetWithID(type, defaultID);
-                if (!hasDefault)
+                if (defaultID > 0 && !hasDefault)
                 {
                     string createPath = $"{targetFolder}/{defaultID}.{defaultBaseName}.asset";
                     CreateAssetAtPath(type, createPath, defaultID, defaultBaseName);
                 }
             }
         }
-
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
+        finally
+        {
+            AssetDatabase.StopAssetEditing();
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
     }
 
     private static void BuildCategoryOrderMap()
@@ -123,17 +130,15 @@ public static class TowerSkillGenerator
             if (order <= 0) continue;
 
             if (!categoryOrderMap.ContainsKey(category) || categoryOrderMap[category] > order)
-            {
                 categoryOrderMap[category] = order;
-            }
         }
     }
 
-    private static string ExtractFirstCategory(string menuName)
+    private static string ExtractFirstCategory(string _menuName)
     {
-        if (string.IsNullOrEmpty(menuName)) return string.Empty;
+        if (string.IsNullOrEmpty(_menuName)) return string.Empty;
 
-        string menu = menuName.Replace('\\', '/').Trim('/');
+        string menu = _menuName.Replace('\\', '/').Trim('/');
 
         if (menu.StartsWith("TowerSkill/", StringComparison.Ordinal))
             menu = menu.Substring("TowerSkill/".Length);
@@ -143,17 +148,6 @@ public static class TowerSkillGenerator
             return menu.Substring(0, slashIndex);
 
         return menu;
-    }
-
-    private static bool HasAssetWithID(Type _type, int _id)
-    {
-        List<string> paths = FindAssetsOfExactType(_type);
-        for (int i = 0; i < paths.Count; i++)
-        {
-            TowerSkill skill = AssetDatabase.LoadAssetAtPath(paths[i], _type) as TowerSkill;
-            if (skill != null && skill.GetID() == _id) return true;
-        }
-        return false;
     }
 
     private static CreateAssetMenuAttribute GetCreateAssetMenu(Type _type)
@@ -191,9 +185,7 @@ public static class TowerSkillGenerator
         if (string.IsNullOrEmpty(_name)) return _name;
 
         if (categoryOrderMap.TryGetValue(_name, out int categoryOrder))
-        {
             _order = categoryOrder;
-        }
 
         if (_order <= 0) return _name;
 

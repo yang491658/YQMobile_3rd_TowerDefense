@@ -90,7 +90,7 @@ public class TowerBuff : MonoBehaviour
     #region 적용
     private void Apply(Buff _buff, Effect _effect)
     {
-        if (_buff == null || _buff.timer <= 0f) return;
+        if (_buff.timer <= 0f) return;
 
         bool hasValue =
             _buff.damagePercent != 0 ||

@@ -241,19 +241,18 @@ public class EntityManager : MonoBehaviour
     public TowerData SearchTower(int _id)
         => towerDic.TryGetValue(_id, out var _data) ? _data : towerDatas[Random.Range(0, towerDatas.Length)];
 
-    public bool CanSpawn(Vector3? _pos = null, bool _useGold = true)
-        => (!_useGold || GameManager.Instance.EnoughGold()) && SelectSlot(_pos) != default;
-
     public Tower SpawnTower(int _id = 0, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
     {
         TowerData data = SearchTower(_id);
 
         if (data == null) return null;
 
-        if (!CanSpawn(_pos, _useGold))
+        if (_useGold && !GameManager.Instance.EnoughGold())
             return null;
 
         Vector3 pos = SelectSlot(_pos);
+        if (pos == default)
+            return null;
 
         Tower tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
             .GetComponent<Tower>();

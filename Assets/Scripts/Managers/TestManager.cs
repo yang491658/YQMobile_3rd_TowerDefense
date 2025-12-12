@@ -227,7 +227,7 @@ public class TestManager : MonoBehaviour
         int limitRank = refRank.value;
         if (limitRank < 1) limitRank = 1;
 
-        for (int r = 1; r < 7; r++)
+        for (int r = 1; r < limitRank; r++)
         {
             for (int i = 0; i < len; i++)
             {
