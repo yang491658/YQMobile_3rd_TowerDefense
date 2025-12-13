@@ -43,7 +43,10 @@ public class TestManager : MonoBehaviour
 
     [Header("Entity Test")]
     [SerializeField] private bool spawn = true;
-    [SerializeField] private float totalDamage = 0f;
+    [SerializeField] private float totalDPS = 0f;
+    [Space]
+    [SerializeField] private int overCount = 0;
+    [SerializeField] private float overDPS = 0f;
 
     [Header("Test UI")]
     [SerializeField] private GameObject testUI;
@@ -54,6 +57,7 @@ public class TestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI maxScoreNum;
     [SerializeField] private TextMeshProUGUI averageScoreNum;
     [SerializeField] private TextMeshProUGUI totalDPSText;
+    [SerializeField] private TextMeshProUGUI overDPSText;
     [Space]
     [SerializeField] private SliderConfig refTower = new SliderConfig(0, 0, 1, "기준타워 : {0}");
     [SerializeField] private SliderConfig refRank = new SliderConfig(3, 1, 7, "기준랭크 : {0}");
@@ -77,6 +81,8 @@ public class TestManager : MonoBehaviour
             averageScoreNum = GameObject.Find("TestUI/AverageScore/TestNum")?.GetComponent<TextMeshProUGUI>();
         if (totalDPSText == null)
             totalDPSText = GameObject.Find("TestUI/TotalDPS/TestText")?.GetComponent<TextMeshProUGUI>();
+        if (overDPSText == null)
+            overDPSText = GameObject.Find("TestUI/TotalDPS/OverDPS")?.GetComponent<TextMeshProUGUI>();
 
         if (refTower.TMP == null)
             refTower.TMP = GameObject.Find("TestUI/RefID/TestText")?.GetComponent<TextMeshProUGUI>();
@@ -131,6 +137,12 @@ public class TestManager : MonoBehaviour
 
             AutoMergeTower();
             UpdateTotalDPS();
+            if (GameManager.Instance?.GetScore() > 1000)
+            {
+                float preTotal = overDPS * overCount++;
+                overDPS = (preTotal + totalDPS) / overCount;
+                GameManager.Instance?.GameOver();
+            }
             if (GameManager.Instance.EnoughGold())
                 if (EntityManager.Instance?.SpawnTowerByIndex(refTower.value) == null) MergeTower();
             if (EntityManager.Instance?.GetAttackTowers().Count <= 0)
@@ -384,6 +396,7 @@ public class TestManager : MonoBehaviour
         UpdateSliderUI(refRank);
 
         UpdateTotalDPS();
+        overDPSText.text = overDPS.ToString() + " / " + overCount.ToString();
     }
 
     private void UpdateTotalDPS()
@@ -392,7 +405,7 @@ public class TestManager : MonoBehaviour
 
         if (towers == null || towers.Count == 0)
         {
-            totalDamage = 0f;
+            totalDPS = 0f;
         }
         else
         {
@@ -420,10 +433,10 @@ public class TestManager : MonoBehaviour
                 sumDps += dps;
             }
 
-            totalDamage = sumDps;
+            totalDPS = sumDps;
         }
 
-        totalDPSText.text = totalDamage.ToString("#,0.0");
+        totalDPSText.text = totalDPS.ToString("#,0.0");
     }
 
     public void OnClickTest()
