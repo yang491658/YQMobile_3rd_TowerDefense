@@ -3,14 +3,15 @@ using UnityEngine;
 
 public class TowerBuff : MonoBehaviour
 {
-    [Header("Damage Buff")]
+    [Header("Buff")]
     [SerializeField][Min(0)] private int damageBonus;
     [SerializeField][Min(0)] private int speedBonus;
     [SerializeField][Min(0)] private int chanceBonus;
     [SerializeField][Min(0)] private int criticalBonus;
-    [SerializeField] private Effect buffEffect;
 
     private readonly List<Buff> buffs = new List<Buff>();
+    private readonly List<GameObject> buffEffects = new List<GameObject>();
+    [SerializeField][Min(0f)] private float effectOffset = 0.35f;
 
     private sealed class Buff
     {
@@ -88,7 +89,7 @@ public class TowerBuff : MonoBehaviour
     }
 
     #region 적용
-    private void Apply(Buff _buff, Effect _effect)
+    private void Apply(Buff _buff, Effect _effect, int _index)
     {
         if (_buff.timer <= 0f) return;
 
@@ -102,19 +103,56 @@ public class TowerBuff : MonoBehaviour
 
         buffs.Add(_buff);
         UpdateSummary();
+
+        ApplyEffect(_effect, _index);
     }
 
-    public void ApplyDamageBuff(int _percent, float _duration, Effect _effect)
-        => Apply(Buff.Damage(_percent, _duration), _effect);
+    private void ApplyEffect(Effect _effect, int _index)
+    {
+        if (_effect == null) return;
 
-    public void ApplySpeedBuff(int _percent, float _duration, Effect _effect)
-        => Apply(Buff.Speed(_percent, _duration), _effect);
+        if (_index < 1 || _index > 4)
+        {
+            Destroy(_effect.gameObject);
+            return;
+        }
 
-    public void ApplyChanceBuff(int _bonus, float _duration, Effect _effect)
-        => Apply(Buff.Chance(_bonus, _duration), _effect);
+        int index = _index - 1;
 
-    public void ApplyCriticalBuff(int _bonus, float _duration, Effect _effect)
-        => Apply(Buff.Critical(_bonus, _duration), _effect);
+        while (buffEffects.Count <= index)
+            buffEffects.Add(null);
+
+        GameObject e = buffEffects[index];
+        Destroy(e);
+        buffEffects[index] = _effect.gameObject;
+
+        Vector3 pos = Vector3.zero;
+
+        if (index == 0)
+            pos = new Vector3(-effectOffset, effectOffset, 0f);
+        else if (index == 1)
+            pos = new Vector3(effectOffset, effectOffset, 0f);
+        else if (index == 2)
+            pos = new Vector3(effectOffset, -effectOffset, 0f);
+        else if (index == 3)
+            pos = new Vector3(-effectOffset, -effectOffset, 0f);
+
+        Transform t = _effect.transform;
+        t.localPosition = pos;
+        t.localScale = Vector3.one * effectOffset;
+    }
+
+    public void ApplyDamageBuff(int _bonus, float _duration, Effect _effect = null, int _index = 1)
+        => Apply(Buff.Damage(_bonus, _duration), _effect, _index);
+
+    public void ApplySpeedBuff(int _bonus, float _duration, Effect _effect = null, int _index = 1)
+        => Apply(Buff.Speed(_bonus, _duration), _effect, _index);
+
+    public void ApplyChanceBuff(int _bonus, float _duration, Effect _effect = null, int _index = 1)
+        => Apply(Buff.Chance(_bonus, _duration), _effect, _index);
+
+    public void ApplyCriticalBuff(int _bonus, float _duration, Effect _effect = null, int _index = 1)
+        => Apply(Buff.Critical(_bonus, _duration), _effect, _index);
     #endregion
 
     #region 계산

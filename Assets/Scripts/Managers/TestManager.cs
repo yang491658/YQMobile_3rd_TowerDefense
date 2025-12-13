@@ -122,13 +122,14 @@ public class TestManager : MonoBehaviour
             AutoPlay();
         if (isAuto)
         {
-            AutoMergeTower();
-
-            if (GameManager.Instance.EnoughGold())
-                if (EntityManager.Instance?.SpawnTowerByIndex(refTower.value) == null) MergeTower();
             if (GameManager.Instance.IsGameOver && autoRoutine == null)
                 autoRoutine = StartCoroutine(AutoReplay());
 
+            AutoMergeTower();
+            if (GameManager.Instance?.GetScore() > 1000)
+                autoRoutine = StartCoroutine(AutoReplay());
+            if (GameManager.Instance.EnoughGold())
+                if (EntityManager.Instance?.SpawnTowerByIndex(refTower.value) == null) MergeTower();
             if (EntityManager.Instance?.GetAttackTowers().Count <= 0)
                 GameManager.Instance?.Replay();
         }
@@ -310,6 +311,7 @@ public class TestManager : MonoBehaviour
     #region 테스트 UI
     private void OnEnable()
     {
+        gameSpeed.value = (int)GameManager.Instance.GetSpeed();
         InitSlider(gameSpeed, ChangeGameSpeed);
         refTower.maxValue = EntityManager.Instance.GetTowerDataCount();
         InitSlider(refTower, ChangeRefTower);

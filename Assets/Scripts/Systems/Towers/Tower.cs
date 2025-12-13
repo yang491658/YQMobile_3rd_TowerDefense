@@ -308,17 +308,17 @@ public class Tower : Entity
         criticalDamage = buff.CalcCritical(critical);
     }
 
-    public void ApplyDamageBuff(int _percent, float _duration, Effect _effect)
-        => buff.ApplyDamageBuff(_percent, _duration, _effect);
+    public void ApplyDamageBuff(int _percent, float _duration, Effect _effect = null, int _index = 1)
+        => buff.ApplyDamageBuff(_percent, _duration, _effect, _index);
 
-    public void ApplySpeedBuff(int _percent, float _duration, Effect _effect)
-        => buff.ApplySpeedBuff(_percent, _duration, _effect);
+    public void ApplySpeedBuff(int _percent, float _duration, Effect _effect = null, int _index = 1)
+        => buff.ApplySpeedBuff(_percent, _duration, _effect, _index);
 
-    public void ApplyChanceBuff(int _bonus, float _duration, Effect _effect)
-        => buff.ApplyChanceBuff(_bonus, _duration, _effect);
+    public void ApplyChanceBuff(int _bonus, float _duration, Effect _effect = null, int _index = 1)
+        => buff.ApplyChanceBuff(_bonus, _duration, _effect, _index);
 
-    public void ApplyCriticalBuff(int _bonus, float _duration, Effect _effect)
-        => buff.ApplyCriticalBuff(_bonus, _duration, _effect);
+    public void ApplyCriticalBuff(int _bonus, float _duration, Effect _effect = null, int _index = 1)
+        => buff.ApplyCriticalBuff(_bonus, _duration, _effect, _index);
 
     public int CalcDamage(int _damage) => buff.CalcDamage(_damage);
     public int CalcSpeed(int _speed) => buff.CalcSpeed(_speed);

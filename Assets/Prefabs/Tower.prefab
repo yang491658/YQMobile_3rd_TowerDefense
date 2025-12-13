@@ -367,8 +367,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b080fe7aff7541e4a83ac803ef5cfe90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damagePercent: 0
-  speedPercent: 0
+  damageBonus: 0
+  speedBonus: 0
   chanceBonus: 0
   criticalBonus: 0
-  buffEffect: {fileID: 0}

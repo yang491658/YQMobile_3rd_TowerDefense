@@ -7,10 +7,8 @@ public class StatUp : TowerSkill
 {
     private enum BuffType
     {
-        [InspectorName("공격력")] Damage,
-        [InspectorName("공격속도")] Speed,
-        [InspectorName("치명타 확률")] Chance,
-        [InspectorName("치명타 피해")] Critical,
+        [InspectorName("공업")] Damage,
+        [InspectorName("속업")] Speed,
     }
 
     [SerializeField] private BuffType buffType = BuffType.Damage;
@@ -51,35 +49,38 @@ public class StatUp : TowerSkill
         for (int i = 0; i < targets.Count; i++)
         {
             Tower target = targets[i];
-            Effect e = EntityManager.Instance?.MakeEffect(_tower, target, _scale: 0.5f, _duration: duration);
+            Effect e = EntityManager.Instance?.MakeEffect(_tower, target, _duration: duration);
 
             switch (buffType)
             {
                 case BuffType.Damage:
-                    target.ApplyDamageBuff(bonus, duration, e);
+                    target.ApplyDamageBuff(bonus, duration, e, 1);
+                    target.ApplyCriticalBuff(bonus, duration);
                     break;
                 case BuffType.Speed:
-                    target.ApplySpeedBuff(bonus, duration, e);
-                    break;
-                case BuffType.Chance:
-                    target.ApplyChanceBuff(bonus, duration, e);
-                    break;
-                case BuffType.Critical:
-                    target.ApplyCriticalBuff(bonus, duration, e);
+                    target.ApplySpeedBuff(bonus, duration, e, 2);
+                    target.ApplyChanceBuff(bonus, duration);
                     break;
             }
         }
 
-        timer = cooldown;
+        timer = duration + cooldown;
 
         if (cooldownRoutine != null)
             _tower.StopCoroutine(cooldownRoutine);
 
-        cooldownRoutine = _tower.StartCoroutine(CooldownCoroutine(_tower, cooldown));
+        cooldownRoutine = _tower.StartCoroutine(CooldownCoroutine(_tower, duration, cooldown));
     }
 
-    private IEnumerator CooldownCoroutine(Tower _tower, float _cooldown)
+    private IEnumerator CooldownCoroutine(Tower _tower, float _duration, float _cooldown)
     {
+        float wait = 0f;
+        while (wait < _duration)
+        {
+            wait += Time.deltaTime;
+            yield return null;
+        }
+
         SpriteRenderer sr = _tower.GetSR();
         sr.color = Color.gray;
 

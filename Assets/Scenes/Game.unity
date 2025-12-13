@@ -14400,7 +14400,6 @@ MonoBehaviour:
   effectTrans: {fileID: 0}
   monsters: []
   towers: []
-  mapPosY: 1
   map: {fileID: 0}
   mapSlot: {fileID: 0}
   mapRoad: {fileID: 0}

@@ -31,7 +31,6 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private List<Tower> towers = new List<Tower>();
 
     [Header("Map")]
-    [SerializeField] private float mapPosY = 1f;
     [SerializeField] private Transform map;
     [SerializeField] private Transform mapSlot;
     [SerializeField] private Transform mapRoad;
@@ -70,7 +69,7 @@ public class EntityManager : MonoBehaviour
             var data = AssetDatabase.LoadAssetAtPath<TowerData>(path);
             if (data != null) tlist.Add(data);
         }
-        towerDatas = tlist.OrderBy(d => d.ID).ThenBy(d => d.Name).ToArray();
+        towerDatas = tlist.OrderBy(_d => _d.ID).ThenBy(d => d.Name).ToArray();
 
         List<Transform> plist = new List<Transform>();
         Transform[] all = Resources.FindObjectsOfTypeAll<Transform>();
@@ -402,20 +401,14 @@ public class EntityManager : MonoBehaviour
 
         Vector3 scale = new Vector3(xScale, yScale, (xScale + yScale) / 2f);
         if (scale.magnitude > 0f) map.localScale = scale;
-
-        Vector3 pos = map.position;
-        pos.y = mapPosY;
-        map.position = pos;
     }
 
     private void SetPath(float _halfX, float _halfY)
     {
-        Vector3 center = map.position;
-
-        path[0].position = new Vector3(center.x - _halfX, center.y - _halfY);
-        path[1].position = new Vector3(center.x + _halfX, center.y - _halfY);
-        path[2].position = new Vector3(center.x - _halfX, center.y + _halfY);
-        path[3].position = new Vector3(center.x + _halfX, center.y + _halfY);
+        path[0].position = new Vector3(-_halfX, -_halfY);
+        path[1].position = new Vector3(_halfX, -_halfY);
+        path[2].position = new Vector3(-_halfX, _halfY);
+        path[3].position = new Vector3(_halfX, _halfY);
     }
     #endregion
 
