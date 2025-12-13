@@ -15,9 +15,13 @@ public enum TowerRole
     [InspectorName("딜러")] Dealer,
     [InspectorName("디버프")] Debuff,
     [InspectorName("버프")] Buff,
-    [InspectorName("경제")] Economy,
+
     [InspectorName("소환")] Summon,
+    [InspectorName("자원")] Resource,
     [InspectorName("빌드")] Build,
+
+    [InspectorName("유틸")] Utility,
+    [InspectorName("특수")] Special,
 }
 
 public enum AttackTarget
