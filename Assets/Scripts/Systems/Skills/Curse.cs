@@ -1,7 +1,7 @@
-﻿using UnityEngine;
+using UnityEngine;
 
-[CreateAssetMenu(fileName = "Slow", menuName = "TowerSkill/Debuff/Slow", order = 202)]
-public class Slow : TowerSkill
+[CreateAssetMenu(fileName = "Curse", menuName = "TowerSkill/Debuff/Curse", order = 203)]
+public class Curse : TowerSkill
 {
     [Header("Skill Value")]
     [SerializeField][Min(0)] private int factor;
@@ -16,6 +16,6 @@ public class Slow : TowerSkill
     public override void OnHit(Tower _tower, Monster _target)
     {
         Effect e = EntityManager.Instance?.MakeEffect(_tower, _target, _duration: duration);
-        _target.ApplySlow(factor, duration, e);
+        _target.ApplyCurse(factor, duration, e);
     }
 }

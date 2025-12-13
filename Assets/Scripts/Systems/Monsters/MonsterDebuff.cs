@@ -21,6 +21,13 @@ public class MonsterDebuff : MonoBehaviour
     private bool hasSlow;
     [SerializeField] private Effect slowEffect;
 
+    [Header("Debuff / Curse")]
+    [SerializeField][Min(0)] private int cursePercent;
+    [SerializeField][Min(0f)] private float curseDuration;
+    private float curseTimer;
+    private bool hasCurse;
+    [SerializeField] private Effect curseEffect;
+
 #if UNITY_EDITOR
     private void OnValidate()
     {
@@ -40,9 +47,10 @@ public class MonsterDebuff : MonoBehaviour
 
         UpdateDOT(Time.deltaTime);
         UpdateSlow(Time.deltaTime);
+        UpdateCurse(Time.deltaTime);
     }
 
-    #region 도트
+    #region 도트 (지속 데미지)
     public void ApplyDOT(int _damage, float _duration, Effect _effect)
     {
         dotDamage = Mathf.Max(_damage, dotDamage);
@@ -88,10 +96,10 @@ public class MonsterDebuff : MonoBehaviour
     }
     #endregion
 
-    #region 슬로우
-    public void ApplySlow(int _slow, float _duration, Effect _effect)
+    #region 슬로우 (이속 감소)
+    public void ApplySlow(int _factor, float _duration, Effect _effect)
     {
-        slowPercent = Mathf.Max(_slow, slowPercent);
+        slowPercent = Mathf.Max(_factor, slowPercent);
         slowDuration = Mathf.Max(_duration, slowDuration);
 
         slowTimer = slowDuration;
@@ -139,9 +147,52 @@ public class MonsterDebuff : MonoBehaviour
         }
         else monster.SetSpeed(baseMoveSpeed);
     }
+    #endregion 
+
+    #region 저주 (피해 증폭)
+    public void ApplyCurse(int _factor, float _duration, Effect _effect)
+    {
+        cursePercent = Mathf.Max(_factor, cursePercent);
+        curseDuration = Mathf.Max(_duration, curseDuration);
+
+        curseTimer = curseDuration;
+        hasCurse = true;
+
+        if (curseEffect == null)
+            curseEffect = _effect;
+        else
+        {
+            Destroy(curseEffect.gameObject);
+            curseEffect = _effect;
+        }
+    }
+
+    private void UpdateCurse(float _deltaTime)
+    {
+        if (!hasCurse) return;
+
+        curseTimer -= _deltaTime;
+
+        if (curseTimer < 0f)
+        {
+            hasCurse = false;
+            cursePercent = 0;
+            curseDuration = 0f;
+
+            curseEffect = null;
+        }
+    }
+
+    public int CalcDamage(int _damage)
+    {
+        if (!hasCurse) return _damage;
+
+        int mul = 100 + cursePercent;
+        return _damage * mul / 100;
+    }
     #endregion
 
     #region GET
-    public bool HasDebuff() => hasDOT || hasSlow;
+    public bool HasDebuff() => hasDOT || hasSlow || hasCurse;
     #endregion
 }

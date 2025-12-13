@@ -14,13 +14,12 @@ public enum TowerRole
 {
     [InspectorName("딜러")] Dealer,
     [InspectorName("디버프")] Debuff,
-    [InspectorName("버프")] Buff,
 
+    [InspectorName("버프")] Buff,
     [InspectorName("소환")] Summon,
     [InspectorName("자원")] Resource,
-    [InspectorName("빌드")] Build,
 
-    [InspectorName("유틸")] Utility,
+    [InspectorName("빌드")] Build,
     [InspectorName("특수")] Special,
 }
 
@@ -63,12 +62,10 @@ public enum ValueType
 {
     [InspectorName("데미지")] Damage = 101,
     [InspectorName("개수")] Count = 102,
-    [InspectorName("수치")] Amount = 103,
-    [InspectorName("보너스")] Bonus = 104,
 
     [InspectorName("계수")] Factor = 201,
-    [InspectorName("비율")] Percent = 202,
-    [InspectorName("확률")] Chance = 203,
+    [InspectorName("확률")] Chance = 202,
+    [InspectorName("보너스")] Bonus = 203,
 
     [InspectorName("범위")] Range = 301,
     [InspectorName("속도")] Speed = 302,

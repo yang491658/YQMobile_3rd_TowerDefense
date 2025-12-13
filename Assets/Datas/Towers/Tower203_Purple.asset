@@ -10,23 +10,27 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8df2efd953c0eac439065a0cfac310fb, type: 3}
-  m_Name: Tower104_Black
+  m_Name: Tower203_Purple
   m_EditorClassIdentifier: 
-  ID: 104
-  Name: Black
-  Symbol: {fileID: 21300000, guid: 445c9f3e8cf511541869149507e1a1a5, type: 3}
-  Color: {r: 0, g: 0, b: 0, a: 1}
+  ID: 203
+  Name: Purple
+  Symbol: {fileID: 21300000, guid: 4c328dfafc05a7e4da7e0871b22fb793, type: 3}
+  Color: {r: 0.78431374, g: 0, b: 0.78431374, a: 1}
   Grade: 0
   Role: 0
-  AttackTarget: 7
+  AttackTarget: 2
   AttackDamage: 10
   AttackSpeed: 20
   CriticalChance: 5
   CriticalDamage: 150
   Skills:
-  - {fileID: 11400000, guid: 5210997bd7dfaf64cb5a65549431ecb7, type: 2}
+  - {fileID: 11400000, guid: ccd9921a9c8c72e4a886cf215435583b, type: 2}
   Values:
-  - valueType: 202
-    baseValue: 5
+  - valueType: 201
+    baseValue: 10
     rankType: 3
     rankBonus: 1
+  - valueType: 401
+    baseValue: 2.5
+    rankType: 1
+    rankBonus: 0.5

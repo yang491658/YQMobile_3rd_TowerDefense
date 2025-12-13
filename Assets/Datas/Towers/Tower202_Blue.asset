@@ -26,7 +26,7 @@ MonoBehaviour:
   Skills:
   - {fileID: 11400000, guid: 19bb69e5c69b31b45bec831caa28dc6a, type: 2}
   Values:
-  - valueType: 202
+  - valueType: 201
     baseValue: 15
     rankType: 1
     rankBonus: 5

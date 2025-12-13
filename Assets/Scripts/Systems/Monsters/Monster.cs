@@ -115,8 +115,10 @@ public class Monster : Entity
             if (reservedDamage < 0) reservedDamage = 0;
         }
 
-        SetHealth(health - _damage);
-        CreateDamage(_damage, _critical);
+        int damage = debuff.CalcDamage(_damage);
+
+        SetHealth(health - damage);
+        CreateDamage(damage, _critical);
         if (health <= 0) Die();
     }
 
@@ -199,8 +201,11 @@ public class Monster : Entity
     public void ApplyDOT(int _damage, float _duration, Effect _effect)
         => debuff.ApplyDOT(_damage, _duration, _effect);
 
-    public void ApplySlow(int _slow, float _duration, Effect _effect)
-        => debuff.ApplySlow(_slow, _duration, _effect);
+    public void ApplySlow(int _factor, float _duration, Effect _effect)
+        => debuff.ApplySlow(_factor, _duration, _effect);
+
+    public void ApplyCurse(int _factor, float _duration, Effect _effect)
+        => debuff.ApplyCurse(_factor, _duration, _effect);
     #endregion
 
     #region SET

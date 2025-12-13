@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: 302
   Name: Pink
-  Symbol: {fileID: 21300000, guid: f5b8cfcc3de3af04dbd85bfaab67fe4a, type: 3}
+  Symbol: {fileID: 21300000, guid: fab4b2520f5a8d84d99fc9bc3e77ee4b, type: 3}
   Color: {r: 1, g: 0.39215687, b: 0.5882353, a: 1}
   Grade: 0
   Role: 2
@@ -26,7 +26,7 @@ MonoBehaviour:
   Skills:
   - {fileID: 11400000, guid: e026d8117f17cb042ad89dc79c8ddca1, type: 2}
   Values:
-  - valueType: 104
+  - valueType: 203
     baseValue: 5
     rankType: 3
     rankBonus: 1
