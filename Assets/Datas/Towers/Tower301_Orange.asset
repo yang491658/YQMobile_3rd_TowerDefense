@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: 301
   Name: Orange
-  Symbol: {fileID: 21300000, guid: f3d5fa75a67f63d4ebd28de6bcf5a544, type: 3}
+  Symbol: {fileID: 21300000, guid: 705799830928dcb449a349e8e06b6843, type: 3}
   Color: {r: 1, g: 0.5882353, b: 0, a: 1}
   Grade: 0
   Role: 2

@@ -371,3 +371,4 @@ MonoBehaviour:
   speedBonus: 0
   chanceBonus: 0
   criticalBonus: 0
+  effectOffset: 0.35

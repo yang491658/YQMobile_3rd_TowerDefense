@@ -6,7 +6,7 @@ public class ADManager : MonoBehaviour
 {
     public static ADManager Instance { private set; get; }
 
-    [SerializeField][Min(0)] private float delay = 0.5f;
+    [SerializeField][Min(0f)] private float delay = 0.5f;
 
     private Canvas rootCanvas;
     private BannerView banner;

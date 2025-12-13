@@ -17,7 +17,7 @@ public class Effect : MonoBehaviour
         sr.color = _tower.GetColor();
         sr.sprite = _tower.GetSymbol();
 
-        transform.localScale *= _scale;
+        transform.localScale = Vector3.one * _scale;
 
         if (_duration > 0f)
             StartCoroutine(EffectCoroutine(sr.color.a, _duration));

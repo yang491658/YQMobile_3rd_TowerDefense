@@ -548,3 +548,6 @@ MonoBehaviour:
   slowPercent: 0
   slowDuration: 0
   slowEffect: {fileID: 0}
+  cursePercent: 0
+  curseDuration: 0
+  curseEffect: {fileID: 0}
