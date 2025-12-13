@@ -11,6 +11,7 @@ public class TowerBuff : MonoBehaviour
 
     private readonly List<Buff> buffs = new List<Buff>();
     private readonly List<GameObject> buffEffects = new List<GameObject>();
+    private readonly List<int> buffOrders = new List<int>();
     [SerializeField][Min(0f)] private float effectOffset = 0.35f;
 
     private sealed class Buff
@@ -20,6 +21,7 @@ public class TowerBuff : MonoBehaviour
         public int chanceBonus;
         public int criticalBonus;
         public float timer;
+        public int order;
 
         public Buff(
             int _damageBonus = 0,
@@ -33,6 +35,7 @@ public class TowerBuff : MonoBehaviour
             chanceBonus = _chanceBonus;
             criticalBonus = _criticalBonus;
             timer = _duration;
+            order = 0;
         }
 
         public static Buff Damage(int _bonus, float _duration)
@@ -60,7 +63,19 @@ public class TowerBuff : MonoBehaviour
             buff.timer -= dt;
 
             if (buff.timer <= 0f)
+            {
+                int order = buff.order;
                 buffs.RemoveAt(i);
+
+                if (order > 0)
+                {
+                    bool alive = false;
+                    for (int j = 0; j < buffs.Count; j++)
+                        if (buffs[j].order == order) { alive = true; break; }
+
+                    if (!alive) RemoveEffect(order);
+                }
+            }
         }
 
         UpdateSummary();
@@ -89,7 +104,7 @@ public class TowerBuff : MonoBehaviour
     }
 
     #region 적용
-    private void Apply(Buff _buff, Effect _effect, int _index)
+    private void Apply(Buff _buff, Effect _effect, int _order)
     {
         if (_buff.timer <= 0f) return;
 
@@ -101,58 +116,122 @@ public class TowerBuff : MonoBehaviour
 
         if (!hasValue) return;
 
+        _buff.order = _order;
+
         buffs.Add(_buff);
         UpdateSummary();
 
-        ApplyEffect(_effect, _index);
+        ApplyEffect(_effect, _order);
     }
 
-    private void ApplyEffect(Effect _effect, int _index)
+    public void ApplyDamageBuff(int _bonus, float _duration, Effect _effect = null, int _order = 1)
+        => Apply(Buff.Damage(_bonus, _duration), _effect, _order);
+
+    public void ApplySpeedBuff(int _bonus, float _duration, Effect _effect = null, int _order = 1)
+        => Apply(Buff.Speed(_bonus, _duration), _effect, _order);
+
+    public void ApplyChanceBuff(int _bonus, float _duration, Effect _effect = null, int _order = 1)
+        => Apply(Buff.Chance(_bonus, _duration), _effect, _order);
+
+    public void ApplyCriticalBuff(int _bonus, float _duration, Effect _effect = null, int _order = 1)
+        => Apply(Buff.Critical(_bonus, _duration), _effect, _order);
+    #endregion
+
+    #region 이펙트
+    private void ApplyEffect(Effect _effect, int _order)
     {
         if (_effect == null) return;
 
-        if (_index < 1 || _index > 4)
+        if (_order <= 0)
         {
             Destroy(_effect.gameObject);
             return;
         }
 
-        int index = _index - 1;
+        int idx = buffOrders.IndexOf(_order);
+        if (idx >= 0)
+        {
+            GameObject old = buffEffects[idx];
+            if (old != null)
+                Destroy(old);
 
-        while (buffEffects.Count <= index)
-            buffEffects.Add(null);
+            buffEffects[idx] = _effect.gameObject;
+        }
+        else
+        {
+            if (buffOrders.Count >= 4)
+            {
+                Destroy(_effect.gameObject);
+                return;
+            }
 
-        GameObject e = buffEffects[index];
-        Destroy(e);
-        buffEffects[index] = _effect.gameObject;
+            buffOrders.Add(_order);
+            buffEffects.Add(_effect.gameObject);
+        }
 
-        Vector3 pos = Vector3.zero;
-
-        if (index == 0)
-            pos = new Vector3(-effectOffset, effectOffset, 0f);
-        else if (index == 1)
-            pos = new Vector3(effectOffset, effectOffset, 0f);
-        else if (index == 2)
-            pos = new Vector3(effectOffset, -effectOffset, 0f);
-        else if (index == 3)
-            pos = new Vector3(-effectOffset, -effectOffset, 0f);
-
-        Transform t = _effect.transform;
-        t.localPosition = pos;
-        t.localScale = Vector3.one * effectOffset;
+        SortEffect();
+        UpdateEffect();
     }
 
-    public void ApplyDamageBuff(int _bonus, float _duration, Effect _effect = null, int _index = 1)
-        => Apply(Buff.Damage(_bonus, _duration), _effect, _index);
+    private void SortEffect()
+    {
+        for (int i = 0; i < buffOrders.Count - 1; i++)
+        {
+            for (int j = i + 1; j < buffOrders.Count; j++)
+            {
+                if (buffOrders[j] < buffOrders[i])
+                {
+                    int tmpP = buffOrders[i];
+                    buffOrders[i] = buffOrders[j];
+                    buffOrders[j] = tmpP;
 
-    public void ApplySpeedBuff(int _bonus, float _duration, Effect _effect = null, int _index = 1)
-        => Apply(Buff.Speed(_bonus, _duration), _effect, _index);
+                    GameObject tmpE = buffEffects[i];
+                    buffEffects[i] = buffEffects[j];
+                    buffEffects[j] = tmpE;
+                }
+            }
+        }
+    }
 
-    public void ApplyChanceBuff(int _bonus, float _duration, Effect _effect = null, int _index = 1)
-        => Apply(Buff.Chance(_bonus, _duration), _effect, _index);
+    private void UpdateEffect()
+    {
+        for (int i = 0; i < buffEffects.Count; i++)
+        {
+            GameObject go = buffEffects[i];
+            if (go == null) continue;
 
-    public void ApplyCriticalBuff(int _bonus, float _duration, Effect _effect = null, int _index = 1)
-        => Apply(Buff.Critical(_bonus, _duration), _effect, _index);
+            Vector3 pos = Vector3.zero;
+
+            switch (i)
+            {
+                case 0: pos = new Vector3(effectOffset, effectOffset, 0f); break;
+                case 1: pos = new Vector3(-effectOffset, effectOffset, 0f); break;
+                case 2: pos = new Vector3(-effectOffset, -effectOffset, 0f); break;
+                case 3: pos = new Vector3(effectOffset, -effectOffset, 0f); break;
+            }
+
+            Transform t = go.transform;
+            t.localPosition = pos;
+            t.localScale = Vector3.one * effectOffset;
+        }
+    }
+
+    private void RemoveEffect(int _order)
+    {
+        if (_order <= 0) return;
+
+        int idx = buffOrders.IndexOf(_order);
+        if (idx < 0) return;
+
+        GameObject go = buffEffects[idx];
+        if (go != null)
+            Destroy(go);
+
+        buffOrders.RemoveAt(idx);
+        buffEffects.RemoveAt(idx);
+
+        UpdateEffect();
+    }
     #endregion
 
     #region 계산
