@@ -54,7 +54,7 @@ public class TestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI averageScoreNum;
     [Space]
     [SerializeField] private SliderConfig refTower = new SliderConfig(0, 0, 1, "기준타워 : {0}");
-    [SerializeField] private SliderConfig refRank = new SliderConfig(4, 1, 7, "기준랭크 : {0}");
+    [SerializeField] private SliderConfig refRank = new SliderConfig(3, 1, 7, "기준랭크 : {0}");
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -351,12 +351,7 @@ public class TestManager : MonoBehaviour
     private void ApplySlider(ref SliderConfig _config, float _value, System.Action<int> _afterAction = null)
     {
         _config.value = ChangeSlider(_value, _config);
-
-        if (string.IsNullOrEmpty(_config.format))
-            _config.TMP.text = _config.value.ToString();
-        else
-            _config.TMP.text = string.Format(_config.format, _config.value);
-
+        UpdateSliderUI(_config);
         _afterAction?.Invoke(_config.value);
     }
 
@@ -369,7 +364,7 @@ public class TestManager : MonoBehaviour
 
         _config.slider.value = _config.value;
     }
-    private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, v => GameManager.Instance?.SetSpeed(v, true));
+    private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, _v => GameManager.Instance?.SetSpeed(_v, true));
     private void ChangeRefTower(float _value) => ApplySlider(ref refTower, _value);
     private void ChangeRefRank(float _value) => ApplySlider(ref refRank, _value);
 
