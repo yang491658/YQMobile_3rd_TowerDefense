@@ -33,7 +33,7 @@ public class Chain : TowerSkill
 
         while (hits++ < _count)
         {
-            if (index >= EntityManager.Instance?.GetMonsterCount())
+            if (index >= EntityManager.Instance.GetMonsterCount())
                 yield break;
 
             Monster mon = EntityManager.Instance?.GetMonsterByIndex(index++);

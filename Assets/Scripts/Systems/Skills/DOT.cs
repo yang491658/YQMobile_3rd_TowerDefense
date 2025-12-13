@@ -5,7 +5,7 @@ public class DOT : TowerSkill
 {
     [Header("Skill Value")]
     [SerializeField][Min(0)] private int damage;
-    [SerializeField][Min(0)] private float duration;
+    [SerializeField][Min(0f)] private float duration;
 
     public override void SetValues(Tower _tower)
     {

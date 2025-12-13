@@ -82,7 +82,7 @@ public class TestManager : MonoBehaviour
         if (totalDPSText == null)
             totalDPSText = GameObject.Find("TestUI/TotalDPS/TestText")?.GetComponent<TextMeshProUGUI>();
         if (overDPSText == null)
-            overDPSText = GameObject.Find("TestUI/TotalDPS/OverDPS")?.GetComponent<TextMeshProUGUI>();
+            overDPSText = GameObject.Find("TestUI/OverDPS/TestText")?.GetComponent<TextMeshProUGUI>();
 
         if (refTower.TMP == null)
             refTower.TMP = GameObject.Find("TestUI/RefID/TestText")?.GetComponent<TextMeshProUGUI>();
@@ -132,21 +132,22 @@ public class TestManager : MonoBehaviour
             AutoPlay();
         if (isAuto)
         {
-            if (GameManager.Instance.IsGameOver && autoRoutine == null)
-                autoRoutine = StartCoroutine(AutoReplay());
-
-            AutoMergeTower();
-            UpdateTotalDPS();
-            if (GameManager.Instance?.GetScore() > 1000)
+            if (GameManager.Instance.IsGameOver)
             {
-                float preTotal = overDPS * overCount++;
-                overDPS = (preTotal + totalDPS) / overCount;
-                GameManager.Instance?.GameOver();
+                if (autoRoutine == null)
+                    autoRoutine = StartCoroutine(AutoReplay());
             }
-            if (GameManager.Instance.EnoughGold())
-                if (EntityManager.Instance?.SpawnTowerByIndex(refTower.value) == null) MergeTower();
-            if (EntityManager.Instance?.GetAttackTowers().Count <= 0)
-                GameManager.Instance?.Replay();
+            else
+            {
+                AutoMergeTower();
+                UpdateTotalDPS();
+                if (GameManager.Instance?.GetScore() > 1000)
+                    GameManager.Instance?.GameOver();
+                if (GameManager.Instance.EnoughGold())
+                    if (EntityManager.Instance?.SpawnTowerByIndex(refTower.value) == null) MergeTower();
+                if (EntityManager.Instance?.GetAttackTowers().Count <= 0)
+                    GameManager.Instance?.Replay();
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.L)) GiveGold();
@@ -226,14 +227,19 @@ public class TestManager : MonoBehaviour
             maxScore = Mathf.Max(score, maxScore);
             averageScore = totalScore / ++testCount;
 
-            UpdateTestUI();
+            if (score > 1000)
+            {
+                float preTotal = overDPS * overCount++;
+                overDPS = (preTotal + totalDPS) / overCount;
+            }
 
+            UpdateTestUI();
             GameManager.Instance?.Replay();
         }
         autoRoutine = null;
     }
 
-    private void GiveGold() => GameManager.Instance?.GoldUp(1_0000);
+    private void GiveGold() => GameManager.Instance?.GoldUp(100_0000);
 
     private void AutoMergeTower()
     {
@@ -396,7 +402,7 @@ public class TestManager : MonoBehaviour
         UpdateSliderUI(refRank);
 
         UpdateTotalDPS();
-        overDPSText.text = overDPS.ToString() + " / " + overCount.ToString();
+        overDPSText.text = overDPS.ToString("#,0.0") + " / " + overCount.ToString();
     }
 
     private void UpdateTotalDPS()
@@ -450,6 +456,9 @@ public class TestManager : MonoBehaviour
         maxScore = 0;
         totalScore = 0;
         averageScore = 0;
+
+        overDPS = 0f;
+        overCount = 0;
 
         UpdateTestUI();
     }
