@@ -53,7 +53,7 @@ public class TestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI testCountNum;
     [SerializeField] private TextMeshProUGUI maxScoreNum;
     [SerializeField] private TextMeshProUGUI averageScoreNum;
-    [SerializeField] private TextMeshProUGUI totalDPSNum;
+    [SerializeField] private TextMeshProUGUI totalDPSText;
     [Space]
     [SerializeField] private SliderConfig refTower = new SliderConfig(0, 0, 1, "기준타워 : {0}");
     [SerializeField] private SliderConfig refRank = new SliderConfig(3, 1, 7, "기준랭크 : {0}");
@@ -75,8 +75,8 @@ public class TestManager : MonoBehaviour
             maxScoreNum = GameObject.Find("TestUI/MaxScore/TestNum")?.GetComponent<TextMeshProUGUI>();
         if (averageScoreNum == null)
             averageScoreNum = GameObject.Find("TestUI/AverageScore/TestNum")?.GetComponent<TextMeshProUGUI>();
-        if (totalDPSNum == null)
-            totalDPSNum = GameObject.Find("TestUI/TotalDPS/TestNum")?.GetComponent<TextMeshProUGUI>();
+        if (totalDPSText == null)
+            totalDPSText = GameObject.Find("TestUI/TotalDPS/TestText")?.GetComponent<TextMeshProUGUI>();
 
         if (refTower.TMP == null)
             refTower.TMP = GameObject.Find("TestUI/RefID/TestText")?.GetComponent<TextMeshProUGUI>();
@@ -388,7 +388,7 @@ public class TestManager : MonoBehaviour
 
     private void UpdateTotalDPS()
     {
-        List<Tower> towers = EntityManager.Instance?.GetTowers();
+        List<Tower> towers = EntityManager.Instance?.GetAttackTowers();
 
         if (towers == null || towers.Count == 0)
         {
@@ -423,7 +423,7 @@ public class TestManager : MonoBehaviour
             totalDamage = sumDps;
         }
 
-        totalDPSNum.text = totalDamage.ToString("F1");
+        totalDPSText.text = totalDamage.ToString("#,0.0");
     }
 
     public void OnClickTest()

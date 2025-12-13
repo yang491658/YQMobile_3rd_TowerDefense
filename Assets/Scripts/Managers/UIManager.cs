@@ -262,7 +262,7 @@ public class UIManager : MonoBehaviour
         countRoutine = null;
     }
 
-    private string FormatNumber(int _number, bool _full)
+    private string FormatNumber(int _number, bool _full = false)
     {
         if (_full && _number < 10000)
             return _number.ToString("0000");
@@ -381,8 +381,8 @@ public class UIManager : MonoBehaviour
 
     public void UpdateGold(int _gold)
     {
-        currentGoldNum.text = FormatNumber(_gold, false);
-        needGoldNum.text = "/ " + FormatNumber(GameManager.Instance.GetNeedGold(), false);
+        currentGoldNum.text = FormatNumber(_gold);
+        needGoldNum.text = "/ " + FormatNumber(GameManager.Instance.GetNeedGold());
 
         goldbtn.interactable = GameManager.Instance.EnoughGold();
     }
