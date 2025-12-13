@@ -64,23 +64,16 @@ public class StatUp : TowerSkill
             }
         }
 
-        timer = duration + cooldown;
+        timer = cooldown;
 
         if (cooldownRoutine != null)
             _tower.StopCoroutine(cooldownRoutine);
 
-        cooldownRoutine = _tower.StartCoroutine(CooldownCoroutine(_tower, duration, cooldown));
+        cooldownRoutine = _tower.StartCoroutine(CooldownCoroutine(_tower, cooldown));
     }
 
-    private IEnumerator CooldownCoroutine(Tower _tower, float _duration, float _cooldown)
+    private IEnumerator CooldownCoroutine(Tower _tower, float _cooldown)
     {
-        float wait = 0f;
-        while (wait < _duration)
-        {
-            wait += Time.deltaTime;
-            yield return null;
-        }
-
         SpriteRenderer sr = _tower.GetSR();
         sr.color = Color.gray;
 

@@ -43,6 +43,7 @@ public class TestManager : MonoBehaviour
 
     [Header("Entity Test")]
     [SerializeField] private bool spawn = true;
+    [SerializeField] private float totalDamage = 0f;
 
     [Header("Test UI")]
     [SerializeField] private GameObject testUI;
@@ -52,6 +53,7 @@ public class TestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI testCountNum;
     [SerializeField] private TextMeshProUGUI maxScoreNum;
     [SerializeField] private TextMeshProUGUI averageScoreNum;
+    [SerializeField] private TextMeshProUGUI totalDPSNum;
     [Space]
     [SerializeField] private SliderConfig refTower = new SliderConfig(0, 0, 1, "기준타워 : {0}");
     [SerializeField] private SliderConfig refRank = new SliderConfig(3, 1, 7, "기준랭크 : {0}");
@@ -73,6 +75,8 @@ public class TestManager : MonoBehaviour
             maxScoreNum = GameObject.Find("TestUI/MaxScore/TestNum")?.GetComponent<TextMeshProUGUI>();
         if (averageScoreNum == null)
             averageScoreNum = GameObject.Find("TestUI/AverageScore/TestNum")?.GetComponent<TextMeshProUGUI>();
+        if (totalDPSNum == null)
+            totalDPSNum = GameObject.Find("TestUI/TotalDPS/TestNum")?.GetComponent<TextMeshProUGUI>();
 
         if (refTower.TMP == null)
             refTower.TMP = GameObject.Find("TestUI/RefID/TestText")?.GetComponent<TextMeshProUGUI>();
@@ -126,8 +130,7 @@ public class TestManager : MonoBehaviour
                 autoRoutine = StartCoroutine(AutoReplay());
 
             AutoMergeTower();
-            if (GameManager.Instance?.GetScore() > 1000)
-                autoRoutine = StartCoroutine(AutoReplay());
+            UpdateTotalDPS();
             if (GameManager.Instance.EnoughGold())
                 if (EntityManager.Instance?.SpawnTowerByIndex(refTower.value) == null) MergeTower();
             if (EntityManager.Instance?.GetAttackTowers().Count <= 0)
@@ -379,6 +382,48 @@ public class TestManager : MonoBehaviour
         UpdateSliderUI(gameSpeed);
         UpdateSliderUI(refTower);
         UpdateSliderUI(refRank);
+
+        UpdateTotalDPS();
+    }
+
+    private void UpdateTotalDPS()
+    {
+        List<Tower> towers = EntityManager.Instance?.GetTowers();
+
+        if (towers == null || towers.Count == 0)
+        {
+            totalDamage = 0f;
+        }
+        else
+        {
+            float sumDps = 0f;
+
+            for (int i = 0; i < towers.Count; i++)
+            {
+                Tower t = towers[i];
+                if (t == null) continue;
+
+                float damage = t.GetDamage();
+                float speed = t.GetSpeed();
+                float critChance = t.GetCriticalChance();
+                float critDamage = t.GetCriticalDamage();
+
+                if (speed <= 0f || damage <= 0f)
+                    continue;
+
+                float chance = critChance / 100f;
+                float critMul = critDamage / 100f;
+                float expectedPerHit = damage * (1f + (critMul - 1f) * chance);
+                float attacksPerSecond = speed / 60f;
+                float dps = expectedPerHit * attacksPerSecond;
+
+                sumDps += dps;
+            }
+
+            totalDamage = sumDps;
+        }
+
+        totalDPSNum.text = totalDamage.ToString("F1");
     }
 
     public void OnClickTest()

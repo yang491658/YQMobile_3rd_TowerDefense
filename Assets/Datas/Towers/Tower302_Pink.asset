@@ -27,7 +27,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e026d8117f17cb042ad89dc79c8ddca1, type: 2}
   Values:
   - valueType: 104
-    baseValue: 10
+    baseValue: 5
     rankType: 3
     rankBonus: 1
   - valueType: 401
