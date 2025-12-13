@@ -17,7 +17,6 @@ public class StatUp : TowerSkill
 
     [Header("Skill")]
     [SerializeField][Min(0)] private int bonus;
-    [SerializeField][Min(0)] private int count;
     [SerializeField][Min(0f)] private float duration;
     [SerializeField][Min(0f)] private float cooldown;
 
@@ -26,8 +25,7 @@ public class StatUp : TowerSkill
 
     public override void SetValues(Tower _tower)
     {
-        bonus = _tower.GetValueInt(ValueType.Percent);
-        count = _tower.GetValueInt(ValueType.Count);
+        bonus = _tower.GetValueInt(ValueType.Bonus);
         duration = _tower.GetValue(ValueType.Duration);
         cooldown = _tower.GetValue(ValueType.Cooldown);
     }
@@ -47,8 +45,7 @@ public class StatUp : TowerSkill
 
     private void ApplyBuff(Tower _tower)
     {
-        List<Tower> targets = EntityManager.Instance?.GetAttackTowers(count);
-
+        List<Tower> targets = EntityManager.Instance?.GetAttackTowers();
         if (targets.Count == 0) return;
 
         for (int i = 0; i < targets.Count; i++)

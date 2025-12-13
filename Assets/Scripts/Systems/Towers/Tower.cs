@@ -348,6 +348,8 @@ public class Tower : Entity
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnGenerate(this);
     }
+    
+    public void SetSymbolColor(Color _color) => symbolSR.color = _color;
 
     public void SetRank(int _rank)
     {

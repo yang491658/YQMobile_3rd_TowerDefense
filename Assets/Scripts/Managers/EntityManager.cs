@@ -31,6 +31,7 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private List<Tower> towers = new List<Tower>();
 
     [Header("Map")]
+    [SerializeField] private float mapPosY = 1f;
     [SerializeField] private Transform map;
     [SerializeField] private Transform mapSlot;
     [SerializeField] private Transform mapRoad;
@@ -401,14 +402,20 @@ public class EntityManager : MonoBehaviour
 
         Vector3 scale = new Vector3(xScale, yScale, (xScale + yScale) / 2f);
         if (scale.magnitude > 0f) map.localScale = scale;
+
+        Vector3 pos = map.position;
+        pos.y = mapPosY;
+        map.position = pos;
     }
 
     private void SetPath(float _halfX, float _halfY)
     {
-        path[0].position = new Vector3(-_halfX, -_halfY);
-        path[1].position = new Vector3(_halfX, -_halfY);
-        path[2].position = new Vector3(-_halfX, _halfY);
-        path[3].position = new Vector3(_halfX, _halfY);
+        Vector3 center = map.position;
+
+        path[0].position = new Vector3(center.x - _halfX, center.y - _halfY);
+        path[1].position = new Vector3(center.x + _halfX, center.y - _halfY);
+        path[2].position = new Vector3(center.x - _halfX, center.y + _halfY);
+        path[3].position = new Vector3(center.x + _halfX, center.y + _halfY);
     }
     #endregion
 
@@ -593,33 +600,19 @@ public class EntityManager : MonoBehaviour
 
     #region GET_타워
     public int GetTowerDataCount() => towerDatas.Length;
-    public List<Tower> GetTowers() => towers;
 
-    public List<Tower> GetAttackTowers(int _count = 0)
+    public List<Tower> GetTowers() => towers;
+    public List<Tower> GetAttackTowers()
     {
-        List<Tower> candidates = new List<Tower>();
+        List<Tower> list = new List<Tower>();
         for (int i = 0; i < towers.Count; i++)
         {
             Tower tower = towers[i];
-            if (tower == null) continue;
-            if (tower.GetDamage() <= 0) continue;
+            if (tower == null || tower.GetDamage() <= 0) continue;
 
-            candidates.Add(tower);
+            list.Add(tower);
         }
-
-        int total = candidates.Count;
-        if (total == 0) return candidates;
-        if (_count <= 0 || _count >= total) return candidates;
-
-        List<Tower> result = new List<Tower>();
-        for (int i = 0; i < _count && candidates.Count > 0; i++)
-        {
-            int index = Random.Range(0, candidates.Count);
-            result.Add(candidates[index]);
-            candidates.RemoveAt(index);
-        }
-
-        return result;
+        return list;
     }
 
     public Tower GetTowerRandom()

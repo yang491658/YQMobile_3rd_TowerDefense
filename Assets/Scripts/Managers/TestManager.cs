@@ -129,7 +129,7 @@ public class TestManager : MonoBehaviour
             if (GameManager.Instance.IsGameOver && autoRoutine == null)
                 autoRoutine = StartCoroutine(AutoReplay());
 
-            if (EntityManager.Instance?.GetAttackTowers(0).Count <= 0)
+            if (EntityManager.Instance?.GetAttackTowers().Count <= 0)
                 GameManager.Instance?.Replay();
         }
 
@@ -152,7 +152,7 @@ public class TestManager : MonoBehaviour
         for (int i = 1; i <= 10; i++)
         {
             KeyCode key = (i == 10) ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha0 + i);
-            if (Input.GetKey(key))
+            if (Input.GetKeyDown(key))
             {
                 EntityManager.Instance?.SpawnTowerByIndex(i, 1, _useGold: false);
                 break;
