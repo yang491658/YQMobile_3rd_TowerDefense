@@ -10,8 +10,7 @@ public class TowerBuff : MonoBehaviour
     [SerializeField][Min(0)] private int criticalBonus;
 
     private readonly List<Buff> buffs = new List<Buff>();
-    private readonly List<GameObject> buffEffects = new List<GameObject>();
-    private readonly List<int> buffOrders = new List<int>();
+    private readonly GameObject[] buffEffects = new GameObject[4];
     [SerializeField][Min(0f)] private float effectOffset = 0.35f;
 
     private sealed class Buff
@@ -148,54 +147,25 @@ public class TowerBuff : MonoBehaviour
             return;
         }
 
-        int idx = buffOrders.IndexOf(_order);
-        if (idx >= 0)
+        int idx = _order - 1;
+        if (idx < 0 || idx >= buffEffects.Length)
         {
-            GameObject old = buffEffects[idx];
-            if (old != null)
-                Destroy(old);
-
-            buffEffects[idx] = _effect.gameObject;
-        }
-        else
-        {
-            if (buffOrders.Count >= 4)
-            {
-                Destroy(_effect.gameObject);
-                return;
-            }
-
-            buffOrders.Add(_order);
-            buffEffects.Add(_effect.gameObject);
+            Destroy(_effect.gameObject);
+            return;
         }
 
-        SortEffect();
+        GameObject old = buffEffects[idx];
+        if (old != null)
+            Destroy(old);
+
+        buffEffects[idx] = _effect.gameObject;
+
         UpdateEffect();
-    }
-
-    private void SortEffect()
-    {
-        for (int i = 0; i < buffOrders.Count - 1; i++)
-        {
-            for (int j = i + 1; j < buffOrders.Count; j++)
-            {
-                if (buffOrders[j] < buffOrders[i])
-                {
-                    int tmpP = buffOrders[i];
-                    buffOrders[i] = buffOrders[j];
-                    buffOrders[j] = tmpP;
-
-                    GameObject tmpE = buffEffects[i];
-                    buffEffects[i] = buffEffects[j];
-                    buffEffects[j] = tmpE;
-                }
-            }
-        }
     }
 
     private void UpdateEffect()
     {
-        for (int i = 0; i < buffEffects.Count; i++)
+        for (int i = 0; i < buffEffects.Length; i++)
         {
             GameObject go = buffEffects[i];
             if (go == null) continue;
@@ -205,9 +175,9 @@ public class TowerBuff : MonoBehaviour
             switch (i)
             {
                 case 0: pos = new Vector3(effectOffset, effectOffset, 0f); break;
-                case 1: pos = new Vector3(-effectOffset, effectOffset, 0f); break;
+                case 1: pos = new Vector3(effectOffset, -effectOffset, 0f); break;
                 case 2: pos = new Vector3(-effectOffset, -effectOffset, 0f); break;
-                case 3: pos = new Vector3(effectOffset, -effectOffset, 0f); break;
+                case 3: pos = new Vector3(-effectOffset, effectOffset, 0f); break;
             }
 
             Transform t = go.transform;
@@ -220,17 +190,14 @@ public class TowerBuff : MonoBehaviour
     {
         if (_order <= 0) return;
 
-        int idx = buffOrders.IndexOf(_order);
-        if (idx < 0) return;
+        int idx = _order - 1;
+        if (idx < 0 || idx >= buffEffects.Length) return;
 
         GameObject go = buffEffects[idx];
         if (go != null)
             Destroy(go);
 
-        buffOrders.RemoveAt(idx);
-        buffEffects.RemoveAt(idx);
-
-        UpdateEffect();
+        buffEffects[idx] = null;
     }
     #endregion
 

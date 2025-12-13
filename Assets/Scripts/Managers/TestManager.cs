@@ -45,8 +45,11 @@ public class TestManager : MonoBehaviour
     [SerializeField] private bool spawn = true;
     [SerializeField] private float totalDPS = 0f;
     [Space]
+    [SerializeField] private float overAverageDPS = 0f;
     [SerializeField] private int overCount = 0;
-    [SerializeField] private float overDPS = 0f;
+    [Space]
+    [SerializeField] private float underMaxDPS = 0f;
+    [SerializeField] private int underCount = 0;
 
     [Header("Test UI")]
     [SerializeField] private GameObject testUI;
@@ -58,6 +61,7 @@ public class TestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI averageScoreNum;
     [SerializeField] private TextMeshProUGUI totalDPSText;
     [SerializeField] private TextMeshProUGUI overDPSText;
+    [SerializeField] private TextMeshProUGUI underDPSText;
     [Space]
     [SerializeField] private SliderConfig refTower = new SliderConfig(0, 0, 1, "기준타워 : {0}");
     [SerializeField] private SliderConfig refRank = new SliderConfig(3, 1, 7, "기준랭크 : {0}");
@@ -83,6 +87,8 @@ public class TestManager : MonoBehaviour
             totalDPSText = GameObject.Find("TestUI/TotalDPS/TestText")?.GetComponent<TextMeshProUGUI>();
         if (overDPSText == null)
             overDPSText = GameObject.Find("TestUI/OverDPS/TestText")?.GetComponent<TextMeshProUGUI>();
+        if (underDPSText == null)
+            underDPSText = GameObject.Find("TestUI/UnderDPS/TestText")?.GetComponent<TextMeshProUGUI>();
 
         if (refTower.TMP == null)
             refTower.TMP = GameObject.Find("TestUI/RefID/TestText")?.GetComponent<TextMeshProUGUI>();
@@ -191,12 +197,17 @@ public class TestManager : MonoBehaviour
             }
         }
         if (Input.GetKeyDown(KeyCode.BackQuote)) OnClickTest();
-        if (Input.GetKeyDown(KeyCode.UpArrow)) ChangeGameSpeed(++gameSpeed.value);
-        if (Input.GetKeyDown(KeyCode.DownArrow)) ChangeGameSpeed(--gameSpeed.value);
         if (Input.GetKey(KeyCode.RightShift))
         {
-            if (Input.GetKeyDown(KeyCode.UpArrow)) ChangeGameSpeed(gameSpeed.value == gameSpeed.maxValue ? 3 : gameSpeed.maxValue);
-            if (Input.GetKeyDown(KeyCode.DownArrow)) ChangeGameSpeed(gameSpeed.value == gameSpeed.minValue ? 3 : gameSpeed.minValue);
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+                ChangeGameSpeed(gameSpeed.value == gameSpeed.maxValue ? GameManager.Instance.GetMaxSpeed() : gameSpeed.maxValue);
+            else if (Input.GetKeyDown(KeyCode.DownArrow))
+                ChangeGameSpeed(gameSpeed.value == gameSpeed.minValue ? GameManager.Instance.GetMaxSpeed() : gameSpeed.minValue);
+        }
+        else
+        {
+            if (Input.GetKeyDown(KeyCode.UpArrow)) ChangeGameSpeed(++gameSpeed.value);
+            else if (Input.GetKeyDown(KeyCode.DownArrow)) ChangeGameSpeed(--gameSpeed.value);
         }
         #endregion
     }
@@ -222,9 +233,10 @@ public class TestManager : MonoBehaviour
 
             if (score > 1000)
             {
-                float preTotal = overDPS * overCount++;
-                overDPS = (preTotal + totalDPS) / overCount;
+                float preTotal = overAverageDPS * overCount++;
+                overAverageDPS = (preTotal + totalDPS) / overCount;
             }
+            else underMaxDPS = Mathf.Max(totalDPS, underMaxDPS);
 
             UpdateTestUI();
             GameManager.Instance?.Replay();
@@ -396,7 +408,8 @@ public class TestManager : MonoBehaviour
         UpdateSliderUI(refRank);
 
         UpdateTotalDPS();
-        overDPSText.text = $"{overDPS.ToString("#,0.0")} ({overCount.ToString()})";
+        overDPSText.text = $"{overAverageDPS.ToString("#,0.0")} ({overCount.ToString()})";
+        underDPSText.text = $"{underMaxDPS.ToString("#,0.0")} ({underCount.ToString()})";
     }
 
     private void UpdateTotalDPS()
@@ -451,8 +464,10 @@ public class TestManager : MonoBehaviour
         totalScore = 0;
         averageScore = 0;
 
-        overDPS = 0f;
+        overAverageDPS = 0f;
         overCount = 0;
+        underMaxDPS = 0f;
+        underCount = 0;
 
         UpdateTestUI();
     }
