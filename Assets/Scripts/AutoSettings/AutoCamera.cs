@@ -7,21 +7,25 @@ public class AutoCamera : MonoBehaviour
     private int lastW, lastH;
 
     [SerializeField] private Vector2 res = new Vector2(1080, 1920);
-    [SerializeField][Min(0f)] private float baseSize = 10f;
     [SerializeField][Min(0f)] private float minSize = 10f;
 
-    public static float SizeDelta { private set; get; } = 0f;
-    public static Vector2 RefResolution { private set; get; }
-    public static float RefAspect { private set; get; }
+    public static float OrthoSize { private set; get; }
+    public static Vector2 Resolution { private set; get; }
+    public static float Aspect { private set; get; }
+
     public static Rect WorldRect { private set; get; }
+    public static float SizeDelta { private set; get; } = 0f;
 
 #if UNITY_EDITOR
     private void OnValidate()
     {
         if (!Application.isPlaying)
         {
-            RefResolution = res;
-            RefAspect = res.x / res.y;
+            cam = GetComponent<Camera>();
+            OrthoSize = cam.orthographicSize;
+
+            Resolution = res;
+            Aspect = res.x / res.y;
         }
     }
 #endif
@@ -31,8 +35,9 @@ public class AutoCamera : MonoBehaviour
         cam = GetComponent<Camera>();
         cam.orthographic = true;
 
-        RefResolution = res;
-        RefAspect = res.x / res.y;
+        OrthoSize = cam.orthographicSize;
+        Resolution = res;
+        Aspect = res.x / res.y;
 
         Apply(true);
     }
@@ -53,7 +58,7 @@ public class AutoCamera : MonoBehaviour
         if (ch == 0) return;
 
         float currentAspect = (float)cw / ch;
-        float size = baseSize * (RefAspect / currentAspect);
+        float size = OrthoSize * (Aspect / currentAspect);
         size = Mathf.Max(size, minSize);
         cam.orthographicSize = size;
 
@@ -62,6 +67,6 @@ public class AutoCamera : MonoBehaviour
         Vector3 pos = cam.transform.position;
         WorldRect = new Rect(pos.x - worldW * 0.5f, pos.y - worldH * 0.5f, worldW, worldH);
 
-        SizeDelta = size - baseSize;
+        SizeDelta = size - OrthoSize;
     }
 }

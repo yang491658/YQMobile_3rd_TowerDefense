@@ -37,7 +37,7 @@ public class AutoUICanvas : MonoBehaviour
         lastW = w; lastH = h;
 
         float current = (float)w / h;
-        scaler.referenceResolution = AutoCamera.RefResolution;
-        scaler.matchWidthOrHeight = current < AutoCamera.RefAspect ? 0f : 1f;
+        scaler.referenceResolution = AutoCamera.Resolution;
+        scaler.matchWidthOrHeight = current < AutoCamera.Aspect ? 0f : 1f;
     }
 }

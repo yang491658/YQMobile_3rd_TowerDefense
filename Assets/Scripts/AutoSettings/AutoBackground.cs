@@ -3,7 +3,6 @@
 [ExecuteAlways]
 public class AutoBackground : MonoBehaviour
 {
-    private Camera cam;
     private SpriteRenderer sr;
     private int lastW, lastH;
     private float lastAspect, lastOrthoSize;
@@ -24,11 +23,9 @@ public class AutoBackground : MonoBehaviour
 
     private void Update()
     {
-        if (cam == null) cam = Camera.main;
-
         if (Screen.width != lastW || Screen.height != lastH ||
-            !Mathf.Approximately(cam.aspect, lastAspect) ||
-            !Mathf.Approximately(cam.orthographicSize, lastOrthoSize))
+            !Mathf.Approximately(AutoCamera.Aspect, lastAspect) ||
+            !Mathf.Approximately(AutoCamera.OrthoSize, lastOrthoSize))
             Fit();
     }
 
@@ -40,26 +37,25 @@ public class AutoBackground : MonoBehaviour
 
     private void Init()
     {
-        cam = Camera.main;
         sr = GetComponent<SpriteRenderer>();
     }
 
     private void Fit()
     {
-        if (cam == null || !cam.orthographic || sr.sprite == null) return;
+        if (sr == null || sr.sprite == null) return;
 
         lastW = Screen.width;
         lastH = Screen.height;
-        lastAspect = cam.aspect;
-        lastOrthoSize = cam.orthographicSize;
-
-        Sprite sp = sr.sprite;
-        float ppu = sp.pixelsPerUnit;
-        if (ppu <= 0f) return;
+        lastAspect = AutoCamera.Aspect;
+        lastOrthoSize = AutoCamera.OrthoSize;
 
         Rect worldRect = AutoCamera.WorldRect;
         float worldW = worldRect.width;
         float worldH = worldRect.height;
+
+        Sprite sp = sr.sprite;
+        float ppu = sp.pixelsPerUnit;
+        if (ppu <= 0f) return;
 
         float spriteW = sp.rect.width / ppu;
         float spriteH = sp.rect.height / ppu;
@@ -67,9 +63,9 @@ public class AutoBackground : MonoBehaviour
 
         Transform tr = transform;
         Transform parent = tr.parent;
-        Vector3 parentLossy = (parent != null) ? parent.lossyScale : Vector3.one;
-        float parentScaleX = (parentLossy.x == 0f) ? 1f : parentLossy.x;
-        float parentScaleY = (parentLossy.y == 0f) ? 1f : parentLossy.y;
+        Vector3 parentLossy = parent != null ? parent.lossyScale : Vector3.one;
+        float parentScaleX = parentLossy.x == 0f ? 1f : parentLossy.x;
+        float parentScaleY = parentLossy.y == 0f ? 1f : parentLossy.y;
 
         float localX = (worldW / spriteW) / parentScaleX;
         float localY = (worldH / spriteH) / parentScaleY;
