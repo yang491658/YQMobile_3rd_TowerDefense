@@ -140,21 +140,13 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region SET
-    public void SetSpeed(float _speed)
-    {
-        speed = Mathf.Clamp(_speed, minSpeed, maxSpeed);
-        if (!IsPaused) Time.timeScale = speed;
-        OnChangeSpeed?.Invoke(speed);
-    }
+    public void SetSpeed(float _speed) => SetSpeed(_speed, false);
+
     public void SetSpeed(float _speed, bool _force)
     {
-        if (_force)
-        {
-            speed = _speed;
-            if (!IsPaused) Time.timeScale = speed;
-            OnChangeSpeed?.Invoke(speed);
-        }
-        else SetSpeed(_speed);
+        speed = _force ? _speed : Mathf.Clamp(_speed, minSpeed, maxSpeed);
+        if (!IsPaused) Time.timeScale = speed;
+        OnChangeSpeed?.Invoke(speed);
     }
     #endregion
 

@@ -279,33 +279,33 @@ public class PoolManager : MonoBehaviour
 #if TEST_Manager
     private void UpdateStatistics()
     {
+        foreach (var p in policy.Values)
+        {
+            if (p == null) continue;
+            p.active = 0;
+            p.wait = 0;
+        }
+
         foreach (var kv in made)
         {
-            int key = kv.Key;
-
-            if (!policy.TryGetValue(key, out var p) || p == null)
+            if (!policy.TryGetValue(kv.Key, out var p) || p == null)
                 continue;
 
-            int count = kv.Value;
-            if (count > 0) p.active += count;
+            p.active = Mathf.Max(kv.Value, 0);
+            if (p.active > p.peak)
+                p.peak = p.active;
         }
 
         foreach (var kv in pool)
         {
-            int key = kv.Key;
-
-            if (!policy.TryGetValue(key, out var p) || p == null)
-                continue;
-
-            Stack<GameObject> stack = kv.Value;
-            if (stack == null || stack.Count == 0)
+            if (!policy.TryGetValue(kv.Key, out var p) || p == null)
                 continue;
 
             int alive = 0;
-            foreach (var o in stack)
+            foreach (var o in kv.Value)
                 if (o != null) alive++;
 
-            if (alive > 0) p.wait += alive;
+            p.wait = alive;
         }
     }
 #endif
