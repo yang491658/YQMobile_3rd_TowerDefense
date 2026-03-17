@@ -2,20 +2,27 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
-  tags: []
+  serializedVersion: 3
+  tags:
+  - Manager
+  - Background
+  - Tower
+  - Monster
+  - Bullet
+  - Summon
+  - Effect
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Backgrouund
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Tower
+  - Monster
+  - Bullet
+  - Summon
+  - Effect
   - 
   - 
   - 
@@ -38,6 +45,29 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 4170262315
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Tower
+    uniqueID: 2990014183
+    locked: 0
+  - name: Monster
+    uniqueID: 3079530391
+    locked: 0
+  - name: Summon
+    uniqueID: 792509481
+    locked: 0
+  - name: Bullet
+    uniqueID: 3277203219
+    locked: 0
+  - name: Effect
+    uniqueID: 1881736491
+    locked: 0
+  - name: UI
+    uniqueID: 2391836211
+    locked: 0
+  m_RenderingLayers:
+  - Default
