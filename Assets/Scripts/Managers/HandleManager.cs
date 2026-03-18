@@ -8,7 +8,7 @@ public class HandleManager : MonoBehaviour
     public static HandleManager Instance { private set; get; }
 
     private Camera cam => Camera.main;
-    private LayerMask layer = 0;
+    private LayerMask layer => LayerMask.GetMask("Tower");
 
     [Header("Click")]
     [SerializeField] private float doubleClick = 0.25f;
@@ -16,7 +16,7 @@ public class HandleManager : MonoBehaviour
     private float clickTimer;
 
     [Header("Drag")]
-    [SerializeField][Min(0f)] private float maxDrag = 5f;
+    [SerializeField][Min(0f)] private float maxDrag = 0f;
     private const float drag = 0.15f;
     private bool canDrag;
     private bool isDragging;
@@ -33,12 +33,6 @@ public class HandleManager : MonoBehaviour
     private readonly List<float> markTimes = new();
     private readonly List<Color> markColors = new();
     private readonly List<Vector3> dragPath = new();
-#endif
-
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-    }
 #endif
 
     private void Awake()
