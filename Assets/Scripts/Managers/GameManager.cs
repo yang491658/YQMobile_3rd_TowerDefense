@@ -20,7 +20,33 @@ public class GameManager : MonoBehaviour
 
     [Header("Score")]
     [SerializeField] private int score = 0;
+    private int scoreStack = 0;
     public event System.Action<int> OnChangeScore;
+
+    [Header("Life")]
+    [SerializeField][Min(0)] private int life = 0;
+    [SerializeField][Min(0)] private int maxLife = 20;
+    [SerializeField][Min(0f)] private float lifeUpCooldown = 10f;
+    private float lifeUpTimer = 0f;
+    public event System.Action<int> OnChangeLife;
+
+    [Header("Exp")]
+    [SerializeField][Min(0)] private int exp = 0;
+    [SerializeField][Min(0)] private int needExp = 100;
+    [SerializeField][Min(0)] private int scoreExp = 10;
+    [SerializeField][Min(0)] private int goldExp = 100;
+    public event System.Action<int, int> OnChangeExp;
+
+    [Header("Level")]
+    [SerializeField][Min(1)] private int level = 1;
+    [SerializeField][Min(1)] private int maxLevel = 10;
+    public event System.Action<int> OnChangeLevel;
+
+    [Header("Gold")]
+    [SerializeField][Min(0)] private int gold = 0;
+    [SerializeField][Min(0)] private int baseGold = 100;
+    [SerializeField][Min(0)] private int needGold = 0;
+    public event System.Action<int> OnChangeGold;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
     [DllImport("__Internal")] private static extern void GameOverReact();
@@ -64,6 +90,12 @@ public class GameManager : MonoBehaviour
         IsGameOver = false;
 
         ResetScore();
+        ResetLife();
+        ResetLevel();
+        ResetGold();
+
+        EntityManager.Instance?.ResetEntity();
+        EntityManager.Instance?.SetEntity();
 
         UIManager.Instance?.ResetUI();
         UIManager.Instance?.OpenUI(false);
@@ -130,12 +162,129 @@ public class GameManager : MonoBehaviour
     {
         score += _score;
         OnChangeScore?.Invoke(score);
+
+        if (level < maxLevel)
+        {
+            scoreStack += _score;
+            while (scoreStack >= scoreExp)
+            {
+                scoreStack -= scoreExp;
+                ExpUp(scoreExp / 10);
+            }
+        }
     }
 
     public void ResetScore()
     {
         score = 0;
+        scoreStack = 0;
         OnChangeScore?.Invoke(score);
+    }
+    #endregion
+
+    #region 생명
+    public void LifeUp(int _life = 1)
+    {
+        if (lifeUpTimer > 0f) return;
+
+        life = Mathf.Min(life + _life, maxLife);
+        lifeUpTimer = lifeUpCooldown;
+        OnChangeLife?.Invoke(life);
+    }
+
+    public void LifeDown(int _life = 1)
+    {
+        if (IsGameOver) return;
+
+        life = Mathf.Max(life - _life, 0);
+        OnChangeLife?.Invoke(life);
+
+        if (life <= 0) GameOver();
+    }
+
+    public void ResetLife()
+    {
+        life = maxLife;
+        lifeUpTimer = 0f;
+        OnChangeLife?.Invoke(life);
+    }
+    #endregion
+
+    #region 경험치
+    public void ExpUp(int _exp = 1)
+    {
+        if (level >= maxLevel) return;
+
+        exp += _exp;
+        while (level < maxLevel && exp >= needExp)
+        {
+            exp -= needExp;
+            LevelUp();
+        }
+        if (level >= maxLevel) exp = 0;
+        OnChangeExp?.Invoke(exp, needExp);
+    }
+
+    public void BuyExp()
+    {
+        if (level >= maxLevel) return;
+        if (gold < goldExp) return;
+
+        ExpUp();
+        GoldDown(goldExp);
+    }
+    #endregion
+
+    #region 레벨
+    public void LevelUp()
+    {
+        if (level >= maxLevel) return;
+
+        OnChangeLevel?.Invoke(++level);
+
+        needExp = 100 * level * (level + 1) / 2;
+        OnChangeExp?.Invoke(exp, needExp);
+    }
+
+    public void ResetLevel()
+    {
+        level = 1;
+        OnChangeLevel?.Invoke(level);
+
+        exp = 0;
+        needExp = 100;
+        OnChangeExp?.Invoke(exp, needExp);
+    }
+    #endregion
+
+    #region 골드
+    public void GoldUp(int _gold = 1)
+    {
+        gold += _gold;
+        OnChangeGold?.Invoke(gold);
+    }
+
+    public void GoldDown(int _gold = 1)
+    {
+        if (gold < _gold) return;
+
+        gold -= _gold;
+        OnChangeGold?.Invoke(gold);
+    }
+
+    public void ResetGold()
+    {
+        gold = baseGold;
+        needGold = 0;
+        OnChangeGold?.Invoke(gold);
+    }
+
+    public void UseGold(bool _useGold)
+    {
+        if (!_useGold) return;
+
+        needGold += 10;
+        GoldDown(needGold);
     }
     #endregion
 
@@ -156,5 +305,21 @@ public class GameManager : MonoBehaviour
     public float GetMaxSpeed() => maxSpeed;
 
     public int GetScore() => score;
+
+    public int GetLife() => life;
+    public int GetMaxLife() => maxLife;
+
+    public int GetExp() => exp;
+    public int GetNeedExp() => needExp;
+    public int GetGoldExp() => goldExp;
+    public bool EnoughExpCost() => gold >= goldExp;
+
+    public int GetLevel() => level;
+    public int GetMaxLevel() => maxLevel;
+    public bool IsMaxLevel() => level >= maxLevel;
+
+    public int GetGold() => gold;
+    public int GetNeedGold() => needGold;
+    public bool EnoughGold() => gold >= needGold;
     #endregion
 }
