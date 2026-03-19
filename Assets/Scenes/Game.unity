@@ -1578,6 +1578,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97a12951844ec24429f29b1ad8bb4617, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  select: {fileID: 0}
   doubleClick: 0.25
   maxDrag: 0
 --- !u!4 &198834868
@@ -6961,6 +6962,20 @@ MonoBehaviour:
   score10Num: {fileID: 3937834829484441480}
   averageScoreNum: {fileID: 7358479592946714387}
   averagePlayNum: {fileID: 274309895}
+  refRank:
+    TMP: {fileID: 168061003}
+    slider: {fileID: 948936902}
+    value: 0
+    minValue: 0
+    maxValue: 0
+    format: "\uAE30\uC900 \uB7AD\uD06C : {0}"
+  refTower:
+    TMP: {fileID: 596149726}
+    slider: {fileID: 1234922609}
+    value: 0
+    minValue: 0
+    maxValue: 0
+    format: "\uAE30\uC900 \uD0C0\uC6CC : {0}"
 --- !u!4 &1407473050
 Transform:
   m_ObjectHideFlags: 0

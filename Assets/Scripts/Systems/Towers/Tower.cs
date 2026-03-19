@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Tower : Entity
 {
@@ -105,6 +103,47 @@ public class Tower : Entity
             case 6: return new[] { grid[1], grid[3], grid[4], grid[6], grid[7], grid[9] };
             default: return grid;
         }
+    }
+    #endregion
+
+    #region 조작
+    public void DragOn(bool _on)
+    {
+        IsDragging = _on;
+
+        int baseOrder = _on ? 1000 : 0;
+
+        SpriteRenderer[] renderers = GetComponentsInChildren<SpriteRenderer>(true);
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            SpriteRenderer r = renderers[i];
+
+            if (r == sr)
+                r.sortingOrder = baseOrder;
+            else if (r == outlineSR)
+                r.sortingOrder = baseOrder + 1;
+            else
+                r.sortingOrder = baseOrder + 2;
+        }
+    }
+
+    public Tower Merge(Tower _target)
+    {
+        if (!EntityManager.Instance.CanMerge(this, _target)) return null;
+
+        return EntityManager.Instance?.MergeTower(this, _target);
+    }
+
+    public void RankUp(int _amount = 1)
+    {
+        if (IsMax) return;
+
+        SetRank(rank + _amount);
+    }
+
+    public void Sell()
+    {
+        EntityManager.Instance?.SellTower(this);
     }
     #endregion
 

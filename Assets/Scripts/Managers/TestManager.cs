@@ -64,6 +64,9 @@ public class TestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI score10Num;
     [SerializeField] private TextMeshProUGUI averageScoreNum;
     [SerializeField] private TextMeshProUGUI averagePlayNum;
+    [Space]
+    [SerializeField] private SliderConfig refRank = new SliderConfig(0, 0, 0, "기준 랭크 : {0}");
+    [SerializeField] private SliderConfig refTower = new SliderConfig(0, 0, 0, "기준 타워 : {0}");
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -84,6 +87,15 @@ public class TestManager : MonoBehaviour
             averageScoreNum = GameObject.Find("TestUI/AverageScore/TestNum")?.GetComponent<TextMeshProUGUI>();
         if (averagePlayNum == null)
             averagePlayNum = GameObject.Find("TestUI/AveragePlay/TestNum")?.GetComponent<TextMeshProUGUI>();
+
+        if (refTower.TMP == null)
+            refTower.TMP = GameObject.Find("TestUI/RefTower/TestText")?.GetComponent<TextMeshProUGUI>();
+        if (refTower.slider == null)
+            refTower.slider = GameObject.Find("TestUI/RefTower/TestSlider")?.GetComponent<Slider>();
+        if (refRank.TMP == null)
+            refRank.TMP = GameObject.Find("TestUI/RefRank/TestText")?.GetComponent<TextMeshProUGUI>();
+        if (refRank.slider == null)
+            refRank.slider = GameObject.Find("TestUI/RefRank/TestSlider")?.GetComponent<Slider>();
     }
 #endif
 
@@ -130,11 +142,35 @@ public class TestManager : MonoBehaviour
         #region 엔티티 매니저
         for (int i = 1; i <= 10; i++)
         {
-            KeyCode key = (i == 10) ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha0 + i);
+            KeyCode key = (KeyCode)((int)KeyCode.Alpha0 + i);
             if (Input.GetKeyDown(key))
             {
+                bool isShift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+
+                int current = refTower.value;
+                int prefix = current / 100;
+                int tens = (current / 10) % 10;
+                int ones = current % 10;
+
+                if (isShift) tens = i;
+                else ones = i;
+
+                int newValue = prefix * 100 + tens * 10 + ones;
+
+                ChangeRefTower(newValue);
                 break;
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            int refID = DataManager.Instance.GetTowerID(refTower.value);
+
+            Vector3 pos = Input.mousePosition;
+            pos.z = -Camera.main.transform.position.z;
+            pos = Camera.main.ScreenToWorldPoint(pos);
+
+            EntityManager.Instance?.SpawnTower(refID, refRank.value, pos, _useGold: false);
         }
         #endregion
 
@@ -198,12 +234,22 @@ public class TestManager : MonoBehaviour
     #region 테스트 UI
     private void OnEnable()
     {
+        gameSpeed.value = (int)GameManager.Instance?.GetSpeed();
         InitSlider(gameSpeed, ChangeGameSpeed);
+
+        refRank.minValue = 1;
+        refRank.maxValue = Tower.MaxRank;
+        InitSlider(refRank, ChangeRefRank);
+        refTower.maxValue = DataManager.Instance.GetTowerDatas().Length;
+        InitSlider(refTower, ChangeRefTower);
     }
 
     private void OnDisable()
     {
         gameSpeed.slider.onValueChanged.RemoveListener(ChangeGameSpeed);
+
+        refRank.slider.onValueChanged.RemoveListener(ChangeRefRank);
+        refTower.slider.onValueChanged.RemoveListener(ChangeRefTower);
     }
 
     private void InitSlider(SliderConfig _config, UnityEngine.Events.UnityAction<float> _action)
@@ -247,7 +293,11 @@ public class TestManager : MonoBehaviour
 
         _config.slider.value = _config.value;
     }
+
     private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, _v => GameManager.Instance?.SetSpeed(_v, true));
+
+    private void ChangeRefRank(float _value) => ApplySlider(ref refRank, _value);
+    private void ChangeRefTower(float _value) => ApplySlider(ref refTower, _value);
 
     private void UpdateTestUI()
     {

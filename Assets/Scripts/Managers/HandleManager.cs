@@ -10,6 +10,10 @@ public class HandleManager : MonoBehaviour
     private Camera cam => Camera.main;
     private LayerMask layer => LayerMask.GetMask("Tower");
 
+    [Header("Tower")]
+    [SerializeField] private Tower select;
+    private Vector3 offset;
+
     [Header("Click")]
     [SerializeField] private float doubleClick = 0.25f;
     private bool isDoubleClick;
@@ -237,30 +241,74 @@ public class HandleManager : MonoBehaviour
 
     private void OnDragBegin(Vector3 _pos)
     {
-        Debug.Log($"드래그 시작 : {_pos} / {Time.time:F3}"); // TODO : 드래그 시작 동작
+        Collider2D hit = Physics2D.OverlapPoint(_pos, layer);
+
+        select = hit.GetComponent<Tower>();
+        select.DragOn(true);
+
+        offset = select.transform.position - _pos;
     }
 
     private void OnDragMove(Vector3 _start, Vector3 _current)
     {
-        Debug.Log($"드래그 진행"); // TODO : 드래그 진행 동작
+        select.transform.position = _current + offset;
     }
 
     private void OnDragEnd(Vector3 _start, Vector3 _end)
     {
-        Debug.Log($"드래그 종료 : {_start} → {_end} / {Time.time:F3}"); // TODO : 드래그 종료 동작
+        Collider2D[] hits = Physics2D.OverlapPointAll(_end, layer);
+
+        Tower target = null;
+        Collider2D selfCol = select.GetCol();
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            Collider2D otherCol = hits[i];
+            if (selfCol == otherCol) continue;
+
+            Tower other = otherCol.GetComponent<Tower>();
+            if (other != null)
+            { target = other; break; }
+        }
+
+        Tower merge = null;
+        if (target != null)
+            merge = select.Merge(target);
+
+        if (merge == null)
+        {
+            select.transform.position = dragStart + offset;
+            select.DragOn(false);
+        }
+
+        select = null;
     }
 
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN
     private void OnRightClick(Vector3 _pos)
     {
-        Debug.Log($"우클릭 : {_pos} / {Time.time:F3}"); // TODO : 우클릭 동작
         AddClick(_pos, Color.yellow);
+
+        Collider2D hit = Physics2D.OverlapPoint(_pos, layer);
+        if (hit == null) return;
+
+        Tower tower = hit.GetComponent<Tower>();
+        if (tower == null) return;
+
+        tower.Sell();
     }
 
     private void OnMiddleClick(Vector3 _pos)
     {
-        Debug.Log($"휠클릭 : {_pos} / {Time.time:F3}"); // TODO : 휠클릭 동작
         AddClick(_pos, Color.red);
+
+        Collider2D hit = Physics2D.OverlapPoint(_pos, layer);
+        if (hit == null) return;
+
+        Tower tower = hit.GetComponent<Tower>();
+        if (tower == null) return;
+
+        tower.RankUp();
     }
 
     private void AddClick(Vector3 _pos, Color _color)
