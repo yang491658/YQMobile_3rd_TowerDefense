@@ -11,7 +11,7 @@ using UnityEditor;
 public class TowerData : ScriptableObject
 {
     [Header("Base")]
-    public Color Color = default;
+    public Color Color = Color.black;
     public Sprite Image;
     public int ID;
     public string Name;
@@ -39,6 +39,11 @@ public class TowerData : ScriptableObject
 
     private void AutoName()
     {
+        if (Image != null)
+        {
+        }
+        else if (Grade == TowerGrade.Temp) { ID = 999; Name = "Temp"; }
+        else { ID = 900 + (int)Grade; Name = Grade.ToString(); }
     }
 
     private void AutoValue()

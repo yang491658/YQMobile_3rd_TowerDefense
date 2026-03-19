@@ -3,13 +3,13 @@ using UnityEngine;
 public enum TowerGrade
 {
     [InspectorName("일반")] Normal = 1,
-    [InspectorName("희귀")] Rare = 3,
-    [InspectorName("서사")] Epic = 7,
-    [InspectorName("유일")] Unique = 15,
-    [InspectorName("전설")] Legend = 35,
-    [InspectorName("신화")] Mythic = 100,
+    [InspectorName("희귀")] Rare = 2,
+    [InspectorName("서사")] Epic = 3,
+    [InspectorName("유일")] Unique = 4,
+    [InspectorName("전설")] Legend = 5,
+    [InspectorName("신화")] Mythic = 6,
 
-    [InspectorName("임시")] Temp = 999,
+    [InspectorName("임시")] Temp = 99,
 }
 
 public enum TowerRole

@@ -433,6 +433,8 @@ public class UIManager : MonoBehaviour
 
         Canvas canvas = inGameUI.GetComponentInParent<Canvas>();
         BannerHeightPx = _margin * canvas.scaleFactor;
+
+        EntityManager.Instance?.SetEntity();
     }
     #endregion
 

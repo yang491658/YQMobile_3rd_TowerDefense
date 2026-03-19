@@ -74,6 +74,11 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    private void Update()
+    {
+        lifeUpTimer -= Time.deltaTime;
+    }
+
     private void OnEnable()
     {
         SceneManager.sceneLoaded += LoadGame;
