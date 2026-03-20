@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
     [Header("Exp")]
     [SerializeField][Min(0)] private int exp = 0;
     [SerializeField][Min(0)] private int needExp = 100;
-    [SerializeField][Min(0)] private int scoreExp = 10;
+    [SerializeField][Min(0)] private int scoreExp = 100;
     [SerializeField][Min(0)] private int goldExp = 100;
     public event System.Action<int, int> OnChangeExp;
 
@@ -235,7 +235,7 @@ public class GameManager : MonoBehaviour
         if (level >= maxLevel) return;
         if (gold < goldExp) return;
 
-        ExpUp();
+        ExpUp(goldExp / 10);
         GoldDown(goldExp);
     }
     #endregion
@@ -295,7 +295,6 @@ public class GameManager : MonoBehaviour
 
     #region SET
     public void SetSpeed(float _speed) => SetSpeed(_speed, false);
-
     public void SetSpeed(float _speed, bool _force)
     {
         speed = _force ? _speed : Mathf.Clamp(_speed, minSpeed, maxSpeed);

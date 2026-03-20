@@ -42,6 +42,7 @@ public class PoolManager : MonoBehaviour
 
     [Header("Policy")]
     [SerializeField] private Policy monsterPolicy = new Policy(0, 0, 0);
+    [SerializeField] private Policy bulletPolicy = new Policy(0, 0, 0);
     private readonly Dictionary<int, Policy> policy = new Dictionary<int, Policy>();
 
     [Header("Pooling")]
@@ -53,6 +54,7 @@ public class PoolManager : MonoBehaviour
 
     [Header("Parent")]
     [SerializeField] private Transform monsterTrans;
+    [SerializeField] private Transform bulletTrans;
     private readonly Dictionary<int, Transform> parent = new Dictionary<int, Transform>();
 
 #if UNITY_EDITOR
@@ -60,6 +62,8 @@ public class PoolManager : MonoBehaviour
     {
         if (monsterTrans == null)
             monsterTrans = transform.Find("Monsters");
+        if (bulletTrans == null)
+            bulletTrans = transform.Find("Bullets");
     }
 #endif
 
@@ -273,6 +277,7 @@ public class PoolManager : MonoBehaviour
     private Policy GetPolicy(GameObject _prefab)
     {
         if (_prefab.TryGetComponent(out Monster _)) return monsterPolicy;
+        if (_prefab.TryGetComponent(out Bullet _)) return bulletPolicy;
 
         return default;
     }
@@ -280,6 +285,7 @@ public class PoolManager : MonoBehaviour
     private Transform GetParent(GameObject _obj)
     {
         if (_obj.TryGetComponent(out Monster _)) return monsterTrans;
+        if (_obj.TryGetComponent(out Bullet _)) return bulletTrans;
 
         return transform;
     }
@@ -288,6 +294,7 @@ public class PoolManager : MonoBehaviour
     private void UpdateStatistics()
     {
         if (monsterPolicy != null) { monsterPolicy.active = 0; monsterPolicy.wait = 0; }
+        if (bulletPolicy != null) { bulletPolicy.active = 0; bulletPolicy.wait = 0; }
 
         foreach (var p in policy.Values)
         {
@@ -319,6 +326,7 @@ public class PoolManager : MonoBehaviour
         }
 
         monsterPolicy.peak = Mathf.Max(monsterPolicy.active, monsterPolicy.peak);
+        bulletPolicy.peak = Mathf.Max(bulletPolicy.active, bulletPolicy.peak);
     }
 #endif
     #endregion

@@ -12,11 +12,13 @@ public class EntityManager : MonoBehaviour
     [Header("Base")]
     [SerializeField] private GameObject towerBase;
     [SerializeField] private GameObject monsterBase;
+    [SerializeField] private GameObject bulletBase;
 
     [Header("InGame")]
     [SerializeField] private Transform inGame;
     [SerializeField] private Transform towerTrans;
     [SerializeField] private Transform monsterTrans;
+    [SerializeField] private Transform otherTrans;
     [Space]
     [SerializeField] private List<Tower> towers = new List<Tower>();
     [SerializeField] private List<Monster> monsters = new List<Monster>();
@@ -28,6 +30,8 @@ public class EntityManager : MonoBehaviour
             towerBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Tower.prefab");
         if (monsterBase == null)
             monsterBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Monster.prefab");
+        if (bulletBase == null)
+            bulletBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Bullet.prefab");
     }
 #endif
 
@@ -47,6 +51,7 @@ public class EntityManager : MonoBehaviour
     private void Start()
     {
         PoolManager.Instance?.Init(monsterBase);
+        PoolManager.Instance?.Init(bulletBase);
     }
 
     #region 타워
@@ -139,6 +144,14 @@ public class EntityManager : MonoBehaviour
 
     public void DespawnPool(Pooling _pooling)
         => PoolManager.Instance?.Release(_pooling.gameObject);
+
+    public Bullet MakeBullet(Tower _tower, Monster _target)
+    {
+        Bullet bullet = SpawnPool<Bullet>(bulletBase, _tower.transform.position, otherTrans);
+        if (bullet == null) return null;
+        bullet.SetBullet(_tower, _target);
+        return bullet;
+    }
     #endregion
 
     public void DespawnAll()
@@ -161,6 +174,7 @@ public class EntityManager : MonoBehaviour
         if (inGame == null) inGame = GameObject.Find("InGame")?.transform;
         if (towerTrans == null) towerTrans = GameObject.Find("InGame/Towers")?.transform;
         if (monsterTrans == null) monsterTrans = GameObject.Find("InGame/Monsters")?.transform;
+        if (otherTrans == null) otherTrans = GameObject.Find("InGame/Others")?.transform;
     }
     #endregion
 
