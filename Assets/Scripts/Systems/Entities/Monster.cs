@@ -39,7 +39,46 @@ public class Monster : Pooling
     protected override void Update()
     {
         base.Update();
+
+        if (IsDead) return;
+
+        Move(moveSpeed, moveDirection);
     }
+
+    #region 전투
+    public bool TakeDamage(Tower _tower, int _damage, bool _critical = false)
+    {
+        if (IsDead) return false;
+
+        SetHealth(health - _damage);
+
+        if (health <= 0) Die();
+
+        return true;
+    }
+
+    public void Die()
+    {
+        if (IsDead) return;
+        IsDead = true;
+
+        OnDeath();
+
+        EntityManager.Instance?.DespawnMonster(this);
+    }
+
+    protected virtual void OnDeath()
+    {
+        GameManager.Instance?.ScoreUp();
+        GameManager.Instance?.GoldUp(gold);
+    }
+
+    protected virtual void OnGoal()
+    {
+        GameManager.Instance?.LifeDown();
+        EntityManager.Instance?.DespawnMonster(this);
+    }
+    #endregion
 
     #region SET
     public void SetMonster(int _set)
@@ -64,6 +103,8 @@ public class Monster : Pooling
 
     public int GetHealth() => health;
     public int GetMaxHealth() => maxHealth;
+    public bool IsAlive() => !IsDead && !IsDespawn;
+    public bool IsInvalid(int _index = -1) => !IsAlive() || (_index >= 0 && Index != _index);
     #endregion
 
     #region 풀링

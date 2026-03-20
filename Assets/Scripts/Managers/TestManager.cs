@@ -65,7 +65,7 @@ public class TestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI averageScoreNum;
     [SerializeField] private TextMeshProUGUI averagePlayNum;
     [Space]
-    [SerializeField] private SliderConfig refRank = new SliderConfig(0, 0, 0, "기준 랭크 : {0}");
+    [SerializeField] private SliderConfig refRank = new SliderConfig(3, 0, 0, "기준 랭크 : {0}");
     [SerializeField] private SliderConfig refTower = new SliderConfig(0, 0, 0, "기준 타워 : {0}");
 
 #if UNITY_EDITOR
@@ -118,10 +118,6 @@ public class TestManager : MonoBehaviour
 
         SetAuto();
         UpdateTestUI();
-
-        int refID = DataManager.Instance.GetTowerID(refTower.value);
-        EntityManager.Instance?.SpawnTower(refID, refRank.value, Vector3.up * -3f, _useGold: false);
-        EntityManager.Instance?.SpawnMonster(Vector3.up * 3f);
     }
 
     private void Update()
@@ -146,7 +142,9 @@ public class TestManager : MonoBehaviour
         #region 엔티티 매니저
         for (int i = 1; i <= 10; i++)
         {
-            KeyCode key = (KeyCode)((int)KeyCode.Alpha0 + i);
+            KeyCode key = i == 10 ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha0 + i);
+            int digit = i == 10 ? 0 : i;
+
             if (Input.GetKeyDown(key))
             {
                 bool isShift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
@@ -156,8 +154,8 @@ public class TestManager : MonoBehaviour
                 int tens = (current / 10) % 10;
                 int ones = current % 10;
 
-                if (isShift) tens = i;
-                else ones = i;
+                if (isShift) tens = digit;
+                else ones = digit;
 
                 int newValue = prefix * 100 + tens * 10 + ones;
 
@@ -185,6 +183,8 @@ public class TestManager : MonoBehaviour
 
             EntityManager.Instance?.SpawnMonster(pos);
         }
+
+        if (Input.GetKeyDown(KeyCode.Delete)) EntityManager.Instance?.DespawnAll();
         #endregion
 
         #region UI 매니저
@@ -217,12 +217,20 @@ public class TestManager : MonoBehaviour
     {
         IsAuto = _on;
 
-        GameManager.Instance?.SetSpeed(_on ? GameManager.Instance.GetMaxSpeed() : 1f);
+        //GameManager.Instance?.SetSpeed(_on ? GameManager.Instance.GetMaxSpeed() : 1f);
     }
 
     private void AutoPlay()
     {
         playTime += Time.deltaTime;
+
+        if (EntityManager.Instance?.GetMonsterCount() < 10)
+        {
+            float x = Random.Range(-5f, 5f);
+            float y = Random.Range(0f, 5f);
+            Vector3 pos = new Vector3(x, y, 0f);
+            EntityManager.Instance?.SpawnMonster(pos);
+        }
     }
 
     private IEnumerator AutoReplay()

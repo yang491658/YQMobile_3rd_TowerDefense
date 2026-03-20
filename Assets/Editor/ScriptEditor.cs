@@ -159,6 +159,7 @@ public static class ScriptEditor
         {
             typeof(Tower),
             typeof(Monster),
+            typeof(Bullet),
         };
         ResetPrefabs(_prefabs);
     }

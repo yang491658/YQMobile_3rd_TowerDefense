@@ -4,9 +4,12 @@ public class Bullet : Pooling
 {
     [Header("Origin")]
     [SerializeField] private Tower tower;
+    [SerializeField][Min(0)] private int damage;
 
     [Header("Move")]
     [SerializeField] private Monster target;
+    private int targetIndex;
+    private Vector3 targetPos;
     [SerializeField][Min(0f)] private float moveSpeed = 10f;
 
     public bool IsHit { private set; get; } = false;
@@ -19,10 +22,29 @@ public class Bullet : Pooling
     protected override void Update()
     {
         base.Update();
+
+        if (target != null && !target.IsInvalid(targetIndex))
+            targetPos = target.transform.position;
+
+        Vector3 direction = targetPos - transform.position;
+        if (direction.sqrMagnitude <= 0.01f)
+        {
+            Despawn();
+            return;
+        }
+
+        Move(moveSpeed, direction);
     }
 
     private void OnTriggerEnter2D(Collider2D _collision)
     {
+        if (target != null && !target.IsInvalid(targetIndex)
+            && target.gameObject == _collision.gameObject)
+        {
+            IsHit = true;
+            tower.HitBullet(target, damage);
+            Despawn();
+        }
     }
 
     private void OnBecameInvisible()
@@ -34,13 +56,20 @@ public class Bullet : Pooling
     public void SetBullet(Tower _tower, Monster _target)
     {
         sr.color = _tower.GetColor();
+
         tower = _tower;
+        damage = _tower.GetDamage();
+
         target = _target;
+        targetIndex = _target.Index;
+        targetPos = _target.transform.position;
     }
     #endregion
 
     #region GET
     public Tower GetTower() => tower;
+    public int GetDamage() => damage;
+
     public Monster GetTarget() => target;
     #endregion
 
@@ -62,7 +91,12 @@ public class Bullet : Pooling
         base.ResetPool();
 
         tower = null;
+        damage = 0;
+
         target = null;
+        targetIndex = 0;
+        targetPos = default;
+        moveSpeed = 10f;
 
         Stop();
     }

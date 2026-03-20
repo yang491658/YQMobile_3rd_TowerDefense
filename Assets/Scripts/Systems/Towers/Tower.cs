@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Tower : Entity
@@ -18,6 +19,17 @@ public class Tower : Entity
 
     public bool IsMax { private set; get; } = false;
 
+    [Header("Battle")]
+    [SerializeField] private Monster attackTarget;
+    private int targetIndex;
+    [Space]
+    [SerializeField][Min(0)] private int attackDamage;
+    [SerializeField][Min(0)] private int attackSpeed;
+    private float attackTimer;
+    [SerializeField][Min(0)] private int criticalChance;
+    [SerializeField][Min(0)] private int criticalDamage;
+    [SerializeField] private List<Bullet> bullets = new List<Bullet>();
+
 #if UNITY_EDITOR
     private void OnValidate()
     {
@@ -37,6 +49,11 @@ public class Tower : Entity
     protected override void Update()
     {
         base.Update();
+
+        float dt = Time.deltaTime;
+        if (attackSpeed > 0) Attack(dt);
+
+        SetStat();
     }
 
     #region 심볼
@@ -147,6 +164,81 @@ public class Tower : Entity
     }
     #endregion
 
+    #region 전투
+    private void FindTarget()
+    {
+        switch (data.Target)
+        {
+            case AttackTarget.None:
+                attackTarget = null; break;
+            case AttackTarget.Random:
+                attackTarget = EntityManager.Instance?.GetMonsterRandom(); break;
+            case AttackTarget.First:
+                attackTarget = EntityManager.Instance?.GetMonsterFirst(); break;
+            case AttackTarget.Last:
+                attackTarget = EntityManager.Instance?.GetMonsterLast(); break;
+            case AttackTarget.Near:
+                attackTarget = EntityManager.Instance?.GetMonsterNearest(transform.position, 0); break;
+            case AttackTarget.Far:
+                attackTarget = EntityManager.Instance?.GetMonsterFarthest(transform.position, 0); break;
+            case AttackTarget.Strong:
+                attackTarget = EntityManager.Instance?.GetMonsterHighHealth(); break;
+            case AttackTarget.Weak:
+                attackTarget = EntityManager.Instance?.GetMonsterLowHealth(); break;
+        }
+
+        targetIndex = attackTarget != null ? attackTarget.Index : 0;
+    }
+
+    private void Attack(float _deltaTime)
+    {
+        attackTimer -= _deltaTime;
+        if (attackTimer > 0f) return;
+
+        if (data.Role == TowerRole.Debuff
+            || attackTarget == null
+            || attackTarget.IsInvalid(targetIndex))
+        {
+            FindTarget();
+            if (attackTarget == null || !attackTarget.IsAlive()) return;
+        }
+
+        Shoot(attackTarget);
+
+        attackTimer = 60f / attackSpeed;
+    }
+
+    public void Shoot(Monster _target)
+        => EntityManager.Instance?.MakeBullet(this, _target);
+
+    private void Hit(Monster _target, int _damage)
+    {
+        if (_target == null) return;
+
+        int damage = _damage;
+        int chance = criticalChance;
+        int overflow = Mathf.Max(chance - 100, 0);
+        chance = Mathf.Min(chance, 100);
+
+        bool critical = false;
+        if (Random.value < chance / 100f)
+        {
+            critical = true;
+            damage = damage * criticalDamage / 100;
+        }
+
+        bool isHit = _target.TakeDamage(this, damage, critical);
+        if (isHit && critical && Random.value < overflow / 1000f)
+            GameManager.Instance?.LifeUp();
+    }
+    #endregion
+
+    #region 불릿
+    public void AddBullet(Bullet _bullet) => bullets.Add(_bullet);
+    public void RemoveBullet(Bullet _bullet) => bullets.Remove(_bullet);
+    public void HitBullet(Monster _target, int _damage) => Hit(_target, _damage);
+    #endregion
+
     #region SET
     public void SetData(TowerData _data)
     {
@@ -157,13 +249,38 @@ public class Tower : Entity
         symbolSR.color = data.Color;
     }
 
-    public void SetSymbolColor(Color _color) => symbolSR.color = _color;
-
     public void SetRank(int _rank)
     {
         rank = Mathf.Clamp(_rank, 1, MaxRank);
 
         UpdateSymbol();
+    }
+
+    private void SetStat()
+    {
+        TowerStat.Stat4 stat = DataManager.Instance.GetBaseStat(data.Role, data.Grade);
+
+        if (data.Target == AttackTarget.None)
+            attackTarget = null;
+
+        int damage = stat.attackDamage * rank;
+        int speed = stat.attackSpeed * rank;
+        int chance = stat.criticalChance * rank;
+        int critical = stat.criticalDamage;
+
+        attackDamage = damage;
+        attackSpeed = speed;
+
+        if (chance <= 0)
+        {
+            criticalChance = 0;
+            criticalDamage = 100;
+        }
+        else
+        {
+            criticalChance = chance;
+            criticalDamage = critical;
+        }
     }
     #endregion
 
@@ -176,5 +293,11 @@ public class Tower : Entity
     public TowerGrade GetGrade() => data.Grade;
 
     public int GetRank() => rank;
+
+    public Monster GetTarget() => attackTarget;
+    public int GetDamage() => attackDamage;
+    public int GetSpeed() => attackSpeed;
+    public int GetChance() => criticalChance;
+    public int GetCritical() => criticalDamage;
     #endregion
 }

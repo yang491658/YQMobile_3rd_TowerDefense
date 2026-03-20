@@ -4283,7 +4283,7 @@ MonoBehaviour:
   lifeUpCooldown: 10
   exp: 0
   needExp: 100
-  scoreExp: 10
+  scoreExp: 100
   goldExp: 100
   level: 1
   maxLevel: 10
@@ -7027,7 +7027,7 @@ MonoBehaviour:
   refRank:
     TMP: {fileID: 168061003}
     slider: {fileID: 948936902}
-    value: 0
+    value: 3
     minValue: 0
     maxValue: 0
     format: "\uAE30\uC900 \uB7AD\uD06C : {0}"
@@ -8636,7 +8636,15 @@ MonoBehaviour:
     active: 0
     wait: 0
     peak: 0
+  bulletPolicy:
+    prewarm: 0
+    limit: 0
+    keep: 0
+    active: 0
+    wait: 0
+    peak: 0
   monsterTrans: {fileID: 174201494}
+  bulletTrans: {fileID: 1420682366}
 --- !u!4 &1841597677
 Transform:
   m_ObjectHideFlags: 0
@@ -9889,9 +9897,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   towerBase: {fileID: 2405136491643342982, guid: 65709820441e41a46b91d7744a937d3a, type: 3}
   monsterBase: {fileID: 2405136491643342982, guid: ad2e77aeb665f6e46879133d8f714c1d, type: 3}
+  bulletBase: {fileID: 7353454852798843222, guid: 9a8455d33d743234994a347db19475d8, type: 3}
   inGame: {fileID: 0}
   towerTrans: {fileID: 0}
   monsterTrans: {fileID: 0}
+  otherTrans: {fileID: 0}
   towers: []
   monsters: []
 --- !u!4 &2061510342
