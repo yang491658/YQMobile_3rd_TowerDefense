@@ -149,16 +149,16 @@ public class TowerChance : ScriptableObject
         newLevels.Sort((_a, _b) => _a.level.CompareTo(_b.level));
         levels = newLevels;
 
-        SetDic();
+        SetDictionary();
     }
 #endif
 
     private void OnEnable()
     {
-        SetDic();
+        SetDictionary();
     }
 
-    private void SetDic()
+    private void SetDictionary()
     {
         levelDic.Clear();
         for (int i = 0; i < levels.Count; i++)

@@ -1202,6 +1202,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 168061001}
   m_CullTransparentMesh: 1
+--- !u!1 &174201493
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 174201494}
+  m_Layer: 0
+  m_Name: Monsters
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &174201494
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 174201493}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1841597677}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &177788167
 GameObject:
   m_ObjectHideFlags: 0
@@ -8536,6 +8567,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fac1e1d7db4dac64b981287655470905, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  monsterPolicy:
+    prewarm: 0
+    limit: 0
+    keep: 0
+    active: 0
+    wait: 0
+    peak: 0
+  monsterTrans: {fileID: 174201494}
 --- !u!4 &1841597677
 Transform:
   m_ObjectHideFlags: 0
@@ -8548,7 +8587,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 174201494}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1846186068
@@ -9784,9 +9824,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   towerBase: {fileID: 2405136491643342982, guid: 65709820441e41a46b91d7744a937d3a, type: 3}
+  monsterBase: {fileID: 2405136491643342982, guid: ad2e77aeb665f6e46879133d8f714c1d, type: 3}
   inGame: {fileID: 0}
   towerTrans: {fileID: 0}
+  monsterTrans: {fileID: 0}
   towers: []
+  monsters: []
 --- !u!4 &2061510342
 Transform:
   m_ObjectHideFlags: 0

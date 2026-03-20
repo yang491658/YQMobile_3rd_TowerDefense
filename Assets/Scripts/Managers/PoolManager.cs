@@ -41,6 +41,7 @@ public class PoolManager : MonoBehaviour
     }
 
     [Header("Policy")]
+    [SerializeField] private Policy monsterPolicy = new Policy(0, 0, 0);
     private readonly Dictionary<int, Policy> policy = new Dictionary<int, Policy>();
 
     [Header("Pooling")]
@@ -51,11 +52,14 @@ public class PoolManager : MonoBehaviour
     private readonly List<GameObject> pending = new List<GameObject>();
 
     [Header("Parent")]
+    [SerializeField] private Transform monsterTrans;
     private readonly Dictionary<int, Transform> parent = new Dictionary<int, Transform>();
 
 #if UNITY_EDITOR
     private void OnValidate()
     {
+        if (monsterTrans == null)
+            monsterTrans = transform.Find("Monsters");
     }
 #endif
 
@@ -268,17 +272,23 @@ public class PoolManager : MonoBehaviour
     #region 유틸
     private Policy GetPolicy(GameObject _prefab)
     {
+        if (_prefab.TryGetComponent(out Monster _)) return monsterPolicy;
+
         return default;
     }
 
     private Transform GetParent(GameObject _obj)
     {
+        if (_obj.TryGetComponent(out Monster _)) return monsterTrans;
+
         return transform;
     }
 
 #if TEST_Manager
     private void UpdateStatistics()
     {
+        if (monsterPolicy != null) { monsterPolicy.active = 0; monsterPolicy.wait = 0; }
+
         foreach (var p in policy.Values)
         {
             if (p == null) continue;
@@ -307,6 +317,8 @@ public class PoolManager : MonoBehaviour
 
             p.wait = alive;
         }
+
+        monsterPolicy.peak = Mathf.Max(monsterPolicy.active, monsterPolicy.peak);
     }
 #endif
     #endregion

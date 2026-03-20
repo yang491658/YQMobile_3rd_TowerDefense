@@ -188,7 +188,7 @@ public class SoundManager : MonoBehaviour
 
         SetBGMVolume(bgmVol);
         SetSFXVolume(sfxVol);
-        SetDictionaries();
+        SetDictionary();
     }
 
     public void SetBGMVolume(float _volume = 1f)
@@ -223,7 +223,7 @@ public class SoundManager : MonoBehaviour
         OnChangeVolume?.Invoke(SoundType.SFX, sfxVol);
     }
 
-    private void SetDictionaries()
+    private void SetDictionary()
     {
         bgmDict.Clear();
         if (soundClips.bgmClips != null)

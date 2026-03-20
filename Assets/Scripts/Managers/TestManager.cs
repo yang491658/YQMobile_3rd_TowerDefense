@@ -118,6 +118,10 @@ public class TestManager : MonoBehaviour
 
         SetAuto();
         UpdateTestUI();
+
+        int refID = DataManager.Instance.GetTowerID(refTower.value);
+        EntityManager.Instance?.SpawnTower(refID, refRank.value, Vector3.up * -3f, _useGold: false);
+        EntityManager.Instance?.SpawnMonster(Vector3.up * 3f);
     }
 
     private void Update()
@@ -171,6 +175,15 @@ public class TestManager : MonoBehaviour
             pos = Camera.main.ScreenToWorldPoint(pos);
 
             EntityManager.Instance?.SpawnTower(refID, refRank.value, pos, _useGold: false);
+        }
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            Vector3 pos = Input.mousePosition;
+            pos.z = -Camera.main.transform.position.z;
+            pos = Camera.main.ScreenToWorldPoint(pos);
+
+            EntityManager.Instance?.SpawnMonster(pos);
         }
         #endregion
 

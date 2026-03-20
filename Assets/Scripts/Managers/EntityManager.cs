@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
-
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -13,18 +11,23 @@ public class EntityManager : MonoBehaviour
 
     [Header("Base")]
     [SerializeField] private GameObject towerBase;
+    [SerializeField] private GameObject monsterBase;
 
     [Header("InGame")]
     [SerializeField] private Transform inGame;
     [SerializeField] private Transform towerTrans;
+    [SerializeField] private Transform monsterTrans;
     [Space]
     [SerializeField] private List<Tower> towers = new List<Tower>();
+    [SerializeField] private List<Monster> monsters = new List<Monster>();
 
 #if UNITY_EDITOR
     private void OnValidate()
     {
         if (towerBase == null)
             towerBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Tower.prefab");
+        if (monsterBase == null)
+            monsterBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Monster.prefab");
     }
 #endif
 
@@ -41,8 +44,13 @@ public class EntityManager : MonoBehaviour
         SetEntity();
     }
 
+    private void Start()
+    {
+        PoolManager.Instance?.Init(monsterBase);
+    }
+
     #region 타워
-    public Tower SpawnTower(int _id = 0, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
+    public Tower SpawnTower(int _id = 0, int _rank = 1, Vector3 _pos = default, bool _useGold = true)
     {
         int id = _id;
         if (_id == 0)
@@ -59,7 +67,7 @@ public class EntityManager : MonoBehaviour
 
         if (_useGold && !GameManager.Instance.EnoughGold()) return null;
 
-        Tower tower = Instantiate(towerBase, _pos.Value, Quaternion.identity, towerTrans)
+        Tower tower = Instantiate(towerBase, _pos, Quaternion.identity, towerTrans)
             .GetComponent<Tower>();
         tower.SetData(data);
         tower.SetRank(_rank);
@@ -106,16 +114,53 @@ public class EntityManager : MonoBehaviour
     }
     #endregion
 
+    #region 몬스터
+    public Monster SpawnMonster(Vector3 _pos = default)
+    {
+        Monster monster = SpawnPool<Monster>(monsterBase, _pos, monsterTrans);
+        if (monster == null) return null;
+
+        monster.SetMonster(GameManager.Instance.GetScore() / 50);
+        monsters.Add(monster);
+
+        return monster;
+    }
+
+    public void DespawnMonster(Monster _monster)
+    {
+        monsters.Remove(_monster);
+        _monster.Despawn();
+    }
+    #endregion
+
+    #region 풀링
+    private T SpawnPool<T>(GameObject _prefab, Vector3 _pos, Transform _parent) where T : Component
+        => PoolManager.Instance?.Rent(_prefab, _pos, _parent)?.GetComponent<T>();
+
+    public void DespawnPool(Pooling _pooling)
+        => PoolManager.Instance?.Release(_pooling.gameObject);
+    #endregion
+
+    public void DespawnAll()
+    {
+        for (int i = towers.Count - 1; i >= 0; i--)
+            DespawnTower(towers[i]);
+        for (int i = monsters.Count - 1; i >= 0; i--)
+            DespawnMonster(monsters[i]);
+    }
+
     #region SET
     public void ResetEntity()
     {
         towers.RemoveAll(_tower => _tower == null);
+        monsters.RemoveAll(_monster => _monster == null);
     }
 
     public void SetEntity()
     {
         if (inGame == null) inGame = GameObject.Find("InGame")?.transform;
         if (towerTrans == null) towerTrans = GameObject.Find("InGame/Towers")?.transform;
+        if (monsterTrans == null) monsterTrans = GameObject.Find("InGame/Monsters")?.transform;
     }
     #endregion
 
