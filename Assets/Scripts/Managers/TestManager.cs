@@ -167,24 +167,12 @@ public class TestManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.T))
         {
             int refID = DataManager.Instance.GetTowerID(refTower.value);
-
-            Vector3 pos = Input.mousePosition;
-            pos.z = -Camera.main.transform.position.z;
-            pos = Camera.main.ScreenToWorldPoint(pos);
-
-            EntityManager.Instance?.SpawnTower(refID, refRank.value, pos, _useGold: false);
+            EntityManager.Instance?.SpawnTower(refID, refRank.value, _useGold: false);
         }
-
         if (Input.GetKeyDown(KeyCode.E))
-        {
-            Vector3 pos = Input.mousePosition;
-            pos.z = -Camera.main.transform.position.z;
-            pos = Camera.main.ScreenToWorldPoint(pos);
-
-            EntityManager.Instance?.SpawnMonster(pos);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Delete)) EntityManager.Instance?.DespawnAll();
+            EntityManager.Instance?.SpawnMonster();
+        if (Input.GetKeyDown(KeyCode.Delete))
+            EntityManager.Instance?.DespawnAll();
         #endregion
 
         #region UI 매니저
@@ -217,20 +205,12 @@ public class TestManager : MonoBehaviour
     {
         IsAuto = _on;
 
-        //GameManager.Instance?.SetSpeed(_on ? GameManager.Instance.GetMaxSpeed() : 1f);
+        GameManager.Instance?.SetSpeed(_on ? GameManager.Instance.GetMaxSpeed() : 1f);
     }
 
     private void AutoPlay()
     {
         playTime += Time.deltaTime;
-
-        if (EntityManager.Instance?.GetMonsterCount() < 10)
-        {
-            float x = Random.Range(-5f, 5f);
-            float y = Random.Range(0f, 5f);
-            Vector3 pos = new Vector3(x, y, 0f);
-            EntityManager.Instance?.SpawnMonster(pos);
-        }
     }
 
     private IEnumerator AutoReplay()

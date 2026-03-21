@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -22,6 +23,18 @@ public class EntityManager : MonoBehaviour
     [Space]
     [SerializeField] private List<Tower> towers = new List<Tower>();
     [SerializeField] private List<Monster> monsters = new List<Monster>();
+
+    [Header("Map")]
+    [SerializeField] private Transform map;
+    [SerializeField] private Transform mapField;
+    private Tilemap mapFieldTilemap;
+    private readonly List<Vector3Int> fieldCells = new List<Vector3Int>();
+    [SerializeField] private float mapMargin = 1f;
+    [Space]
+    private Vector3Int exitCell;
+    private Vector3Int entryCell;
+    [SerializeField] private Color exitColor = Color.magenta;
+    [SerializeField] private Color entryColor = Color.green;
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -54,8 +67,111 @@ public class EntityManager : MonoBehaviour
         PoolManager.Instance?.Init(bulletBase);
     }
 
+    #region 필드
+    private bool HasTower(Vector3Int _cell)
+    {
+        for (int i = 0; i < towers.Count; i++)
+        {
+            Tower tower = towers[i];
+            if (tower == null) continue;
+
+            if (mapFieldTilemap.WorldToCell(tower.transform.position) == _cell)
+                return true;
+        }
+        return false;
+    }
+
+    private bool PickRandom(out Vector3Int _cell)
+    {
+        _cell = default;
+
+        bool found = false;
+        int count = 0;
+
+        for (int i = 0; i < fieldCells.Count; i++)
+        {
+            Vector3Int cell = fieldCells[i];
+            if (HasTower(cell)) continue;
+
+            count++;
+            if (Random.Range(0, count) == 0)
+            {
+                _cell = cell;
+                found = true;
+            }
+        }
+
+        return found;
+    }
+
+    private bool PickNearest(Vector3 _pos, out Vector3Int _cell)
+    {
+        _cell = default;
+
+        bool found = false;
+        float bestDistSqr = 0f;
+
+        Vector2 p2 = new Vector2(_pos.x, _pos.y);
+
+        for (int i = 0; i < fieldCells.Count; i++)
+        {
+            Vector3Int cell = fieldCells[i];
+            if (HasTower(cell)) continue;
+
+            Vector3 w = mapFieldTilemap.GetCellCenterWorld(cell);
+            Vector2 w2 = new Vector2(w.x, w.y);
+            float d = (w2 - p2).sqrMagnitude;
+
+            if (!found || d < bestDistSqr)
+            {
+                found = true;
+                bestDistSqr = d;
+                _cell = cell;
+            }
+        }
+
+        return found;
+    }
+
+    private Vector3 SelectField(Vector3? _pos = null)
+    {
+        if (fieldCells.Count == 0) return Vector3.positiveInfinity;
+
+        float z = _pos.HasValue ? _pos.Value.z : 0f;
+
+        Vector3Int cell;
+
+        if (!_pos.HasValue)
+        {
+            if (!PickRandom(out cell)) return Vector3.positiveInfinity;
+
+            Vector3 r = mapFieldTilemap.GetCellCenterWorld(cell);
+            r.z = z;
+            return r;
+        }
+
+        Vector3 p = _pos.Value;
+
+        Vector3Int originCell = mapFieldTilemap.WorldToCell(p);
+        if (mapFieldTilemap.HasTile(originCell) &&
+            originCell != entryCell && originCell != exitCell &&
+            !HasTower(originCell))
+        {
+            Vector3 r = mapFieldTilemap.GetCellCenterWorld(originCell);
+            r.z = z;
+            return r;
+        }
+
+        if (!PickNearest(p, out cell)) return Vector3.positiveInfinity;
+
+        Vector3 result = mapFieldTilemap.GetCellCenterWorld(cell);
+        result.z = z;
+        return result;
+    }
+    #endregion
+
     #region 타워
-    public Tower SpawnTower(int _id = 0, int _rank = 1, Vector3 _pos = default, bool _useGold = true)
+    public Tower SpawnTower(int _id = 0, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
     {
         int id = _id;
         if (_id == 0)
@@ -72,7 +188,10 @@ public class EntityManager : MonoBehaviour
 
         if (_useGold && !GameManager.Instance.EnoughGold()) return null;
 
-        Tower tower = Instantiate(towerBase, _pos, Quaternion.identity, towerTrans)
+        Vector3 pos = SelectField(_pos);
+        if (float.IsInfinity(pos.x)) return null;
+
+        Tower tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
             .GetComponent<Tower>();
         tower.SetData(data);
         tower.SetRank(_rank);
@@ -120,9 +239,15 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region 몬스터
-    public Monster SpawnMonster(Vector3 _pos = default)
+    public Monster SpawnMonster(Vector3? _pos = null)
     {
-        Monster monster = SpawnPool<Monster>(monsterBase, _pos, monsterTrans);
+        Vector3 pos = _pos.HasValue ?
+            SelectField(_pos) :
+            mapFieldTilemap.GetCellCenterWorld(entryCell);
+
+        if (float.IsInfinity(pos.x)) return null;
+
+        Monster monster = SpawnPool<Monster>(monsterBase, pos, monsterTrans);
         if (monster == null) return null;
 
         monster.SetMonster(GameManager.Instance.GetScore() / 50);
@@ -175,6 +300,108 @@ public class EntityManager : MonoBehaviour
         if (towerTrans == null) towerTrans = GameObject.Find("InGame/Towers")?.transform;
         if (monsterTrans == null) monsterTrans = GameObject.Find("InGame/Monsters")?.transform;
         if (otherTrans == null) otherTrans = GameObject.Find("InGame/Others")?.transform;
+
+        if (map == null) map = GameObject.Find("Map")?.transform;
+        if (mapField == null) mapField = GameObject.Find("Field")?.transform;
+        mapFieldTilemap = mapField.GetComponent<Tilemap>();
+
+        SetMap();
+        SetCell();
+        SetPath();
+    }
+
+    private void SetMap()
+    {
+        Rect r = AutoCamera.WorldRect;
+
+        float side = r.width * (mapMargin / 100f);
+        r = Rect.MinMaxRect(r.xMin + side, r.yMin, r.xMax - side, r.yMax);
+        if (r.width <= 0f || r.height <= 0f) return;
+
+        mapFieldTilemap.CompressBounds();
+
+        Bounds localBounds = mapFieldTilemap.localBounds;
+        float localW = localBounds.size.x;
+        float localH = localBounds.size.y;
+        if (localW <= 0f || localH <= 0f) return;
+
+        Vector3 tileLossy = mapFieldTilemap.transform.lossyScale;
+        Vector3 mapScale = map.localScale;
+
+        float denomX = localW * Mathf.Abs(tileLossy.x / mapScale.x);
+        float denomY = localH * Mathf.Abs(tileLossy.y / mapScale.y);
+        if (denomX <= 0f || denomY <= 0f) return;
+
+        float xScale = r.width / denomX;
+        float yScale = r.height / denomY;
+        float s = Mathf.Min(xScale, yScale);
+        if (s <= 0f) return;
+
+        map.localScale = new Vector3(s, s, mapScale.z);
+
+        Vector3 pos = map.position;
+        pos.x = r.center.x;
+        pos.y = r.center.y;
+        map.position = pos;
+    }
+
+    private void SetCell()
+    {
+        fieldCells.Clear();
+
+        mapFieldTilemap.CompressBounds();
+        BoundsInt bounds = mapFieldTilemap.cellBounds;
+
+        bool hasTile = false;
+        int minX = 0, maxX = 0, minY = 0, maxY = 0;
+
+        for (int y = bounds.yMin; y < bounds.yMax; y++)
+        {
+            for (int x = bounds.xMin; x < bounds.xMax; x++)
+            {
+                Vector3Int cell = new Vector3Int(x, y, 0);
+                if (!mapFieldTilemap.HasTile(cell)) continue;
+
+                fieldCells.Add(cell);
+
+                if (!hasTile)
+                {
+                    hasTile = true;
+                    minX = maxX = x;
+                    minY = maxY = y;
+                    continue;
+                }
+
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+            }
+        }
+
+        if (!hasTile) return;
+
+        entryCell = new Vector3Int(minX, maxY, 0);
+        exitCell = new Vector3Int(maxX, minY, 0);
+
+        for (int i = fieldCells.Count - 1; i >= 0; i--)
+        {
+            Vector3Int cell = fieldCells[i];
+            if (cell == entryCell || cell == exitCell)
+                fieldCells.RemoveAt(i);
+        }
+
+        TileFlags entryFlags = mapFieldTilemap.GetTileFlags(entryCell);
+        mapFieldTilemap.SetTileFlags(entryCell, entryFlags & ~TileFlags.LockColor);
+        mapFieldTilemap.SetColor(entryCell, entryColor);
+
+        TileFlags exitFlags = mapFieldTilemap.GetTileFlags(exitCell);
+        mapFieldTilemap.SetTileFlags(exitCell, exitFlags & ~TileFlags.LockColor);
+        mapFieldTilemap.SetColor(exitCell, exitColor);
+    }
+
+    private void SetPath()
+    {
     }
     #endregion
 

@@ -103,7 +103,7 @@ public class DataManager : MonoBehaviour
 
         return result.ToArray();
     }
-    public int GetTowerID(int _order) 
+    public int GetTowerID(int _order)
         => (_order > 0 && _order <= towerDatas.Length) ? towerDatas[_order - 1].ID : 0;
 
     public IReadOnlyList<TowerChance.GradeChance> GetGradeChance(int _level) => towerChance.GetGradeChance(_level);
