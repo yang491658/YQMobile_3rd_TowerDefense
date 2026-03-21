@@ -15,8 +15,8 @@ public class TowerStat : ScriptableObject
         {
             attackDamage = Mathf.Max(_damage, 0);
             attackSpeed = Mathf.Max(_speed, 0);
-            criticalChance = _damage > 0 ? Mathf.Max(_chance, 0) : 0;
-            criticalDamage = _chance > 0 ? Mathf.Max(_critical, 100) : 100;
+            criticalChance = attackDamage > 0 ? Mathf.Max(_chance, 0) : 0;
+            criticalDamage = criticalChance > 0 ? Mathf.Max(_critical, 100) : 100;
         }
     }
 

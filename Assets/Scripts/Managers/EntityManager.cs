@@ -510,29 +510,15 @@ public class EntityManager : MonoBehaviour
             float value = _selector(entity);
             if (_useMin && value < _min) continue;
 
-            if (!hasBest)
+            if (!hasBest || (_low ? value < bestValue : value > bestValue))
             {
                 hasBest = true;
                 bestValue = value;
                 bestEntity = entity;
-                continue;
-            }
-
-            if (_low)
-            {
-                if (value < bestValue)
-                { bestValue = value; bestEntity = entity; }
-            }
-            else
-            {
-                if (value > bestValue)
-                { bestValue = value; bestEntity = entity; }
             }
         }
 
-        if (!hasBest) return null;
-
-        return bestEntity;
+        return hasBest ? bestEntity : null;
     }
     #endregion
 

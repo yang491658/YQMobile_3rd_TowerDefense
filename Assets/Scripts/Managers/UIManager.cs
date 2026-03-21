@@ -335,13 +335,13 @@ public class UIManager : MonoBehaviour
         UpdatePlayTime();
     }
 
-    public void UpdateSpeed(float _speed)
+    private void UpdateSpeed(float _speed)
     {
         if (!Mathf.Approximately(speedSlider.value, _speed))
             speedSlider.value = _speed;
     }
 
-    public void UpdatePlayTime()
+    private void UpdatePlayTime()
     {
         int total = Mathf.FloorToInt(playTime);
         if (total == playTimeSec) return;
@@ -351,7 +351,7 @@ public class UIManager : MonoBehaviour
         playTimeText.text = s;
     }
 
-    public void UpdateScore(int _score)
+    private void UpdateScore(int _score)
     {
         string s = FormatNumber(_score, true);
         scoreNum.text = s;
@@ -359,7 +359,7 @@ public class UIManager : MonoBehaviour
         resultScoreNum.text = s;
     }
 
-    public void UpdateVolume(SoundType _type, float _volume)
+    private void UpdateVolume(SoundType _type, float _volume)
     {
         switch (_type)
         {
@@ -378,7 +378,7 @@ public class UIManager : MonoBehaviour
         UpdateSoundIcon();
     }
 
-    public void UpdateSoundIcon()
+    private void UpdateSoundIcon()
     {
         if (bgmIcons.Count >= 2)
             bgmIcon.sprite = SoundManager.Instance.IsBGMMuted() ? bgmIcons[1] : bgmIcons[0];
