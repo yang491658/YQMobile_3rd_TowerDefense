@@ -10,8 +10,14 @@ public class Monster : Pooling
     [SerializeField] private TextMeshProUGUI healthText;
 
     [Header("Move")]
+    [SerializeField] private Vector3 current;
+    [SerializeField] private Vector3 target;
     [SerializeField][Min(0f)] private float moveSpeed = 3f;
+    [SerializeField][Min(0f)] private float moveCooldown = 1f;
+    private float moveTimer = 0f;
     [SerializeField] private Vector3 moveDirection;
+
+    public bool IsMoving { private set; get; } = false;
 
     [Header("Battle")]
     [SerializeField][Min(0)] private int health;
@@ -26,7 +32,7 @@ public class Monster : Pooling
     {
         Canvas[] canvases = GetComponentsInChildren<Canvas>(true);
         if (canvas == null) canvas = canvases[0];
-        if (healthText == null)
+        if (healthText == null) 
             healthText = canvas.GetComponentInChildren<TextMeshProUGUI>();
     }
 #endif
@@ -42,8 +48,51 @@ public class Monster : Pooling
 
         if (IsDead) return;
 
+        float dt = Time.deltaTime;
+        UpdateMove(dt);
+    }
+
+    #region 이동
+    private void UpdateMove(float _deltaTime)
+    {
+        moveTimer -= _deltaTime;
+
+        if (!IsMoving)
+        {
+            if (moveTimer > 0f) return;
+
+            Vector3Int currentCell = Vector3Int.RoundToInt(current);
+
+            if (!EntityManager.Instance.GetNextCell(currentCell, out Vector3Int nextCell))
+            {
+                OnGoal();
+                return;
+            }
+
+            target = nextCell;
+            IsMoving = true;
+        }
+
+        Vector3 targetPos = EntityManager.Instance.GetCellPos(Vector3Int.RoundToInt(target));
+        Vector3 delta = targetPos - transform.position;
+
+        float arrive = Mathf.Max(moveSpeed * _deltaTime, 0.1f);
+        if (delta.sqrMagnitude <= arrive * arrive)
+        {
+            transform.position = targetPos;
+            current = Vector3Int.RoundToInt(target);
+            target = current;
+            moveDirection = Vector3.zero;
+            moveTimer = moveCooldown;
+            IsMoving = false;
+            Stop();
+            return;
+        }
+
+        moveDirection = delta.normalized;
         Move(moveSpeed, moveDirection);
     }
+    #endregion
 
     #region 전투
     public bool TakeDamage(Tower _tower, int _damage, bool _critical = false)
@@ -88,6 +137,15 @@ public class Monster : Pooling
         gold = Mathf.Max(10 * _set, 10);
     }
 
+    public void SetMove(Vector3Int _current)
+    {
+        current = _current;
+        target = _current;
+        moveDirection = Vector3.zero;
+        moveTimer = 0f;
+        IsMoving = false;
+    }
+
     public float SetSpeed(float _speed) => moveSpeed = Mathf.Max(_speed, 0f);
 
     public void SetHealth(int _health)
@@ -127,7 +185,13 @@ public class Monster : Pooling
     {
         base.ResetPool();
 
+        current = default;
+        target = default;
         moveSpeed = 3f;
+        moveTimer = 0f;
+        moveDirection = Vector3.zero;
+        IsMoving = false;
+        Stop();
     }
     #endregion
 }

@@ -28,13 +28,18 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private Transform map;
     [SerializeField] private Transform mapField;
     private Tilemap mapFieldTilemap;
-    private readonly List<Vector3Int> fieldCells = new List<Vector3Int>();
     [SerializeField] private float mapMargin = 1f;
-    [Space]
-    private Vector3Int exitCell;
+    private readonly List<Vector3Int> fieldCells = new List<Vector3Int>();
+    private readonly HashSet<Vector3Int> fieldCellSet = new();
     private Vector3Int entryCell;
-    [SerializeField] private Color exitColor = Color.magenta;
+    private Vector3Int exitCell;
+    [Space]
     [SerializeField] private Color entryColor = Color.green;
+    [SerializeField] private Color exitColor = Color.magenta;
+    [SerializeField] private Color pathColor = Color.yellow;
+
+    private static readonly Vector3Int[] moveDirs = { Vector3Int.up, Vector3Int.right, Vector3Int.down, Vector3Int.left };
+    private readonly Dictionary<Vector3Int, Vector3Int> pathDic = new();
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -81,7 +86,78 @@ public class EntityManager : MonoBehaviour
         return false;
     }
 
-    private bool PickRandom(out Vector3Int _cell)
+    private bool HasMonster(Vector3Int _cell)
+    {
+        for (int i = 0; i < monsters.Count; i++)
+        {
+            Monster monster = monsters[i];
+            if (monster == null) continue;
+
+            if (mapFieldTilemap.WorldToCell(monster.transform.position) == _cell)
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool CanMoveMonster(Vector3Int _cell)
+        => _cell == entryCell || _cell == exitCell || fieldCellSet.Contains(_cell);
+
+    private bool CanReachExit(Vector3Int _block)
+    {
+        if (!mapFieldTilemap.HasTile(entryCell) || !mapFieldTilemap.HasTile(exitCell))
+            return false;
+
+        HashSet<Vector3Int> towerCells = new HashSet<Vector3Int>();
+
+        for (int i = 0; i < towers.Count; i++)
+        {
+            Tower tower = towers[i];
+            if (tower == null) continue;
+
+            towerCells.Add(mapFieldTilemap.WorldToCell(tower.transform.position));
+        }
+
+        towerCells.Add(_block);
+
+        Queue<Vector3Int> queue = new Queue<Vector3Int>();
+        HashSet<Vector3Int> visited = new HashSet<Vector3Int>();
+
+        queue.Enqueue(entryCell);
+        visited.Add(entryCell);
+
+        while (queue.Count > 0)
+        {
+            Vector3Int cell = queue.Dequeue();
+            if (cell == exitCell) return true;
+
+            for (int i = 0; i < moveDirs.Length; i++)
+            {
+                Vector3Int next = cell + moveDirs[i];
+
+                if (!CanMoveMonster(next)) continue;
+                if (visited.Contains(next)) continue;
+                if (towerCells.Contains(next)) continue;
+
+                visited.Add(next);
+                queue.Enqueue(next);
+            }
+        }
+
+        return false;
+    }
+
+    private bool CanPlaceTower(Vector3Int _cell)
+    {
+        if (!fieldCellSet.Contains(_cell)) return false;
+        if (_cell == entryCell || _cell == exitCell) return false;
+        if (HasTower(_cell)) return false;
+        if (HasMonster(_cell)) return false;
+
+        return CanReachExit(_cell);
+    }
+
+    private bool PickRandom(out Vector3Int _cell, bool _forTower = true)
     {
         _cell = default;
 
@@ -91,7 +167,8 @@ public class EntityManager : MonoBehaviour
         for (int i = 0; i < fieldCells.Count; i++)
         {
             Vector3Int cell = fieldCells[i];
-            if (HasTower(cell)) continue;
+            bool canUse = _forTower ? CanPlaceTower(cell) : !HasTower(cell);
+            if (!canUse) continue;
 
             count++;
             if (Random.Range(0, count) == 0)
@@ -104,7 +181,7 @@ public class EntityManager : MonoBehaviour
         return found;
     }
 
-    private bool PickNearest(Vector3 _pos, out Vector3Int _cell)
+    private bool PickNearest(Vector3 _pos, out Vector3Int _cell, bool _forTower = true)
     {
         _cell = default;
 
@@ -116,7 +193,8 @@ public class EntityManager : MonoBehaviour
         for (int i = 0; i < fieldCells.Count; i++)
         {
             Vector3Int cell = fieldCells[i];
-            if (HasTower(cell)) continue;
+            bool canUse = _forTower ? CanPlaceTower(cell) : !HasTower(cell);
+            if (!canUse) continue;
 
             Vector3 w = mapFieldTilemap.GetCellCenterWorld(cell);
             Vector2 w2 = new Vector2(w.x, w.y);
@@ -133,7 +211,7 @@ public class EntityManager : MonoBehaviour
         return found;
     }
 
-    private Vector3 SelectField(Vector3? _pos = null)
+    private Vector3 SelectField(Vector3? _pos = null, bool _forTower = true)
     {
         if (fieldCells.Count == 0) return Vector3.positiveInfinity;
 
@@ -143,7 +221,7 @@ public class EntityManager : MonoBehaviour
 
         if (!_pos.HasValue)
         {
-            if (!PickRandom(out cell)) return Vector3.positiveInfinity;
+            if (!PickRandom(out cell, _forTower)) return Vector3.positiveInfinity;
 
             Vector3 r = mapFieldTilemap.GetCellCenterWorld(cell);
             r.z = z;
@@ -151,18 +229,22 @@ public class EntityManager : MonoBehaviour
         }
 
         Vector3 p = _pos.Value;
-
         Vector3Int originCell = mapFieldTilemap.WorldToCell(p);
-        if (mapFieldTilemap.HasTile(originCell) &&
+
+        bool canUseOrigin = _forTower ?
+            CanPlaceTower(originCell) :
+            mapFieldTilemap.HasTile(originCell) &&
             originCell != entryCell && originCell != exitCell &&
-            !HasTower(originCell))
+            !HasTower(originCell);
+
+        if (canUseOrigin)
         {
             Vector3 r = mapFieldTilemap.GetCellCenterWorld(originCell);
             r.z = z;
             return r;
         }
 
-        if (!PickNearest(p, out cell)) return Vector3.positiveInfinity;
+        if (!PickNearest(p, out cell, _forTower)) return Vector3.positiveInfinity;
 
         Vector3 result = mapFieldTilemap.GetCellCenterWorld(cell);
         result.z = z;
@@ -197,6 +279,8 @@ public class EntityManager : MonoBehaviour
         tower.SetRank(_rank);
         towers.Add(tower);
 
+        SetPath();
+
         GameManager.Instance?.UseGold(_useGold);
 
         return tower;
@@ -214,8 +298,11 @@ public class EntityManager : MonoBehaviour
         int rank = _target.GetRank();
         Vector3 pos = _target.transform.position;
 
-        DespawnTower(_select);
-        DespawnTower(_target);
+        towers.Remove(_select);
+        towers.Remove(_target);
+
+        Destroy(_select.gameObject);
+        Destroy(_target.gameObject);
 
         return SpawnTower(id, rank + 1, pos, false);
     }
@@ -224,6 +311,8 @@ public class EntityManager : MonoBehaviour
     {
         towers.Remove(_tower);
         Destroy(_tower.gameObject);
+
+        SetPath();
     }
 
     public void SellTower(Tower _tower)
@@ -242,7 +331,7 @@ public class EntityManager : MonoBehaviour
     public Monster SpawnMonster(Vector3? _pos = null)
     {
         Vector3 pos = _pos.HasValue ?
-            SelectField(_pos) :
+            SelectField(_pos, false) :
             mapFieldTilemap.GetCellCenterWorld(entryCell);
 
         if (float.IsInfinity(pos.x)) return null;
@@ -251,6 +340,7 @@ public class EntityManager : MonoBehaviour
         if (monster == null) return null;
 
         monster.SetMonster(GameManager.Instance.GetScore() / 50);
+        monster.SetMove(mapFieldTilemap.WorldToCell(pos));
         monsters.Add(monster);
 
         return monster;
@@ -348,6 +438,7 @@ public class EntityManager : MonoBehaviour
     private void SetCell()
     {
         fieldCells.Clear();
+        fieldCellSet.Clear();
 
         mapFieldTilemap.CompressBounds();
         BoundsInt bounds = mapFieldTilemap.cellBounds;
@@ -388,7 +479,12 @@ public class EntityManager : MonoBehaviour
         {
             Vector3Int cell = fieldCells[i];
             if (cell == entryCell || cell == exitCell)
+            {
                 fieldCells.RemoveAt(i);
+                continue;
+            }
+
+            fieldCellSet.Add(cell);
         }
 
         TileFlags entryFlags = mapFieldTilemap.GetTileFlags(entryCell);
@@ -402,7 +498,80 @@ public class EntityManager : MonoBehaviour
 
     private void SetPath()
     {
+        pathDic.Clear();
+
+        if (!mapFieldTilemap.HasTile(entryCell) || !mapFieldTilemap.HasTile(exitCell))
+            return;
+
+        HashSet<Vector3Int> towerCells = new HashSet<Vector3Int>();
+
+        for (int i = 0; i < towers.Count; i++)
+        {
+            Tower tower = towers[i];
+            if (tower == null) continue;
+
+            towerCells.Add(mapFieldTilemap.WorldToCell(tower.transform.position));
+        }
+
+        Queue<Vector3Int> queue = new Queue<Vector3Int>();
+        HashSet<Vector3Int> visited = new HashSet<Vector3Int>();
+
+        queue.Enqueue(exitCell);
+        visited.Add(exitCell);
+
+        while (queue.Count > 0)
+        {
+            Vector3Int cell = queue.Dequeue();
+
+            for (int i = 0; i < moveDirs.Length; i++)
+            {
+                Vector3Int next = cell + moveDirs[i];
+
+                if (!CanMoveMonster(next)) continue;
+                if (visited.Contains(next)) continue;
+                if (towerCells.Contains(next)) continue;
+
+                visited.Add(next);
+                pathDic[next] = cell;
+                queue.Enqueue(next);
+            }
+        }
+
+        for (int i = 0; i < fieldCells.Count; i++)
+        {
+            Vector3Int cell = fieldCells[i];
+            TileFlags flags = mapFieldTilemap.GetTileFlags(cell);
+            mapFieldTilemap.SetTileFlags(cell, flags & ~TileFlags.LockColor);
+            mapFieldTilemap.SetColor(cell, Color.white);
+        }
+
+        Vector3Int pathCell = entryCell;
+
+        while (pathDic.TryGetValue(pathCell, out Vector3Int nextCell))
+        {
+            if (nextCell == exitCell) break;
+
+            TileFlags flags = mapFieldTilemap.GetTileFlags(nextCell);
+            mapFieldTilemap.SetTileFlags(nextCell, flags & ~TileFlags.LockColor);
+            mapFieldTilemap.SetColor(nextCell, pathColor);
+
+            pathCell = nextCell;
+        }
     }
+    #endregion
+
+    #region GET_기타
+    public bool GetNextCell(Vector3Int _cell, out Vector3Int _next)
+    {
+        if (pathDic.TryGetValue(_cell, out _next))
+            return true;
+
+        _next = default;
+        return false;
+    }
+
+    public Vector3 GetCellPos(Vector3Int _cell)
+    => mapFieldTilemap.GetCellCenterWorld(_cell);
     #endregion
 
     #region GET_공통

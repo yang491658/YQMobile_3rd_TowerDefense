@@ -8219,7 +8219,7 @@ MonoBehaviour:
   refRank:
     TMP: {fileID: 168061003}
     slider: {fileID: 948936902}
-    value: 3
+    value: 1
     minValue: 0
     maxValue: 0
     format: "\uAE30\uC900 \uB7AD\uD06C : {0}"
@@ -11100,8 +11100,9 @@ MonoBehaviour:
   map: {fileID: 0}
   mapField: {fileID: 0}
   mapMargin: 1
-  exitColor: {r: 1, g: 0, b: 1, a: 1}
   entryColor: {r: 0, g: 1, b: 0, a: 1}
+  exitColor: {r: 1, g: 0, b: 1, a: 1}
+  pathColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!4 &2061510342
 Transform:
   m_ObjectHideFlags: 0

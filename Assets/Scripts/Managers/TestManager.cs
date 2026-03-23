@@ -65,7 +65,7 @@ public class TestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI averageScoreNum;
     [SerializeField] private TextMeshProUGUI averagePlayNum;
     [Space]
-    [SerializeField] private SliderConfig refRank = new SliderConfig(3, 0, 0, "기준 랭크 : {0}");
+    [SerializeField] private SliderConfig refRank = new SliderConfig(1, 0, 0, "기준 랭크 : {0}");
     [SerializeField] private SliderConfig refTower = new SliderConfig(0, 0, 0, "기준 타워 : {0}");
 
 #if UNITY_EDITOR
@@ -167,7 +167,11 @@ public class TestManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.T))
         {
             int refID = DataManager.Instance.GetTowerID(refTower.value);
-            EntityManager.Instance?.SpawnTower(refID, refRank.value, _useGold: false);
+            Vector3 pos = Input.mousePosition;
+            pos.z = -Camera.main.transform.position.z;
+            pos = Camera.main.ScreenToWorldPoint(pos);
+
+            EntityManager.Instance?.SpawnTower(refID, refRank.value, pos, _useGold: false);
         }
         if (Input.GetKeyDown(KeyCode.E))
             EntityManager.Instance?.SpawnMonster();

@@ -141,9 +141,9 @@ public class HandleManager : MonoBehaviour
         if (!canDrag) return;
 
         Vector3 worldPos = ScreenToWorld(_pos);
-        float distance = Vector3.Distance(dragStart, worldPos);
+        float distanceSqr = (worldPos - dragStart).sqrMagnitude;
 
-        if (!isDragging && distance >= drag)
+        if (!isDragging && distanceSqr >= drag * drag)
         {
             isDragging = true;
             OnDragBegin(dragStart);
@@ -169,8 +169,9 @@ public class HandleManager : MonoBehaviour
         if (isDragging)
         {
             worldPos = ClampDrag(dragStart, worldPos);
-            float distance = Vector3.Distance(dragStart, worldPos);
-            if (distance >= drag)
+            float distanceSqr = (worldPos - dragStart).sqrMagnitude;
+
+            if (distanceSqr >= drag * drag)
             {
                 OnDragEnd(dragStart, worldPos);
                 ResetDrag();
