@@ -45,30 +45,23 @@ public class TowerStat : ScriptableObject
         return stat;
     }
 
-    public int GetGradeStat(TowerGrade _grade)
+    public int GetGradeStat(TowerGrade _grade) => _grade switch
     {
-        switch (_grade)
-        {
-            case TowerGrade.Normal: return normal;
-            case TowerGrade.Rare: return rare;
-            case TowerGrade.Epic: return epic;
-            case TowerGrade.Unique: return unique;
-            case TowerGrade.Legend: return legend;
-            case TowerGrade.Mythic: return mythic;
-            case TowerGrade.Temp: return normal;
-            default: return 1;
-        }
-    }
+        TowerGrade.Normal or TowerGrade.Temp => normal,
+        TowerGrade.Rare => rare,
+        TowerGrade.Epic => epic,
+        TowerGrade.Unique => unique,
+        TowerGrade.Legend => legend,
+        TowerGrade.Mythic => mythic,
+        _ => 1,
+    };
 
-    private Stat4 GetRoleStat(TowerRole _role)
+    private Stat4 GetRoleStat(TowerRole _role) => _role switch
     {
-        switch (_role)
-        {
-            case TowerRole.Dealer: return dealer;
-            case TowerRole.Debuff: return debuff;
-            case TowerRole.Buff: return buff;
-            case TowerRole.Summon: return summon;
-            default: return default;
-        }
-    }
+        TowerRole.Dealer => dealer,
+        TowerRole.Debuff => debuff,
+        TowerRole.Buff => buff,
+        TowerRole.Summon => summon,
+        _ => default,
+    };
 }

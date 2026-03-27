@@ -108,7 +108,7 @@ public class EntityManager : MonoBehaviour
         if (!mapFieldTilemap.HasTile(entryCell) || !mapFieldTilemap.HasTile(exitCell))
             return false;
 
-        HashSet<Vector3Int> towerCells = new HashSet<Vector3Int>();
+        HashSet<Vector3Int> towerCells = new();
 
         for (int i = 0; i < towers.Count; i++)
         {
@@ -120,8 +120,8 @@ public class EntityManager : MonoBehaviour
 
         towerCells.Add(_block);
 
-        Queue<Vector3Int> queue = new Queue<Vector3Int>();
-        HashSet<Vector3Int> visited = new HashSet<Vector3Int>();
+        Queue<Vector3Int> queue = new();
+        HashSet<Vector3Int> visited = new();
 
         queue.Enqueue(entryCell);
         visited.Add(entryCell);
@@ -503,7 +503,7 @@ public class EntityManager : MonoBehaviour
         if (!mapFieldTilemap.HasTile(entryCell) || !mapFieldTilemap.HasTile(exitCell))
             return;
 
-        HashSet<Vector3Int> towerCells = new HashSet<Vector3Int>();
+        HashSet<Vector3Int> towerCells = new();
 
         for (int i = 0; i < towers.Count; i++)
         {
@@ -513,8 +513,8 @@ public class EntityManager : MonoBehaviour
             towerCells.Add(mapFieldTilemap.WorldToCell(tower.transform.position));
         }
 
-        Queue<Vector3Int> queue = new Queue<Vector3Int>();
-        HashSet<Vector3Int> visited = new HashSet<Vector3Int>();
+        Queue<Vector3Int> queue = new();
+        HashSet<Vector3Int> visited = new();
 
         queue.Enqueue(exitCell);
         visited.Add(exitCell);
@@ -620,7 +620,7 @@ public class EntityManager : MonoBehaviour
 
     private List<T> GetInRange<T>(List<T> _list, Vector3 _center, float _range, int _count = 0) where T : Component
     {
-        List<T> result = new List<T>();
+        List<T> result = new();
         int total = _list.Count;
         if (total == 0) return result;
 
@@ -638,7 +638,7 @@ public class EntityManager : MonoBehaviour
             return result;
         }
 
-        List<int> indices = new List<int>();
+        List<int> indices = new();
         for (int i = 0; i < total; i++)
         {
             T entity = _list[i];

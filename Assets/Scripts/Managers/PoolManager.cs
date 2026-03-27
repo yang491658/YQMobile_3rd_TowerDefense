@@ -177,10 +177,7 @@ public class PoolManager : MonoBehaviour
 
         if (obj == null)
         {
-            Policy pLimit = null;
-            policy.TryGetValue(key, out pLimit);
-
-            if (pLimit != null && pLimit.limit > 0)
+            if (policy.TryGetValue(key, out var pLimit) && pLimit.limit > 0)
             {
                 made.TryGetValue(key, out int activeCount);
 

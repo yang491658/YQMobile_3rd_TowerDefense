@@ -32,7 +32,7 @@ public class Monster : Pooling
     {
         Canvas[] canvases = GetComponentsInChildren<Canvas>(true);
         if (canvas == null) canvas = canvases[0];
-        if (healthText == null) 
+        if (healthText == null)
             healthText = canvas.GetComponentInChildren<TextMeshProUGUI>();
     }
 #endif

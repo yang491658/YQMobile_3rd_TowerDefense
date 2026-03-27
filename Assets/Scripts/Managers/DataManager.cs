@@ -11,7 +11,7 @@ public class DataManager : MonoBehaviour
 
     [Header("Data")]
     [SerializeField] private TowerData[] towerDatas;
-    private readonly Dictionary<int, TowerData> towerDic = new Dictionary<int, TowerData>();
+    private readonly Dictionary<int, TowerData> towerDic = new();
 
     [Header("Tables")]
     [SerializeField] private TowerChance towerChance;
@@ -92,7 +92,7 @@ public class DataManager : MonoBehaviour
     public TowerData[] GetTowerDatas() => towerDatas;
     public TowerData[] GetTowerDatas(TowerGrade _grade)
     {
-        List<TowerData> result = new List<TowerData>(towerDatas.Length);
+        List<TowerData> result = new(towerDatas.Length);
 
         for (int i = 0; i < towerDatas.Length; i++)
         {
