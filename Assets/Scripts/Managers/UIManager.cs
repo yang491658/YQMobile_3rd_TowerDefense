@@ -33,6 +33,29 @@ public class UIManager : MonoBehaviour
     private int playTimeSec = -1;
     [SerializeField] private TextMeshProUGUI scoreNum;
 
+    [Header("InGame UI / Player")]
+    [SerializeField] private SliderUI life;
+    [Space]
+    [SerializeField] private GameObject expUI;
+    [SerializeField] private SliderUI exp;
+    [Space]
+    [SerializeField] private TextMeshProUGUI levelText;
+    [SerializeField] private TextMeshProUGUI goldText;
+    [SerializeField] private TextMeshProUGUI[] chanceText;
+
+    [System.Serializable]
+    private struct SliderUI
+    {
+        public Slider slider;
+        public TextMeshProUGUI text;
+        public Button btn;
+
+        [HideInInspector] public Image fill;
+        [HideInInspector] public Color color;
+        [HideInInspector] public int prev;
+        [HideInInspector] public Coroutine routine;
+    }
+
     [Header("Setting UI")]
     [SerializeField] private GameObject settingUI;
     [SerializeField] private TextMeshProUGUI settingScoreNum;
@@ -67,6 +90,29 @@ public class UIManager : MonoBehaviour
             playTimeText = GameObject.Find("InGameUI/Score/PlayTimeText")?.GetComponent<TextMeshProUGUI>();
         if (scoreNum == null)
             scoreNum = GameObject.Find("InGameUI/Score/ScoreNum")?.GetComponent<TextMeshProUGUI>();
+
+        if (life.slider == null)
+            life.slider = GameObject.Find("InGameUI/Player/Life/LifeSlider")?.GetComponent<Slider>();
+        if (life.text == null)
+            life.text = GameObject.Find("InGameUI/Player/Life/LifeText")?.GetComponent<TextMeshProUGUI>();
+        if (life.btn == null)
+            life.btn = GameObject.Find("InGameUI/Player/Life/LifeBtn")?.GetComponent<Button>();
+
+        if (expUI == null)
+            expUI = GameObject.Find("InGameUI/Player/Exp");
+        if (exp.slider == null)
+            exp.slider = GameObject.Find("InGameUI/Player/Exp/ExpSlider")?.GetComponent<Slider>();
+        if (exp.text == null)
+            exp.text = GameObject.Find("InGameUI/Player/Exp/ExpText")?.GetComponent<TextMeshProUGUI>();
+        if (exp.btn == null)
+            exp.btn = GameObject.Find("InGameUI/Player/Exp/ExpBtn")?.GetComponent<Button>();
+
+        if (levelText == null)
+            levelText = GameObject.Find("InGameUI/Player/Level+Gold/LevelText")?.GetComponent<TextMeshProUGUI>();
+        if (goldText == null)
+            goldText = GameObject.Find("InGameUI/Player/Level+Gold/GoldText")?.GetComponent<TextMeshProUGUI>();
+        if (chanceText == null || chanceText.Length == 0)
+            chanceText = GameObject.Find("InGameUI/Player/Chance").GetComponentsInChildren<TextMeshProUGUI>();
 
         if (settingUI == null)
             settingUI = GameObject.Find("SettingUI");
@@ -133,11 +179,16 @@ public class UIManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        life.fill = life.slider.fillRect.GetComponent<Image>();
+        life.color = life.fill.color;
+        exp.fill = exp.slider.fillRect.GetComponent<Image>();
+        exp.color = exp.fill.color;
     }
 
     private void Start()
     {
-        UpdateScore(GameManager.Instance.GetScore());
+        ResetUI();
     }
 
     private void Update()
@@ -161,6 +212,12 @@ public class UIManager : MonoBehaviour
         speedSlider.onValueChanged.AddListener(GameManager.Instance.SetSpeed);
 
         GameManager.Instance.OnChangeScore += UpdateScore;
+        GameManager.Instance.OnChangeLife += UpdateLife;
+        life.slider.maxValue = GameManager.Instance.GetMaxLife();
+        life.slider.value = GameManager.Instance.GetLife();
+        GameManager.Instance.OnChangeExp += UpdateExp;
+        GameManager.Instance.OnChangeLevel += UpdateLevel;
+        GameManager.Instance.OnChangeGold += UpdateGold;
 
         SoundManager.Instance.OnChangeVolume += UpdateVolume;
         bgmSlider.value = SoundManager.Instance.GetBGMVolume();
@@ -180,6 +237,10 @@ public class UIManager : MonoBehaviour
         speedSlider.onValueChanged.RemoveListener(GameManager.Instance.SetSpeed);
 
         GameManager.Instance.OnChangeScore -= UpdateScore;
+        GameManager.Instance.OnChangeLife -= UpdateLife;
+        GameManager.Instance.OnChangeExp -= UpdateExp;
+        GameManager.Instance.OnChangeLevel -= UpdateLevel;
+        GameManager.Instance.OnChangeGold -= UpdateGold;
 
         SoundManager.Instance.OnChangeVolume -= UpdateVolume;
         bgmSlider.onValueChanged.RemoveListener(SoundManager.Instance.SetBGMVolume);
@@ -242,7 +303,7 @@ public class UIManager : MonoBehaviour
         countRoutine = null;
     }
 
-    private string FormatNumber(int _number, bool _full)
+    private string FormatNumber(int _number, bool _full = false)
     {
         if (_full && _number < 10000)
             return _number.ToString("0000");
@@ -332,7 +393,24 @@ public class UIManager : MonoBehaviour
         playTime = 0;
         playTimeSec = -1;
 
+        ResetSlider(ref life);
+        ResetSlider(ref exp);
+
         UpdatePlayTime();
+        UpdateScore(GameManager.Instance.GetScore());
+        UpdateLife(GameManager.Instance.GetLife(), GameManager.Instance.GetMaxLife());
+        UpdateExp(GameManager.Instance.GetExp(), GameManager.Instance.GetNeedExp());
+        UpdateLevel(GameManager.Instance.GetLevel());
+        UpdateGold(GameManager.Instance.GetGold());
+    }
+
+    private void ResetSlider(ref SliderUI _slider)
+    {
+        _slider.fill.color = _slider.color;
+        _slider.prev = int.MinValue;
+        if (_slider.routine != null)
+            StopCoroutine(_slider.routine);
+        _slider.routine = null;
     }
 
     private void UpdateSpeed(float _speed)
@@ -357,6 +435,104 @@ public class UIManager : MonoBehaviour
         scoreNum.text = s;
         settingScoreNum.text = s;
         resultScoreNum.text = s;
+    }
+
+    private IEnumerator FlashCoroutine(SliderUI _ui)
+    {
+        _ui.fill.color = Color.white;
+
+        yield return new WaitForSecondsRealtime(0.05f);
+
+        float start = Time.realtimeSinceStartup;
+        while (true)
+        {
+            float t = (Time.realtimeSinceStartup - start) / 0.3f;
+            if (t >= 1f) break;
+
+            _ui.fill.color = Color.Lerp(Color.white, _ui.color, t);
+            yield return null;
+        }
+
+        _ui.fill.color = _ui.color;
+    }
+
+    private void UpdateSlider(ref SliderUI _ui, int _value, int _maxValue, bool _interactable)
+    {
+        _ui.slider.maxValue = _maxValue;
+        _ui.slider.value = Mathf.Min(_value, _maxValue);
+        _ui.text.text = $"{_value} / {_maxValue}";
+        _ui.btn.interactable = _interactable;
+
+        if (_ui.prev == int.MinValue)
+        { _ui.prev = _value; return; }
+
+        if (_value == _ui.prev) return;
+        _ui.prev = _value;
+
+        if (_ui.routine != null)
+            StopCoroutine(_ui.routine);
+        _ui.routine = StartCoroutine(FlashCoroutine(_ui));
+    }
+
+    private void UpdateLife(int _life, int _maxLife)
+        => UpdateSlider(ref life, _life, _maxLife, GameManager.Instance.EnoughLifeCost());
+
+    private void UpdateExp(int _exp, int _needExp)
+    {
+        if (GameManager.Instance.IsMaxLevel())
+        {
+            if (exp.routine != null)
+                StopCoroutine(exp.routine);
+            exp.routine = null;
+            return;
+        }
+
+        UpdateSlider(ref exp, _exp, _needExp, GameManager.Instance.EnoughExpCost());
+    }
+
+    private void UpdateLevel(int _level)
+    {
+        bool isMax = GameManager.Instance.IsMaxLevel();
+
+        expUI.SetActive(!isMax);
+        levelText.text = isMax ? "Lv.MAX" : $"Lv.{_level}";
+
+        UpdateChanceUI(_level);
+    }
+
+    private void UpdateGold(int _gold)
+    {
+        if (life.btn.gameObject.activeSelf)
+            life.btn.interactable = GameManager.Instance.EnoughLifeCost();
+
+        if (exp.btn.gameObject.activeSelf)
+            exp.btn.interactable = GameManager.Instance.EnoughExpCost();
+
+        goldText.text = $"{FormatNumber(_gold)}/{FormatNumber(GameManager.Instance.GetNeedGold())}";
+    }
+
+    private void UpdateChanceUI(int _level)
+    {
+        var rows = DataManager.Instance?.GetGradeChance(_level);
+
+        int index = 0;
+        foreach (TowerGrade grade in System.Enum.GetValues(typeof(TowerGrade)))
+        {
+            if (grade == TowerGrade.Temp) continue;
+            if (index >= chanceText.Length) break;
+
+            int weight = 0;
+            for (int j = 0; j < rows.Count; j++)
+            {
+                if (rows[j].grade == grade)
+                { weight = rows[j].weight; break; }
+            }
+
+            chanceText[index].text = $"{weight}%";
+            chanceText[index].color = DataManager.Instance.GetGradeColor(grade);
+
+            index++;
+        }
     }
 
     private void UpdateVolume(SoundType _type, float _volume)
@@ -397,6 +573,8 @@ public class UIManager : MonoBehaviour
 
     #region 버튼
     public void OnClickSetting() => OpenSetting(true);
+    public void OnClickLife() => GameManager.Instance?.BuyLife();
+    public void OnClickExp() => GameManager.Instance?.BuyExp();
 
     public void OnClickClose() => OpenUI(false);
     public void OnClickSpeed()

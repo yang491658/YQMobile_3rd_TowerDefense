@@ -26,15 +26,14 @@ public class GameManager : MonoBehaviour
     [Header("Life")]
     [SerializeField][Min(0)] private int life = 0;
     [SerializeField][Min(0)] private int maxLife = 20;
-    [SerializeField][Min(0f)] private float lifeUpCooldown = 10f;
-    private float lifeUpTimer = 0f;
-    public event System.Action<int> OnChangeLife;
+    [SerializeField][Min(0)] private int lifeGold = 100;
+    public event System.Action<int, int> OnChangeLife;
 
     [Header("Exp")]
     [SerializeField][Min(0)] private int exp = 0;
     [SerializeField][Min(0)] private int needExp = 100;
-    [SerializeField][Min(0)] private int scoreExp = 100;
-    [SerializeField][Min(0)] private int goldExp = 100;
+    [SerializeField][Min(0)] private int expScore = 100;
+    [SerializeField][Min(0)] private int expGold = 100;
     public event System.Action<int, int> OnChangeExp;
 
     [Header("Level")]
@@ -72,11 +71,6 @@ public class GameManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-    }
-
-    private void Update()
-    {
-        lifeUpTimer -= Time.deltaTime;
     }
 
     private void OnEnable()
@@ -171,10 +165,10 @@ public class GameManager : MonoBehaviour
         if (level < maxLevel)
         {
             scoreStack += _score;
-            while (scoreStack >= scoreExp)
+            while (scoreStack >= expScore)
             {
-                scoreStack -= scoreExp;
-                ExpUp(scoreExp / 10);
+                scoreStack -= expScore;
+                ExpUp(expScore / 10);
             }
         }
     }
@@ -190,11 +184,8 @@ public class GameManager : MonoBehaviour
     #region 생명
     public void LifeUp(int _life = 1)
     {
-        if (lifeUpTimer > 0f) return;
-
         life = Mathf.Min(life + _life, maxLife);
-        lifeUpTimer = lifeUpCooldown;
-        OnChangeLife?.Invoke(life);
+        OnChangeLife?.Invoke(life, maxLife);
     }
 
     public void LifeDown(int _life = 1)
@@ -202,16 +193,24 @@ public class GameManager : MonoBehaviour
         if (IsGameOver) return;
 
         life = Mathf.Max(life - _life, 0);
-        OnChangeLife?.Invoke(life);
+        OnChangeLife?.Invoke(life, maxLife);
 
         if (life <= 0) GameOver();
+    }
+
+    public void BuyLife()
+    {
+        if (life >= maxLife) return;
+        if (gold < lifeGold) return;
+
+        LifeUp();
+        GoldDown(lifeGold);
     }
 
     public void ResetLife()
     {
         life = maxLife;
-        lifeUpTimer = 0f;
-        OnChangeLife?.Invoke(life);
+        OnChangeLife?.Invoke(life, maxLife);
     }
     #endregion
 
@@ -233,10 +232,10 @@ public class GameManager : MonoBehaviour
     public void BuyExp()
     {
         if (level >= maxLevel) return;
-        if (gold < goldExp) return;
+        if (gold < expGold) return;
 
-        ExpUp(goldExp / 10);
-        GoldDown(goldExp);
+        ExpUp(expGold / 10);
+        GoldDown(expGold);
     }
     #endregion
 
@@ -312,11 +311,11 @@ public class GameManager : MonoBehaviour
 
     public int GetLife() => life;
     public int GetMaxLife() => maxLife;
+    public bool EnoughLifeCost() => gold >= lifeGold && life < maxLife;
 
     public int GetExp() => exp;
     public int GetNeedExp() => needExp;
-    public int GetGoldExp() => goldExp;
-    public bool EnoughExpCost() => gold >= goldExp;
+    public bool EnoughExpCost() => gold >= expGold;
 
     public int GetLevel() => level;
     public int GetMaxLevel() => maxLevel;
