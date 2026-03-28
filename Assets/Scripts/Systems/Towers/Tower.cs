@@ -28,7 +28,7 @@ public class Tower : Entity
     private float attackTimer;
     [SerializeField][Min(0)] private int criticalChance;
     [SerializeField][Min(0)] private int criticalDamage;
-    [SerializeField] private List<Bullet> bullets = new List<Bullet>();
+    [SerializeField] private List<Bullet> bullets = new();
 
 #if UNITY_EDITOR
     private void OnValidate()

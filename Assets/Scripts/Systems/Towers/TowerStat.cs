@@ -29,10 +29,10 @@ public class TowerStat : ScriptableObject
     [SerializeField][Min(0)] private int mythic = 100;
 
     [Header("Role")]
-    [SerializeField] private Stat4 dealer = new Stat4(10, 20, 5, 150);
-    [SerializeField] private Stat4 debuff = new Stat4(5, 15, 5, 150);
-    [SerializeField] private Stat4 buff = new Stat4(0, 0, 0, 100);
-    [SerializeField] private Stat4 summon = new Stat4(10, 5, 5, 150);
+    [SerializeField] private Stat4 dealer = new(10, 20, 5, 150);
+    [SerializeField] private Stat4 debuff = new(5, 15, 5, 150);
+    [SerializeField] private Stat4 buff = new(0, 0, 0, 100);
+    [SerializeField] private Stat4 summon = new(10, 5, 5, 150);
 
     public Stat4 GetStat(TowerRole _role, TowerGrade _grade)
     {

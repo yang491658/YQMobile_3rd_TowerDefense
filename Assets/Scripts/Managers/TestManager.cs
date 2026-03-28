@@ -44,7 +44,7 @@ public class TestManager : MonoBehaviour
     public static TestManager Instance { private set; get; }
 
     [Header("Game Test")]
-    [SerializeField] private List<TestResult> testResults = new List<TestResult>();
+    [SerializeField] private List<TestResult> testResults = new();
     [SerializeField][Min(0f)] private float playTime = 0f;
     [Space]
     [SerializeField][Min(0f)] private float autoReplay = 0f;
@@ -58,15 +58,15 @@ public class TestManager : MonoBehaviour
     [Header("Test UI")]
     [SerializeField] private GameObject testUI;
     [Space]
-    [SerializeField] private SliderConfig gameSpeed = new SliderConfig(1, 1, 10, "배속 × {0}");
+    [SerializeField] private SliderConfig gameSpeed = new(1, 1, 10, "배속 × {0}");
     [Space]
     [SerializeField] private TextMeshProUGUI testCountNum;
     [SerializeField] private TextMeshProUGUI score10Num;
     [SerializeField] private TextMeshProUGUI averageScoreNum;
     [SerializeField] private TextMeshProUGUI averagePlayNum;
     [Space]
-    [SerializeField] private SliderConfig refRank = new SliderConfig(1, 0, 0, "기준 랭크 : {0}");
-    [SerializeField] private SliderConfig refTower = new SliderConfig(0, 0, 0, "기준 타워 : {0}");
+    [SerializeField] private SliderConfig refRank = new(1, 0, 0, "기준 랭크 : {0}");
+    [SerializeField] private SliderConfig refTower = new(0, 0, 0, "기준 타워 : {0}");
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -264,23 +264,14 @@ public class TestManager : MonoBehaviour
         _config.slider.minValue = _config.minValue;
         _config.slider.maxValue = _config.maxValue;
         _config.slider.wholeNumbers = true;
-
-        float v = _config.value;
-        if (v < _config.minValue) v = _config.minValue;
-        else if (v > _config.maxValue) v = _config.maxValue;
-        _config.slider.value = v;
+        _config.slider.value = Mathf.Clamp(_config.value, _config.minValue, _config.maxValue);
 
         _action.Invoke(_config.slider.value);
         _config.slider.onValueChanged.AddListener(_action);
     }
 
     private int ChangeSlider(float _value, SliderConfig _config)
-    {
-        int v = Mathf.RoundToInt(_value);
-        if (v < _config.minValue) v = _config.minValue;
-        else if (v > _config.maxValue) v = _config.maxValue;
-        return v;
-    }
+        => Mathf.Clamp(Mathf.RoundToInt(_value), _config.minValue, _config.maxValue);
 
     private void ApplySlider(ref SliderConfig _config, float _value, System.Action<int> _afterAction = null)
     {

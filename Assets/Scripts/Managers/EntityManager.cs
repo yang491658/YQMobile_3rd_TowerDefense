@@ -21,15 +21,15 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private Transform monsterTrans;
     [SerializeField] private Transform otherTrans;
     [Space]
-    [SerializeField] private List<Tower> towers = new List<Tower>();
-    [SerializeField] private List<Monster> monsters = new List<Monster>();
+    [SerializeField] private List<Tower> towers = new();
+    [SerializeField] private List<Monster> monsters = new();
 
     [Header("Map")]
     [SerializeField] private Transform map;
     [SerializeField] private Transform mapField;
     private Tilemap mapFieldTilemap;
     [SerializeField] private float mapMargin = 1f;
-    private readonly List<Vector3Int> fieldCells = new List<Vector3Int>();
+    private readonly List<Vector3Int> fieldCells = new();
     private readonly HashSet<Vector3Int> fieldCellSet = new();
     private Vector3Int entryCell;
     private Vector3Int exitCell;
@@ -330,9 +330,9 @@ public class EntityManager : MonoBehaviour
     #region 몬스터
     public Monster SpawnMonster(Vector3? _pos = null)
     {
-        Vector3 pos = _pos.HasValue ?
-            SelectField(_pos, false) :
-            mapFieldTilemap.GetCellCenterWorld(entryCell);
+        Vector3 pos = _pos.HasValue
+            ? SelectField(_pos, false)
+            : mapFieldTilemap.GetCellCenterWorld(entryCell);
 
         if (float.IsInfinity(pos.x)) return null;
 
@@ -571,7 +571,7 @@ public class EntityManager : MonoBehaviour
     }
 
     public Vector3 GetCellPos(Vector3Int _cell)
-    => mapFieldTilemap.GetCellCenterWorld(_cell);
+        => mapFieldTilemap.GetCellCenterWorld(_cell);
     #endregion
 
     #region GET_공통

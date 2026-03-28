@@ -66,8 +66,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Slider sfxSlider;
     [SerializeField] private Image bgmIcon;
     [SerializeField] private Image sfxIcon;
-    [SerializeField] private List<Sprite> bgmIcons = new List<Sprite>();
-    [SerializeField] private List<Sprite> sfxIcons = new List<Sprite>();
+    [SerializeField] private List<Sprite> bgmIcons = new();
+    [SerializeField] private List<Sprite> sfxIcons = new();
 
     [Header("Confirm UI")]
     [SerializeField] private GameObject confirmUI;

@@ -15,11 +15,11 @@ public class TowerChance : ScriptableObject
     public class LevelChanceRow
     {
         public int level;
-        public List<GradeChance> gradeChances = new List<GradeChance>();
+        public List<GradeChance> gradeChances = new();
     }
 
-    [SerializeField] private List<LevelChanceRow> levels = new List<LevelChanceRow>();
-    private readonly Dictionary<int, LevelChanceRow> levelDic = new Dictionary<int, LevelChanceRow>();
+    [SerializeField] private List<LevelChanceRow> levels = new();
+    private readonly Dictionary<int, LevelChanceRow> levelDic = new();
 
 #if UNITY_EDITOR
     [SerializeField] private TextAsset csv;
@@ -135,12 +135,7 @@ public class TowerChance : ScriptableObject
                 }
 
                 if (!found)
-                {
-                    GradeChance gc = new GradeChance();
-                    gc.grade = grade;
-                    gc.weight = 0;
-                    row.gradeChances.Add(gc);
-                }
+                    row.gradeChances.Add(new GradeChance { grade = grade, weight = 0 });
             }
 
             newLevels.Add(row);

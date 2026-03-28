@@ -41,21 +41,21 @@ public class PoolManager : MonoBehaviour
     }
 
     [Header("Policy")]
-    [SerializeField] private Policy monsterPolicy = new Policy(0, 0, 0);
-    [SerializeField] private Policy bulletPolicy = new Policy(0, 0, 0);
-    private readonly Dictionary<int, Policy> policy = new Dictionary<int, Policy>();
+    [SerializeField] private Policy monsterPolicy = new(0, 0, 0);
+    [SerializeField] private Policy bulletPolicy = new(0, 0, 0);
+    private readonly Dictionary<int, Policy> policy = new();
 
     [Header("Pooling")]
-    private readonly Dictionary<int, int> origin = new Dictionary<int, int>();
-    private readonly Dictionary<int, Stack<GameObject>> pool = new Dictionary<int, Stack<GameObject>>();
-    private readonly Dictionary<int, int> made = new Dictionary<int, int>();
-    private readonly Dictionary<int, IPoolable[]> hook = new Dictionary<int, IPoolable[]>();
-    private readonly List<GameObject> pending = new List<GameObject>();
+    private readonly Dictionary<int, int> origin = new();
+    private readonly Dictionary<int, Stack<GameObject>> pool = new();
+    private readonly Dictionary<int, int> made = new();
+    private readonly Dictionary<int, IPoolable[]> hook = new();
+    private readonly List<GameObject> pending = new();
 
     [Header("Parent")]
     [SerializeField] private Transform monsterTrans;
     [SerializeField] private Transform bulletTrans;
-    private readonly Dictionary<int, Transform> parent = new Dictionary<int, Transform>();
+    private readonly Dictionary<int, Transform> parent = new();
 
 #if UNITY_EDITOR
     private void OnValidate()
