@@ -23,5 +23,5 @@ public class TowerColor : ScriptableObject
             TowerGrade.Mythic => mythic,
             _ => Color.white,
         };
-    #endregion 
+    #endregion
 }

@@ -14,26 +14,35 @@ public class Bullet : Pooling
 
     public bool IsHit { private set; get; } = false;
 
-    protected override void Awake()
-    {
-        base.Awake();
-    }
-
     protected override void Update()
     {
         base.Update();
 
         if (target != null && !target.IsInvalid(targetIndex))
             targetPos = target.transform.position;
+    }
 
-        Vector3 direction = targetPos - transform.position;
-        if (direction.sqrMagnitude <= 0.01f)
+    private void FixedUpdate()
+    {
+        if (IsDespawn) return;
+
+        float step = moveSpeed * Time.fixedDeltaTime;
+
+        Vector2 from = rb.position;
+        Vector2 to = Vector2.MoveTowards(from, targetPos, step);
+
+        rb.MovePosition(to);
+
+        Vector2 delta = (Vector2)targetPos - to;
+        if (delta.sqrMagnitude > 0.0001f) return;
+
+        if (target != null && !target.IsInvalid(targetIndex))
         {
-            Despawn();
-            return;
+            IsHit = true;
+            tower.HitBullet(target, damage);
         }
 
-        Move(moveSpeed, direction);
+        Despawn();
     }
 
     private void OnTriggerEnter2D(Collider2D _collision)
@@ -55,14 +64,18 @@ public class Bullet : Pooling
     #region SET
     public void SetBullet(Tower _tower, Monster _target)
     {
+        transform.localScale = _tower.transform.localScale * 0.3f;
+        sr.sprite = _tower.GetSymbol();
         sr.color = _tower.GetColor();
 
         tower = _tower;
+        tower.AddBullet(this);
         damage = _tower.GetDamage();
 
         target = _target;
         targetIndex = _target.Index;
         targetPos = _target.transform.position;
+        target.ReserveUp(damage);
     }
     #endregion
 
@@ -83,6 +96,12 @@ public class Bullet : Pooling
 
     public override void OnDespawnPool()
     {
+        if (tower != null)
+            tower.RemoveBullet(this);
+
+        if (!IsHit && damage > 0 && target != null && !target.IsInvalid(targetIndex))
+            target.ReserveDown(damage);
+
         base.OnDespawnPool();
     }
 

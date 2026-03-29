@@ -80,7 +80,8 @@ public class Tower : Entity
             return;
         }
 
-        symbol.localScale = Vector3.one * 0.15f;
+        symbol.localScale = Vector3.one * 0.18f;
+        symbolSR.sprite = DataManager.Instance.GetRoleSymbol(data.Role);
         IsMax = false;
 
         Vector2[] positions = SymbolPos(rank);
@@ -94,7 +95,7 @@ public class Tower : Entity
 
     private Vector2[] SymbolPos(int _rank)
     {
-        float offset = symbol.localScale.x * 1.2f;
+        float offset = symbol.localScale.x * 1.25f;
 
         Vector2[] grid =
         {
@@ -197,10 +198,11 @@ public class Tower : Entity
 
         if (data.Role == TowerRole.Debuff
             || attackTarget == null
+            || attackTarget.IsExclude()
             || attackTarget.IsInvalid(targetIndex))
         {
             FindTarget();
-            if (attackTarget == null || !attackTarget.IsAlive()) return;
+            if (attackTarget == null || attackTarget.IsExclude()) return;
         }
 
         Shoot(attackTarget);
@@ -292,6 +294,7 @@ public class Tower : Entity
     public TowerRole GetRole() => data.Role;
     public TowerGrade GetGrade() => data.Grade;
 
+    public Sprite GetSymbol() => symbolSR.sprite;
     public int GetRank() => rank;
 
     public Monster GetTarget() => attackTarget;

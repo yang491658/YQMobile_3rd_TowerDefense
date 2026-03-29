@@ -95,6 +95,7 @@ public class GameManager : MonoBehaviour
 
         EntityManager.Instance?.ResetEntity();
         EntityManager.Instance?.SetEntity();
+        EntityManager.Instance?.ToggleSpawn(true);
 
         UIManager.Instance?.ResetUI();
         UIManager.Instance?.OpenUI(false);
@@ -287,8 +288,10 @@ public class GameManager : MonoBehaviour
     {
         if (!_useGold) return;
 
-        needGold += 10;
         GoldDown(needGold);
+
+        needGold += 10;
+        OnChangeGold?.Invoke(gold);
     }
     #endregion
 

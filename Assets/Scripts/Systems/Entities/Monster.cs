@@ -5,7 +5,7 @@ public class Monster : Pooling
 {
     private static int sorting = 0;
 
-    [Header("Text UI")]
+    [Header("UI")]
     [SerializeField] private Canvas canvas;
     [SerializeField] private TextMeshProUGUI healthText;
 
@@ -13,7 +13,7 @@ public class Monster : Pooling
     [SerializeField] private Vector3 current;
     [SerializeField] private Vector3 target;
     [SerializeField][Min(0f)] private float moveSpeed = 3f;
-    [SerializeField][Min(0f)] private float moveCooldown = 1f;
+    [SerializeField][Min(0f)] private float moveCooldown = 3f;
     private float moveTimer = 0f;
     [SerializeField] private Vector3 moveDirection;
 
@@ -22,6 +22,7 @@ public class Monster : Pooling
     [Header("Battle")]
     [SerializeField][Min(0)] private int health;
     [SerializeField][Min(0)] protected int maxHealth;
+    [SerializeField][Min(0)] private int reserve = 0;
     [Space]
     [SerializeField][Min(0)] private int gold;
 
@@ -95,9 +96,11 @@ public class Monster : Pooling
     #endregion
 
     #region 전투
-    public bool TakeDamage(Tower _tower, int _damage, bool _critical = false)
+    public bool TakeDamage(Tower _tower, int _damage, bool _critical = false, bool _direct = false)
     {
         if (IsDead) return false;
+
+        if (!_direct) ReserveDown(_damage);
 
         SetHealth(health - _damage);
 
@@ -105,6 +108,9 @@ public class Monster : Pooling
 
         return true;
     }
+
+    public void ReserveUp(int _damage) => reserve += _damage;
+    public void ReserveDown(int _damage) => reserve = Mathf.Max(reserve - _damage, 0);
 
     public void Die()
     {
@@ -161,8 +167,8 @@ public class Monster : Pooling
 
     public int GetHealth() => health;
     public int GetMaxHealth() => maxHealth;
-    public bool IsAlive() => !IsDead && !IsDespawn;
-    public bool IsInvalid(int _index = -1) => !IsAlive() || (_index >= 0 && Index != _index);
+    public bool IsExclude() => health < reserve || IsDead || IsDespawn;
+    public bool IsInvalid(int _index = -1) => IsDead || IsDespawn || (_index >= 0 && Index != _index);
     #endregion
 
     #region 풀링
@@ -178,6 +184,7 @@ public class Monster : Pooling
         sr.sortingOrder = order;
         canvas.sortingOrder = order;
 
+        reserve = 0;
         IsDead = false;
     }
 

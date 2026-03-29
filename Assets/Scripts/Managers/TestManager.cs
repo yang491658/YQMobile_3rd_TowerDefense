@@ -65,7 +65,7 @@ public class TestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI averageScoreNum;
     [SerializeField] private TextMeshProUGUI averagePlayNum;
     [Space]
-    [SerializeField] private SliderConfig refRank = new(1, 0, 0, "기준 랭크 : {0}");
+    [SerializeField] private SliderConfig refRank = new(3, 0, 0, "기준 랭크 : {0}");
     [SerializeField] private SliderConfig refTower = new(0, 0, 0, "기준 타워 : {0}");
 
 #if UNITY_EDITOR
@@ -174,7 +174,7 @@ public class TestManager : MonoBehaviour
             EntityManager.Instance?.SpawnTower(refID, refRank.value, pos, _useGold: false);
         }
         if (Input.GetKeyDown(KeyCode.E))
-            EntityManager.Instance?.SpawnMonster();
+            EntityManager.Instance?.ToggleSpawn(!EntityManager.Instance.IsSpawning);
         if (Input.GetKeyDown(KeyCode.Delete))
             EntityManager.Instance?.DespawnAll();
         #endregion
@@ -215,6 +215,23 @@ public class TestManager : MonoBehaviour
     private void AutoPlay()
     {
         playTime += Time.deltaTime;
+
+        AutoMerge(); SyncBasic();
+        if (GameManager.Instance.EnoughGold())
+        {
+            if (EntityManager.Instance.HasEmptyField())
+                EntityManager.Instance?.SpawnTower(refTower.value == 0 ? 0 : DataManager.Instance.GetTowerID(refTower.value));
+            else MergeRandom();
+        }
+
+        int towerCount = EntityManager.Instance.GetTowerCount();
+        int monsterCount = EntityManager.Instance.GetMonsterCount();
+        if (towerCount < 30 && monsterCount < 50)
+            ChangeGameSpeed(gameSpeed.maxValue);
+        else if (towerCount < 100 && monsterCount < 200)
+            ChangeGameSpeed(GameManager.Instance.GetMaxSpeed());
+        else
+            ChangeGameSpeed(1f);
     }
 
     private IEnumerator AutoReplay()
@@ -233,6 +250,146 @@ public class TestManager : MonoBehaviour
             UpdateTestUI();
         }
         autoRoutine = null;
+    }
+
+    private void AutoMerge()
+    {
+        var towers = EntityManager.Instance?.GetTowers();
+        if (towers == null) return;
+
+        int len = towers.Count; if (len < 2) return;
+        int limitRank = refRank.value; if (limitRank < 1) limitRank = 1;
+
+        for (int r = 1; r < limitRank; r++)
+        {
+            for (int i = 0; i < len; i++)
+            {
+                Tower a = towers[i];
+                if (a == null || a.IsDragging) continue;
+                if (a.GetRank() != r) continue;
+
+                for (int j = 0; j < len; j++)
+                {
+                    if (i == j) continue;
+
+                    Tower b = towers[j];
+                    if (b == null || b.IsDragging) continue;
+                    if (b.GetRank() != r) continue;
+
+                    if (a.Merge(b) != null) return;
+                }
+            }
+        }
+    }
+
+    private void SyncBasic()
+    {
+        if (refTower.value == 0) return;
+
+        int refID = DataManager.Instance.GetTowerID(refTower.value);
+        TowerData refData = DataManager.Instance?.SearchTower(refID);
+        if (refData.Role != TowerRole.Buff && refData.Role != TowerRole.Debuff) return;
+
+        List<Tower> towers = EntityManager.Instance?.GetTowers();
+        int maxRank = Tower.MaxRank;
+
+        int[] target = new int[maxRank + 1];
+        List<Tower>[] basics = new List<Tower>[maxRank + 1];
+
+        for (int r = 0; r <= maxRank; r++)
+            basics[r] = new List<Tower>();
+
+        for (int i = 0; i < towers.Count; i++)
+        {
+            Tower t = towers[i];
+            if (t == null || t.IsDragging) continue;
+
+            int rank = t.GetRank(); int id = t.GetID();
+
+            if (id == refID) target[rank]++;
+            else if (id == 999) basics[rank].Add(t);
+        }
+
+        for (int rank = 1; rank <= maxRank; rank++)
+        {
+            List<Tower> list = basics[rank];
+            int need = target[rank];
+
+            while (list.Count < need)
+            {
+                Tower spawned = EntityManager.Instance?.SpawnTower(999, rank, _useGold: false);
+                if (spawned == null) break;
+
+                list.Add(spawned);
+            }
+
+            while (list.Count > need)
+            {
+                if (rank < maxRank && list.Count - need >= 2)
+                {
+                    int last = list.Count - 1; Tower a = list[last]; list.RemoveAt(last);
+                    last = list.Count - 1; Tower b = list[last]; list.RemoveAt(last);
+
+                    Tower merged = a.Merge(b);
+                    if (merged != null) basics[rank + 1].Add(merged);
+                    else break;
+                }
+                else
+                {
+                    int last = list.Count - 1;
+                    Tower remove = list[last];
+                    list.RemoveAt(last);
+                    EntityManager.Instance?.DespawnTower(remove);
+                }
+            }
+        }
+    }
+
+    private void MergeRandom()
+    {
+        List<Tower> towers = EntityManager.Instance?.GetTowers();
+        if (towers == null) return;
+
+        int len = towers.Count; if (len < 2) return;
+
+        HashSet<int> rankSet = new HashSet<int>();
+        for (int i = 0; i < len; i++)
+        {
+            Tower t = towers[i];
+            if (t == null || t.IsDragging) continue;
+
+            rankSet.Add(t.GetRank());
+        }
+
+        List<int> ranks = new List<int>(rankSet); ranks.Sort();
+
+        for (int r = 0; r < ranks.Count; r++)
+        {
+            int curRank = ranks[r];
+            List<int> indices = new List<int>();
+            for (int i = 0; i < len; i++)
+            {
+                Tower t = towers[i];
+                if (t == null || t.IsDragging) continue;
+
+                if (t.GetRank() == curRank) indices.Add(i);
+            }
+
+            int count = indices.Count; if (count < 2) continue;
+            int start = Random.Range(0, count);
+
+            for (int n = 0; n < count; n++)
+            {
+                Tower a = towers[indices[(start + n) % count]];
+                for (int m = 0; m < count; m++)
+                {
+                    if (n == m) continue;
+                    Tower b = towers[indices[m]];
+
+                    if (a.Merge(b) != null) return;
+                }
+            }
+        }
     }
     #endregion
 

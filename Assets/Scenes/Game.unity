@@ -6443,6 +6443,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 957616aae9cd38948a6d653f338f3465, type: 2}
   towerChance: {fileID: 11400000, guid: fa32553a70dee124aa6919c8820d9f57, type: 2}
   towerColor: {fileID: 11400000, guid: cae0e69b465fe334fbc8bc3ac7fa48dc, type: 2}
+  towerSymbol: {fileID: 11400000, guid: 34e1aa77c835a0e41bc4329c081274de, type: 2}
   towerStat: {fileID: 11400000, guid: 6fcd522abd58ae34e9e25a70f96dbfd9, type: 2}
 --- !u!4 &1065004637
 Transform:
@@ -10051,7 +10052,7 @@ MonoBehaviour:
   refRank:
     TMP: {fileID: 168061003}
     slider: {fileID: 948936902}
-    value: 1
+    value: 3
     minValue: 0
     maxValue: 0
     format: "\uAE30\uC900 \uB7AD\uD06C : {0}"
@@ -13642,8 +13643,10 @@ MonoBehaviour:
   mapField: {fileID: 0}
   mapMargin: 1
   entryColor: {r: 0, g: 1, b: 0, a: 1}
-  exitColor: {r: 1, g: 0, b: 1, a: 1}
+  towerColor: {r: 0, g: 0, b: 1, a: 1}
   pathColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  exitColor: {r: 1, g: 0, b: 1, a: 1}
+  spawnDelay: 3
 --- !u!4 &2061510342
 Transform:
   m_ObjectHideFlags: 0
