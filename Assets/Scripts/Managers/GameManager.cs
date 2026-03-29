@@ -94,12 +94,7 @@ public class GameManager : MonoBehaviour
         ResetGold();
 
         EntityManager.Instance?.ResetEntity();
-        EntityManager.Instance?.SetEntity();
-        EntityManager.Instance?.ToggleSpawn(true);
-
         UIManager.Instance?.ResetUI();
-        UIManager.Instance?.OpenUI(false);
-        UIManager.Instance?.StartCountdown();
 
 #if TEST_Manager
         if (TestManager.Instance.IsAuto) TestManager.Instance?.SetAuto();
@@ -241,11 +236,12 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region 레벨
-    public void LevelUp()
+    public void LevelUp(int _level = 1)
     {
         if (level >= maxLevel) return;
 
-        OnChangeLevel?.Invoke(++level);
+        level += _level;
+        OnChangeLevel?.Invoke(level);
 
         needExp = 100 * level * (level + 1) / 2;
         OnChangeExp?.Invoke(exp, needExp);

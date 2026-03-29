@@ -65,10 +65,7 @@ public class Monster : Pooling
             Vector3Int currentCell = Vector3Int.RoundToInt(current);
 
             if (!EntityManager.Instance.GetNextCell(currentCell, out Vector3Int nextCell))
-            {
-                OnGoal();
-                return;
-            }
+            { OnGoal(); return; }
 
             target = nextCell;
             IsMoving = true;
@@ -81,11 +78,13 @@ public class Monster : Pooling
         if (delta.sqrMagnitude <= arrive * arrive)
         {
             transform.position = targetPos;
+
             current = Vector3Int.RoundToInt(target);
             target = current;
             moveDirection = Vector3.zero;
             moveTimer = moveCooldown;
             IsMoving = false;
+
             Stop();
             return;
         }
@@ -151,7 +150,6 @@ public class Monster : Pooling
         moveTimer = 0f;
         IsMoving = false;
     }
-
     public float SetSpeed(float _speed) => moveSpeed = Mathf.Max(_speed, 0f);
 
     public void SetHealth(int _health)

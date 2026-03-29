@@ -35,8 +35,8 @@ public class EntityManager : MonoBehaviour
     private Vector3Int exitCell;
     [Space]
     [SerializeField] private Color entryColor = Color.green;
-    [SerializeField] private Color towerColor = Color.blue;
     [SerializeField] private Color pathColor = Color.yellow;
+    [SerializeField] private Color towerColor = Color.blue;
     [SerializeField] private Color exitColor = Color.magenta;
 
     private static readonly Vector3Int[] moveDirs = { Vector3Int.up, Vector3Int.right, Vector3Int.down, Vector3Int.left };
@@ -87,7 +87,7 @@ public class EntityManager : MonoBehaviour
         if (IsSpawning)
         {
             spawnTimer -= Time.deltaTime;
-            if (spawnTimer <= 0f)
+            if (spawnTimer < 0f)
             {
                 SpawnMonster();
                 spawnTimer = spawnDelay;
@@ -473,12 +473,13 @@ public class EntityManager : MonoBehaviour
     #region SET
     public void ResetEntity()
     {
-        towers.RemoveAll(_tower => _tower == null);
+        towers.Clear();
+        monsters.Clear();
+        pathDic.Clear();
         towerDic.Clear();
-        for (int i = 0; i < towers.Count; i++)
-            towerDic[towers[i]] = mapFieldTilemap.WorldToCell(towers[i].transform.position);
 
-        monsters.RemoveAll(_monster => _monster == null);
+        SetEntity();
+        ToggleSpawn(true);
     }
 
     public void SetEntity()
@@ -495,6 +496,8 @@ public class EntityManager : MonoBehaviour
         SetMap();
         SetCell();
         SetPath();
+
+        spawnTimer = spawnDelay;
     }
 
     private void SetMap()

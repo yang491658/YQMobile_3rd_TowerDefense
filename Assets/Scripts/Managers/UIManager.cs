@@ -402,6 +402,9 @@ public class UIManager : MonoBehaviour
         UpdateExp(GameManager.Instance.GetExp(), GameManager.Instance.GetNeedExp());
         UpdateLevel(GameManager.Instance.GetLevel());
         UpdateGold(GameManager.Instance.GetGold());
+
+        OpenUI(false);
+        StartCountdown();
     }
 
     private void ResetSlider(ref SliderUI _slider)

@@ -13643,8 +13643,8 @@ MonoBehaviour:
   mapField: {fileID: 0}
   mapMargin: 1
   entryColor: {r: 0, g: 1, b: 0, a: 1}
-  towerColor: {r: 0, g: 0, b: 1, a: 1}
   pathColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  towerColor: {r: 0, g: 0, b: 1, a: 1}
   exitColor: {r: 1, g: 0, b: 1, a: 1}
   spawnDelay: 3
 --- !u!4 &2061510342
