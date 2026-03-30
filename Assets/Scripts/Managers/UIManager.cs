@@ -390,7 +390,7 @@ public class UIManager : MonoBehaviour
     public void ResetUI()
     {
         onPlayTime = true;
-        playTime = 0;
+        playTime = 0f;
         playTimeSec = -1;
 
         ResetSlider(ref life);
