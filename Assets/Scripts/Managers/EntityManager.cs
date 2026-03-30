@@ -14,12 +14,14 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private GameObject towerBase;
     [SerializeField] private GameObject monsterBase;
     [SerializeField] private GameObject bulletBase;
+    [SerializeField] private GameObject textBase;
 
     [Header("InGame")]
     [SerializeField] private Transform inGame;
     [SerializeField] private Transform towerTrans;
     [SerializeField] private Transform monsterTrans;
     [SerializeField] private Transform otherTrans;
+    [SerializeField] private RectTransform effectTrans;
     [Space]
     [SerializeField] private List<Tower> towers = new();
     [SerializeField] private List<Monster> monsters = new();
@@ -44,7 +46,7 @@ public class EntityManager : MonoBehaviour
     private readonly Dictionary<Tower, Vector3Int> towerDic = new();
 
     [Header("Wave / Temp")]
-    [SerializeField][Min(0f)] private float spawnDelay = 3f;
+    [SerializeField][Min(0.3f)] private float spawnDelay = 1f;
     private float spawnTimer;
 
     public bool IsSpawning { private set; get; } = false;
@@ -58,6 +60,8 @@ public class EntityManager : MonoBehaviour
             monsterBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Monster.prefab");
         if (bulletBase == null)
             bulletBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Bullet.prefab");
+        if (textBase == null)
+            textBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/TextEffect.prefab");
     }
 #endif
 
@@ -78,6 +82,7 @@ public class EntityManager : MonoBehaviour
     {
         PoolManager.Instance?.Init(monsterBase);
         PoolManager.Instance?.Init(bulletBase);
+        PoolManager.Instance?.Init(textBase);
     }
 
     private void Update()
@@ -457,8 +462,25 @@ public class EntityManager : MonoBehaviour
     {
         Bullet bullet = SpawnPool<Bullet>(bulletBase, _tower.transform.position, otherTrans);
         if (bullet == null) return null;
+
         bullet.SetBullet(_tower, _target);
         return bullet;
+    }
+
+    public TextEffect MakeTextEffect(Vector3 _pos = default)
+    {
+        TextEffect effect = SpawnPool<TextEffect>(textBase, _pos, effectTrans);
+        if (effect == null) return null;
+
+        effect.SetPosition(WorldToCanvas(_pos));
+        return effect;
+    }
+
+    private Vector2 WorldToCanvas(Vector3 _worldPos)
+    {
+        Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(Camera.main, _worldPos);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(effectTrans, screenPos, null, out Vector2 uiPos);
+        return uiPos;
     }
     #endregion
 
@@ -488,6 +510,7 @@ public class EntityManager : MonoBehaviour
         if (towerTrans == null) towerTrans = GameObject.Find("InGame/Towers")?.transform;
         if (monsterTrans == null) monsterTrans = GameObject.Find("InGame/Monsters")?.transform;
         if (otherTrans == null) otherTrans = GameObject.Find("InGame/Others")?.transform;
+        if (effectTrans == null) effectTrans = GameObject.Find("InGame/Effects")?.GetComponent<RectTransform>();
 
         if (map == null) map = GameObject.Find("Map")?.transform;
         if (mapField == null) mapField = GameObject.Find("Field")?.transform;

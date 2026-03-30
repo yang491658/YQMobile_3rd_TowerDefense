@@ -153,6 +153,7 @@ public class TowerChance : ScriptableObject
         SetDictionary();
     }
 
+    #region SET
     private void SetDictionary()
     {
         levelDic.Clear();
@@ -162,7 +163,9 @@ public class TowerChance : ScriptableObject
             levelDic[row.level] = row;
         }
     }
+    #endregion
 
+    #region GET
     public TowerGrade GetGrade(int _level)
     {
         List<GradeChance> gradeChances = levelDic[_level].gradeChances;
@@ -193,4 +196,5 @@ public class TowerChance : ScriptableObject
     }
 
     public IReadOnlyList<GradeChance> GetGradeChance(int _level) => levelDic[_level].gradeChances;
+    #endregion
 }

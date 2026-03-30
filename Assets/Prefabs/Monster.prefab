@@ -168,10 +168,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvas: {fileID: 1692177131567420101}
   healthText: {fileID: 3766315220739497655}
+  damageSpeed: 150
+  damageDuration: 1.5
   current: {x: 0, y: 0, z: 0}
   target: {x: 0, y: 0, z: 0}
   moveSpeed: 3
-  moveCooldown: 3
+  moveCooldown: 1
   moveDirection: {x: 0, y: 0, z: 0}
   health: 0
   maxHealth: 0

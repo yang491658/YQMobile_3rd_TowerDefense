@@ -8,12 +8,15 @@ public class Monster : Pooling
     [Header("UI")]
     [SerializeField] private Canvas canvas;
     [SerializeField] private TextMeshProUGUI healthText;
+    [Space]
+    [SerializeField][Min(0f)] private float damageSpeed = 150f;
+    [SerializeField][Min(0f)] private float damageDuration = 1.5f;
 
     [Header("Move")]
     [SerializeField] private Vector3 current;
     [SerializeField] private Vector3 target;
     [SerializeField][Min(0f)] private float moveSpeed = 3f;
-    [SerializeField][Min(0f)] private float moveCooldown = 3f;
+    [SerializeField][Min(0f)] private float moveCooldown = 1f;
     private float moveTimer = 0f;
     [SerializeField] private Vector3 moveDirection;
 
@@ -97,10 +100,30 @@ public class Monster : Pooling
         if (!_direct) ReserveDown(_damage);
 
         SetHealth(health - _damage);
+        CreateDamage(_damage, _critical);
 
         if (health <= 0) Die();
 
         return true;
+    }
+
+    private void CreateDamage(int _damage, bool _critical = false)
+    {
+        if (_damage <= 0) return;
+
+        float font = _critical ? 65f : 50f;
+        Color color = _critical ? Color.red : Color.black;
+
+        Vector3 from = transform.position;
+        Vector3 to = new Vector3(0f, AutoCamera.WorldRect.yMax, 0f);
+        Vector3 dir = (to - from).normalized;
+
+        TextEffect text = EntityManager.Instance?.MakeTextEffect(transform.position);
+        if (text == null) return;
+
+        text.SetText(_damage.ToString(), font, color);
+        text.SetMove(damageSpeed, dir);
+        text.SetDuration(damageDuration);
     }
 
     public void ReserveUp(int _damage) => reserve += _damage;

@@ -34,6 +34,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI scoreNum;
 
     [Header("InGame UI / Player")]
+    [SerializeField] private RectTransform mapArea;
+    [Space]
     [SerializeField] private SliderUI life;
     [Space]
     [SerializeField] private GameObject expUI;
@@ -90,6 +92,8 @@ public class UIManager : MonoBehaviour
             playTimeText = GameObject.Find("InGameUI/Score/PlayTimeText")?.GetComponent<TextMeshProUGUI>();
         if (scoreNum == null)
             scoreNum = GameObject.Find("InGameUI/Score/ScoreNum")?.GetComponent<TextMeshProUGUI>();
+        if (mapArea == null)
+            mapArea = GameObject.Find("InGameUI/MapArea")?.GetComponent<RectTransform>();
 
         if (life.slider == null)
             life.slider = GameObject.Find("InGameUI/Player/Life/LifeSlider")?.GetComponent<Slider>();

@@ -245,6 +245,18 @@ public class GameManager : MonoBehaviour
 
         needExp = 100 * level * (level + 1) / 2;
         OnChangeExp?.Invoke(exp, needExp);
+
+        LevelText();
+    }
+
+    private void LevelText()
+    {
+        TextEffect effect = EntityManager.Instance?.MakeTextEffect();
+        if (effect == null) return;
+
+        effect.SetText("레벨업", 150f, Color.blue, 0.3f);
+        effect.SetColor(Color.white);
+        effect.SetDuration(1f);
     }
 
     public void ResetLevel()

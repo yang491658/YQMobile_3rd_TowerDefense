@@ -81,7 +81,7 @@ public class Tower : Entity
         }
 
         symbol.localScale = Vector3.one * 0.18f;
-        symbolSR.sprite = DataManager.Instance.GetRoleSymbol(data.Role);
+        symbolSR.sprite = DataManager.Instance?.GetRoleSymbol(data.Role);
         IsMax = false;
 
         Vector2[] positions = SymbolPos(rank);
