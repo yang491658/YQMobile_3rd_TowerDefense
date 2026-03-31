@@ -52,8 +52,6 @@ public class Tower : Entity
 
         float dt = Time.deltaTime;
         if (attackSpeed > 0) Attack(dt);
-
-        SetStat();
     }
 
     #region 심볼
@@ -249,12 +247,15 @@ public class Tower : Entity
         gameObject.name = data.Name;
         outlineSR.color = DataManager.Instance.GetGradeColor(data.Grade);
         symbolSR.color = data.Color;
+
+        SetStat();
     }
 
     public void SetRank(int _rank)
     {
         rank = Mathf.Clamp(_rank, 1, MaxRank);
 
+        SetStat();
         UpdateSymbol();
     }
 

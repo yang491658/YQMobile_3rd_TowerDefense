@@ -339,7 +339,7 @@ public class EntityManager : MonoBehaviour
         return result;
     }
 
-    public bool HasEmptyField() => !float.IsInfinity(SelectField().x);
+    public bool HasEmptyField() => PickRandom(out _, true);
     #endregion
 
     #region 타워

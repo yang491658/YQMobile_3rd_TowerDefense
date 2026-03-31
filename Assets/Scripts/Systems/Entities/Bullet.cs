@@ -24,7 +24,7 @@ public class Bullet : Pooling
 
     private void FixedUpdate()
     {
-        if (IsDespawn) return;
+        if (IsDespawn || IsHit) return;
 
         float step = moveSpeed * Time.fixedDeltaTime;
 
@@ -47,6 +47,8 @@ public class Bullet : Pooling
 
     private void OnTriggerEnter2D(Collider2D _collision)
     {
+        if (IsDespawn || IsHit) return;
+
         if (target != null && !target.IsInvalid(targetIndex)
             && target.gameObject == _collision.gameObject)
         {

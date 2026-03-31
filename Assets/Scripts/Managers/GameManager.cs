@@ -240,7 +240,7 @@ public class GameManager : MonoBehaviour
     {
         if (level >= maxLevel) return;
 
-        level += _level;
+        level = Mathf.Min(level + _level, maxLevel);
         OnChangeLevel?.Invoke(level);
 
         needExp = 100 * level * (level + 1) / 2;

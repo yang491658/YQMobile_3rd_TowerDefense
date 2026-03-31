@@ -172,7 +172,7 @@ public class Monster : Pooling
 
     public void SetHealth(int _health)
     {
-        health = _health;
+        health = Mathf.Max(_health, 0);
         healthText.text = _health < int.MaxValue ? health.ToString() : "ㄱ-";
     }
     #endregion
