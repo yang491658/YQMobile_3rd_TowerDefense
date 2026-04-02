@@ -8,8 +8,13 @@ public class Tower : Entity
     [SerializeField] private TowerData data;
     [SerializeField] private Transform outline;
     private SpriteRenderer outlineSR;
+
+    [Header("Symbol")]
     [SerializeField] private Transform symbol;
     private SpriteRenderer symbolSR;
+    [SerializeField] private float interval = 1.25f;
+    [SerializeField] private float baseSize = 0.18f;
+    [SerializeField] private float maxSize = 0.65f;
 
     [Header("Control")]
     public bool IsDragging { private set; get; } = false;
@@ -72,14 +77,14 @@ public class Tower : Entity
             symbol.localPosition = Vector3.zero;
             if (!IsMax)
             {
-                symbol.localScale = Vector3.one * 0.65f;
+                symbol.localScale = Vector3.one * maxSize;
                 symbolSR.sprite = data.Image;
                 IsMax = true;
             }
             return;
         }
 
-        symbol.localScale = Vector3.one * 0.18f;
+        symbol.localScale = Vector3.one * baseSize;
         symbolSR.sprite = DataManager.Instance?.GetRoleSymbol(data.Role);
         IsMax = false;
 
@@ -94,7 +99,7 @@ public class Tower : Entity
 
     private Vector2[] SymbolPos(int _rank, float _standard)
     {
-        float offset = _standard * 1.25f;
+        float offset = _standard * interval;
 
         Vector2[] grid =
             {
@@ -143,12 +148,12 @@ public class Tower : Entity
 
         if (rank >= MaxRank)
         {
-            _symbol.rectTransform.localScale = Vector3.one * 65f;
+            _symbol.rectTransform.localScale = Vector3.one * maxSize * 100f;
             _symbol.rectTransform.anchoredPosition = Vector2.zero;
             return;
         }
 
-        _symbol.rectTransform.localScale = Vector3.one * 18f;
+        _symbol.rectTransform.localScale = Vector3.one * baseSize * 100f;
 
         Vector2[] positions = SymbolPos(rank, _symbol.rectTransform.localScale.x);
         _symbol.rectTransform.anchoredPosition = positions[0];
