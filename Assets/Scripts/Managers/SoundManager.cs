@@ -48,9 +48,7 @@ public class SoundManager : MonoBehaviour
     {
         _list.Clear();
         string path = "Sounds/" + (_type == SoundType.BGM ? "BGMs" : "SFXs");
-        var clips = Resources.LoadAll<AudioClip>(path);
-        if (clips != null && clips.Length > 0)
-            _list.AddRange(clips);
+        _list.AddRange(Resources.LoadAll<AudioClip>(path));
     }
 #endif
 

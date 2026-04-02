@@ -260,7 +260,7 @@ public class GameManager : MonoBehaviour
         TextEffect effect = EntityManager.Instance?.MakeTextEffect();
         if (effect == null) return;
 
-        effect.SetText("레벨업", 150f, Color.blue, 0.3f);
+        effect.SetText("레벨업", 150f, Color.blue, 0.15f);
         effect.SetColor(Color.white);
         effect.SetDuration(1f);
     }
