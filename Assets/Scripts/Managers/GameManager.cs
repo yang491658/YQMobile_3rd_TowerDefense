@@ -32,8 +32,7 @@ public class GameManager : MonoBehaviour
     [Header("Exp")]
     [SerializeField][Min(0)] private int exp = 0;
     [SerializeField][Min(0)] private int needExp = 100;
-    [SerializeField][Min(0)] private int expScore = 100;
-    [SerializeField][Min(0)] private int expGold = 100;
+    [SerializeField][Min(0)] private int expScore = 1000;
     public event System.Action<int, int> OnChangeExp;
 
     [Header("Level")]
@@ -42,10 +41,9 @@ public class GameManager : MonoBehaviour
     public event System.Action<int> OnChangeLevel;
 
     [Header("Gold")]
-    [SerializeField][Min(0)] private int gold = 0;
-    [SerializeField][Min(0)] private int baseGold = 100;
+    [SerializeField][Min(0)] private int gold = 100;
     [SerializeField][Min(0)] private int needGold = 0;
-    public event System.Action<int> OnChangeGold;
+    public event System.Action<int, int> OnChangeGold;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
     [DllImport("__Internal")] private static extern void GameOverReact();
@@ -108,6 +106,9 @@ public class GameManager : MonoBehaviour
 
         IsPaused = _pause;
         Time.timeScale = _pause ? 0f : speed;
+
+        if (_pause)
+            HandleManager.Instance?.CancelDrag();
     }
 
     private void ActWithReward(System.Action _act)
@@ -196,16 +197,21 @@ public class GameManager : MonoBehaviour
 
     public void BuyLife()
     {
-        if (life >= maxLife) return;
-        if (gold < lifeGold) return;
+        if (!CanBuyLife()) return;
 
-        LifeUp();
-        GoldDown(lifeGold);
+        gold = -lifeGold;
+        OnChangeGold?.Invoke(gold, needGold);
+
+        life = ++maxLife;
+        lifeGold *= 2;
+        OnChangeLife?.Invoke(life, maxLife);
     }
 
     public void ResetLife()
     {
+        maxLife = 20;
         life = maxLife;
+        lifeGold = 100;
         OnChangeLife?.Invoke(life, maxLife);
     }
     #endregion
@@ -227,11 +233,11 @@ public class GameManager : MonoBehaviour
 
     public void BuyExp()
     {
-        if (level >= maxLevel) return;
-        if (gold < expGold) return;
+        if (!CanBuyExp()) return;
 
-        ExpUp(expGold / 10);
-        GoldDown(expGold);
+        int cost = needExp;
+        ExpUp(cost / 10);
+        GoldDown(cost);
     }
     #endregion
 
@@ -274,7 +280,7 @@ public class GameManager : MonoBehaviour
     public void GoldUp(int _gold = 1)
     {
         gold += _gold;
-        OnChangeGold?.Invoke(gold);
+        OnChangeGold?.Invoke(gold, needGold);
     }
 
     public void GoldDown(int _gold = 1)
@@ -282,24 +288,23 @@ public class GameManager : MonoBehaviour
         if (gold < _gold) return;
 
         gold -= _gold;
-        OnChangeGold?.Invoke(gold);
+        OnChangeGold?.Invoke(gold, needGold);
     }
 
     public void ResetGold()
     {
-        gold = baseGold;
+        gold = 100;
         needGold = 0;
-        OnChangeGold?.Invoke(gold);
+        OnChangeGold?.Invoke(gold, needGold);
     }
 
     public void UseGold(bool _useGold)
     {
-        if (!_useGold) return;
+        if (!_useGold || !EnoughGold()) return;
 
-        GoldDown(needGold);
-
+        gold -= needGold;
         needGold += 10;
-        OnChangeGold?.Invoke(gold);
+        OnChangeGold?.Invoke(gold, needGold);
     }
     #endregion
 
@@ -322,11 +327,11 @@ public class GameManager : MonoBehaviour
 
     public int GetLife() => life;
     public int GetMaxLife() => maxLife;
-    public bool EnoughLifeCost() => gold >= lifeGold && life < maxLife;
+    public bool CanBuyLife() => gold > 0 && life * 2 <= maxLife;
 
     public int GetExp() => exp;
     public int GetNeedExp() => needExp;
-    public bool EnoughExpCost() => gold >= expGold;
+    public bool CanBuyExp() => gold >= needExp && level < maxLevel;
 
     public int GetLevel() => level;
     public int GetMaxLevel() => maxLevel;
@@ -334,6 +339,8 @@ public class GameManager : MonoBehaviour
 
     public int GetGold() => gold;
     public int GetNeedGold() => needGold;
+    public int GetSellGold(Tower _tower)
+        => needGold * _tower.GetRank() * DataManager.Instance.GetGradeStat(_tower.GetGrade()) / 2;
     public bool EnoughGold() => gold >= needGold;
     #endregion
 }

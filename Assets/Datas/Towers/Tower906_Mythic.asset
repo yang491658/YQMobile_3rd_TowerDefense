@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tower906_Mythic
   m_EditorClassIdentifier: 
   Color: {r: 0, g: 0, b: 0, a: 1}
-  Image: {fileID: 0}
+  Image: {fileID: 21300000, guid: ae37da49eab54264fb74f25470480992, type: 3}
   ID: 906
   Name: Mythic
   Grade: 6

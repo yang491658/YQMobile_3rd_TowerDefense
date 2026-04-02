@@ -224,6 +224,21 @@ public class HandleManager : MonoBehaviour
     #endregion
 
     #region 동작
+    public void CancelDrag()
+    {
+        if (select != null)
+        {
+            select.transform.position = dragStart + offset;
+            select.DragOn(false);
+            select = null;
+        }
+
+        ResetDrag();
+
+        UIManager.Instance?.UpdateStore(false);
+        UIManager.Instance?.UpdateDrag(null);
+    }
+
     private void OnSingle(Vector3 _pos)
     {
         Debug.Log($"단순 클릭 : {_pos} / {Time.time:F3}"); // TODO : 단순 클릭 동작
@@ -248,15 +263,30 @@ public class HandleManager : MonoBehaviour
         select.DragOn(true);
 
         offset = select.transform.position - _pos;
+
+        UIManager.Instance?.UpdateDrag(select, select.transform.position);
     }
 
     private void OnDragMove(Vector3 _start, Vector3 _current)
     {
         select.transform.position = _current + offset;
+
+        bool isSell = UIManager.Instance.IsStore(_current);
+        int sellGold = GameManager.Instance.GetSellGold(select);
+
+        UIManager.Instance?.UpdateStore(isSell, sellGold);
+        UIManager.Instance?.UpdateDrag(select, select.transform.position);
     }
 
     private void OnDragEnd(Vector3 _start, Vector3 _end)
     {
+        if (UIManager.Instance.IsStore(_end))
+        {
+            select.Sell();
+            select = null;
+            return;
+        }
+
         Collider2D[] hits = Physics2D.OverlapPointAll(_end, layer);
 
         Tower target = null;
@@ -283,6 +313,9 @@ public class HandleManager : MonoBehaviour
         }
 
         select = null;
+
+        UIManager.Instance?.UpdateStore(false);
+        UIManager.Instance?.UpdateDrag(null);
     }
 
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN

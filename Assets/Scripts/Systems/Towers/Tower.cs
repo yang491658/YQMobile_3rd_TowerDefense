@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Tower : Entity
 {
@@ -82,7 +83,7 @@ public class Tower : Entity
         symbolSR.sprite = DataManager.Instance?.GetRoleSymbol(data.Role);
         IsMax = false;
 
-        Vector2[] positions = SymbolPos(rank);
+        Vector2[] positions = SymbolPos(rank, symbol.localScale.x);
         symbol.localPosition = positions[0];
         for (int i = 1; i < positions.Length; i++)
         {
@@ -91,12 +92,12 @@ public class Tower : Entity
         }
     }
 
-    private Vector2[] SymbolPos(int _rank)
+    private Vector2[] SymbolPos(int _rank, float _standard)
     {
-        float offset = symbol.localScale.x * 1.25f;
+        float offset = _standard * 1.25f;
 
         Vector2[] grid =
-        {
+            {
             Vector2.zero ,
             new Vector2(    -offset ,   -offset ) ,
             new Vector2(         0f ,   -offset ) ,
@@ -123,6 +124,43 @@ public class Tower : Entity
     #endregion
 
     #region 조작
+    public void SetDrag(Image _outline, Image _symbol)
+    {
+        _outline.sprite = outlineSR.sprite;
+        _outline.color = outlineSR.color;
+
+        Transform parent = _symbol.transform.parent;
+        for (int i = parent.childCount - 1; i >= 0; i--)
+        {
+            Transform child = parent.GetChild(i);
+            if (child == _symbol.transform) continue;
+            if (child.name == _symbol.name)
+                Destroy(child.gameObject);
+        }
+
+        _symbol.sprite = symbolSR.sprite;
+        _symbol.color = symbolSR.color;
+
+        if (rank >= MaxRank)
+        {
+            _symbol.rectTransform.localScale = Vector3.one * 65f;
+            _symbol.rectTransform.anchoredPosition = Vector2.zero;
+            return;
+        }
+
+        _symbol.rectTransform.localScale = Vector3.one * 18f;
+
+        Vector2[] positions = SymbolPos(rank, _symbol.rectTransform.localScale.x);
+        _symbol.rectTransform.anchoredPosition = positions[0];
+
+        for (int i = 1; i < positions.Length; i++)
+        {
+            Image clone = Instantiate(_symbol, parent);
+            clone.name = _symbol.name;
+            clone.rectTransform.anchoredPosition = positions[i];
+        }
+    }
+
     public void DragOn(bool _on)
     {
         IsDragging = _on;

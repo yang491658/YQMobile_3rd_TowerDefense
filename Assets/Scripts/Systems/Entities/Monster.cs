@@ -114,11 +114,11 @@ public class Monster : Pooling
         float font = _critical ? 65f : 50f;
         Color color = _critical ? Color.red : Color.black;
 
-        Vector3 from = transform.position;
+        Vector3 from = transform.position + Vector3.up * 0.3f;
         Vector3 to = new Vector3(0f, AutoCamera.WorldRect.yMax, 0f);
         Vector3 dir = (to - from).normalized;
 
-        TextEffect text = EntityManager.Instance?.MakeTextEffect(transform.position);
+        TextEffect text = EntityManager.Instance?.MakeTextEffect(from);
         if (text == null) return;
 
         text.SetText(_damage.ToString(), font, color);

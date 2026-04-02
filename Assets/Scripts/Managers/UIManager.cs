@@ -35,6 +35,16 @@ public class UIManager : MonoBehaviour
 
     [Header("InGame UI / Player")]
     [SerializeField] private RectTransform mapArea;
+    [SerializeField] private RectTransform store;
+    private Image storeImage;
+    private Color storeColor;
+    private bool onSell = false;
+    private int sellGold = 0;
+    [Space]
+    [SerializeField] private RectTransform drag;
+    [SerializeField] private Image dragOutline;
+    [SerializeField] private Image dragSymbol;
+
     [Space]
     [SerializeField] private SliderUI life;
     [Space]
@@ -43,6 +53,8 @@ public class UIManager : MonoBehaviour
     [Space]
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI goldText;
+    [SerializeField] private GameObject goldImage;
+    [SerializeField] private GameObject loanImage;
     [SerializeField] private TextMeshProUGUI[] chanceText;
 
     [System.Serializable]
@@ -92,31 +104,44 @@ public class UIManager : MonoBehaviour
             playTimeText = GameObject.Find("InGameUI/Score/PlayTimeText")?.GetComponent<TextMeshProUGUI>();
         if (scoreNum == null)
             scoreNum = GameObject.Find("InGameUI/Score/ScoreNum")?.GetComponent<TextMeshProUGUI>();
+
         if (mapArea == null)
             mapArea = GameObject.Find("InGameUI/MapArea")?.GetComponent<RectTransform>();
+        if (store == null)
+            store = GameObject.Find("InGameUI/Store")?.GetComponent<RectTransform>();
+        if (drag == null)
+            drag = GameObject.Find("InGameUI/Drag")?.GetComponent<RectTransform>();
+        if (dragOutline == null)
+            dragOutline = GameObject.Find("InGameUI/Drag/OutLine")?.GetComponent<Image>();
+        if (dragSymbol == null)
+            dragSymbol = GameObject.Find("InGameUI/Drag/Symbol")?.GetComponent<Image>();
 
         if (life.slider == null)
-            life.slider = GameObject.Find("InGameUI/Player/Life/LifeSlider")?.GetComponent<Slider>();
+            life.slider = GameObject.Find("InGameUI/Store/Life/LifeSlider")?.GetComponent<Slider>();
         if (life.text == null)
-            life.text = GameObject.Find("InGameUI/Player/Life/LifeText")?.GetComponent<TextMeshProUGUI>();
+            life.text = GameObject.Find("InGameUI/Store/Life/LifeText")?.GetComponent<TextMeshProUGUI>();
         if (life.btn == null)
-            life.btn = GameObject.Find("InGameUI/Player/Life/LifeBtn")?.GetComponent<Button>();
+            life.btn = GameObject.Find("InGameUI/Store/Life/LifeBtn")?.GetComponent<Button>();
 
         if (expUI == null)
-            expUI = GameObject.Find("InGameUI/Player/Exp");
+            expUI = GameObject.Find("InGameUI/Store/Exp");
         if (exp.slider == null)
-            exp.slider = GameObject.Find("InGameUI/Player/Exp/ExpSlider")?.GetComponent<Slider>();
+            exp.slider = GameObject.Find("InGameUI/Store/Exp/ExpSlider")?.GetComponent<Slider>();
         if (exp.text == null)
-            exp.text = GameObject.Find("InGameUI/Player/Exp/ExpText")?.GetComponent<TextMeshProUGUI>();
+            exp.text = GameObject.Find("InGameUI/Store/Exp/ExpText")?.GetComponent<TextMeshProUGUI>();
         if (exp.btn == null)
-            exp.btn = GameObject.Find("InGameUI/Player/Exp/ExpBtn")?.GetComponent<Button>();
+            exp.btn = GameObject.Find("InGameUI/Store/Exp/ExpBtn")?.GetComponent<Button>();
 
         if (levelText == null)
-            levelText = GameObject.Find("InGameUI/Player/Level+Gold/LevelText")?.GetComponent<TextMeshProUGUI>();
+            levelText = GameObject.Find("InGameUI/Store/Level+Gold/LevelText")?.GetComponent<TextMeshProUGUI>();
         if (goldText == null)
-            goldText = GameObject.Find("InGameUI/Player/Level+Gold/GoldText")?.GetComponent<TextMeshProUGUI>();
+            goldText = GameObject.Find("InGameUI/Store/Level+Gold/GoldText")?.GetComponent<TextMeshProUGUI>();
+        if (goldImage == null)
+            goldImage = GameObject.Find("InGameUI/Store/Level+Gold/GoldImage");
+        if (loanImage == null)
+            loanImage = GameObject.Find("InGameUI/Store/Level+Gold/LoanImage");
         if (chanceText == null || chanceText.Length == 0)
-            chanceText = GameObject.Find("InGameUI/Player/Chance").GetComponentsInChildren<TextMeshProUGUI>();
+            chanceText = GameObject.Find("InGameUI/Store/Chance").GetComponentsInChildren<TextMeshProUGUI>();
 
         if (settingUI == null)
             settingUI = GameObject.Find("SettingUI");
@@ -184,6 +209,8 @@ public class UIManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        storeImage = store.GetComponent<Image>();
+        storeColor = storeImage.color;
         life.fill = life.slider.fillRect.GetComponent<Image>();
         life.color = life.fill.color;
         exp.fill = exp.slider.fillRect.GetComponent<Image>();
@@ -368,16 +395,8 @@ public class UIManager : MonoBehaviour
         }
 
         confirmUI.SetActive(_on);
-
-        if (_on)
-        {
-            confirmTitle.text = $"{_text}하시겠습니까?";
-            confirmAction = _action;
-            return;
-        }
-
-        confirmTitle.text = string.Empty;
-        confirmAction = null;
+        confirmTitle.text = _on ? $"{_text}하시겠습니까?" : string.Empty;
+        confirmAction = _on ? _action : null;
     }
 
     public void OpenResult(bool _on)
@@ -402,10 +421,13 @@ public class UIManager : MonoBehaviour
 
         UpdatePlayTime();
         UpdateScore(GameManager.Instance.GetScore());
+
+        UpdateStore(false);
+        UpdateDrag(null);
         UpdateLife(GameManager.Instance.GetLife(), GameManager.Instance.GetMaxLife());
         UpdateExp(GameManager.Instance.GetExp(), GameManager.Instance.GetNeedExp());
         UpdateLevel(GameManager.Instance.GetLevel());
-        UpdateGold(GameManager.Instance.GetGold());
+        UpdateGold(GameManager.Instance.GetGold(), GameManager.Instance.GetNeedGold());
 
         OpenUI(false);
         StartCountdown();
@@ -442,6 +464,19 @@ public class UIManager : MonoBehaviour
         scoreNum.text = s;
         settingScoreNum.text = s;
         resultScoreNum.text = s;
+    }
+
+    public void UpdateDrag(Tower _tower, Vector3 _worldPos = default)
+    {
+        if (_tower == null)
+        {
+            drag.gameObject.SetActive(false);
+            return;
+        }
+        _tower.SetDrag(dragOutline, dragSymbol);
+
+        drag.gameObject.SetActive(true);
+        drag.position = RectTransformUtility.WorldToScreenPoint(Camera.main, _worldPos);
     }
 
     private IEnumerator FlashCoroutine(SliderUI _ui)
@@ -481,8 +516,23 @@ public class UIManager : MonoBehaviour
         _ui.routine = StartCoroutine(FlashCoroutine(_ui));
     }
 
+    public bool IsStore(Vector3 _pos)
+    {
+        Camera cam = Camera.main;
+        Vector3 pos = cam.WorldToScreenPoint(_pos);
+        return RectTransformUtility.RectangleContainsScreenPoint(store, pos);
+    }
+
+    public void UpdateStore(bool _on, int _gold = 0)
+    {
+        onSell = _on; sellGold = _gold;
+        storeImage.color = onSell ? Color.cyan : storeColor;
+
+        UpdateGold(GameManager.Instance.GetGold(), GameManager.Instance.GetNeedGold());
+    }
+
     private void UpdateLife(int _life, int _maxLife)
-        => UpdateSlider(ref life, _life, _maxLife, GameManager.Instance.EnoughLifeCost());
+        => UpdateSlider(ref life, _life, _maxLife, GameManager.Instance.CanBuyLife());
 
     private void UpdateExp(int _exp, int _needExp)
     {
@@ -494,7 +544,7 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        UpdateSlider(ref exp, _exp, _needExp, GameManager.Instance.EnoughExpCost());
+        UpdateSlider(ref exp, _exp, _needExp, GameManager.Instance.CanBuyExp());
     }
 
     private void UpdateLevel(int _level)
@@ -507,15 +557,30 @@ public class UIManager : MonoBehaviour
         UpdateChanceUI(_level);
     }
 
-    private void UpdateGold(int _gold)
+    private void UpdateGold(int _gold, int _needGold)
     {
         if (life.btn.gameObject.activeSelf)
-            life.btn.interactable = GameManager.Instance.EnoughLifeCost();
+            life.btn.interactable = GameManager.Instance.CanBuyLife();
 
         if (exp.btn.gameObject.activeSelf)
-            exp.btn.interactable = GameManager.Instance.EnoughExpCost();
+            exp.btn.interactable = GameManager.Instance.CanBuyExp();
 
-        goldText.text = $"{FormatNumber(_gold)}/{FormatNumber(GameManager.Instance.GetNeedGold())}";
+        int totalGold = _gold + sellGold;
+        int showGold = onSell ? totalGold : _gold;
+
+        if (onSell)
+        {
+            goldText.text = $"{FormatNumber(showGold)}(+{FormatNumber(sellGold)})/{FormatNumber(_needGold)}";
+            goldText.color = showGold >= 0 ? Color.blue : Color.red;
+        }
+        else
+        {
+            goldText.text = $"{FormatNumber(_gold)}/{FormatNumber(_needGold)}";
+            goldText.color = _gold >= 0 ? Color.white : Color.red;
+        }
+
+        goldImage.SetActive(_gold >= 0);
+        loanImage.SetActive(_gold < 0);
     }
 
     private void UpdateChanceUI(int _level)
@@ -629,5 +694,27 @@ public class UIManager : MonoBehaviour
     public bool GetOnConfirm() => confirmUI.activeSelf;
     public bool GetOnResult() => resultUI.activeSelf;
 #endif
+
+    public Rect GetMapAreaRect(float _z = 0f)
+    {
+        Vector3[] corners = new Vector3[4];
+        mapArea.GetWorldCorners(corners);
+
+        Canvas canvas = mapArea.GetComponentInParent<Canvas>();
+        Camera uiCam = null;
+        if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            uiCam = canvas.worldCamera;
+
+        Camera worldCam = Camera.main;
+        float depth = Mathf.Abs(_z - worldCam.transform.position.z);
+
+        Vector3 minScreen = RectTransformUtility.WorldToScreenPoint(uiCam, corners[0]);
+        Vector3 maxScreen = RectTransformUtility.WorldToScreenPoint(uiCam, corners[2]);
+
+        Vector3 minWorld = worldCam.ScreenToWorldPoint(new Vector3(minScreen.x, minScreen.y, depth));
+        Vector3 maxWorld = worldCam.ScreenToWorldPoint(new Vector3(maxScreen.x, maxScreen.y, depth));
+
+        return Rect.MinMaxRect(minWorld.x, minWorld.y, maxWorld.x, maxWorld.y);
+    }
     #endregion
 }

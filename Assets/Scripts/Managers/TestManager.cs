@@ -352,7 +352,7 @@ public class TestManager : MonoBehaviour
 
         int len = towers.Count; if (len < 2) return;
 
-        HashSet<int> rankSet = new HashSet<int>();
+        HashSet<int> rankSet = new();
         for (int i = 0; i < len; i++)
         {
             Tower t = towers[i];
@@ -361,8 +361,7 @@ public class TestManager : MonoBehaviour
             rankSet.Add(t.GetRank());
         }
 
-        List<int> ranks = new List<int>(rankSet); ranks.Sort();
-
+        List<int> ranks = new(rankSet); ranks.Sort();
         for (int r = 0; r < ranks.Count; r++)
         {
             int curRank = ranks[r];
@@ -439,11 +438,9 @@ public class TestManager : MonoBehaviour
 
     private void UpdateSliderUI(SliderConfig _config)
     {
-        if (string.IsNullOrEmpty(_config.format))
-            _config.TMP.text = _config.value.ToString();
-        else
-            _config.TMP.text = string.Format(_config.format, _config.value);
-
+        _config.TMP.text = string.IsNullOrEmpty(_config.format)
+            ? _config.value.ToString()
+            : string.Format(_config.format, _config.value);
         _config.slider.value = _config.value;
     }
 
@@ -456,7 +453,7 @@ public class TestManager : MonoBehaviour
     {
         int count = testResults.Count;
 
-        List<int> scores = new List<int>(count);
+        List<int> scores = new(count);
         int totalScore = 0;
         float totalPlay = 0f;
         double scoreSqSum = 0d;

@@ -30,12 +30,12 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private Transform map;
     [SerializeField] private Transform mapField;
     private Tilemap mapFieldTilemap;
-    [SerializeField] private float mapMargin = 1f;
     private readonly List<Vector3Int> fieldCells = new();
     private readonly HashSet<Vector3Int> fieldCellSet = new();
     private Vector3Int entryCell;
     private Vector3Int exitCell;
-    [Space]
+
+    [Header("Map / Color")]
     [SerializeField] private Color entryColor = Color.green;
     [SerializeField] private Color pathColor = Color.yellow;
     [SerializeField] private Color towerColor = Color.blue;
@@ -74,12 +74,12 @@ public class EntityManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        SetEntity();
     }
 
     private void Start()
     {
+        SetEntity();
+
         PoolManager.Instance?.Init(monsterBase);
         PoolManager.Instance?.Init(bulletBase);
         PoolManager.Instance?.Init(textBase);
@@ -412,11 +412,9 @@ public class EntityManager : MonoBehaviour
 
     public void SellTower(Tower _tower)
     {
-        int gain = DataManager.Instance.GetGradeStat(_tower.GetData().Grade);
-        int rank = _tower.GetRank();
-
-        GameManager.Instance?.ExpUp(gain * rank);
-        GameManager.Instance?.GoldUp(GameManager.Instance.GetNeedGold() * rank / 2);
+        GameManager.Instance?.GoldUp(GameManager.Instance.GetSellGold(_tower));
+        UIManager.Instance?.UpdateStore(false);
+        UIManager.Instance?.UpdateDrag(null);
 
         DespawnTower(_tower);
     }
@@ -525,10 +523,7 @@ public class EntityManager : MonoBehaviour
 
     private void SetMap()
     {
-        Rect r = AutoCamera.WorldRect;
-
-        float side = r.width * (mapMargin / 100f);
-        r = Rect.MinMaxRect(r.xMin + side, r.yMin, r.xMax - side, r.yMax);
+        Rect r = UIManager.Instance.GetMapAreaRect(map.position.z);
         if (r.width <= 0f || r.height <= 0f) return;
 
         mapFieldTilemap.CompressBounds();
@@ -553,7 +548,8 @@ public class EntityManager : MonoBehaviour
         map.localScale = new Vector3(s, s, mapScale.z);
 
         Vector3 worldCenter = mapFieldTilemap.transform.TransformPoint(localBounds.center);
-        Vector3 offset = new Vector3(-worldCenter.x, -worldCenter.y, 0f);
+        Vector2 areaCenter = r.center;
+        Vector3 offset = new Vector3(areaCenter.x - worldCenter.x, areaCenter.y - worldCenter.y, 0f);
         map.position += offset;
     }
 

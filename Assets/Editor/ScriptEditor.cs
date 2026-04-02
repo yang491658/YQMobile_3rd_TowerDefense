@@ -213,7 +213,6 @@ public static class ScriptEditor
     private static void SetTestDefine(BuildTargetGroup _group, bool _on)
     {
         var named = UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(_group);
-
         string symbols = PlayerSettings.GetScriptingDefineSymbols(named);
 
         var list = new List<string>(
@@ -223,15 +222,16 @@ public static class ScriptEditor
         bool contains = list.Contains(TestDefineSymbol);
         if (_on)
         {
-            if (!contains) list.Add(TestDefineSymbol);
+            if (contains) return;
+            list.Add(TestDefineSymbol);
         }
         else
         {
-            if (contains) list.Remove(TestDefineSymbol);
+            if (!contains) return;
+            list.Remove(TestDefineSymbol);
         }
 
-        string newSymbols = string.Join(";", list.ToArray());
-        PlayerSettings.SetScriptingDefineSymbols(named, newSymbols);
+        PlayerSettings.SetScriptingDefineSymbols(named, string.Join(";", list));
     }
 
     private static void SetTestActive(bool _on)
