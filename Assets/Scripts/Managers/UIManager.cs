@@ -37,15 +37,18 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject waveUI;
     [SerializeField] private SliderUI wave;
 
-    [Header("InGame UI / Store")]
+    [Header("InGame UI / Player")]
+    [SerializeField] private RectTransform mapArea;
     [SerializeField] private RectTransform store;
     private Image storeImage;
     private Color storeColor;
     private bool onSell = false;
     private int sellGold = 0;
+    [Space]
     [SerializeField] private SliderUI life;
     [SerializeField] private GameObject expUI;
     [SerializeField] private SliderUI exp;
+    [Space]
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI goldText;
     [SerializeField] private GameObject goldImage;
@@ -53,8 +56,6 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI[] chanceText;
 
     [Header("InGame UI / Tower")]
-    [SerializeField] private RectTransform mapArea;
-    [Space]
     [SerializeField] private RectTransform drag;
     [SerializeField] private Image dragOutline;
     [SerializeField] private Image dragSymbol;
@@ -117,14 +118,18 @@ public class UIManager : MonoBehaviour
         if (wave.text == null)
             wave.text = GameObject.Find("InGameUI/Wave/WaveText")?.GetComponent<TextMeshProUGUI>();
 
+        if (mapArea == null)
+            mapArea = GameObject.Find("InGameUI/MapArea")?.GetComponent<RectTransform>();
         if (store == null)
             store = GameObject.Find("InGameUI/Store")?.GetComponent<RectTransform>();
+
         if (life.slider == null)
             life.slider = GameObject.Find("InGameUI/Store/Life/LifeSlider")?.GetComponent<Slider>();
         if (life.text == null)
             life.text = GameObject.Find("InGameUI/Store/Life/LifeText")?.GetComponent<TextMeshProUGUI>();
         if (life.btn == null)
             life.btn = GameObject.Find("InGameUI/Store/Life/LifeBtn")?.GetComponent<Button>();
+
         if (expUI == null)
             expUI = GameObject.Find("InGameUI/Store/Exp");
         if (exp.slider == null)
@@ -133,6 +138,7 @@ public class UIManager : MonoBehaviour
             exp.text = GameObject.Find("InGameUI/Store/Exp/ExpText")?.GetComponent<TextMeshProUGUI>();
         if (exp.btn == null)
             exp.btn = GameObject.Find("InGameUI/Store/Exp/ExpBtn")?.GetComponent<Button>();
+
         if (levelText == null)
             levelText = GameObject.Find("InGameUI/Store/Level+Gold/LevelText")?.GetComponent<TextMeshProUGUI>();
         if (goldText == null)
@@ -144,8 +150,6 @@ public class UIManager : MonoBehaviour
         if (chanceText == null || chanceText.Length == 0)
             chanceText = GameObject.Find("InGameUI/Store/Chance").GetComponentsInChildren<TextMeshProUGUI>();
 
-        if (mapArea == null)
-            mapArea = GameObject.Find("InGameUI/MapArea")?.GetComponent<RectTransform>();
         if (drag == null)
             drag = GameObject.Find("InGameUI/Drag")?.GetComponent<RectTransform>();
         if (dragOutline == null)

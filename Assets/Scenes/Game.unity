@@ -3619,6 +3619,7 @@ MonoBehaviour:
     fill: {fileID: 0}
     color: {r: 0, g: 0, b: 0, a: 0}
     prev: 0
+  mapArea: {fileID: 1136766316}
   store: {fileID: 575930610}
   life:
     slider: {fileID: 1737631418}
@@ -3647,7 +3648,6 @@ MonoBehaviour:
   - {fileID: 1304190140}
   - {fileID: 304340854}
   - {fileID: 922733204}
-  mapArea: {fileID: 1136766316}
   drag: {fileID: 1378122647}
   dragOutline: {fileID: 1820387282}
   dragSymbol: {fileID: 1840224535}
@@ -4580,8 +4580,8 @@ RectTransform:
   - {fileID: 1168613734}
   - {fileID: 969651608}
   - {fileID: 1510357923}
-  - {fileID: 575930610}
   - {fileID: 1136766316}
+  - {fileID: 575930610}
   - {fileID: 1378122647}
   m_Father: {fileID: 1092585283}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
