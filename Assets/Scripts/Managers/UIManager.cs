@@ -696,13 +696,7 @@ public class UIManager : MonoBehaviour
     public void OnClickExp() => GameManager.Instance?.BuyExp();
 
     public void OnClickClose() => OpenUI(false);
-    public void OnClickSpeed()
-    {
-        if (speedSlider.value != 1f)
-            speedSlider.value = 1f;
-        else
-            speedSlider.value = speedSlider.maxValue;
-    }
+    public void OnClickSpeed() => speedSlider.value = speedSlider.value != 1f ? 1f : speedSlider.maxValue;
     public void OnClickBGM() => SoundManager.Instance?.ToggleBGM();
     public void OnClickSFX() => SoundManager.Instance?.ToggleSFX();
 
