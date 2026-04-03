@@ -45,12 +45,6 @@ public class EntityManager : MonoBehaviour
     private readonly Dictionary<Vector3Int, Vector3Int> pathDic = new();
     private readonly Dictionary<Tower, Vector3Int> towerDic = new();
 
-    [Header("Wave / Temp")]
-    [SerializeField][Min(0.3f)] private float spawnDelay = 1f;
-    private float spawnTimer;
-
-    public bool IsSpawning { private set; get; } = false;
-
 #if UNITY_EDITOR
     private void OnValidate()
     {
@@ -83,21 +77,6 @@ public class EntityManager : MonoBehaviour
         PoolManager.Instance?.Init(monsterBase);
         PoolManager.Instance?.Init(bulletBase);
         PoolManager.Instance?.Init(textBase);
-    }
-
-    private void Update()
-    {
-        if (GameManager.Instance.IsGameOver) return;
-
-        if (IsSpawning)
-        {
-            spawnTimer -= Time.deltaTime;
-            if (spawnTimer < 0f)
-            {
-                SpawnMonster();
-                spawnTimer = spawnDelay;
-            }
-        }
     }
 
     #region 필드
@@ -421,7 +400,17 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region 몬스터
-    public void ToggleSpawn(bool _on) => IsSpawning = _on;
+    public void ToggleSpawn(bool _on)
+    {
+        if (_on)
+        {
+            if (!MonsterWave.Instance.IsRunning)
+                MonsterWave.Instance.StartWave();
+            else
+                MonsterWave.Instance.PauseWave(false);
+        }
+        else MonsterWave.Instance.PauseWave(true);
+    }
 
     public Monster SpawnMonster(Vector3? _pos = null)
     {
@@ -498,6 +487,7 @@ public class EntityManager : MonoBehaviour
         pathDic.Clear();
         towerDic.Clear();
 
+        MonsterWave.Instance?.StopWave();
         SetEntity();
         ToggleSpawn(true);
     }
@@ -517,8 +507,6 @@ public class EntityManager : MonoBehaviour
         SetMap();
         SetCell();
         SetPath();
-
-        spawnTimer = spawnDelay;
     }
 
     private void SetMap()

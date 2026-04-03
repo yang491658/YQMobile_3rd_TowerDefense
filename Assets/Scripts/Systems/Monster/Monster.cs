@@ -15,12 +15,8 @@ public class Monster : Pooling
     [Header("Move")]
     [SerializeField] private Vector3 current;
     [SerializeField] private Vector3 target;
-    [SerializeField][Min(0f)] private float moveSpeed = 3f;
-    [SerializeField][Min(0f)] private float moveCooldown = 1f;
-    private float moveTimer = 0f;
+    [SerializeField][Min(0f)] private float moveSpeed = 1f;
     [SerializeField] private Vector3 moveDirection;
-
-    public bool IsMoving { private set; get; } = false;
 
     [Header("Battle")]
     [SerializeField][Min(0)] private int health;
@@ -54,20 +50,12 @@ public class Monster : Pooling
     #region 이동
     private void UpdateMove(float _deltaTime)
     {
-        moveTimer -= _deltaTime;
+        Vector3Int currentCell = Vector3Int.RoundToInt(current);
 
-        if (!IsMoving)
-        {
-            if (moveTimer > 0f) return;
+        if (!EntityManager.Instance.GetNextCell(currentCell, out Vector3Int nextCell))
+        { OnGoal(); return; }
 
-            Vector3Int currentCell = Vector3Int.RoundToInt(current);
-
-            if (!EntityManager.Instance.GetNextCell(currentCell, out Vector3Int nextCell))
-            { OnGoal(); return; }
-
-            target = nextCell;
-            IsMoving = true;
-        }
+        target = nextCell;
 
         Vector3 targetPos = EntityManager.Instance.GetCellPos(Vector3Int.RoundToInt(target));
         Vector3 delta = targetPos - transform.position;
@@ -80,8 +68,6 @@ public class Monster : Pooling
             current = Vector3Int.RoundToInt(target);
             target = current;
             moveDirection = Vector3.zero;
-            moveTimer = moveCooldown;
-            IsMoving = false;
 
             Stop();
             return;
@@ -165,8 +151,6 @@ public class Monster : Pooling
         current = _current;
         target = _current;
         moveDirection = Vector3.zero;
-        moveTimer = 0f;
-        IsMoving = false;
     }
     public float SetSpeed(float _speed) => moveSpeed = Mathf.Max(_speed, 0f);
 
@@ -211,9 +195,7 @@ public class Monster : Pooling
         current = default;
         target = default;
         moveSpeed = 3f;
-        moveTimer = 0f;
         moveDirection = Vector3.zero;
-        IsMoving = false;
         Stop();
     }
     #endregion

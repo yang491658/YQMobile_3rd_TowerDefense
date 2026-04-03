@@ -81,6 +81,38 @@ public class TextEffect : MonoBehaviour, IPoolable
 
         Vector2 dir = moveDirection.normalized;
         rect.anchoredPosition += dir * moveSpeed * _deltaTime;
+
+        if (CameraOut())
+            Despawn();
+    }
+
+    private bool CameraOut()
+    {
+        Vector3[] corners = new Vector3[4];
+        rect.GetWorldCorners(corners);
+
+        Camera cam = Camera.main;
+        float z = -cam.transform.position.z;
+
+        float minX = float.MaxValue;
+        float maxX = float.MinValue;
+        float minY = float.MaxValue;
+        float maxY = float.MinValue;
+
+        for (int i = 0; i < corners.Length; i++)
+        {
+            Vector3 screenPos = RectTransformUtility.WorldToScreenPoint(null, corners[i]);
+            Vector3 worldPos = cam.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, z));
+
+            if (worldPos.x < minX) minX = worldPos.x;
+            if (worldPos.x > maxX) maxX = worldPos.x;
+            if (worldPos.y < minY) minY = worldPos.y;
+            if (worldPos.y > maxY) maxY = worldPos.y;
+        }
+
+        Rect worldRect = AutoCamera.WorldRect;
+        return maxX < worldRect.xMin || minX > worldRect.xMax ||
+            maxY < worldRect.yMin || minY > worldRect.yMax;
     }
 
     #region SET

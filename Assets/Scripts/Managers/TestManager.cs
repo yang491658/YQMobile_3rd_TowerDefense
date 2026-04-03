@@ -174,7 +174,7 @@ public class TestManager : MonoBehaviour
             EntityManager.Instance?.SpawnTower(refID, refRank.value, pos, _useGold: false);
         }
         if (Input.GetKeyDown(KeyCode.E))
-            EntityManager.Instance?.ToggleSpawn(!EntityManager.Instance.IsSpawning);
+            EntityManager.Instance?.ToggleSpawn(MonsterWave.Instance.IsPause);
         if (Input.GetKeyDown(KeyCode.Delete))
             EntityManager.Instance?.DespawnAll();
         #endregion
