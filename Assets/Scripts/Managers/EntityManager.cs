@@ -506,29 +506,34 @@ public class EntityManager : MonoBehaviour
             DespawnMonster(monsters[i]);
     }
 
-    public void MoveInGame(Vector3 _target, float _speed = 0f)
+    public void MoveInGame(Vector3 _target, float _time = 0f)
     {
         if (inGameRoutine != null)
             StopCoroutine(inGameRoutine);
 
-        if (_speed <= 0f)
+        if (_time <= 0f)
         {
             inGame.position = _target;
             inGameRoutine = null;
             return;
         }
 
-        inGameRoutine = StartCoroutine(InGameCoroutine(_target, _speed));
+        inGameRoutine = StartCoroutine(InGameCoroutine(_target, _time));
     }
 
-    private IEnumerator InGameCoroutine(Vector3 _target, float _speed)
+    private IEnumerator InGameCoroutine(Vector3 _target, float _time)
     {
-        while (inGame.position != _target)
+        Vector3 start = inGame.position;
+        float timer = 0f;
+
+        while (timer < _time)
         {
-            inGame.position = Vector3.MoveTowards(inGame.position, _target, _speed * Time.deltaTime);
+            timer += Time.deltaTime;
+            inGame.position = Vector3.Lerp(start, _target, Mathf.Clamp01(timer / _time));
             yield return null;
         }
 
+        inGame.position = _target;
         inGameRoutine = null;
     }
 

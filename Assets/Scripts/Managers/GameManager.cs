@@ -257,11 +257,16 @@ public class GameManager : MonoBehaviour
 
     private void LevelText()
     {
-        TextEffect effect = EntityManager.Instance?.MakeTextEffect();
+        Rect mapRect = UIManager.Instance.GetMapAreaRect();
+        Vector3 pos = new Vector3(0f, mapRect.yMin, 0f);
+        Vector3 offset = UIManager.Instance.GetPlayerOffset();
+
+        TextEffect effect = EntityManager.Instance?.MakeTextEffect(pos + offset);
         if (effect == null) return;
 
-        effect.SetText("레벨업", 150f, Color.blue, 0.15f);
+        effect.SetText("레벨업", 80f, Color.blue, 0.1f);
         effect.SetColor(Color.white);
+        effect.SetMove(150f, Vector3.up);
         effect.SetDuration(1f);
     }
 

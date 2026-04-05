@@ -505,6 +505,7 @@ public class UIManager : MonoBehaviour
         wave.slider.value = value;
         wave.slider.maxValue = maxValue;
         wave.fill.color = color;
+
         switch (phase)
         {
             case Phase.Normal:
@@ -515,8 +516,9 @@ public class UIManager : MonoBehaviour
                 break;
             case Phase.Boss:
                 wave.image.gameObject.SetActive(false);
-                wave.text.gameObject.SetActive(true);
-                wave.text.text = $"{FormatNumber((int)value)} / {FormatNumber((int)maxValue)}";
+                wave.text.gameObject.SetActive(MonsterWave.Instance.IsSpawned);
+                if (MonsterWave.Instance.IsSpawned)
+                    wave.text.text = $"{FormatNumber((int)value)} / {FormatNumber((int)maxValue)}";
                 storeUI.SetActive(false);
                 break;
             default:

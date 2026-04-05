@@ -14,8 +14,12 @@ public class TextEffect : MonoBehaviour, IPoolable
     private float colorTimer;
 
     [Header("Move")]
+    [SerializeField] private bool moveType;
     [SerializeField][Min(0f)] private float moveSpeed;
     [SerializeField] private Vector3 moveDirection;
+    [Space]
+    [SerializeField] private Vector3 moveTarget;
+    [SerializeField][Min(0f)] private float moveTime;
     [Space]
     [SerializeField][Min(0f)] private float duration;
     private float timer;
@@ -46,16 +50,9 @@ public class TextEffect : MonoBehaviour, IPoolable
     {
         if (colors == null || colors.Count == 0) return;
 
-        if (colors.Count == 1)
-        {
-            Color c = colors[0];
+        Color color = colors[0];
 
-            if (duration > 0f)
-                c.a = Mathf.Clamp01(timer / duration);
-
-            text.color = c;
-        }
-        else if (colorInterval > 0f)
+        if (colors.Count >= 2 && colorInterval > 0f)
         {
             colorTimer += _deltaTime;
 
@@ -65,25 +62,50 @@ public class TextEffect : MonoBehaviour, IPoolable
 
             int index = Mathf.FloorToInt(timeInCycle / colorInterval);
             int nextIndex = (index + 1) % count;
+            float t = (timeInCycle - index * colorInterval) / colorInterval;
 
-            float t2 = (timeInCycle - index * colorInterval) / colorInterval;
-
-            Color from = colors[index];
-            Color to = colors[nextIndex];
-
-            text.color = Color.Lerp(from, to, t2);
+            color = Color.Lerp(colors[index], colors[nextIndex], t);
         }
+
+        if (duration > 0f)
+            color.a *= Mathf.Clamp01(timer / duration);
+
+        text.color = color;
     }
 
     private void UpdateMove(float _deltaTime)
     {
-        if (moveSpeed <= 0f) return;
+        if (moveType)
+        {
+            if (moveSpeed <= 0f) return;
 
-        Vector2 dir = moveDirection.normalized;
-        rect.anchoredPosition += dir * moveSpeed * _deltaTime;
+            Vector2 dir = moveDirection.normalized;
+            rect.anchoredPosition += dir * moveSpeed * _deltaTime;
 
-        if (CameraOut())
-            Despawn();
+            if (CameraOut())
+                Despawn();
+
+            return;
+        }
+
+        if (moveTime <= 0f)
+        {
+            rect.anchoredPosition = moveTarget;
+            return;
+        }
+
+        Vector2 current = rect.anchoredPosition;
+        Vector2 target = moveTarget;
+
+        if (_deltaTime >= moveTime)
+        {
+            rect.anchoredPosition = target;
+            moveTime = 0f;
+            return;
+        }
+
+        rect.anchoredPosition = Vector2.Lerp(current, target, _deltaTime / moveTime);
+        moveTime -= _deltaTime;
     }
 
     private bool CameraOut()
@@ -131,8 +153,20 @@ public class TextEffect : MonoBehaviour, IPoolable
     public void SetPosition(Vector2 _pos) => rect.anchoredPosition = _pos;
     public void SetMove(float _speed, Vector3 _direction)
     {
+        moveType = true;
         moveSpeed = _speed;
         moveDirection = _direction;
+    }
+    public void SetMove(Vector3 _target, float _time)
+    {
+        Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(Camera.main, _target);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(rect.parent as RectTransform, screenPos, null, out Vector2 targetPos);
+
+        moveType = false;
+        moveTarget = targetPos;
+        moveTime = Mathf.Max(_time, 0f);
+
+        SetDuration(_time);
     }
     public void SetDuration(float _duration)
     {
@@ -169,8 +203,12 @@ public class TextEffect : MonoBehaviour, IPoolable
         colorInterval = 0f;
         colorTimer = 0f;
 
+        moveType = true;
         moveSpeed = 0f;
         moveDirection = Vector3.zero;
+        moveTarget = Vector3.zero;
+        moveTime = 0f;
+
         duration = 0f;
         timer = 0f;
     }

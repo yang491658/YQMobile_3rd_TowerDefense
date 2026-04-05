@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: 1
   Name: Temp
-  Image: {fileID: 0}
+  Image: {fileID: 21300000, guid: 51264865f8ee877469b7590543ab51ca, type: 3}
   MoveSpeed: 1
   TotalHealth: 1000
   Exp: 100

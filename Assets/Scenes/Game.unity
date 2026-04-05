@@ -10152,9 +10152,10 @@ MonoBehaviour:
   spawnPeak: 30
   warningTime: 5
   warningInterval: 0.3
-  bossCome: 3
+  bossDelay: 1
   bossOrder: 1
   boss: {fileID: 0}
+  rewardDealy: 1.5
   rewardTime: 3
   rewardExp: 0
   rewardGold: 0
