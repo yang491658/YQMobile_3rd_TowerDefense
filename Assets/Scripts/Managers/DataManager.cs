@@ -82,7 +82,7 @@ public class DataManager : MonoBehaviour
 
     #region 검색
     public TowerData SearchTower(int _id)
-        => towerDic.TryGetValue(_id, out var _data) ? _data : towerDatas[Random.Range(0, towerDatas.Length)];
+        => towerDic.TryGetValue(_id, out var _data) ? _data : null;
 
     public BossData SearchBoss(int _id)
         => bossDic.TryGetValue(_id, out var _data) ? _data : null;
@@ -107,16 +107,24 @@ public class DataManager : MonoBehaviour
     public TowerData[] GetTowerDatas() => towerDatas;
     public TowerData[] GetTowerDatas(TowerGrade _grade)
     {
-        List<TowerData> result = new(towerDatas.Length);
-
+        int count = 0;
         for (int i = 0; i < towerDatas.Length; i++)
         {
             TowerData data = towerDatas[i];
             if (data != null && data.Grade == _grade)
-                result.Add(data);
+                count++;
         }
 
-        return result.ToArray();
+        int index = 0;
+        TowerData[] result = new TowerData[count];
+        for (int i = 0; i < towerDatas.Length; i++)
+        {
+            TowerData data = towerDatas[i];
+            if (data != null && data.Grade == _grade)
+                result[index++] = data;
+        }
+
+        return result;
     }
     public int GetTowerID(int _order)
         => (_order > 0 && _order <= towerDatas.Length) ? towerDatas[_order - 1].ID : 0;

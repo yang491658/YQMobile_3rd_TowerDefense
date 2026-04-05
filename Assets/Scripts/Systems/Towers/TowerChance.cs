@@ -178,7 +178,7 @@ public class TowerChance : ScriptableObject
         }
 
         if (totalWeight <= 0)
-            return gradeChances[gradeChances.Count - 1].grade;
+            return TowerGrade.Temp;
 
         int roll = Random.Range(0, totalWeight);
         int acc = 0;
@@ -192,7 +192,7 @@ public class TowerChance : ScriptableObject
             if (roll < acc) return gc.grade;
         }
 
-        return gradeChances[gradeChances.Count - 1].grade;
+        return TowerGrade.Temp;
     }
 
     public IReadOnlyList<GradeChance> GetGradeChance(int _level) => levelDic[_level].gradeChances;

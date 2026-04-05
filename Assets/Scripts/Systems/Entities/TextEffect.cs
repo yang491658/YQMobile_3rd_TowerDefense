@@ -110,9 +110,7 @@ public class TextEffect : MonoBehaviour, IPoolable
 
     private bool CameraOut()
     {
-        Vector3[] corners = new Vector3[4];
-        rect.GetWorldCorners(corners);
-
+        Rect localRect = rect.rect;
         Camera cam = Camera.main;
         float z = -cam.transform.position.z;
 
@@ -121,9 +119,10 @@ public class TextEffect : MonoBehaviour, IPoolable
         float minY = float.MaxValue;
         float maxY = float.MinValue;
 
-        for (int i = 0; i < corners.Length; i++)
+        void CheckCorner(Vector3 _localCorner)
         {
-            Vector3 screenPos = RectTransformUtility.WorldToScreenPoint(null, corners[i]);
+            Vector3 worldCorner = rect.TransformPoint(_localCorner);
+            Vector3 screenPos = RectTransformUtility.WorldToScreenPoint(null, worldCorner);
             Vector3 worldPos = cam.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, z));
 
             if (worldPos.x < minX) minX = worldPos.x;
@@ -131,6 +130,11 @@ public class TextEffect : MonoBehaviour, IPoolable
             if (worldPos.y < minY) minY = worldPos.y;
             if (worldPos.y > maxY) maxY = worldPos.y;
         }
+
+        CheckCorner(new Vector3(localRect.xMin, localRect.yMin, 0f));
+        CheckCorner(new Vector3(localRect.xMin, localRect.yMax, 0f));
+        CheckCorner(new Vector3(localRect.xMax, localRect.yMax, 0f));
+        CheckCorner(new Vector3(localRect.xMax, localRect.yMin, 0f));
 
         Rect worldRect = AutoCamera.WorldRect;
         return maxX < worldRect.xMin || minX > worldRect.xMax ||

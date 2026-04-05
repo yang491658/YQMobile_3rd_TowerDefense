@@ -753,9 +753,7 @@ public class UIManager : MonoBehaviour
 
     public Rect GetMapAreaRect(float _z = 0f)
     {
-        Vector3[] corners = new Vector3[4];
-        mapUI.GetWorldCorners(corners);
-
+        Rect rect = mapUI.rect;
         Canvas canvas = mapUI.GetComponentInParent<Canvas>();
         Camera uiCam = null;
         if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
@@ -764,8 +762,11 @@ public class UIManager : MonoBehaviour
         Camera worldCam = Camera.main;
         float depth = Mathf.Abs(_z - worldCam.transform.position.z);
 
-        Vector3 minScreen = RectTransformUtility.WorldToScreenPoint(uiCam, corners[0]);
-        Vector3 maxScreen = RectTransformUtility.WorldToScreenPoint(uiCam, corners[2]);
+        Vector3 minCorner = mapUI.TransformPoint(new Vector3(rect.xMin, rect.yMin, 0f));
+        Vector3 maxCorner = mapUI.TransformPoint(new Vector3(rect.xMax, rect.yMax, 0f));
+
+        Vector3 minScreen = RectTransformUtility.WorldToScreenPoint(uiCam, minCorner);
+        Vector3 maxScreen = RectTransformUtility.WorldToScreenPoint(uiCam, maxCorner);
 
         Vector3 minWorld = worldCam.ScreenToWorldPoint(new Vector3(minScreen.x, minScreen.y, depth));
         Vector3 maxWorld = worldCam.ScreenToWorldPoint(new Vector3(maxScreen.x, maxScreen.y, depth));

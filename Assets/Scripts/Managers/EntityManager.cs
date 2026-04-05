@@ -336,8 +336,9 @@ public class EntityManager : MonoBehaviour
             TowerGrade grade = DataManager.Instance.GetRandomGrade(GameManager.Instance.GetLevel());
             TowerData[] datas = DataManager.Instance?.GetTowerDatas(grade);
 
-            if (datas.Length > 0)
-                id = datas[Random.Range(0, datas.Length)].ID;
+            if (datas.Length <= 0) return null;
+
+            id = datas[Random.Range(0, datas.Length)].ID;
         }
 
         TowerData data = DataManager.Instance?.SearchTower(id);
