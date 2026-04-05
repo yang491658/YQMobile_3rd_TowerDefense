@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -13,11 +14,13 @@ public class EntityManager : MonoBehaviour
     [Header("Base")]
     [SerializeField] private GameObject towerBase;
     [SerializeField] private GameObject monsterBase;
+    [SerializeField] private GameObject bossBase;
     [SerializeField] private GameObject bulletBase;
     [SerializeField] private GameObject textBase;
 
     [Header("InGame")]
     [SerializeField] private Transform inGame;
+    private Coroutine inGameRoutine;
     [SerializeField] private Transform towerTrans;
     [SerializeField] private Transform monsterTrans;
     [SerializeField] private Transform otherTrans;
@@ -52,6 +55,8 @@ public class EntityManager : MonoBehaviour
             towerBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Tower.prefab");
         if (monsterBase == null)
             monsterBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Monster.prefab");
+        if (bossBase == null)
+            bossBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Boss.prefab");
         if (bulletBase == null)
             bulletBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Bullet.prefab");
         if (textBase == null)
@@ -75,6 +80,7 @@ public class EntityManager : MonoBehaviour
         SetEntity();
 
         PoolManager.Instance?.Init(monsterBase);
+        PoolManager.Instance?.Init(bossBase);
         PoolManager.Instance?.Init(bulletBase);
         PoolManager.Instance?.Init(textBase);
     }
@@ -392,7 +398,7 @@ public class EntityManager : MonoBehaviour
     public void SellTower(Tower _tower)
     {
         GameManager.Instance?.GoldUp(GameManager.Instance.GetSellGold(_tower));
-        UIManager.Instance?.UpdateStore(false);
+        UIManager.Instance?.UpdateSell(false);
         UIManager.Instance?.UpdateDrag(null);
 
         DespawnTower(_tower);
@@ -405,11 +411,11 @@ public class EntityManager : MonoBehaviour
         if (_on)
         {
             if (!MonsterWave.Instance.IsRunning)
-                MonsterWave.Instance.StartWave();
+                MonsterWave.Instance?.StartWave();
             else
-                MonsterWave.Instance.PauseWave(false);
+                MonsterWave.Instance?.PauseWave(false);
         }
-        else MonsterWave.Instance.PauseWave(true);
+        else MonsterWave.Instance?.PauseWave(true);
     }
 
     public Monster SpawnMonster(Vector3? _pos = null)
@@ -429,6 +435,27 @@ public class EntityManager : MonoBehaviour
         monsters.Add(monster);
 
         return monster;
+    }
+
+    public Boss SpawnBoss(int _order)
+    {
+        int id = DataManager.Instance.GetBossID(_order);
+        if (id == 0) return null;
+
+        BossData data = DataManager.Instance?.SearchBoss(id);
+        if (data == null) return null;
+
+        Vector3 pos = mapFieldTilemap.GetCellCenterWorld(entryCell);
+
+        Boss boss = SpawnPool<Boss>(bossBase, pos, monsterTrans);
+        if (boss == null) return null;
+
+        boss.SetBoss(data);
+        boss.SetMove(mapFieldTilemap.WorldToCell(pos));
+        boss.transform.localScale = map.localScale;
+        monsters.Add(boss);
+
+        return boss;
     }
 
     public void DespawnMonster(Monster _monster)
@@ -477,6 +504,32 @@ public class EntityManager : MonoBehaviour
             DespawnTower(towers[i]);
         for (int i = monsters.Count - 1; i >= 0; i--)
             DespawnMonster(monsters[i]);
+    }
+
+    public void MoveInGame(Vector3 _target, float _speed = 0f)
+    {
+        if (inGameRoutine != null)
+            StopCoroutine(inGameRoutine);
+
+        if (_speed <= 0f)
+        {
+            inGame.position = _target;
+            inGameRoutine = null;
+            return;
+        }
+
+        inGameRoutine = StartCoroutine(InGameCoroutine(_target, _speed));
+    }
+
+    private IEnumerator InGameCoroutine(Vector3 _target, float _speed)
+    {
+        while (inGame.position != _target)
+        {
+            inGame.position = Vector3.MoveTowards(inGame.position, _target, _speed * Time.deltaTime);
+            yield return null;
+        }
+
+        inGameRoutine = null;
     }
 
     #region SET

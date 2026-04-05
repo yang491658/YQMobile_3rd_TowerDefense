@@ -12,6 +12,8 @@ public class DataManager : MonoBehaviour
     [Header("Data")]
     [SerializeField] private TowerData[] towerDatas;
     private readonly Dictionary<int, TowerData> towerDic = new();
+    [SerializeField] private BossData[] bossDatas;
+    private readonly Dictionary<int, BossData> bossDic = new();
 
     [Header("Tables")]
     [SerializeField] private TowerChance towerChance;
@@ -22,17 +24,18 @@ public class DataManager : MonoBehaviour
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        towerDatas = CollectDatas<TowerData>("t:TowerData", new[] { "Assets/Datas/Towers" });
+        towerDatas = CollectDatas<TowerData>("t:TowerData", new[] { "Assets/Datas/Towers" }, _data => _data.ID);
+        bossDatas = CollectDatas<BossData>("t:BossData", new[] { "Assets/Datas/Monsters" }, _data => _data.ID);
 
-        towerChance = LoadTableAsset<TowerChance>();
-        towerColor = LoadTableAsset<TowerColor>();
-        towerSymbol = LoadTableAsset<TowerSymbol>();
-        towerStat = LoadTableAsset<TowerStat>();
+        towerChance = LoadAsset<TowerChance>();
+        towerColor = LoadAsset<TowerColor>();
+        towerSymbol = LoadAsset<TowerSymbol>();
+        towerStat = LoadAsset<TowerStat>();
 
         EditorUtility.SetDirty(this);
     }
 
-    private static TAsset[] CollectDatas<TAsset>(string _filter, string[] _folders) where TAsset : ScriptableObject
+    private static TAsset[] CollectDatas<TAsset>(string _filter, string[] _folders, System.Func<TAsset, int> _order) where TAsset : ScriptableObject
     {
         string[] guids = AssetDatabase.FindAssets(_filter, _folders);
         var list = new List<TAsset>(guids.Length);
@@ -45,13 +48,15 @@ public class DataManager : MonoBehaviour
                 list.Add(data);
         }
 
+        list.Sort((_a, _b) => _order(_a).CompareTo(_order(_b)));
+
         return list.ToArray();
     }
 
-    private T LoadTableAsset<T>() where T : ScriptableObject
+    private static T LoadAsset<T>() where T : ScriptableObject
     {
         string typeName = typeof(T).Name;
-        string[] guids = AssetDatabase.FindAssets($"t:{typeName}", new[] { "Assets/Datas/Tables" });
+        string[] guids = AssetDatabase.FindAssets($"t:{typeName}", new[] { "Assets/Datas" });
         if (guids.Length > 0)
         {
             string path = AssetDatabase.GUIDToAssetPath(guids[0]);
@@ -78,6 +83,9 @@ public class DataManager : MonoBehaviour
     #region 검색
     public TowerData SearchTower(int _id)
         => towerDic.TryGetValue(_id, out var _data) ? _data : towerDatas[Random.Range(0, towerDatas.Length)];
+
+    public BossData SearchBoss(int _id)
+        => bossDic.TryGetValue(_id, out var _data) ? _data : null;
     #endregion
 
     #region SET
@@ -87,6 +95,11 @@ public class DataManager : MonoBehaviour
         foreach (var d in towerDatas)
             if (d != null)
                 towerDic.TryAdd(d.ID, d);
+
+        bossDic.Clear();
+        foreach (var d in bossDatas)
+            if (d != null)
+                bossDic.TryAdd(d.ID, d);
     }
     #endregion
 
@@ -107,6 +120,10 @@ public class DataManager : MonoBehaviour
     }
     public int GetTowerID(int _order)
         => (_order > 0 && _order <= towerDatas.Length) ? towerDatas[_order - 1].ID : 0;
+
+    public BossData[] GetBossDatas() => bossDatas;
+    public int GetBossID(int _order)
+        => (_order > 0 && _order <= bossDatas.Length) ? bossDatas[_order - 1].ID : 0;
 
     public IReadOnlyList<TowerChance.GradeChance> GetGradeChance(int _level) => towerChance.GetGradeChance(_level);
     public TowerGrade GetRandomGrade(int _level) => towerChance.GetGrade(_level);

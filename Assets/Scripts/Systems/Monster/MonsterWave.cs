@@ -15,7 +15,7 @@ public sealed class MonsterWave : MonoBehaviour
     [Header("Normal")]
     [SerializeField][Min(0.1f)] private float normalTime = 180f;
     private float normalTimer;
-    [SerializeField] private Vector2 spawnRange = new Vector2(0.3f, 3f);
+    [SerializeField] private Vector2 spawnRange = new Vector2(1f, 3f);
     private float spawnDelay;
     private float spawnTimer;
     [SerializeField] private float spawnPeak = 30f;
@@ -28,10 +28,13 @@ public sealed class MonsterWave : MonoBehaviour
     private float warningTextTimer;
 
     [Header("Boss")]
+    [SerializeField][Min(0f)] private float bossCome = 1.5f;
     [SerializeField][Min(1)] private int bossOrder = 1;
-    [SerializeField] private Monster boss; // TODO 보스 시스템
+    [SerializeField] private Boss boss;
+    private bool onBoss = false;
 
     public bool IsSpawned { private set; get; } = false;
+    public bool IsFinished { private set; get; } = false;
 
     [Header("Reward")]
     [SerializeField][Min(0.1f)] private float rewardTime = 3f;
@@ -77,9 +80,11 @@ public sealed class MonsterWave : MonoBehaviour
         warningTimer = 0f;
         warningTextTimer = 0f;
 
+        onBoss = false;
         bossOrder = 1;
         boss = null;
         IsSpawned = false;
+        IsFinished = false;
 
         rewardTimer = 0f;
         rewardExp = 0;
@@ -111,6 +116,8 @@ public sealed class MonsterWave : MonoBehaviour
 
         if (spawnDelay > spawnRange.x)
             spawnDelay = Mathf.Max(spawnDelay - _deltaTime / spawnDecrease, spawnRange.x);
+
+        if (IsFinished) return;
 
         normalTimer -= _deltaTime;
         if (normalTimer <= 0f)
@@ -161,24 +168,35 @@ public sealed class MonsterWave : MonoBehaviour
     #endregion
 
     #region 보스 페이즈
-    private void BossPhase(float _deltaTime) // TODO 보스 시스템
+    private void BossPhase(float _deltaTime)
     {
+        if (!onBoss)
+        {
+            Vector3 offset = UIManager.Instance.GetPlayerOffset();
+            EntityManager.Instance?.MoveInGame(offset, bossCome);
+            onBoss = true;
+        }
+
         if (!IsSpawned)
         {
             BossText();
-            boss = EntityManager.Instance?.SpawnMonster();
-            boss.SetHealth(10000);
+            boss = EntityManager.Instance?.SpawnBoss(bossOrder);
             IsSpawned = true;
+
+            BossData data = boss.GetData();
+            rewardExp = data.Exp;
+            rewardGold = data.Gold;
             return;
         }
 
-        if (boss.IsDead || boss.IsDespawn)
+        if (boss.IsDead)
         {
             RewardText();
             phase = Phase.Reward;
             rewardTimer = rewardTime;
             boss = null;
             IsSpawned = false;
+            if (DataManager.Instance?.GetBossID(++bossOrder) == 0) IsFinished = true;
         }
     }
 
@@ -196,6 +214,12 @@ public sealed class MonsterWave : MonoBehaviour
     #region 보상 페이즈
     private void RewardPhase(float _deltaTime)
     {
+        if (onBoss)
+        {
+            EntityManager.Instance?.MoveInGame(Vector3.zero, bossCome);
+            onBoss = false;
+        }
+
         float ratio = _deltaTime * rewardTimer;
 
         if (rewardExp > 0)
@@ -270,7 +294,7 @@ public sealed class MonsterWave : MonoBehaviour
                 _color = Color.yellow;
                 break;
 
-            case Phase.Boss: // TODO 보스 시스템
+            case Phase.Boss:
                 if (boss != null)
                 {
                     _value = boss.GetHealth();

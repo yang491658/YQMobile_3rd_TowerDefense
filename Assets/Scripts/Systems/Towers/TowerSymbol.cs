@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "TowerSymbol", menuName = "Towers/Tables/TowerSymbol", order = 104)]
+[CreateAssetMenu(fileName = "TowerSymbol", menuName = "Tower/Table/Symbol", order = 104)]
 public class TowerSymbol : ScriptableObject
 {
     [Header("Role")]

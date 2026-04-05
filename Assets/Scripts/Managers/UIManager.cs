@@ -37,22 +37,24 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject waveUI;
     [SerializeField] private SliderUI wave;
 
-    [Header("InGame UI / Player")]
-    [SerializeField] private RectTransform mapArea;
-    [SerializeField] private RectTransform store;
-    private Image storeImage;
-    private Color storeColor;
+    [Header("InGame UI / Player & Store")]
+    [SerializeField] private RectTransform mapUI;
+    [SerializeField] private RectTransform playerUI;
+    private float playerHeight = 0f;
     private bool onSell = false;
     private int sellGold = 0;
+    private Image sellImage;
+    private Color sellColor;
     [Space]
     [SerializeField] private SliderUI life;
     [SerializeField] private GameObject expUI;
     [SerializeField] private SliderUI exp;
-    [Space]
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI goldText;
     [SerializeField] private GameObject goldImage;
     [SerializeField] private GameObject loanImage;
+    [Space]
+    [SerializeField] private GameObject storeUI;
     [SerializeField] private TextMeshProUGUI[] chanceText;
 
     [Header("InGame UI / Tower")]
@@ -118,37 +120,40 @@ public class UIManager : MonoBehaviour
         if (wave.text == null)
             wave.text = GameObject.Find("InGameUI/Wave/WaveText")?.GetComponent<TextMeshProUGUI>();
 
-        if (mapArea == null)
-            mapArea = GameObject.Find("InGameUI/MapArea")?.GetComponent<RectTransform>();
-        if (store == null)
-            store = GameObject.Find("InGameUI/Store")?.GetComponent<RectTransform>();
+        if (mapUI == null)
+            mapUI = GameObject.Find("InGameUI/Map")?.GetComponent<RectTransform>();
+        if (playerUI == null)
+            playerUI = GameObject.Find("InGameUI/Player")?.GetComponent<RectTransform>();
 
         if (life.slider == null)
-            life.slider = GameObject.Find("InGameUI/Store/Life/LifeSlider")?.GetComponent<Slider>();
+            life.slider = GameObject.Find("InGameUI/Player/Life/LifeSlider")?.GetComponent<Slider>();
         if (life.text == null)
-            life.text = GameObject.Find("InGameUI/Store/Life/LifeText")?.GetComponent<TextMeshProUGUI>();
+            life.text = GameObject.Find("InGameUI/Player/Life/LifeText")?.GetComponent<TextMeshProUGUI>();
         if (life.btn == null)
-            life.btn = GameObject.Find("InGameUI/Store/Life/LifeBtn")?.GetComponent<Button>();
+            life.btn = GameObject.Find("InGameUI/Player/Life/LifeBtn")?.GetComponent<Button>();
 
         if (expUI == null)
-            expUI = GameObject.Find("InGameUI/Store/Exp");
+            expUI = GameObject.Find("InGameUI/Player/Exp");
         if (exp.slider == null)
-            exp.slider = GameObject.Find("InGameUI/Store/Exp/ExpSlider")?.GetComponent<Slider>();
+            exp.slider = GameObject.Find("InGameUI/Player/Exp/ExpSlider")?.GetComponent<Slider>();
         if (exp.text == null)
-            exp.text = GameObject.Find("InGameUI/Store/Exp/ExpText")?.GetComponent<TextMeshProUGUI>();
+            exp.text = GameObject.Find("InGameUI/Player/Exp/ExpText")?.GetComponent<TextMeshProUGUI>();
         if (exp.btn == null)
-            exp.btn = GameObject.Find("InGameUI/Store/Exp/ExpBtn")?.GetComponent<Button>();
+            exp.btn = GameObject.Find("InGameUI/Player/Exp/ExpBtn")?.GetComponent<Button>();
 
         if (levelText == null)
-            levelText = GameObject.Find("InGameUI/Store/Level+Gold/LevelText")?.GetComponent<TextMeshProUGUI>();
+            levelText = GameObject.Find("InGameUI/Player/Level+Gold/LevelText")?.GetComponent<TextMeshProUGUI>();
         if (goldText == null)
-            goldText = GameObject.Find("InGameUI/Store/Level+Gold/GoldText")?.GetComponent<TextMeshProUGUI>();
+            goldText = GameObject.Find("InGameUI/Player/Level+Gold/GoldText")?.GetComponent<TextMeshProUGUI>();
         if (goldImage == null)
-            goldImage = GameObject.Find("InGameUI/Store/Level+Gold/GoldImage");
+            goldImage = GameObject.Find("InGameUI/Player/Level+Gold/GoldImage");
         if (loanImage == null)
-            loanImage = GameObject.Find("InGameUI/Store/Level+Gold/LoanImage");
+            loanImage = GameObject.Find("InGameUI/Player/Level+Gold/LoanImage");
+
+        if (storeUI == null)
+            storeUI = GameObject.Find("InGameUI/Player/Store");
         if (chanceText == null || chanceText.Length == 0)
-            chanceText = GameObject.Find("InGameUI/Store/Chance").GetComponentsInChildren<TextMeshProUGUI>();
+            chanceText = GameObject.Find("InGameUI/Player/Store/Chance").GetComponentsInChildren<TextMeshProUGUI>();
 
         if (drag == null)
             drag = GameObject.Find("InGameUI/Drag")?.GetComponent<RectTransform>();
@@ -224,8 +229,12 @@ public class UIManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         wave.fill = wave.slider.fillRect.GetComponent<Image>();
-        storeImage = store.GetComponent<Image>();
-        storeColor = storeImage.color;
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(playerUI);
+        playerHeight = playerUI.rect.height;
+        sellImage = playerUI.GetComponent<Image>();
+        sellColor = sellImage.color;
+
         life.fill = life.slider.fillRect.GetComponent<Image>();
         life.color = life.fill.color;
         exp.fill = exp.slider.fillRect.GetComponent<Image>();
@@ -381,7 +390,7 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region 오픈
-    public void OpenUI(bool _on)
+    private void OpenUI(bool _on)
     {
         OpenResult(_on);
         OpenConfirm(_on);
@@ -438,7 +447,7 @@ public class UIManager : MonoBehaviour
         UpdatePlayTime();
         UpdateScore(GameManager.Instance.GetScore());
 
-        UpdateStore(false);
+        UpdateSell(false);
         UpdateLife(GameManager.Instance.GetLife(), GameManager.Instance.GetMaxLife());
         UpdateExp(GameManager.Instance.GetExp(), GameManager.Instance.GetNeedExp());
         UpdateLevel(GameManager.Instance.GetLevel());
@@ -484,9 +493,10 @@ public class UIManager : MonoBehaviour
 
     private void UpdateWave()
     {
-        if (!MonsterWave.Instance.IsRunning)
+        if (!MonsterWave.Instance.IsRunning || MonsterWave.Instance.IsFinished)
         {
             waveUI.SetActive(false);
+            storeUI.SetActive(true);
             return;
         }
         waveUI.SetActive(true);
@@ -499,17 +509,20 @@ public class UIManager : MonoBehaviour
         {
             case Phase.Normal:
                 wave.image.gameObject.SetActive(true);
-                //wave.image.sprite = null; TODO 보스 시스템
+                //wave.image.sprite = null; // TODO 보스 이미지 적용
                 wave.text.gameObject.SetActive(false);
+                storeUI.SetActive(true);
                 break;
             case Phase.Boss:
                 wave.image.gameObject.SetActive(false);
                 wave.text.gameObject.SetActive(true);
                 wave.text.text = $"{FormatNumber((int)value)} / {FormatNumber((int)maxValue)}";
+                storeUI.SetActive(false);
                 break;
             default:
                 wave.image.gameObject.SetActive(false);
                 wave.text.gameObject.SetActive(false);
+                storeUI.SetActive(true);
                 break;
         }
     }
@@ -551,17 +564,17 @@ public class UIManager : MonoBehaviour
         _ui.routine = StartCoroutine(FlashCoroutine(_ui));
     }
 
-    public bool IsStore(Vector3 _pos)
+    public bool IsSell(Vector3 _pos)
     {
         Camera cam = Camera.main;
         Vector3 pos = cam.WorldToScreenPoint(_pos);
-        return RectTransformUtility.RectangleContainsScreenPoint(store, pos);
+        return RectTransformUtility.RectangleContainsScreenPoint(playerUI, pos);
     }
 
-    public void UpdateStore(bool _on, int _gold = 0)
+    public void UpdateSell(bool _on, int _gold = 0)
     {
         onSell = _on; sellGold = _gold;
-        storeImage.color = onSell ? Color.cyan : storeColor;
+        sellImage.color = onSell ? Color.cyan : sellColor;
 
         UpdateGold(GameManager.Instance.GetGold(), GameManager.Instance.GetNeedGold());
     }
@@ -739,9 +752,9 @@ public class UIManager : MonoBehaviour
     public Rect GetMapAreaRect(float _z = 0f)
     {
         Vector3[] corners = new Vector3[4];
-        mapArea.GetWorldCorners(corners);
+        mapUI.GetWorldCorners(corners);
 
-        Canvas canvas = mapArea.GetComponentInParent<Canvas>();
+        Canvas canvas = mapUI.GetComponentInParent<Canvas>();
         Camera uiCam = null;
         if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
             uiCam = canvas.worldCamera;
@@ -756,6 +769,27 @@ public class UIManager : MonoBehaviour
         Vector3 maxWorld = worldCam.ScreenToWorldPoint(new Vector3(maxScreen.x, maxScreen.y, depth));
 
         return Rect.MinMaxRect(minWorld.x, minWorld.y, maxWorld.x, maxWorld.y);
+    }
+
+    public Vector3 GetPlayerOffset(float _z = 0f)
+    {
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(playerUI);
+
+        float height = playerHeight - playerUI.rect.height;
+        if (Mathf.Approximately(height, 0f))
+            return Vector3.zero;
+
+        float scaleFactor = playerUI.GetComponentInParent<Canvas>().scaleFactor;
+        float heightPx = height * scaleFactor;
+
+        Camera worldCam = Camera.main;
+        float depth = Mathf.Abs(_z - worldCam.transform.position.z);
+
+        Vector3 origin = worldCam.ScreenToWorldPoint(new Vector3(0f, 0f, depth));
+        Vector3 move = worldCam.ScreenToWorldPoint(new Vector3(0f, heightPx, depth));
+
+        return origin - move;
     }
     #endregion
 }

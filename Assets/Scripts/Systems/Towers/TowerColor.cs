@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "TowerColor", menuName = "Towers/Tables/TowerColor", order = 103)]
+[CreateAssetMenu(fileName = "TowerColor", menuName = "Tower/Table/Color", order = 103)]
 public class TowerColor : ScriptableObject
 {
     [Header("Grades")]

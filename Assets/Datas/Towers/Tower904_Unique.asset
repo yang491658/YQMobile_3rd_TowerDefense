@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abf7c14b1ff5e1746b8923d9ca7ebcef, type: 3}
   m_Name: Tower904_Unique
   m_EditorClassIdentifier: 
-  Color: {r: 0, g: 0, b: 0, a: 1}
-  Image: {fileID: 21300000, guid: ae37da49eab54264fb74f25470480992, type: 3}
   ID: 904
   Name: Unique
+  Image: {fileID: 21300000, guid: ae37da49eab54264fb74f25470480992, type: 3}
+  Color: {r: 0, g: 0, b: 0, a: 1}
   Grade: 4
   Role: 1
   Target: 0

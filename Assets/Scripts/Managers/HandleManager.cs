@@ -235,7 +235,7 @@ public class HandleManager : MonoBehaviour
 
         ResetDrag();
 
-        UIManager.Instance?.UpdateStore(false);
+        UIManager.Instance?.UpdateSell(false);
         UIManager.Instance?.UpdateDrag(null);
     }
 
@@ -271,16 +271,16 @@ public class HandleManager : MonoBehaviour
     {
         select.transform.position = _current + offset;
 
-        bool isSell = UIManager.Instance.IsStore(_current);
+        bool isSell = UIManager.Instance.IsSell(_current);
         int sellGold = GameManager.Instance.GetSellGold(select);
 
-        UIManager.Instance?.UpdateStore(isSell, sellGold);
+        UIManager.Instance?.UpdateSell(isSell, sellGold);
         UIManager.Instance?.UpdateDrag(select, select.transform.position);
     }
 
     private void OnDragEnd(Vector3 _start, Vector3 _end)
     {
-        if (UIManager.Instance.IsStore(_end))
+        if (UIManager.Instance.IsSell(_end))
         {
             select.Sell();
             select = null;
@@ -314,7 +314,7 @@ public class HandleManager : MonoBehaviour
 
         select = null;
 
-        UIManager.Instance?.UpdateStore(false);
+        UIManager.Instance?.UpdateSell(false);
         UIManager.Instance?.UpdateDrag(null);
     }
 

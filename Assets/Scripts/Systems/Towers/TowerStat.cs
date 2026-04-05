@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "TowerStat", menuName = "Towers/Tables/TowerStat", order = 105)]
+[CreateAssetMenu(fileName = "TowerStat", menuName = "Tower/Table/Stat", order = 105)]
 public class TowerStat : ScriptableObject
 {
     [System.Serializable]

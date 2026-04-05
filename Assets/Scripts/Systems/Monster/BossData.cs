@@ -4,21 +4,21 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-[CreateAssetMenu(fileName = "TowerData", menuName = "Tower/Data", order = 101)]
-public class TowerData : ScriptableObject
+[CreateAssetMenu(fileName = "BossData", menuName = "Monster/Boss/Data", order = 201)]
+public class BossData : ScriptableObject
 {
     [Header("Base")]
     public int ID;
     public string Name;
     public Sprite Image;
-    public Color Color = Color.black;
-
-    [Header("Type")]
-    public TowerGrade Grade = TowerGrade.Temp;
-    public TowerRole Role = TowerRole.None;
 
     [Header("Stat")]
-    public AttackTarget Target = AttackTarget.First;
+    [Min(0f)] public float MoveSpeed = 1f;
+    [Min(0)] public int TotalHealth;
+
+    [Header("Reward")]
+    [Min(0)] public int Exp;
+    [Min(0)] public int Gold;
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -35,8 +35,7 @@ public class TowerData : ScriptableObject
         if (Image != null)
         {
         }
-        else if (Grade == TowerGrade.Temp) { ID = 999; Name = "Temp"; }
-        else { ID = 900 + (int)Grade; Name = Grade.ToString(); }
+        else { Name = "Temp"; }
     }
 
     private void AutoImage()
@@ -45,6 +44,12 @@ public class TowerData : ScriptableObject
 
     private void AutoValue()
     {
+        if (Name == "Temp")
+        {
+            TotalHealth = ID * 1000;
+            Exp = TotalHealth / 10;
+            Gold = TotalHealth / 10;
+        }
     }
 #endif
 }

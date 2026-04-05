@@ -30,10 +30,10 @@ public class Monster : Pooling
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        Canvas[] canvases = GetComponentsInChildren<Canvas>(true);
-        if (canvas == null) canvas = canvases[0];
+        if (canvas == null)
+            canvas = GetComponentInChildren<Canvas>();
         if (healthText == null)
-            healthText = canvas.GetComponentInChildren<TextMeshProUGUI>();
+            healthText = canvas?.GetComponentInChildren<TextMeshProUGUI>();
     }
 #endif
 
@@ -157,7 +157,9 @@ public class Monster : Pooling
     public void SetHealth(int _health)
     {
         health = Mathf.Max(_health, 0);
-        healthText.text = _health < int.MaxValue ? health.ToString() : "ㄱ-";
+
+        if (healthText != null)
+            healthText.text = _health < int.MaxValue ? health.ToString() : "ㄱ-";
     }
     #endregion
 
@@ -182,7 +184,8 @@ public class Monster : Pooling
 
         int order = ++sorting;
         sr.sortingOrder = order;
-        canvas.sortingOrder = order;
+        if (canvas != null)
+            canvas.sortingOrder = order;
 
         reserve = 0;
         IsDead = false;
@@ -194,7 +197,7 @@ public class Monster : Pooling
 
         current = default;
         target = default;
-        moveSpeed = 3f;
+        moveSpeed = 1f;
         moveDirection = Vector3.zero;
         Stop();
     }
