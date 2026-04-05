@@ -46,7 +46,7 @@ public class BossData : ScriptableObject
     {
         if (Name == "Temp")
         {
-            TotalHealth = ID * 10000;
+            TotalHealth = ID * 1000;
             Exp = ID * 100;
             Gold = ID * 100;
         }

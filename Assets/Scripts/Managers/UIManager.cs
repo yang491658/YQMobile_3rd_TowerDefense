@@ -33,9 +33,11 @@ public class UIManager : MonoBehaviour
     private int playTimeSec = -1;
     [SerializeField] private TextMeshProUGUI scoreNum;
 
-    [Header("InGame UI / Wave")]
+    [Header("InGame UI / Wave & Boss")]
     [SerializeField] private GameObject waveUI;
     [SerializeField] private SliderUI wave;
+    [SerializeField] private GameObject bossUI;
+    [SerializeField] private Image bossImage;
 
     [Header("InGame UI / Player & Store")]
     [SerializeField] private RectTransform mapUI;
@@ -66,13 +68,14 @@ public class UIManager : MonoBehaviour
     private struct SliderUI
     {
         public Slider slider;
+        [HideInInspector] public Image fill;
+        [HideInInspector] public Color color;
+        [HideInInspector] public int prev;
+
         public Image image;
         public TextMeshProUGUI text;
         public Button btn;
 
-        [HideInInspector] public Image fill;
-        [HideInInspector] public Color color;
-        [HideInInspector] public int prev;
         [HideInInspector] public Coroutine routine;
     }
 
@@ -120,6 +123,11 @@ public class UIManager : MonoBehaviour
         if (wave.text == null)
             wave.text = GameObject.Find("InGameUI/Wave/WaveText")?.GetComponent<TextMeshProUGUI>();
 
+        if (bossUI == null)
+            bossUI = GameObject.Find("InGameUI/Boss");
+        if (bossImage == null)
+            bossImage = GameObject.Find("InGameUI/Boss/BossImage")?.GetComponent<Image>();
+
         if (mapUI == null)
             mapUI = GameObject.Find("InGameUI/Map")?.GetComponent<RectTransform>();
         if (playerUI == null)
@@ -128,7 +136,7 @@ public class UIManager : MonoBehaviour
         if (life.slider == null)
             life.slider = GameObject.Find("InGameUI/Player/Life/LifeSlider")?.GetComponent<Slider>();
         if (life.text == null)
-            life.text = GameObject.Find("InGameUI/Player/Life/LifeText")?.GetComponent<TextMeshProUGUI>();
+            life.text = GameObject.Find("InGameUI/Player/Life/LifeSlider/LifeText")?.GetComponent<TextMeshProUGUI>();
         if (life.btn == null)
             life.btn = GameObject.Find("InGameUI/Player/Life/LifeBtn")?.GetComponent<Button>();
 
@@ -137,7 +145,7 @@ public class UIManager : MonoBehaviour
         if (exp.slider == null)
             exp.slider = GameObject.Find("InGameUI/Player/Exp/ExpSlider")?.GetComponent<Slider>();
         if (exp.text == null)
-            exp.text = GameObject.Find("InGameUI/Player/Exp/ExpText")?.GetComponent<TextMeshProUGUI>();
+            exp.text = GameObject.Find("InGameUI/Player/Exp/ExpSlider/ExpText")?.GetComponent<TextMeshProUGUI>();
         if (exp.btn == null)
             exp.btn = GameObject.Find("InGameUI/Player/Exp/ExpBtn")?.GetComponent<Button>();
 
@@ -462,6 +470,8 @@ public class UIManager : MonoBehaviour
     {
         _slider.fill.color = _slider.color;
         _slider.prev = int.MinValue;
+        _slider.text.color = Color.white;
+
         if (_slider.routine != null)
             StopCoroutine(_slider.routine);
         _slider.routine = null;
@@ -496,6 +506,7 @@ public class UIManager : MonoBehaviour
         if (!MonsterWave.Instance.IsRunning || MonsterWave.Instance.IsFinished)
         {
             waveUI.SetActive(false);
+            bossUI.SetActive(false);
             storeUI.SetActive(true);
             return;
         }
@@ -510,20 +521,27 @@ public class UIManager : MonoBehaviour
         {
             case Phase.Normal:
                 wave.image.gameObject.SetActive(true);
-                //wave.image.sprite = null; // TODO 보스 이미지 적용
+                wave.image.sprite = MonsterWave.Instance?.GetBoss().Image;
                 wave.text.gameObject.SetActive(false);
+                bossUI.SetActive(false);
                 storeUI.SetActive(true);
                 break;
             case Phase.Boss:
                 wave.image.gameObject.SetActive(false);
                 wave.text.gameObject.SetActive(MonsterWave.Instance.IsSpawned);
                 if (MonsterWave.Instance.IsSpawned)
+                {
                     wave.text.text = $"{FormatNumber((int)value)} / {FormatNumber((int)maxValue)}";
+                    bossUI.SetActive(true);
+                    bossImage.sprite = MonsterWave.Instance?.GetBoss().Image;
+                }
+                else bossUI.SetActive(false);
                 storeUI.SetActive(false);
                 break;
             default:
                 wave.image.gameObject.SetActive(false);
                 wave.text.gameObject.SetActive(false);
+                bossUI.SetActive(false);
                 storeUI.SetActive(true);
                 break;
         }
@@ -532,6 +550,7 @@ public class UIManager : MonoBehaviour
     private IEnumerator FlashCoroutine(SliderUI _ui)
     {
         _ui.fill.color = Color.white;
+        _ui.text.color = Color.black;
 
         yield return new WaitForSecondsRealtime(0.05f);
 
@@ -542,10 +561,12 @@ public class UIManager : MonoBehaviour
             if (t >= 1f) break;
 
             _ui.fill.color = Color.Lerp(Color.white, _ui.color, t);
+            _ui.text.color = Color.Lerp(Color.black, Color.white, t);
             yield return null;
         }
 
         _ui.fill.color = _ui.color;
+        _ui.text.color = Color.white;
     }
 
     private void UpdateSlider(ref SliderUI _ui, int _value, int _maxValue, bool _interactable)
@@ -587,9 +608,9 @@ public class UIManager : MonoBehaviour
     {
         if (GameManager.Instance.IsMaxLevel())
         {
-            if (exp.routine != null)
-                StopCoroutine(exp.routine);
-            exp.routine = null;
+            exp.slider.maxValue = 1;
+            exp.slider.value = 1;
+            ResetSlider(ref exp);
             return;
         }
 
@@ -600,7 +621,8 @@ public class UIManager : MonoBehaviour
     {
         bool isMax = GameManager.Instance.IsMaxLevel();
 
-        expUI.SetActive(!isMax);
+        exp.text.gameObject.SetActive(!isMax);
+        exp.btn.gameObject.SetActive(!isMax);
         levelText.text = isMax ? "Lv.MAX" : $"Lv.{_level}";
 
         UpdateChanceUI(_level);

@@ -311,6 +311,9 @@ public sealed class MonsterWave : MonoBehaviour
     #endregion
 
     #region GET
+    public BossData GetBoss()
+        => DataManager.Instance?.SearchBossByOrder(bossOrder);
+
     public void GetPhaseValue(out Phase _phase, out float _value, out float _maxValue, out Color _color)
     {
         _phase = phase;

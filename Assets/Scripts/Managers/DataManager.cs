@@ -86,6 +86,9 @@ public class DataManager : MonoBehaviour
 
     public BossData SearchBoss(int _id)
         => bossDic.TryGetValue(_id, out var _data) ? _data : null;
+
+    public BossData SearchBossByOrder(int _order)
+        => (_order > 0 && _order <= bossDatas.Length) ? bossDatas[_order - 1] : null;
     #endregion
 
     #region SET
