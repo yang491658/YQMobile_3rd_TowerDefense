@@ -596,7 +596,8 @@ public class UIManager : MonoBehaviour
 
     public void UpdateSell(bool _on, int _gold = 0)
     {
-        onSell = _on; sellGold = _gold;
+        onSell = _on;
+        sellGold = _gold;
         sellImage.color = onSell ? Color.cyan : sellColor;
 
         UpdateGold(GameManager.Instance.GetGold(), GameManager.Instance.GetNeedGold());
