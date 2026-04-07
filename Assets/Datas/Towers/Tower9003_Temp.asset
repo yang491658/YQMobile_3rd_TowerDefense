@@ -9,13 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: acd254633bed0af4c846e297b0695389, type: 3}
-  m_Name: Boss02_Temp
+  m_Script: {fileID: 11500000, guid: abf7c14b1ff5e1746b8923d9ca7ebcef, type: 3}
+  m_Name: Tower9003_Temp
   m_EditorClassIdentifier: 
-  Image: {fileID: 21300000, guid: 51264865f8ee877469b7590543ab51ca, type: 3}
-  ID: 2
+  Image: {fileID: 0}
+  ID: 9003
   Name: Temp
-  MoveSpeed: 1
-  MaxHealth: 2000
-  Exp: 200
-  Gold: 200
+  Color: {r: 0, g: 0, b: 0, a: 1}
+  Grade: 3
+  Role: 0
+  Target: 0

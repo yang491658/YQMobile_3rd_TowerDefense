@@ -8338,17 +8338,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   towerDatas:
-  - {fileID: 11400000, guid: aa46be60f11a4b0449686134e224e537, type: 2}
-  - {fileID: 11400000, guid: b051631621301ae428e347bd59fef916, type: 2}
-  - {fileID: 11400000, guid: 74ea910cd711d8545ace40f0e47c9022, type: 2}
-  - {fileID: 11400000, guid: d8f54aa859b93644e9937975af62fcd6, type: 2}
-  - {fileID: 11400000, guid: 70a3c669e4b415a4f9ef5b438b315e86, type: 2}
-  - {fileID: 11400000, guid: 6ff92dce9e80fcc418426f1e873e9482, type: 2}
-  - {fileID: 11400000, guid: 957616aae9cd38948a6d653f338f3465, type: 2}
+  - {fileID: 11400000, guid: e5c42b787f0e30047a73e795238d043d, type: 2}
+  - {fileID: 11400000, guid: 4eb478724165676428fe8f2fdbc185e5, type: 2}
+  - {fileID: 11400000, guid: 8d698908eef56c4499b8a9b6eb4e0810, type: 2}
+  - {fileID: 11400000, guid: 7f339b1811313dd459daa408b60415f7, type: 2}
+  - {fileID: 11400000, guid: 1de17337b40c2ad42b596176c5dacb7c, type: 2}
+  - {fileID: 11400000, guid: c43627e9eab24a04f83d614a891b7d0a, type: 2}
+  - {fileID: 11400000, guid: a75ab2c18f67fab49a88624782c1a07a, type: 2}
+  - {fileID: 11400000, guid: bdf53faecb9afdc4f8ff906c09f7da53, type: 2}
+  - {fileID: 11400000, guid: 16010d677502c3b41b8b9415b2e75b62, type: 2}
+  - {fileID: 11400000, guid: 49886587badbb9346840342f0b33a376, type: 2}
   bossDatas:
-  - {fileID: 11400000, guid: 856229fe59d82734ea42ca1d6e6fe21d, type: 2}
-  - {fileID: 11400000, guid: 6f4c8b31714242540a4379ca16bace3f, type: 2}
-  - {fileID: 11400000, guid: 90a0537d29b8fbb47963b2e1425e1030, type: 2}
+  - {fileID: 11400000, guid: 713e6d01d27c6cd4d92e356f76d91b66, type: 2}
+  - {fileID: 11400000, guid: ea73735c6a9011d4b91ecb4737e27696, type: 2}
+  - {fileID: 11400000, guid: b5b8f1105502e48468f4272d01379ff5, type: 2}
   towerChance: {fileID: 11400000, guid: fa32553a70dee124aa6919c8820d9f57, type: 2}
   towerColor: {fileID: 11400000, guid: cae0e69b465fe334fbc8bc3ac7fa48dc, type: 2}
   towerSymbol: {fileID: 11400000, guid: 34e1aa77c835a0e41bc4329c081274de, type: 2}

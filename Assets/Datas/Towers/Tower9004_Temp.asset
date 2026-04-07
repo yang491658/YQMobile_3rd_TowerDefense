@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: abf7c14b1ff5e1746b8923d9ca7ebcef, type: 3}
-  m_Name: Tower906_Mythic
+  m_Name: Tower9004_Temp
   m_EditorClassIdentifier: 
-  ID: 906
-  Name: Mythic
-  Image: {fileID: 21300000, guid: ae37da49eab54264fb74f25470480992, type: 3}
+  Image: {fileID: 0}
+  ID: 9004
+  Name: Temp
   Color: {r: 0, g: 0, b: 0, a: 1}
-  Grade: 6
-  Role: 1
+  Grade: 4
+  Role: 0
   Target: 0

@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acd254633bed0af4c846e297b0695389, type: 3}
   m_Name: Boss03_Temp
   m_EditorClassIdentifier: 
+  Image: {fileID: 0}
   ID: 3
   Name: Temp
-  Image: {fileID: 0}
   MoveSpeed: 1
-  TotalHealth: 3000
+  MaxHealth: 3000
   Exp: 300
   Gold: 300

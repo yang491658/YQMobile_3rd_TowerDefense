@@ -9,7 +9,7 @@ public enum TowerGrade
     [InspectorName("전설")] Legend = 5,
     [InspectorName("신화")] Mythic = 6,
 
-    [InspectorName("임시")] Temp = 99,
+    [InspectorName("임시")] Temp = 9,
 }
 
 public enum TowerRole

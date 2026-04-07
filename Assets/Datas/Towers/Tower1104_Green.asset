@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: abf7c14b1ff5e1746b8923d9ca7ebcef, type: 3}
-  m_Name: Tower903_Epic
+  m_Name: Tower1104_Green
   m_EditorClassIdentifier: 
-  ID: 903
-  Name: Epic
-  Image: {fileID: 21300000, guid: ae37da49eab54264fb74f25470480992, type: 3}
+  Image: {fileID: 21300000, guid: 0a35880d9dd57eb43b20e2cda00ff45a, type: 3}
+  ID: 1104
+  Name: Green
   Color: {r: 0, g: 0, b: 0, a: 1}
-  Grade: 3
+  Grade: 1
   Role: 1
   Target: 0

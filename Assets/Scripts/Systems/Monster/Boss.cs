@@ -24,7 +24,7 @@ public class Boss : Monster
         data = _data;
 
         SetSpeed(data.MoveSpeed);
-        maxHealth = data.TotalHealth;
+        maxHealth = data.MaxHealth;
         SetHealth(maxHealth);
     }
     #endregion
