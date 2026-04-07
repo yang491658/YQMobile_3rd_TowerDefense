@@ -159,7 +159,7 @@ public class Monster : Pooling
         health = Mathf.Max(_health, 0);
 
         if (healthText != null)
-            healthText.text = _health < int.MaxValue ? health.ToString() : "ㄱ-";
+            healthText.text = _health < int.MaxValue ? UIManager.Instance?.FormatNumber(health) : "ㄱ-";
     }
     #endregion
 
