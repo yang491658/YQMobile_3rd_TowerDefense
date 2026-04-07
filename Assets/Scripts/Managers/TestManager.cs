@@ -58,7 +58,7 @@ public class TestManager : MonoBehaviour
     [Header("Test UI")]
     [SerializeField] private GameObject testUI;
     [Space]
-    [SerializeField] private SliderConfig gameSpeed = new(1, 1, 10, "배속 × {0}");
+    [SerializeField] private SliderConfig gameSpeed = new(1, 1, 20, "배속 × {0}");
     [Space]
     [SerializeField] private TextMeshProUGUI testCountNum;
     [SerializeField] private TextMeshProUGUI score10Num;

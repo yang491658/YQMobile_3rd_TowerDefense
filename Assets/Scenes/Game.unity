@@ -11066,7 +11066,7 @@ MonoBehaviour:
     slider: {fileID: 6970153951016945753}
     value: 1
     minValue: 1
-    maxValue: 10
+    maxValue: 20
     format: "\uBC30\uC18D \xD7 {0}"
   testCountNum: {fileID: 82935451405714779}
   score10Num: {fileID: 3937834829484441480}
