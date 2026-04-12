@@ -167,6 +167,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colors: []
   colorInterval: 0
+  moveType: 0
   moveSpeed: 0
   moveDirection: {x: 0, y: 0, z: 0}
+  moveTarget: {x: 0, y: 0, z: 0}
+  moveTime: 0
   duration: 0

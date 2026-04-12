@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 
+[RequireComponent(typeof(MonsterDebuff))]
 public class Monster : Pooling
 {
     private static int sorting = 0;
@@ -24,6 +25,8 @@ public class Monster : Pooling
     [SerializeField][Min(0)] private int reserve = 0;
     [Space]
     [SerializeField][Min(0)] private int gold;
+    [Space]
+    [SerializeField] private MonsterDebuff debuff;
 
     public bool IsDead { private set; get; } = false;
 
@@ -34,6 +37,8 @@ public class Monster : Pooling
             canvas = GetComponentInChildren<Canvas>();
         if (healthText == null)
             healthText = canvas?.GetComponentInChildren<TextMeshProUGUI>();
+        if (debuff == null)
+            debuff = GetComponent<MonsterDebuff>();
     }
 #endif
 
@@ -79,32 +84,34 @@ public class Monster : Pooling
     #endregion
 
     #region 전투
-    public bool TakeDamage(Tower _tower, int _damage, bool _critical = false, bool _direct = false)
+    public bool TakeDamage(int _damage, bool _isCritical = false, bool _direct = false)
     {
         if (IsDead) return false;
 
+        int damage = debuff.CalcDamage(_damage);
+
         if (!_direct) ReserveDown(_damage);
 
-        SetHealth(health - _damage);
-        CreateDamage(_damage, _critical);
+        SetHealth(health - damage);
+        CreateDamage(damage, _isCritical);
 
         if (health <= 0) Die();
 
         return true;
     }
 
-    private void CreateDamage(int _damage, bool _critical = false)
+    private void CreateDamage(int _damage, bool _isCritical = false)
     {
         if (_damage <= 0) return;
 
-        float font = _critical ? 65f : 50f;
-        Color color = _critical ? Color.red : Color.black;
+        float font = _isCritical ? 65f : 50f;
+        Color color = _isCritical ? Color.red : Color.black;
 
         Vector3 from = transform.position + Vector3.up * 0.3f;
         Vector3 to = new Vector3(0f, AutoCamera.WorldRect.yMax, 0f);
         Vector3 dir = (to - from).normalized;
 
-        TextEffect text = EntityManager.Instance?.MakeTextEffect(from);
+        TextEffect text = EntityManager.Instance?.MakeText(from);
         if (text == null) return;
 
         text.SetText(_damage.ToString(), font, color);
@@ -159,7 +166,7 @@ public class Monster : Pooling
         health = Mathf.Max(_health, 0);
 
         if (healthText != null)
-            healthText.text = _health < int.MaxValue ? UIManager.Instance?.FormatNumber(health) : "ㄱ-";
+            healthText.text = health < int.MaxValue ? UIManager.Instance?.FormatNumber(health) : "ㄱ-";
     }
     #endregion
 
@@ -171,6 +178,8 @@ public class Monster : Pooling
     public int GetMaxHealth() => maxHealth;
     public bool IsExclude() => health < reserve || IsDead || IsDespawn;
     public bool IsInvalid(int _index = -1) => IsDead || IsDespawn || (_index >= 0 && Index != _index);
+
+    public MonsterDebuff GetDebuff() => debuff;
     #endregion
 
     #region 풀링
@@ -199,6 +208,9 @@ public class Monster : Pooling
         target = default;
         moveSpeed = 1f;
         moveDirection = Vector3.zero;
+
+        debuff.Clear();
+
         Stop();
     }
     #endregion

@@ -14,7 +14,6 @@ public enum TowerGrade
 
 public enum TowerRole
 {
-    [InspectorName("없음")] None = 0,
     [InspectorName("딜러")] Dealer = 1,
     [InspectorName("디버프")] Debuff = 2,
     [InspectorName("버프")] Buff = 3,
@@ -59,6 +58,19 @@ public struct SkillValue
 public enum ValueType
 {
     [InspectorName("데미지")] Damage = 101,
+    [InspectorName("개수")] Count = 102,
+
+    [InspectorName("계수")] Factor = 201,
+    [InspectorName("확률")] Chance = 202,
+
+    [InspectorName("범위")] Range = 301,
+    [InspectorName("크기")] Scale = 302,
+
+    [InspectorName("지속")] Duration = 401,
+    [InspectorName("쿨다운")] Cooldown = 402,
+
+    [InspectorName("최대")] Max = 501,
+    [InspectorName("최소")] Min = 502,
 }
 
 public enum RankType

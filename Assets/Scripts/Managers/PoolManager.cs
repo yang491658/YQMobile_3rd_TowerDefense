@@ -43,6 +43,7 @@ public class PoolManager : MonoBehaviour
     [Header("Policy")]
     [SerializeField] private Policy monsterPolicy = new(0, 0, 0);
     [SerializeField] private Policy bulletPolicy = new(0, 0, 0);
+    [SerializeField] private Policy summonPolicy = new(0, 0, 0);
     [SerializeField] private Policy effectPolicy = new(0, 0, 0);
     private readonly Dictionary<int, Policy> policy = new();
 
@@ -56,6 +57,7 @@ public class PoolManager : MonoBehaviour
     [Header("Parent")]
     [SerializeField] private Transform monsterTrans;
     [SerializeField] private Transform bulletTrans;
+    [SerializeField] private Transform summonTrans;
     [SerializeField] private Transform effectTrans;
     private readonly Dictionary<int, Transform> parent = new();
 
@@ -66,6 +68,8 @@ public class PoolManager : MonoBehaviour
             monsterTrans = transform.Find("Monsters");
         if (bulletTrans == null)
             bulletTrans = transform.Find("Bullets");
+        if (summonTrans == null)
+            summonTrans = transform.Find("Summons");
         if (effectTrans == null)
             effectTrans = transform.Find("Effects");
     }
@@ -279,6 +283,8 @@ public class PoolManager : MonoBehaviour
     {
         if (_prefab.TryGetComponent(out Monster _)) return monsterPolicy;
         if (_prefab.TryGetComponent(out Bullet _)) return bulletPolicy;
+        if (_prefab.TryGetComponent(out Summon _)) return summonPolicy;
+        if (_prefab.TryGetComponent(out ViewEffect _)) return effectPolicy;
         if (_prefab.TryGetComponent(out TextEffect _)) return effectPolicy;
 
         return default;
@@ -288,6 +294,8 @@ public class PoolManager : MonoBehaviour
     {
         if (_obj.TryGetComponent(out Monster _)) return monsterTrans;
         if (_obj.TryGetComponent(out Bullet _)) return bulletTrans;
+        if (_obj.TryGetComponent(out Summon _)) return summonTrans;
+        if (_obj.TryGetComponent(out ViewEffect _)) return effectTrans;
         if (_obj.TryGetComponent(out TextEffect _)) return effectTrans;
 
         return transform;
@@ -298,6 +306,7 @@ public class PoolManager : MonoBehaviour
     {
         if (monsterPolicy != null) { monsterPolicy.active = 0; monsterPolicy.wait = 0; }
         if (bulletPolicy != null) { bulletPolicy.active = 0; bulletPolicy.wait = 0; }
+        if (summonPolicy != null) { summonPolicy.active = 0; summonPolicy.wait = 0; }
         if (effectPolicy != null) { effectPolicy.active = 0; effectPolicy.wait = 0; }
 
         foreach (var p in policy.Values)
@@ -331,6 +340,7 @@ public class PoolManager : MonoBehaviour
 
         monsterPolicy.peak = Mathf.Max(monsterPolicy.active, monsterPolicy.peak);
         bulletPolicy.peak = Mathf.Max(bulletPolicy.active, bulletPolicy.peak);
+        summonPolicy.peak = Mathf.Max(summonPolicy.active, summonPolicy.peak);
         effectPolicy.peak = Mathf.Max(effectPolicy.active, effectPolicy.peak);
     }
 #endif

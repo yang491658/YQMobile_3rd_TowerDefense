@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "TowerStat", menuName = "Tower/Table/Stat", order = 105)]
+[CreateAssetMenu(fileName = "TowerStat", menuName = "Table/Tower/Stat", order = 53)]
 public class TowerStat : ScriptableObject
 {
     [System.Serializable]
@@ -62,6 +62,6 @@ public class TowerStat : ScriptableObject
         TowerRole.Debuff => debuff,
         TowerRole.Buff => buff,
         TowerRole.Summon => summon,
-        _ => default,
+        _ => dealer,
     };
 }

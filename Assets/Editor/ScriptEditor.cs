@@ -159,9 +159,14 @@ public static class ScriptEditor
         var _prefabs = new Type[]
         {
             typeof(Tower),
+            typeof(TowerBuff),
             typeof(Monster),
+            typeof(MonsterDebuff),
             typeof(Boss),
             typeof(Bullet),
+            typeof(Summon),
+            typeof(ViewEffect),
+            typeof(TextEffect),
         };
         ResetPrefabs(_prefabs);
     }

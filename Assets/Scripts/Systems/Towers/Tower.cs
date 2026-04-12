@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(TowerBuff))]
 public class Tower : Entity
 {
     [Header("Data & Base")]
@@ -36,6 +37,13 @@ public class Tower : Entity
     [SerializeField][Min(0)] private int criticalDamage;
     [SerializeField] private List<Bullet> bullets = new();
 
+    [Header("Skill")]
+    [SerializeField] private List<TowerSkill> skills = new();
+    private readonly Dictionary<TowerSkill, Dictionary<ValueType, float>> valueDic = new();
+    [Space]
+    [SerializeField] private TowerBuff buff;
+    [SerializeField] private List<Summon> summons = new();
+
 #if UNITY_EDITOR
     private void OnValidate()
     {
@@ -50,6 +58,7 @@ public class Tower : Entity
 
         outlineSR = outline.GetComponent<SpriteRenderer>();
         symbolSR = symbol.GetComponent<SpriteRenderer>();
+        buff = GetComponent<TowerBuff>();
     }
 
     protected override void Update()
@@ -57,6 +66,11 @@ public class Tower : Entity
         base.Update();
 
         float dt = Time.deltaTime;
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnUpdate(this, dt);
+
+        UpdateBuff();
+
         if (attackSpeed > 0) Attack(dt);
     }
 
@@ -85,7 +99,7 @@ public class Tower : Entity
         }
 
         symbol.localScale = Vector3.one * baseSize;
-        symbolSR.sprite = DataManager.Instance?.GetRoleSymbol(data.Role);
+        symbolSR.sprite = data.Symbol;
         IsMax = false;
 
         Vector2[] positions = SymbolPos(rank, symbol.localScale.x);
@@ -190,6 +204,12 @@ public class Tower : Entity
     {
         if (!EntityManager.Instance.CanMerge(this, _target)) return null;
 
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnMerge(this, _target);
+
+        for (int i = 0; i < _target.skills.Count; i++)
+            _target.skills[i].OnMerge(_target, this);
+
         return EntityManager.Instance?.MergeTower(this, _target);
     }
 
@@ -198,10 +218,16 @@ public class Tower : Entity
         if (IsMax) return;
 
         SetRank(rank + _amount);
+
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnRankUp(this, _amount);
     }
 
     public void Sell()
     {
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnSell(this);
+
         EntityManager.Instance?.SellTower(this);
     }
     #endregion
@@ -209,24 +235,31 @@ public class Tower : Entity
     #region 전투
     private void FindTarget()
     {
+        System.Predicate<Monster> filter = null;
+        for (int i = 0; i < skills.Count; i++)
+        {
+            filter = skills[i].GetFilter();
+            if (filter != null) break;
+        }
+
         switch (data.Target)
         {
             case AttackTarget.None:
                 attackTarget = null; break;
             case AttackTarget.Random:
-                attackTarget = EntityManager.Instance?.GetMonsterRandom(); break;
+                attackTarget = EntityManager.Instance?.GetMonsterRandom(filter); break;
             case AttackTarget.First:
-                attackTarget = EntityManager.Instance?.GetMonsterFirst(); break;
+                attackTarget = EntityManager.Instance?.GetMonsterFirst(filter); break;
             case AttackTarget.Last:
-                attackTarget = EntityManager.Instance?.GetMonsterLast(); break;
+                attackTarget = EntityManager.Instance?.GetMonsterLast(filter); break;
             case AttackTarget.Near:
-                attackTarget = EntityManager.Instance?.GetMonsterNearest(transform.position, 0); break;
+                attackTarget = EntityManager.Instance?.GetMonsterNearest(transform.position, 0, filter); break;
             case AttackTarget.Far:
-                attackTarget = EntityManager.Instance?.GetMonsterFarthest(transform.position, 0); break;
+                attackTarget = EntityManager.Instance?.GetMonsterFarthest(transform.position, 0, filter); break;
             case AttackTarget.Strong:
-                attackTarget = EntityManager.Instance?.GetMonsterHighHealth(); break;
+                attackTarget = EntityManager.Instance?.GetMonsterHighHealth(filter); break;
             case AttackTarget.Weak:
-                attackTarget = EntityManager.Instance?.GetMonsterLowHealth(); break;
+                attackTarget = EntityManager.Instance?.GetMonsterLowHealth(filter); break;
         }
 
         targetIndex = attackTarget != null ? attackTarget.Index : 0;
@@ -246,7 +279,12 @@ public class Tower : Entity
             if (attackTarget == null || attackTarget.IsExclude()) return;
         }
 
-        Shoot(attackTarget);
+        bool instead = data.Role == TowerRole.Summon;
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnAttack(this, attackTarget, ref instead);
+
+        if (!instead)
+            Shoot(attackTarget);
 
         attackTimer = 60f / attackSpeed;
     }
@@ -254,24 +292,30 @@ public class Tower : Entity
     public void Shoot(Monster _target)
         => EntityManager.Instance?.MakeBullet(this, _target);
 
-    private void Hit(Monster _target, int _damage)
+    public void Hit(Monster _target, bool _onHit = true)
     {
-        if (_target == null) return;
+        bool instead = false;
 
-        int damage = _damage;
+        if (_onHit)
+            for (int i = 0; i < skills.Count; i++)
+                skills[i].OnHit(this, _target, ref instead);
+
+        if (_target == null || instead) return;
+
+        int damage = attackDamage;
         int chance = criticalChance;
         int overflow = Mathf.Max(chance - 100, 0);
         chance = Mathf.Min(chance, 100);
 
-        bool critical = false;
+        bool isCritical = false;
         if (Random.value < chance / 100f)
         {
-            critical = true;
+            isCritical = true;
             damage = damage * criticalDamage / 100;
         }
 
-        bool isHit = _target.TakeDamage(this, damage, critical);
-        if (isHit && critical && Random.value < overflow / 1000f)
+        bool isHit = _target.TakeDamage(damage, isCritical);
+        if (isHit && isCritical && Random.value < overflow / 1000f)
             GameManager.Instance?.LifeUp();
     }
     #endregion
@@ -279,30 +323,28 @@ public class Tower : Entity
     #region 불릿
     public void AddBullet(Bullet _bullet) => bullets.Add(_bullet);
     public void RemoveBullet(Bullet _bullet) => bullets.Remove(_bullet);
-    public void HitBullet(Monster _target, int _damage) => Hit(_target, _damage);
     #endregion
 
-    #region SET
-    public void SetData(TowerData _data)
+    #region 소환
+    public void AddSummon(Summon _summon) => summons.Add(_summon);
+    public void RemoveSummon(Summon _summon) => summons.Remove(_summon);
+    public void ClearSummon(TowerSkill _skill = null)
     {
-        data = _data;
+        for (int i = summons.Count - 1; i >= 0; i--)
+        {
+            Summon summon = summons[i];
+            if (summon == null) continue;
+            if (_skill != null && summon.ID != _skill.ID) continue;
 
-        gameObject.name = data.Name;
-        outlineSR.color = DataManager.Instance.GetGradeColor(data.Grade);
-        symbolSR.color = data.Color;
+            summon.Despawn();
+        }
 
-        SetStat();
+        if (_skill == null)
+            summons.Clear();
     }
+    #endregion
 
-    public void SetRank(int _rank)
-    {
-        rank = Mathf.Clamp(_rank, 1, MaxRank);
-
-        SetStat();
-        UpdateSymbol();
-    }
-
-    private void SetStat()
+    private void UpdateBuff()
     {
         TowerStat.Stat4 stat = DataManager.Instance.GetBaseStat(data.Role, data.Grade);
 
@@ -314,8 +356,11 @@ public class Tower : Entity
         int chance = stat.criticalChance * rank;
         int critical = stat.criticalDamage;
 
-        attackDamage = damage;
-        attackSpeed = speed;
+        attackDamage = buff.CalcStat(TowerBuff.SubType.Damage, damage);
+        attackSpeed = buff.CalcStat(TowerBuff.SubType.Speed, speed);
+
+        chance = buff.CalcStat(TowerBuff.SubType.Chance, chance);
+        critical = buff.CalcStat(TowerBuff.SubType.Critical, critical);
 
         if (chance <= 0)
         {
@@ -328,23 +373,127 @@ public class Tower : Entity
             criticalDamage = critical;
         }
     }
+
+    #region SET
+    public void SetTower(TowerData _data, int _rank = 1)
+    {
+        data = _data;
+
+        gameObject.name = data.Name;
+        outlineSR.color = DataManager.Instance.GetGradeColor(data.Grade);
+        symbolSR.color = data.Color;
+        buff.Clear();
+
+        for (int i = 0; i < skills.Count; i++)
+            Destroy(skills[i]);
+
+        skills.Clear();
+        for (int i = 0; i < data.Skills.Count; i++)
+        {
+            SkillConfig config = data.Skills[i];
+            if (config.skill == null) continue;
+
+            TowerSkill skill = Instantiate(config.skill);
+            skills.Add(skill);
+        }
+
+        SetRank(_rank);
+
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnGenerate(this);
+    }
+
+    public void SetRank(int _rank)
+    {
+        rank = Mathf.Clamp(_rank, 1, MaxRank);
+
+        UpdateBuff();
+        UpdateSymbol();
+
+        valueDic.Clear(); int index = 0;
+        for (int i = 0; i < data.Skills.Count && index < skills.Count; i++)
+        {
+            SkillConfig config = data.Skills[i];
+            if (config.skill == null) continue;
+
+            if (config.values != null)
+            {
+                TowerSkill skill = skills[index];
+
+                Dictionary<ValueType, float> dic = new(config.values.Count);
+                valueDic.Add(skill, dic);
+
+                for (int j = 0; j < config.values.Count; j++)
+                {
+                    SkillValue value = config.values[j];
+                    dic[value.valueType] = SetValue(value);
+                }
+            }
+
+            index++;
+        }
+
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].SetValues(this);
+    }
+
+    private float SetValue(SkillValue _value)
+    {
+        float value = _value.baseValue;
+        float bonus = _value.rankBonus;
+
+        switch (_value.rankType)
+        {
+            case RankType.Add: return value + bonus * rank;
+            case RankType.Subtract: return value - bonus * rank;
+            case RankType.Multiply: return value * rank;
+            case RankType.Divide: return value / rank;
+            default: return value;
+        }
+    }
     #endregion
 
     #region GET
     public TowerData GetData() => data;
-    public int GetID() => data.ID;
-    public Color GetColor() => data.Color;
     public Sprite GetImage() => data.Image;
+    public int GetID() => data.ID;
+    public Sprite GetSymbol() => data.Symbol;
+    public Color GetColor() => data.Color;
     public TowerRole GetRole() => data.Role;
     public TowerGrade GetGrade() => data.Grade;
 
-    public Sprite GetSymbol() => symbolSR.sprite;
     public int GetRank() => rank;
-
     public Monster GetTarget() => attackTarget;
     public int GetDamage() => attackDamage;
     public int GetSpeed() => attackSpeed;
     public int GetChance() => criticalChance;
     public int GetCritical() => criticalDamage;
+
+    public float GetValue(TowerSkill _skill, ValueType _type)
+    {
+        if (!valueDic.TryGetValue(_skill, out var dic)) return 0f;
+        return dic.TryGetValue(_type, out var value) ? value : 0f;
+    }
+    public int GetValueInt(TowerSkill _skill, ValueType _type)
+        => Mathf.FloorToInt(GetValue(_skill, _type) + 0.5f);
+
+    public TowerBuff GetBuff() => buff;
+    public int GetSummonCount(TowerSkill _skill = null)
+    {
+        if (_skill == null)
+            return summons.Count;
+
+        int count = 0;
+        for (int i = 0; i < summons.Count; i++)
+        {
+            Summon summon = summons[i];
+            if (summon == null) continue;
+            if (summon.ID != _skill.ID) continue;
+
+            count++;
+        }
+
+        return count;
+    }
     #endregion
 }

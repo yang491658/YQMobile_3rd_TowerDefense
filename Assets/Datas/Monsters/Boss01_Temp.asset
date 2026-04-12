@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acd254633bed0af4c846e297b0695389, type: 3}
   m_Name: Boss01_Temp
   m_EditorClassIdentifier: 
-  Image: {fileID: 0}
+  Image: {fileID: 21300000, guid: 7b4fddb39d9e5c546982caaf1fd97f81, type: 3}
   ID: 1
   Name: Temp
   MoveSpeed: 1

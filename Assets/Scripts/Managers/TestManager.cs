@@ -201,6 +201,10 @@ public class TestManager : MonoBehaviour
             ChangeGameSpeed(gameSpeed.value == gameSpeed.maxValue ? GameManager.Instance.GetMaxSpeed() : gameSpeed.maxValue);
         if (Input.GetKeyDown(KeyCode.DownArrow))
             ChangeGameSpeed(gameSpeed.value == gameSpeed.minValue ? GameManager.Instance.GetMaxSpeed() : gameSpeed.minValue);
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+            ChangeRefTower(--refTower.value);
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+            ChangeRefTower(++refTower.value);
         #endregion
     }
 
@@ -209,7 +213,7 @@ public class TestManager : MonoBehaviour
     {
         IsAuto = _on;
 
-        GameManager.Instance?.SetSpeed(_on ? GameManager.Instance.GetMaxSpeed() : 1f);
+        //GameManager.Instance?.SetSpeed(_on ? GameManager.Instance.GetMaxSpeed() : 1f); 
     }
 
     private void AutoPlay()
@@ -224,14 +228,14 @@ public class TestManager : MonoBehaviour
             else MergeRandom();
         }
 
-        int towerCount = EntityManager.Instance.GetTowerCount();
-        int monsterCount = EntityManager.Instance.GetMonsterCount();
-        if (towerCount < 30 && monsterCount < 50)
-            ChangeGameSpeed(gameSpeed.maxValue);
-        else if (towerCount < 100 && monsterCount < 200)
-            ChangeGameSpeed(GameManager.Instance.GetMaxSpeed());
-        else
-            ChangeGameSpeed(1f);
+        //int towerCount = EntityManager.Instance.GetTowerCount();
+        //int monsterCount = EntityManager.Instance.GetMonsterCount();
+        //if (towerCount < 30 && monsterCount < 50)
+        //    ChangeGameSpeed(gameSpeed.maxValue);
+        //else if (towerCount < 100 && monsterCount < 200)
+        //    ChangeGameSpeed(GameManager.Instance.GetMaxSpeed());
+        //else
+        //    ChangeGameSpeed(1f);
     }
 
     private IEnumerator AutoReplay()
@@ -254,7 +258,7 @@ public class TestManager : MonoBehaviour
 
     private void AutoMerge()
     {
-        var towers = EntityManager.Instance?.GetTowers();
+        List<Tower> towers = EntityManager.Instance?.GetTowers();
         if (towers == null) return;
 
         int len = towers.Count; if (len < 2) return;
@@ -265,7 +269,7 @@ public class TestManager : MonoBehaviour
             for (int i = 0; i < len; i++)
             {
                 Tower a = towers[i];
-                if (a == null || a.IsDragging) continue;
+                if (a == null || a.IsDragging || a.IsMax) continue;
                 if (a.GetRank() != r) continue;
 
                 for (int j = 0; j < len; j++)
@@ -273,8 +277,8 @@ public class TestManager : MonoBehaviour
                     if (i == j) continue;
 
                     Tower b = towers[j];
-                    if (b == null || b.IsDragging) continue;
-                    if (b.GetRank() != r) continue;
+                    if (b == null || b.IsDragging || b.IsMax) continue;
+                    if (b.GetRank() != r || b.GetID() != a.GetID()) continue;
 
                     if (a.Merge(b) != null) return;
                 }
@@ -356,20 +360,22 @@ public class TestManager : MonoBehaviour
         for (int i = 0; i < len; i++)
         {
             Tower t = towers[i];
-            if (t == null || t.IsDragging) continue;
+            if (t == null || t.IsDragging || t.IsMax) continue;
 
             rankSet.Add(t.GetRank());
         }
 
         List<int> ranks = new(rankSet); ranks.Sort();
+
         for (int r = 0; r < ranks.Count; r++)
         {
             int curRank = ranks[r];
-            List<int> indices = new List<int>();
+            List<int> indices = new();
+
             for (int i = 0; i < len; i++)
             {
                 Tower t = towers[i];
-                if (t == null || t.IsDragging) continue;
+                if (t == null || t.IsDragging || t.IsMax) continue;
 
                 if (t.GetRank() == curRank) indices.Add(i);
             }
@@ -384,6 +390,8 @@ public class TestManager : MonoBehaviour
                 {
                     if (n == m) continue;
                     Tower b = towers[indices[m]];
+
+                    if (b.GetID() != a.GetID()) continue;
 
                     if (a.Merge(b) != null) return;
                 }

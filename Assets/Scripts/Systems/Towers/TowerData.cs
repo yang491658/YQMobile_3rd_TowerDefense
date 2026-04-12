@@ -6,27 +6,37 @@ using System.IO;
 using UnityEditor;
 #endif
 
-[CreateAssetMenu(fileName = "TowerData", menuName = "Tower/Data", order = 101)]
+[System.Serializable]
+public struct SkillConfig
+{
+    public TowerSkill skill;
+    public List<SkillValue> values;
+}
+
+[CreateAssetMenu(fileName = "TowerData", menuName = "Data/Tower", order = 1)]
 public class TowerData : ScriptableObject
 {
     [Header("Base")]
     public Sprite Image;
     public int ID;
     public string Name;
+    public Sprite Symbol;
     public Color Color = Color.black;
 
     [Header("Type")]
     public TowerGrade Grade = TowerGrade.Temp;
-    public TowerRole Role = TowerRole.None;
+    public TowerRole Role = TowerRole.Dealer;
 
     [Header("Stat")]
     public AttackTarget Target = AttackTarget.First;
+    public List<SkillConfig> Skills = new();
 
 #if UNITY_EDITOR
     private void OnValidate()
     {
         AutoImage();
         AutoName();
+        AutoSymbol();
         AutoValue();
 
         EditorUtility.SetDirty(this);
@@ -95,14 +105,94 @@ public class TowerData : ScriptableObject
         }
         else
         {
-            Role = TowerRole.None;
+            Role = TowerRole.Dealer;
             ID = 9000 + (int)Grade;
-            Name = "Temp";
+            Name = Grade.ToString();
+        }
+    }
+
+    private void AutoSymbol()
+    {
+        Sprite[] sprites = Resources.LoadAll<Sprite>("Images/Symbols");
+        for (int i = 0; i < sprites.Length; i++)
+        {
+            Sprite sprite = sprites[i];
+            if (sprite.name != Role.ToString()) continue;
+
+            Symbol = sprite;
+            return;
         }
     }
 
     private void AutoValue()
     {
+        if (Skills == null)
+            Skills = new();
+
+        for (int i = Skills.Count - 1; i >= 0; i--)
+        {
+            SkillConfig config = Skills[i];
+
+            if (config.skill == null)
+            {
+                if (config.values == null)
+                    config.values = new();
+
+                Skills[i] = config;
+                continue;
+            }
+
+            ValidateSkill(ref config);
+            Skills[i] = config;
+        }
+    }
+
+    private void ValidateSkill(ref SkillConfig _config)
+    {
+        if (_config.skill == null) return;
+        if (_config.values == null) _config.values = new();
+
+        HashSet<ValueType> required = new();
+
+        ValueType[] types = _config.skill.GetValues();
+        if (types != null && types.Length > 0)
+        {
+            for (int i = 0; i < types.Length; i++)
+            {
+                ValueType type = types[i];
+                if (!required.Add(type)) continue;
+
+                bool exists = false;
+                for (int j = 0; j < _config.values.Count; j++)
+                    if (_config.values[j].valueType == type)
+                    { exists = true; break; }
+
+                if (!exists)
+                    _config.values.Add(new SkillValue(type, 0f, RankType.None));
+            }
+        }
+
+        for (int i = _config.values.Count - 1; i >= 0; i--)
+        {
+            SkillValue value = _config.values[i];
+
+            if (!required.Contains(value.valueType))
+            { _config.values.RemoveAt(i); continue; }
+
+            ValidateValue(ref value);
+            _config.values[i] = value;
+        }
+    }
+
+    private void ValidateValue(ref SkillValue _value)
+    {
+        _value.baseValue = Mathf.Max(_value.baseValue, 0f);
+
+        if (_value.rankType == RankType.None)
+            _value.rankBonus = 0f;
+        else if (_value.rankType == RankType.Multiply
+            || _value.rankType == RankType.Divide)
+            _value.rankBonus = 1f;
     }
 #endif
 }

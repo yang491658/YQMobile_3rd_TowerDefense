@@ -18,7 +18,6 @@ public class DataManager : MonoBehaviour
     [Header("Tables")]
     [SerializeField] private TowerChance towerChance;
     [SerializeField] private TowerColor towerColor;
-    [SerializeField] private TowerSymbol towerSymbol;
     [SerializeField] private TowerStat towerStat;
 
 #if UNITY_EDITOR
@@ -29,7 +28,6 @@ public class DataManager : MonoBehaviour
 
         towerChance = LoadAsset<TowerChance>();
         towerColor = LoadAsset<TowerColor>();
-        towerSymbol = LoadAsset<TowerSymbol>();
         towerStat = LoadAsset<TowerStat>();
 
         EditorUtility.SetDirty(this);
@@ -110,24 +108,16 @@ public class DataManager : MonoBehaviour
     public TowerData[] GetTowerDatas() => towerDatas;
     public TowerData[] GetTowerDatas(TowerGrade _grade)
     {
-        int count = 0;
+        List<TowerData> result = new(towerDatas.Length);
+
         for (int i = 0; i < towerDatas.Length; i++)
         {
             TowerData data = towerDatas[i];
             if (data != null && data.Grade == _grade)
-                count++;
+                result.Add(data);
         }
 
-        int index = 0;
-        TowerData[] result = new TowerData[count];
-        for (int i = 0; i < towerDatas.Length; i++)
-        {
-            TowerData data = towerDatas[i];
-            if (data != null && data.Grade == _grade)
-                result[index++] = data;
-        }
-
-        return result;
+        return result.ToArray();
     }
     public int GetTowerID(int _order)
         => (_order > 0 && _order <= towerDatas.Length) ? towerDatas[_order - 1].ID : 0;
@@ -140,7 +130,6 @@ public class DataManager : MonoBehaviour
     public TowerGrade GetRandomGrade(int _level) => towerChance.GetGrade(_level);
 
     public Color GetGradeColor(TowerGrade _grade) => towerColor.GetColor(_grade);
-    public Sprite GetRoleSymbol(TowerRole _role) => towerSymbol.GetSymbol(_role);
 
     public TowerStat.Stat4 GetBaseStat(TowerRole _role, TowerGrade _grade) => towerStat.GetStat(_role, _grade);
     public int GetGradeStat(TowerGrade _grade) => towerStat.GetGradeStat(_grade);

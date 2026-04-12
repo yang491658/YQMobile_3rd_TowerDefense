@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5097317302990778872}
   - component: {fileID: 4146417558866710935}
   - component: {fileID: 7671763201978090631}
+  - component: {fileID: 7060836011662514846}
   m_Layer: 7
   m_Name: Boss
   m_TagString: Monster
@@ -177,4 +178,33 @@ MonoBehaviour:
   maxHealth: 0
   reserve: 0
   gold: 0
+  debuff: {fileID: 7060836011662514846}
   data: {fileID: 0}
+--- !u!114 &7060836011662514846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2405136491643342982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01017c941860f374791e182f65ab0009, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  monster: {fileID: 0}
+  tickDamage:
+    value: 0
+    duration: 0
+    timer: 0
+    immune: 0
+  damageAmp:
+    value: 0
+    duration: 0
+    timer: 0
+    immune: 0
+  speedControl:
+    value: 0
+    duration: 0
+    timer: 0
+    immune: 0

@@ -16,6 +16,8 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private GameObject monsterBase;
     [SerializeField] private GameObject bossBase;
     [SerializeField] private GameObject bulletBase;
+    [SerializeField] private GameObject summonBase;
+    [SerializeField] private GameObject viewBase;
     [SerializeField] private GameObject textBase;
 
     [Header("InGame")]
@@ -59,6 +61,10 @@ public class EntityManager : MonoBehaviour
             bossBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Boss.prefab");
         if (bulletBase == null)
             bulletBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Bullet.prefab");
+        if (summonBase == null)
+            summonBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Summon.prefab");
+        if (viewBase == null)
+            viewBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/ViewEffect.prefab");
         if (textBase == null)
             textBase = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/TextEffect.prefab");
     }
@@ -82,6 +88,8 @@ public class EntityManager : MonoBehaviour
         PoolManager.Instance?.Init(monsterBase);
         PoolManager.Instance?.Init(bossBase);
         PoolManager.Instance?.Init(bulletBase);
+        PoolManager.Instance?.Init(summonBase);
+        PoolManager.Instance?.Init(viewBase);
         PoolManager.Instance?.Init(textBase);
     }
 
@@ -289,35 +297,27 @@ public class EntityManager : MonoBehaviour
         if (fieldCells.Count == 0) return Vector3.positiveInfinity;
 
         float z = _pos.HasValue ? _pos.Value.z : 0f;
-
         Vector3Int cell;
 
-        if (!_pos.HasValue)
+        if (_pos.HasValue)
         {
-            if (!PickRandom(out cell, _forTower)) return Vector3.positiveInfinity;
+            Vector3 pos = _pos.Value;
+            Vector3Int originCell = mapFieldTilemap.WorldToCell(pos);
 
-            Vector3 r = mapFieldTilemap.GetCellCenterWorld(cell);
-            r.z = z;
-            return r;
+            bool canUseOrigin = _forTower ?
+                CanPlaceTower(originCell) :
+                mapFieldTilemap.HasTile(originCell) &&
+                originCell != entryCell &&
+                originCell != exitCell &&
+                !HasTower(originCell);
+
+            if (canUseOrigin)
+                cell = originCell;
+            else if (!PickNearest(pos, out cell, _forTower))
+                return Vector3.positiveInfinity;
         }
-
-        Vector3 p = _pos.Value;
-        Vector3Int originCell = mapFieldTilemap.WorldToCell(p);
-
-        bool canUseOrigin = _forTower ?
-            CanPlaceTower(originCell) :
-            mapFieldTilemap.HasTile(originCell) &&
-            originCell != entryCell && originCell != exitCell &&
-            !HasTower(originCell);
-
-        if (canUseOrigin)
-        {
-            Vector3 r = mapFieldTilemap.GetCellCenterWorld(originCell);
-            r.z = z;
-            return r;
-        }
-
-        if (!PickNearest(p, out cell, _forTower)) return Vector3.positiveInfinity;
+        else if (!PickRandom(out cell, _forTower))
+            return Vector3.positiveInfinity;
 
         Vector3 result = mapFieldTilemap.GetCellCenterWorld(cell);
         result.z = z;
@@ -351,8 +351,8 @@ public class EntityManager : MonoBehaviour
 
         Tower tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
             .GetComponent<Tower>();
-        tower.SetData(data);
-        tower.SetRank(_rank);
+
+        tower.SetTower(data, _rank);
         tower.transform.localScale = map.localScale;
         towers.Add(tower);
         towerDic[tower] = mapFieldTilemap.WorldToCell(pos);
@@ -376,19 +376,16 @@ public class EntityManager : MonoBehaviour
         int rank = _target.GetRank();
         Vector3 pos = _target.transform.position;
 
-        towers.Remove(_select);
-        towers.Remove(_target);
-        towerDic.Remove(_select);
-        towerDic.Remove(_target);
-
-        Destroy(_select.gameObject);
-        Destroy(_target.gameObject);
+        DespawnTower(_select);
+        DespawnTower(_target);
 
         return SpawnTower(id, rank + 1, pos, false);
     }
 
     public void DespawnTower(Tower _tower)
     {
+        _tower.ClearSummon();
+
         towers.Remove(_tower);
         towerDic.Remove(_tower);
         Destroy(_tower.gameObject);
@@ -482,7 +479,42 @@ public class EntityManager : MonoBehaviour
         return bullet;
     }
 
-    public TextEffect MakeTextEffect(Vector3 _pos = default)
+    public Summon MakeSummon(TowerSkill _skill, Tower _tower, Vector3 _pos, float _scale = 1f, float _rate = 1f)
+    {
+        Summon summon = SpawnPool<Summon>(summonBase, _pos, otherTrans);
+        if (summon == null) return null;
+
+        summon.SetSummon(_skill, _tower, _scale, _rate);
+        return summon;
+    }
+
+    public ViewEffect MakeEffect(Tower _tower, Vector3 _pos, float _scale, float _duration = 0.5f)
+    {
+        ViewEffect effect = SpawnPool<ViewEffect>(viewBase, _pos, otherTrans);
+        if (effect == null) return null;
+
+        effect.SetEffect(_tower, _scale, _duration);
+        effect.transform.localScale = Vector3.Scale(effect.transform.localScale, map.localScale);
+        return effect;
+    }
+
+    public ViewEffect MakeEffect(Tower _tower, Entity _entity, float _duration = 0.5f)
+    {
+        if (_entity == null || !_entity.gameObject.activeInHierarchy) return null;
+
+        Transform parent = _entity.transform;
+
+        ViewEffect effect = SpawnPool<ViewEffect>(viewBase, parent.position, parent);
+        if (effect == null) return null;
+
+        effect.SetEffect(_tower, 0.8f, _duration);
+        effect.GetSR().sortingLayerID = _entity.GetSR().sortingLayerID;
+        effect.GetSR().sortingOrder = _entity.GetSR().sortingOrder + 1;
+
+        return effect;
+    }
+
+    public TextEffect MakeText(Vector3 _pos = default)
     {
         TextEffect effect = SpawnPool<TextEffect>(textBase, _pos, effectTrans);
         if (effect == null) return null;
@@ -837,29 +869,33 @@ public class EntityManager : MonoBehaviour
         return _list[_index];
     }
 
-    private T GetByDistance<T>(List<T> _list, Vector3 _pos, bool _near, int _distance) where T : Component
+    private T GetByDistance<T>(List<T> _list, Vector3 _pos, bool _near, int _distance = 0) where T : Component
     {
         if (_list.Count == 0) return null;
 
-        float maxDistSqr = _distance > 0 ? _distance * _distance : float.MaxValue;
+        Vector3Int centerCell = mapFieldTilemap.WorldToCell(_pos);
+        int maxDistance = _distance > 0 ? _distance : int.MaxValue;
 
         T result = null;
         bool found = false;
-        float bestDistSqr = 0f;
+        int bestDistance = 0;
 
         for (int i = 0; i < _list.Count; i++)
         {
             T entity = _list[i];
             if (entity == null) continue;
 
-            float distSqr = (entity.transform.position - _pos).sqrMagnitude;
+            Vector3Int entityCell = mapFieldTilemap.WorldToCell(entity.transform.position);
+            int distance =
+                Mathf.Abs(entityCell.x - centerCell.x) +
+                Mathf.Abs(entityCell.y - centerCell.y);
 
-            if (distSqr > maxDistSqr) continue;
+            if (distance > maxDistance) continue;
 
-            if (!found || (_near ? distSqr < bestDistSqr : distSqr > bestDistSqr))
+            if (!found || (_near ? distance < bestDistance : distance > bestDistance))
             {
                 found = true;
-                bestDistSqr = distSqr;
+                bestDistance = distance;
                 result = entity;
             }
         }
@@ -867,48 +903,40 @@ public class EntityManager : MonoBehaviour
         return found ? result : null;
     }
 
-    private List<T> GetInRange<T>(List<T> _list, Vector3 _center, float _range, int _count = 0) where T : Component
+    private List<T> GetInRange<T>(List<T> _list, Vector3 _center, int _range, int _count = 0) where T : Component
     {
-        List<T> result = new();
+        List<T> targets = new();
         int total = _list.Count;
-        if (total == 0) return result;
+        if (total == 0) return targets;
 
-        float r2 = _range * _range;
+        Vector3Int centerCell = mapFieldTilemap.WorldToCell(_center);
 
-        if (_count <= 0)
-        {
-            for (int i = 0; i < total; i++)
-            {
-                T entity = _list[i];
-                Vector3 diff = entity.transform.position - _center;
-                if (diff.sqrMagnitude <= r2)
-                    result.Add(entity);
-            }
-            return result;
-        }
-
-        List<int> indices = new();
         for (int i = 0; i < total; i++)
         {
             T entity = _list[i];
-            Vector3 diff = entity.transform.position - _center;
-            if (diff.sqrMagnitude <= r2)
-                indices.Add(i);
+            if (entity == null) continue;
+
+            Vector3Int entityCell = mapFieldTilemap.WorldToCell(entity.transform.position);
+            int distance =
+                Mathf.Abs(entityCell.x - centerCell.x) +
+                Mathf.Abs(entityCell.y - centerCell.y);
+
+            if (distance <= _range)
+                targets.Add(entity);
         }
 
-        int available = indices.Count;
-        if (available == 0) return result;
+        if (_count <= 0 || targets.Count <= _count)
+            return targets;
 
-        int pick = Mathf.Min(_count, available);
-        for (int i = 0; i < pick; i++)
+        List<T> result = new(_count);
+        for (int i = 0; i < _count; i++)
         {
-            int r = Random.Range(0, indices.Count);
-            int index = indices[r];
-            result.Add(_list[index]);
+            int last = targets.Count - 1;
+            int index = Random.Range(0, targets.Count);
 
-            int last = indices.Count - 1;
-            indices[r] = indices[last];
-            indices.RemoveAt(last);
+            result.Add(targets[index]);
+            targets[index] = targets[last];
+            targets.RemoveAt(last);
         }
 
         return result;
@@ -958,56 +986,72 @@ public class EntityManager : MonoBehaviour
     public Tower GetTowerFarthest(Vector3 _pos, int _distance = 0)
         => GetByDistance(towers, _pos, false, _distance);
 
-    public List<Tower> GetTowersInRange(Vector3 _center, float _range, int _count = 0)
+    public List<Tower> GetTowersInRange(Vector3 _center, int _range, int _count = 0)
         => GetInRange(towers, _center, _range, _count);
     #endregion
 
     #region GET_몬스터
     public int GetMonsterCount() => monsters.Count;
     public List<Monster> GetMonsters() => monsters;
-    public List<Monster> GetTargetMonsters()
+    public List<Monster> GetMonsters(System.Predicate<Monster> _filter)
     {
         List<Monster> targets = new(monsters.Count);
+
+        if (_filter == null)
+        {
+            for (int i = 0; i < monsters.Count; i++)
+            {
+                Monster monster = monsters[i];
+                if (monster.IsExclude()) continue;
+
+                targets.Add(monster);
+            }
+
+            return targets;
+        }
+
+        List<Monster> preferred = new(monsters.Count);
         for (int i = 0; i < monsters.Count; i++)
         {
             Monster monster = monsters[i];
-
             if (monster.IsExclude()) continue;
 
             targets.Add(monster);
+            if (_filter(monster))
+                preferred.Add(monster);
         }
 
-        return targets;
+        return preferred.Count > 0 ? preferred : targets;
     }
 
-    public Monster GetMonsterRandom()
-        => GetRandom(GetTargetMonsters());
+    public Monster GetMonsterRandom(System.Predicate<Monster> _filter = null)
+        => GetRandom(GetMonsters(_filter));
 
     public Monster GetMonsterByIndex(int _index)
         => GetByIndex(monsters, _index);
 
-    public Monster GetMonsterFirst()
-        => GetByStat(GetTargetMonsters(), GetDistance, false);
+    public Monster GetMonsterFirst(System.Predicate<Monster> _filter = null)
+        => GetByStat(GetMonsters(_filter), GetDistanceExit, false);
 
-    public Monster GetMonsterLast()
-        => GetByStat(GetTargetMonsters(), GetDistance, true);
+    public Monster GetMonsterLast(System.Predicate<Monster> _filter = null)
+        => GetByStat(GetMonsters(_filter), GetDistanceExit, true);
 
-    public Monster GetMonsterNearest(Vector3 _pos, int _distance = 0)
-        => GetByDistance(GetTargetMonsters(), _pos, true, _distance);
+    public Monster GetMonsterNearest(Vector3 _pos, int _distance = 0, System.Predicate<Monster> _filter = null)
+        => GetByDistance(GetMonsters(_filter), _pos, true, _distance);
 
-    public Monster GetMonsterFarthest(Vector3 _pos, int _distance = 0)
-        => GetByDistance(GetTargetMonsters(), _pos, false, _distance);
+    public Monster GetMonsterFarthest(Vector3 _pos, int _distance = 0, System.Predicate<Monster> _filter = null)
+        => GetByDistance(GetMonsters(_filter), _pos, false, _distance);
 
-    public Monster GetMonsterHighHealth()
-        => GetByStat(GetTargetMonsters(), _monster => _monster.GetHealth(), true);
+    public Monster GetMonsterHighHealth(System.Predicate<Monster> _filter = null)
+        => GetByStat(GetMonsters(_filter), _monster => _monster.GetHealth(), true);
 
-    public Monster GetMonsterLowHealth()
-        => GetByStat(GetTargetMonsters(), _monster => _monster.GetHealth(), false);
+    public Monster GetMonsterLowHealth(System.Predicate<Monster> _filter = null)
+        => GetByStat(GetMonsters(_filter), _monster => _monster.GetHealth(), false);
 
-    public List<Monster> GetMonstersInRange(Vector3 _center, float _range, int _count = 0)
+    public List<Monster> GetMonstersInRange(Vector3 _center, int _range, int _count = 0)
         => GetInRange(monsters, _center, _range, _count);
 
-    private float GetDistance(Monster _monster)
+    private float GetDistanceExit(Monster _monster)
     {
         Vector3Int cell = mapFieldTilemap.WorldToCell(_monster.transform.position);
         if (cell == exitCell) return 0f;

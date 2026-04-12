@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
     public event System.Action<int> OnChangeLevel;
 
     [Header("Gold")]
-    [SerializeField][Min(0)] private int gold = 100;
+    [SerializeField] private int gold = 100;
     [SerializeField][Min(0)] private int needGold = 0;
     public event System.Action<int, int> OnChangeGold;
 
@@ -199,8 +199,7 @@ public class GameManager : MonoBehaviour
     {
         if (!CanBuyLife()) return;
 
-        gold = -lifeGold;
-        OnChangeGold?.Invoke(gold, needGold);
+        GoldDown(gold + lifeGold, true);
 
         life = ++maxLife;
         lifeGold *= 2;
@@ -261,7 +260,7 @@ public class GameManager : MonoBehaviour
         Vector3 pos = new Vector3(0f, mapRect.yMin, 0f);
         Vector3 offset = UIManager.Instance.GetPlayerOffset();
 
-        TextEffect effect = EntityManager.Instance?.MakeTextEffect(pos + offset);
+        TextEffect effect = EntityManager.Instance?.MakeText(pos + offset);
         if (effect == null) return;
 
         effect.SetText("레벨업", 80f, Color.blue, 0.1f);
@@ -288,9 +287,9 @@ public class GameManager : MonoBehaviour
         OnChangeGold?.Invoke(gold, needGold);
     }
 
-    public void GoldDown(int _gold = 1)
+    public void GoldDown(int _gold = 1, bool _force = false)
     {
-        if (gold < _gold) return;
+        if (!_force && gold < _gold) return;
 
         gold -= _gold;
         OnChangeGold?.Invoke(gold, needGold);
@@ -332,7 +331,7 @@ public class GameManager : MonoBehaviour
 
     public int GetLife() => life;
     public int GetMaxLife() => maxLife;
-    public bool CanBuyLife() => gold > 0 && life * 2 <= maxLife;
+    public bool CanBuyLife() => gold > 0 && life <= maxLife / 2;
 
     public int GetExp() => exp;
     public int GetNeedExp() => needExp;

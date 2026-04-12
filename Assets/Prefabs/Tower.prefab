@@ -100,6 +100,7 @@ GameObject:
   - component: {fileID: 7918624026226016034}
   - component: {fileID: 4146417558866710935}
   - component: {fileID: 948046729222306252}
+  - component: {fileID: 8253603349244014122}
   m_Layer: 6
   m_Name: Tower
   m_TagString: Tower
@@ -277,6 +278,22 @@ MonoBehaviour:
   criticalChance: 0
   criticalDamage: 0
   bullets: []
+  skills: []
+  buff: {fileID: 0}
+  summons: []
+--- !u!114 &8253603349244014122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2405136491643342982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d120bf21774de64293223c0f55ab58f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buffs: []
 --- !u!1 &9039598325841256950
 GameObject:
   m_ObjectHideFlags: 0

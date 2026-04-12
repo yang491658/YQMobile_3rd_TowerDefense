@@ -36,13 +36,7 @@ public class Bullet : Pooling
         Vector2 delta = (Vector2)targetPos - to;
         if (delta.sqrMagnitude > 0.0001f) return;
 
-        if (target != null && !target.IsInvalid(targetIndex))
-        {
-            IsHit = true;
-            tower.HitBullet(target, damage);
-        }
-
-        Despawn();
+        Hit();
     }
 
     private void OnTriggerEnter2D(Collider2D _collision)
@@ -51,11 +45,14 @@ public class Bullet : Pooling
 
         if (target != null && !target.IsInvalid(targetIndex)
             && target.gameObject == _collision.gameObject)
-        {
-            IsHit = true;
-            tower.HitBullet(target, damage);
-            Despawn();
-        }
+            Hit();
+    }
+
+    private void Hit()
+    {
+        IsHit = true;
+        tower.Hit(target);
+        Despawn();
     }
 
     private void OnBecameInvisible()
@@ -83,9 +80,7 @@ public class Bullet : Pooling
 
     #region GET
     public Tower GetTower() => tower;
-    public int GetDamage() => damage;
-
-    public Monster GetTarget() => target;
+    public Monster GetTarget() => target != null && target.IsInvalid(targetIndex) ? null : target;
     #endregion
 
     #region 풀링

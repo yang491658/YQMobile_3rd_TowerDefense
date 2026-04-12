@@ -6170,7 +6170,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.1972656, y: 3.8986354, z: 3.0479505}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -7954,6 +7954,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 969651607}
   m_CullTransparentMesh: 1
+--- !u!1 &982851989
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 982851990}
+  m_Layer: 0
+  m_Name: Summons
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &982851990
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 982851989}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1841597677}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1044087804
 GameObject:
   m_ObjectHideFlags: 0
@@ -8339,22 +8370,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   towerDatas:
   - {fileID: 11400000, guid: e5c42b787f0e30047a73e795238d043d, type: 2}
-  - {fileID: 11400000, guid: 4eb478724165676428fe8f2fdbc185e5, type: 2}
-  - {fileID: 11400000, guid: 8d698908eef56c4499b8a9b6eb4e0810, type: 2}
-  - {fileID: 11400000, guid: 7f339b1811313dd459daa408b60415f7, type: 2}
-  - {fileID: 11400000, guid: 1de17337b40c2ad42b596176c5dacb7c, type: 2}
-  - {fileID: 11400000, guid: c43627e9eab24a04f83d614a891b7d0a, type: 2}
+  - {fileID: 11400000, guid: 9dd2e6cf6c6a4724a9173ffddebcc67d, type: 2}
+  - {fileID: 11400000, guid: 4bc104331101ea347bb61b413f939a7f, type: 2}
+  - {fileID: 11400000, guid: 1c9839bacbb3a034f8519427e0e31460, type: 2}
+  - {fileID: 11400000, guid: 48d23fbce5287294494cd504eaa5b22c, type: 2}
+  - {fileID: 11400000, guid: b095e3b9193c08048a783eb8f77997b4, type: 2}
+  - {fileID: 11400000, guid: 1c0364bda2a28c343a54a52a507c59fc, type: 2}
+  - {fileID: 11400000, guid: bdb028f39f4d7a8488bde7081c075ffc, type: 2}
+  - {fileID: 11400000, guid: 0273da3a64efe5d40ab87b4cbc40c7b7, type: 2}
   - {fileID: 11400000, guid: a75ab2c18f67fab49a88624782c1a07a, type: 2}
   - {fileID: 11400000, guid: bdf53faecb9afdc4f8ff906c09f7da53, type: 2}
   - {fileID: 11400000, guid: 16010d677502c3b41b8b9415b2e75b62, type: 2}
   - {fileID: 11400000, guid: 49886587badbb9346840342f0b33a376, type: 2}
   bossDatas:
-  - {fileID: 11400000, guid: 713e6d01d27c6cd4d92e356f76d91b66, type: 2}
-  - {fileID: 11400000, guid: ea73735c6a9011d4b91ecb4737e27696, type: 2}
-  - {fileID: 11400000, guid: b5b8f1105502e48468f4272d01379ff5, type: 2}
+  - {fileID: 11400000, guid: 33f45f685c94d044dbff460e59fce319, type: 2}
+  - {fileID: 11400000, guid: 45862eebabcb0c44fa0f90d339fc501d, type: 2}
+  - {fileID: 11400000, guid: d3e85a2e421ba944e856fe007589dd08, type: 2}
   towerChance: {fileID: 11400000, guid: fa32553a70dee124aa6919c8820d9f57, type: 2}
   towerColor: {fileID: 11400000, guid: cae0e69b465fe334fbc8bc3ac7fa48dc, type: 2}
-  towerSymbol: {fileID: 11400000, guid: 34e1aa77c835a0e41bc4329c081274de, type: 2}
   towerStat: {fileID: 11400000, guid: 6fcd522abd58ae34e9e25a70f96dbfd9, type: 2}
 --- !u!4 &1065004637
 Transform:
@@ -10201,7 +10234,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   phase: 0
   normalTime: 180
-  spawnRange: {x: 1, y: 3}
+  spawnRange: {x: 0.3, y: 3}
   spawnPeak: 30
   warningTime: 5
   warningInterval: 0.3
@@ -13516,6 +13549,13 @@ MonoBehaviour:
     active: 0
     wait: 0
     peak: 0
+  summonPolicy:
+    prewarm: 0
+    limit: 0
+    keep: 0
+    active: 0
+    wait: 0
+    peak: 0
   effectPolicy:
     prewarm: 0
     limit: 0
@@ -13525,6 +13565,7 @@ MonoBehaviour:
     peak: 0
   monsterTrans: {fileID: 174201494}
   bulletTrans: {fileID: 1420682366}
+  summonTrans: {fileID: 982851990}
   effectTrans: {fileID: 1052957022}
 --- !u!4 &1841597677
 Transform:
@@ -13541,6 +13582,7 @@ Transform:
   m_Children:
   - {fileID: 174201494}
   - {fileID: 1420682366}
+  - {fileID: 982851990}
   - {fileID: 1052957022}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -15004,8 +15046,8 @@ Transform:
   - {fileID: 1325962}
   - {fileID: 740847081}
   - {fileID: 413919820}
-  - {fileID: 83588502}
   - {fileID: 941287566}
+  - {fileID: 83588502}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2053206854
@@ -15162,6 +15204,8 @@ MonoBehaviour:
   monsterBase: {fileID: 2405136491643342982, guid: ad2e77aeb665f6e46879133d8f714c1d, type: 3}
   bossBase: {fileID: 2405136491643342982, guid: 30cf22942067e3c4bb94bab194f718f0, type: 3}
   bulletBase: {fileID: 7353454852798843222, guid: 9a8455d33d743234994a347db19475d8, type: 3}
+  summonBase: {fileID: 7353454852798843222, guid: fcce60d004c9c424ca5e863608accb78, type: 3}
+  viewBase: {fileID: 7353454852798843222, guid: 2b4ba42113a7a344684448287c873a01, type: 3}
   textBase: {fileID: 8769850233489386034, guid: 43ddd25385c1737489d9dd2fa22834e7, type: 3}
   inGame: {fileID: 0}
   towerTrans: {fileID: 0}

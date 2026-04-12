@@ -682,9 +682,13 @@ public class UIManager : MonoBehaviour
             drag.gameObject.SetActive(false);
             return;
         }
-        _tower.SetDrag(dragOutline, dragSymbol);
 
-        drag.gameObject.SetActive(true);
+        if (!drag.gameObject.activeSelf)
+        {
+            _tower.SetDrag(dragOutline, dragSymbol);
+            drag.gameObject.SetActive(true);
+        }
+
         drag.position = RectTransformUtility.WorldToScreenPoint(Camera.main, _worldPos);
     }
 

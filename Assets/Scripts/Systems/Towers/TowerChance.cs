@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "TowerChance", menuName = "Tower/Table/Chance", order = 102)]
+[CreateAssetMenu(fileName = "TowerChance", menuName = "Table/Tower/Chance", order = 51)]
 public class TowerChance : ScriptableObject
 {
     [System.Serializable]

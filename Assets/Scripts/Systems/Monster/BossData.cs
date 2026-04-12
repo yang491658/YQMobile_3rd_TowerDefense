@@ -6,7 +6,7 @@ using System.IO;
 using UnityEditor;
 #endif
 
-[CreateAssetMenu(fileName = "BossData", menuName = "Monster/Boss/Data", order = 201)]
+[CreateAssetMenu(fileName = "BossData", menuName = "Data/Boss", order = 2)]
 public class BossData : ScriptableObject
 {
     [Header("Base")]

@@ -17,7 +17,7 @@ public sealed class MonsterWave : MonoBehaviour
     [Header("Normal")]
     [SerializeField][Min(0.1f)] private float normalTime = 180f;
     private float normalTimer;
-    [SerializeField] private Vector2 spawnRange = new Vector2(1f, 3f);
+    [SerializeField] private Vector2 spawnRange = new Vector2(0.3f, 3f);
     private float spawnDelay;
     private float spawnTimer;
     [SerializeField] private float spawnPeak = 30f;
@@ -26,11 +26,11 @@ public sealed class MonsterWave : MonoBehaviour
     [Header("Warning")]
     [SerializeField][Min(0.1f)] private float warningTime = 5f;
     private float warningTimer;
-    [SerializeField][Min(0f)] private float warningInterval = 0.3f;
+    [SerializeField][Min(0.1f)] private float warningInterval = 0.3f;
     private float warningTextTimer;
 
     [Header("Boss")]
-    [SerializeField][Min(0f)] private float bossDelay = 1f;
+    [SerializeField][Min(0.1f)] private float bossDelay = 1f;
     [SerializeField][Min(1)] private int bossOrder = 1;
     [SerializeField] private Boss boss;
     private bool onBoss = false;
@@ -39,7 +39,7 @@ public sealed class MonsterWave : MonoBehaviour
     public bool IsFinished { private set; get; } = false;
 
     [Header("Reward")]
-    [SerializeField][Min(0f)] private float rewardDelay = 1.5f;
+    [SerializeField][Min(0.1f)] private float rewardDelay = 1.5f;
     [SerializeField][Min(0.1f)] private float rewardTime = 3f;
     private float rewardTimer;
     [SerializeField][Min(0)] private int rewardExp;
@@ -163,7 +163,7 @@ public sealed class MonsterWave : MonoBehaviour
         float scale = Random.Range(50f, 120f);
         float speed = Random.Range(150f, 500f);
 
-        TextEffect effect = EntityManager.Instance?.MakeTextEffect(pos);
+        TextEffect effect = EntityManager.Instance?.MakeText(pos);
         if (effect == null) return;
 
         effect.SetText("경고", scale, Color.yellow, 0.1f);
@@ -229,7 +229,7 @@ public sealed class MonsterWave : MonoBehaviour
         Vector3 pos = new Vector3(0f, worldRect.yMax, 0f);
         Vector3 target = new Vector3(0f, mapRect.yMax * 0.85f, 0f);
 
-        TextEffect effect = EntityManager.Instance?.MakeTextEffect(pos);
+        TextEffect effect = EntityManager.Instance?.MakeText(pos);
         if (effect == null) return;
 
         effect.SetText("보스 등장", 250f, Color.red, 0.05f);
@@ -295,7 +295,7 @@ public sealed class MonsterWave : MonoBehaviour
         Vector3 pos = new Vector3(0f, mapRect.center.y, 0f);
         Vector3 target = new Vector3(0f, mapRect.yMax * 0.85f, 0f);
 
-        TextEffect effect = EntityManager.Instance?.MakeTextEffect(pos);
+        TextEffect effect = EntityManager.Instance?.MakeText(pos);
         if (effect == null) return;
 
         effect.SetText("클리어", 250f, Color.green, 0.3f);

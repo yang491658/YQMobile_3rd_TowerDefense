@@ -15,7 +15,19 @@ MonoBehaviour:
   Image: {fileID: 21300000, guid: bf28ac785fb4c1540adda523aaefd306, type: 3}
   ID: 1101
   Name: Red
-  Color: {r: 0, g: 0, b: 0, a: 1}
+  Symbol: {fileID: 21300000, guid: 08afd7d4024c36a45b413c7f2fdd63ea, type: 3}
+  Color: {r: 1, g: 0, b: 0, a: 1}
   Grade: 1
   Role: 1
   Target: 0
+  Skills:
+  - skill: {fileID: 11400000, guid: 15c3191720711df4b8e5136b4ea50b07, type: 2}
+    values:
+    - valueType: 101
+      baseValue: 5
+      rankType: 3
+      rankBonus: 1
+    - valueType: 301
+      baseValue: 1
+      rankType: 0
+      rankBonus: 0
