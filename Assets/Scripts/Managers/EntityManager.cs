@@ -263,35 +263,6 @@ public class EntityManager : MonoBehaviour
         return found;
     }
 
-    private bool PickNearest(Vector3 _pos, out Vector3Int _cell, bool _forTower = true)
-    {
-        _cell = default;
-
-        bool found = false;
-        float bestDistSqr = 0f;
-
-        Vector2 p2 = _pos;
-
-        for (int i = 0; i < fieldCells.Count; i++)
-        {
-            Vector3Int cell = fieldCells[i];
-            bool canUse = _forTower ? CanPlaceTower(cell) : !HasTower(cell);
-            if (!canUse) continue;
-
-            Vector2 w2 = mapFieldTilemap.GetCellCenterWorld(cell);
-            float d = (w2 - p2).sqrMagnitude;
-
-            if (!found || d < bestDistSqr)
-            {
-                found = true;
-                bestDistSqr = d;
-                _cell = cell;
-            }
-        }
-
-        return found;
-    }
-
     private Vector3 SelectField(Vector3? _pos = null, bool _forTower = true)
     {
         if (fieldCells.Count == 0) return Vector3.positiveInfinity;
@@ -301,19 +272,16 @@ public class EntityManager : MonoBehaviour
 
         if (_pos.HasValue)
         {
-            Vector3 pos = _pos.Value;
-            Vector3Int originCell = mapFieldTilemap.WorldToCell(pos);
+            cell = mapFieldTilemap.WorldToCell(_pos.Value);
 
-            bool canUseOrigin = _forTower ?
-                CanPlaceTower(originCell) :
-                mapFieldTilemap.HasTile(originCell) &&
-                originCell != entryCell &&
-                originCell != exitCell &&
-                !HasTower(originCell);
+            bool canUse = _forTower ?
+                CanPlaceTower(cell) :
+                mapFieldTilemap.HasTile(cell) &&
+                cell != entryCell &&
+                cell != exitCell &&
+                !HasTower(cell);
 
-            if (canUseOrigin)
-                cell = originCell;
-            else if (!PickNearest(pos, out cell, _forTower))
+            if (!canUse)
                 return Vector3.positiveInfinity;
         }
         else if (!PickRandom(out cell, _forTower))
@@ -903,7 +871,7 @@ public class EntityManager : MonoBehaviour
         return found ? result : null;
     }
 
-    private List<T> GetInRange<T>(List<T> _list, Vector3 _center, int _range, int _count = 0) where T : Component
+    private List<T> GetInRange<T>(List<T> _list, Vector3 _center, int _range, int _count = 0, bool _square = false) where T : Component
     {
         List<T> targets = new();
         int total = _list.Count;
@@ -917,11 +885,10 @@ public class EntityManager : MonoBehaviour
             if (entity == null) continue;
 
             Vector3Int entityCell = mapFieldTilemap.WorldToCell(entity.transform.position);
-            int distance =
-                Mathf.Abs(entityCell.x - centerCell.x) +
-                Mathf.Abs(entityCell.y - centerCell.y);
+            int dx = Mathf.Abs(entityCell.x - centerCell.x);
+            int dy = Mathf.Abs(entityCell.y - centerCell.y);
 
-            if (distance <= _range)
+            if (_square ? dx <= _range && dy <= _range : dx + dy <= _range)
                 targets.Add(entity);
         }
 
@@ -986,8 +953,8 @@ public class EntityManager : MonoBehaviour
     public Tower GetTowerFarthest(Vector3 _pos, int _distance = 0)
         => GetByDistance(towers, _pos, false, _distance);
 
-    public List<Tower> GetTowersInRange(Vector3 _center, int _range, int _count = 0)
-        => GetInRange(towers, _center, _range, _count);
+    public List<Tower> GetTowersInRange(Vector3 _center, int _range, int _count = 0, bool _square = false)
+        => GetInRange(towers, _center, _range, _count, _square);
     #endregion
 
     #region GET_몬스터
@@ -1048,8 +1015,8 @@ public class EntityManager : MonoBehaviour
     public Monster GetMonsterLowHealth(System.Predicate<Monster> _filter = null)
         => GetByStat(GetMonsters(_filter), _monster => _monster.GetHealth(), false);
 
-    public List<Monster> GetMonstersInRange(Vector3 _center, int _range, int _count = 0)
-        => GetInRange(monsters, _center, _range, _count);
+    public List<Monster> GetMonstersInRange(Vector3 _center, int _range, int _count = 0, bool _square = false)
+        => GetInRange(monsters, _center, _range, _count, _square);
 
     private float GetDistanceExit(Monster _monster)
     {
