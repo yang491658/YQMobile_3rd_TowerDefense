@@ -33,13 +33,13 @@ public class UIManager : MonoBehaviour
     private int playTimeSec = -1;
     [SerializeField] private TextMeshProUGUI scoreNum;
 
-    [Header("InGame UI / Wave & Boss")]
+    [Header("InGame UI / Wave + Boss")]
     [SerializeField] private GameObject waveUI;
     [SerializeField] private SliderUI wave;
     [SerializeField] private GameObject bossUI;
     [SerializeField] private Image bossImage;
 
-    [Header("InGame UI / Player & Store")]
+    [Header("InGame UI / Player + Store")]
     [SerializeField] private RectTransform mapUI;
     [SerializeField] private RectTransform playerUI;
     private float playerHeight = 0f;

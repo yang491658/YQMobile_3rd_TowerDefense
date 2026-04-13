@@ -73,9 +73,9 @@ public sealed class MonsterWave : MonoBehaviour
     #region 웨이브
     public void ResetWave()
     {
-        IsPause = false;
         phaseTimer = 0f;
         onText = false;
+        IsPause = false;
 
         normalTimer = normalTime;
         spawnDelay = spawnRange.y;
@@ -85,9 +85,9 @@ public sealed class MonsterWave : MonoBehaviour
         warningTimer = 0f;
         warningTextTimer = 0f;
 
-        onBoss = false;
         bossOrder = 1;
         boss = null;
+        onBoss = false;
         IsSpawned = false;
         IsFinished = false;
 
@@ -179,10 +179,11 @@ public sealed class MonsterWave : MonoBehaviour
         if (!onBoss)
         {
             Vector3 offset = UIManager.Instance.GetPlayerOffset();
-            EntityManager.Instance?.MoveInGame(offset, bossDelay);
-            onBoss = true;
-            onText = false;
+            EntityManager.Instance?.MoveMap(offset, bossDelay);
+
             phaseTimer = bossDelay;
+            onText = false;
+            onBoss = true;
             return;
         }
 
@@ -192,8 +193,8 @@ public sealed class MonsterWave : MonoBehaviour
             if (phaseTimer > 0f) return;
 
             BossText();
-            onText = true;
             phaseTimer = bossDelay;
+            onText = true;
             return;
         }
 
@@ -215,10 +216,10 @@ public sealed class MonsterWave : MonoBehaviour
         {
             phase = Phase.Reward;
             onText = false;
-            rewardTimer = rewardTime;
             boss = null;
             IsSpawned = false;
-            if (DataManager.Instance?.GetBossID(++bossOrder) == 0) IsFinished = true;
+            IsFinished = DataManager.Instance?.GetBossID(++bossOrder) == 0;
+            rewardTimer = rewardTime;
         }
     }
 
@@ -244,7 +245,7 @@ public sealed class MonsterWave : MonoBehaviour
     {
         if (!onText)
         {
-            EntityManager.Instance?.MoveInGame(Vector3.zero, rewardDelay);
+            EntityManager.Instance?.MoveMap(Vector3.zero, rewardDelay);
             RewardText();
 
             phaseTimer = rewardDelay;

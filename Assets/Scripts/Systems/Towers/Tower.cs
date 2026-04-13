@@ -5,7 +5,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(TowerBuff))]
 public class Tower : Entity
 {
-    [Header("Data & Base")]
+    [Header("Data + Base")]
     [SerializeField] private TowerData data;
     [SerializeField] private Transform outline;
     private SpriteRenderer outlineSR;
@@ -63,6 +63,8 @@ public class Tower : Entity
 
     protected override void Update()
     {
+        if (EntityManager.Instance.IsMoving) return;
+
         base.Update();
 
         float dt = Time.deltaTime;

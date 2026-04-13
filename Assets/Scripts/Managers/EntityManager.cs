@@ -22,7 +22,6 @@ public class EntityManager : MonoBehaviour
 
     [Header("InGame")]
     [SerializeField] private Transform inGame;
-    private Coroutine inGameRoutine;
     [SerializeField] private Transform towerTrans;
     [SerializeField] private Transform monsterTrans;
     [SerializeField] private Transform otherTrans;
@@ -39,6 +38,7 @@ public class EntityManager : MonoBehaviour
     private readonly HashSet<Vector3Int> fieldCellSet = new();
     private Vector3Int entryCell;
     private Vector3Int exitCell;
+    private Coroutine mapRoutine;
 
     [Header("Map / Color")]
     [SerializeField] private Color entryColor = Color.green;
@@ -49,6 +49,9 @@ public class EntityManager : MonoBehaviour
     private static readonly Vector3Int[] moveDirs = { Vector3Int.up, Vector3Int.right, Vector3Int.down, Vector3Int.left };
     private readonly Dictionary<Vector3Int, Vector3Int> pathDic = new();
     private readonly Dictionary<Tower, Vector3Int> towerDic = new();
+
+
+    public bool IsMoving { private set; get; } = false;
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -499,43 +502,67 @@ public class EntityManager : MonoBehaviour
     }
     #endregion
 
+    #region 맵
+    public void ClearMap()
+    {
+        Pooling[] poolings = inGame.GetComponentsInChildren<Pooling>(true);
+
+        for (int i = 0; i < poolings.Length; i++)
+        {
+            Pooling pooling = poolings[i];
+
+            if (pooling is Bullet || pooling is Summon || pooling is ViewEffect)
+                pooling.Despawn();
+        }
+    }
+
+    public void MoveMap(Vector3 _target, float _time = 0f)
+    {
+        if (mapRoutine != null)
+        {
+            StopCoroutine(mapRoutine);
+            mapRoutine = null;
+            IsMoving = false;
+        }
+
+        ClearMap();
+
+        if (_time <= 0f)
+        {
+            inGame.position = _target;
+            return;
+        }
+
+        mapRoutine = StartCoroutine(MapCoroutine(_target, _time));
+    }
+
+    private IEnumerator MapCoroutine(Vector3 _target, float _time)
+    {
+        Vector3 start = inGame.position;
+        float timer2 = 0f;
+        IsMoving = true;
+
+        while (timer2 < _time)
+        {
+            timer2 += Time.deltaTime;
+            inGame.position = Vector3.Lerp(start, _target, Mathf.Clamp01(timer2 / _time));
+            yield return null;
+        }
+
+        inGame.position = _target;
+        mapRoutine = null;
+        IsMoving = false;
+    }
+    #endregion
+
     public void DespawnAll()
     {
         for (int i = towers.Count - 1; i >= 0; i--)
             DespawnTower(towers[i]);
         for (int i = monsters.Count - 1; i >= 0; i--)
             DespawnMonster(monsters[i]);
-    }
 
-    public void MoveInGame(Vector3 _target, float _time = 0f)
-    {
-        if (inGameRoutine != null)
-            StopCoroutine(inGameRoutine);
-
-        if (_time <= 0f)
-        {
-            inGame.position = _target;
-            inGameRoutine = null;
-            return;
-        }
-
-        inGameRoutine = StartCoroutine(InGameCoroutine(_target, _time));
-    }
-
-    private IEnumerator InGameCoroutine(Vector3 _target, float _time)
-    {
-        Vector3 start = inGame.position;
-        float timer = 0f;
-
-        while (timer < _time)
-        {
-            timer += Time.deltaTime;
-            inGame.position = Vector3.Lerp(start, _target, Mathf.Clamp01(timer / _time));
-            yield return null;
-        }
-
-        inGame.position = _target;
-        inGameRoutine = null;
+        ClearMap();
     }
 
     #region SET
@@ -545,6 +572,13 @@ public class EntityManager : MonoBehaviour
         monsters.Clear();
         pathDic.Clear();
         towerDic.Clear();
+
+        if (mapRoutine != null)
+        {
+            StopCoroutine(mapRoutine);
+            mapRoutine = null;
+        }
+        IsMoving = false;
 
         MonsterWave.Instance?.StopWave();
         SetEntity();

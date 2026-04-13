@@ -30,7 +30,7 @@ public class DamageUp : TowerSkill
 
     public override void OnUpdate(Tower _tower, float _deltaTime)
     {
-        List<Tower> current = EntityManager.Instance.GetTowersInRange(_tower.transform.position, range);
+        List<Tower> current = EntityManager.Instance?.GetTowersInRange(_tower.transform.position, range);
         currents.Clear();
         for (int i = 0; i < current.Count; i++) currents.Add(current[i]);
 
@@ -55,7 +55,7 @@ public class DamageUp : TowerSkill
 
             if (targets.Contains(target)) continue;
 
-            EntityManager.Instance.MakeEffect(_tower, target);
+            EntityManager.Instance?.MakeEffect(_tower, target);
             targets.Add(target);
         }
     }
