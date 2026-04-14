@@ -22,8 +22,8 @@ public class AutoCamera : MonoBehaviour
         if (!Application.isPlaying)
         {
             cam = GetComponent<Camera>();
-            OrthoSize = cam.orthographicSize;
 
+            OrthoSize = cam.orthographicSize;
             Resolution = res;
             Aspect = res.x / res.y;
         }

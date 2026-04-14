@@ -114,7 +114,7 @@ public class HandleManager : MonoBehaviour
         Vector3 worldPos = ScreenToWorld(_pos);
         Collider2D hit = Physics2D.OverlapPoint(worldPos, layer);
 
-        if (CanSelect(hit))
+        if (CanSelect(hit) || TowerStore.Instance.IsPlacing)
         {
             canDrag = true;
             isDragging = false;
@@ -241,23 +241,27 @@ public class HandleManager : MonoBehaviour
 
     private void OnSingle(Vector3 _pos)
     {
-        Debug.Log($"단순 클릭 : {_pos} / {Time.time:F3}"); // TODO : 단순 클릭 동작
-#if UNITY_EDITOR || UNITY_STANDALONE_WIN
-        AddClick(_pos, Color.cyan);
-#endif
+        if (TowerStore.Instance.IsPlacing)
+        {
+            Rect mapRect = UIManager.Instance.GetMapAreaRect(_pos.z);
+
+            if (mapRect.Contains(new Vector2(_pos.x, _pos.y)))
+                TowerStore.Instance?.PurchaseSlot(_pos);
+        }
     }
 
     private void OnDouble(Vector3 _pos)
     {
-        Debug.Log($"더블 클릭 : {_pos} / {Time.time:F3}"); // TODO : 더블 클릭 동작
-#if UNITY_EDITOR || UNITY_STANDALONE_WIN
-        AddClick(_pos, Color.blue);
-#endif
+        if (TowerStore.Instance.IsPlacing)
+            OnSingle(_pos);
     }
 
     private void OnDragBegin(Vector3 _pos)
     {
         Collider2D hit = Physics2D.OverlapPoint(_pos, layer);
+
+        if (hit == null)
+        { select = null; return; }
 
         select = hit.GetComponent<Tower>();
         select.DragOn(true);
@@ -269,6 +273,8 @@ public class HandleManager : MonoBehaviour
 
     private void OnDragMove(Vector3 _start, Vector3 _current)
     {
+        if (select == null) return;
+
         select.transform.position = _current + offset;
 
         bool isSell = UIManager.Instance.IsSell(_current);
@@ -280,6 +286,8 @@ public class HandleManager : MonoBehaviour
 
     private void OnDragEnd(Vector3 _start, Vector3 _end)
     {
+        if (select == null) return;
+
         if (UIManager.Instance.IsSell(_end))
         {
             select.Sell();

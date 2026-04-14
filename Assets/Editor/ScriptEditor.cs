@@ -152,6 +152,8 @@ public static class ScriptEditor
 #if TEST_Manager
             typeof(TestManager),
 #endif
+            typeof(TowerStore),
+            typeof(TowerSlot),
             typeof(MonsterWave),
         };
         for (int i = 0; i < _managers.Length; i++) ResetManager(_managers[i]);

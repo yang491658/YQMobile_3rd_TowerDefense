@@ -122,6 +122,14 @@ public class DataManager : MonoBehaviour
     public int GetTowerID(int _order)
         => (_order > 0 && _order <= towerDatas.Length) ? towerDatas[_order - 1].ID : 0;
 
+    public TowerData GetRandomTower()
+    {
+        int level = GameManager.Instance.GetLevel();
+        TowerGrade grade = GetRandomGrade(level);
+        TowerData[] datas = GetTowerDatas(grade);
+        return datas[Random.Range(0, datas.Length)];
+    }
+
     public BossData[] GetBossDatas() => bossDatas;
     public int GetBossID(int _order)
         => (_order > 0 && _order <= bossDatas.Length) ? bossDatas[_order - 1].ID : 0;

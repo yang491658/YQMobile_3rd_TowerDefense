@@ -187,6 +187,9 @@ public class MonsterDebuff : MonoBehaviour
                 if (_effect != null) _effect.Despawn();
                 return;
             }
+
+            if (!(monster is Boss) && speedControl.Value != 100 && _factor == 100)
+                speedControl.Reset();
         }
 
         speedControl.Apply(_factor, _duration, _effect);

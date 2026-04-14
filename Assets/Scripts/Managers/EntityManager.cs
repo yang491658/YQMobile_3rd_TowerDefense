@@ -34,6 +34,8 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private Transform map;
     [SerializeField] private Transform mapField;
     private Tilemap mapFieldTilemap;
+    [SerializeField] private Transform mapOverlay;
+    private Tilemap mapOverlayTilemap;
     private readonly List<Vector3Int> fieldCells = new();
     private Vector3Int entryCell;
     private Vector3Int exitCell;
@@ -93,6 +95,11 @@ public class EntityManager : MonoBehaviour
         PoolManager.Instance?.Init(summonBase);
         PoolManager.Instance?.Init(viewBase);
         PoolManager.Instance?.Init(textBase);
+    }
+
+    private void Update()
+    {
+        ShowPlaceField(TowerStore.Instance.IsPlacing);
     }
 
     #region 필드
@@ -265,7 +272,7 @@ public class EntityManager : MonoBehaviour
         return found;
     }
 
-    private Vector3 SelectField(Vector3? _pos = null, bool _forTower = true)
+    public Vector3 SelectField(Vector3? _pos = null, bool _forTower = true)
     {
         if (fieldCells.Count == 0) return Vector3.positiveInfinity;
 
@@ -295,21 +302,43 @@ public class EntityManager : MonoBehaviour
     }
 
     public bool HasEmptyField() => PickRandom(out _, true);
+
+    public void ShowPlaceField(bool _on)
+    {
+        TileFlags entryFlags = mapOverlayTilemap.GetTileFlags(entryCell);
+        mapOverlayTilemap.SetTileFlags(entryCell, entryFlags & ~TileFlags.LockColor);
+        mapOverlayTilemap.SetColor(entryCell, Color.clear);
+
+        for (int i = 0; i < fieldCells.Count; i++)
+        {
+            Vector3Int cell = fieldCells[i];
+
+            TileFlags flags = mapOverlayTilemap.GetTileFlags(cell);
+            mapOverlayTilemap.SetTileFlags(cell, flags & ~TileFlags.LockColor);
+            mapOverlayTilemap.SetColor(cell, Color.clear);
+        }
+
+        if (!_on) return;
+
+        mapOverlayTilemap.SetColor(entryCell, Color.red);
+
+        for (int i = 0; i < fieldCells.Count; i++)
+        {
+            Vector3Int cell = fieldCells[i];
+
+            if (CanPlaceTower(cell)) continue;
+
+            TileFlags flags = mapOverlayTilemap.GetTileFlags(cell);
+            mapOverlayTilemap.SetTileFlags(cell, flags & ~TileFlags.LockColor);
+            mapOverlayTilemap.SetColor(cell, Color.red);
+        }
+    }
     #endregion
 
     #region 타워
     public Tower SpawnTower(int _id = 0, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
     {
-        int id = _id;
-        if (_id == 0)
-        {
-            TowerGrade grade = DataManager.Instance.GetRandomGrade(GameManager.Instance.GetLevel());
-            TowerData[] datas = DataManager.Instance?.GetTowerDatas(grade);
-
-            if (datas.Length <= 0) return null;
-
-            id = datas[Random.Range(0, datas.Length)].ID;
-        }
+        int id = _id > 0 ? _id : DataManager.Instance.GetRandomTower().ID;
 
         TowerData data = DataManager.Instance?.SearchTower(id);
         if (data == null) return null;
@@ -579,6 +608,7 @@ public class EntityManager : MonoBehaviour
         }
         IsMoving = false;
 
+        TowerStore.Instance?.ResetStore();
         MonsterWave.Instance?.StopWave();
         SetEntity();
         ToggleSpawn(true);
@@ -595,10 +625,14 @@ public class EntityManager : MonoBehaviour
         if (map == null) map = GameObject.Find("Map")?.transform;
         if (mapField == null) mapField = GameObject.Find("Field")?.transform;
         mapFieldTilemap = mapField.GetComponent<Tilemap>();
+        if (mapOverlay == null) mapOverlay = GameObject.Find("Overlay")?.transform;
+        mapOverlayTilemap = mapOverlay.GetComponent<Tilemap>();
 
         SetMap();
         SetCell();
         SetPath();
+
+        ShowPlaceField(false);
     }
 
     private void SetMap()

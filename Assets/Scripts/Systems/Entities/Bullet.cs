@@ -51,7 +51,7 @@ public class Bullet : Pooling
     private void Hit()
     {
         IsHit = true;
-        tower.Hit(target);
+        tower.Hit(target, targetIndex, targetPos);
         Despawn();
     }
 
@@ -76,11 +76,6 @@ public class Bullet : Pooling
         targetPos = _target.transform.position;
         target.ReserveUp(damage);
     }
-    #endregion
-
-    #region GET
-    public Tower GetTower() => tower;
-    public Monster GetTarget() => target != null && target.IsInvalid(targetIndex) ? null : target;
     #endregion
 
     #region 풀링

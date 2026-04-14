@@ -28,6 +28,8 @@ public abstract class TowerSkill : ScriptableObject
 
     public virtual void OnHit(Tower _tower, Monster _target, ref bool _instead) { }
 
+    public virtual void OnHit(Tower _tower, Vector3 _pos, ref bool _instead) { }
+
     public virtual void OnMerge(Tower _tower, Tower _target) { }
 
     public virtual void OnSell(Tower _tower) { }

@@ -8,8 +8,6 @@ public class Splash : TowerSkill
     [SerializeField][Min(0)] private int damage;
     [SerializeField][Min(0)] private int range;
 
-    private Vector3 targetPos;
-
 #if UNITY_EDITOR
     public override void SetID() => ID = 101;
     public override ValueType[] GetValues()
@@ -22,19 +20,13 @@ public class Splash : TowerSkill
         range = _tower.GetValueInt(this, ValueType.Range);
     }
 
-    public override void OnAttack(Tower _tower, Monster _target, ref bool _instead)
-    {
-        targetPos = _target.transform.position;
-    }
-
     public override void OnHit(Tower _tower, Monster _target, ref bool _instead)
     {
-        if (_target != null)
-            targetPos = _target.transform.position;
+        Vector3 pos = _target.transform.position;
 
-        EntityManager.Instance?.MakeEffect(_tower, targetPos, range * 2f);
+        EntityManager.Instance?.MakeEffect(_tower, pos, range * 2f);
 
-        List<Monster> monsters = EntityManager.Instance?.GetMonstersInRange(targetPos, range);
+        List<Monster> monsters = EntityManager.Instance?.GetMonstersInRange(pos, range);
         for (int i = 0; i < monsters.Count; i++)
         {
             Monster monster = monsters[i];
@@ -42,5 +34,14 @@ public class Splash : TowerSkill
 
             monster.TakeDamage(damage, _direct: true);
         }
+    }
+
+    public override void OnHit(Tower _tower, Vector3 _pos, ref bool _instead)
+    {
+        EntityManager.Instance?.MakeEffect(_tower, _pos, range * 2f);
+
+        List<Monster> monsters = EntityManager.Instance?.GetMonstersInRange(_pos, range);
+        for (int i = 0; i < monsters.Count; i++)
+            monsters[i].TakeDamage(damage, _direct: true);
     }
 }

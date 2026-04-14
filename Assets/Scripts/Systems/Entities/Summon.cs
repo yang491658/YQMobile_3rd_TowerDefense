@@ -67,10 +67,10 @@ public class Summon : Pooling
                 if (!target.IsInvalid(targetIndex) && target == _monster)
                 {
                     isHit = true;
-                    tower.Hit(_monster, onHit);
+                    tower.Hit(target, targetIndex, targetPos, onHit);
                 }
             }
-            else tower.Hit(_monster, onHit);
+            else tower.Hit(_monster, _monster.Index, _monster.transform.position, onHit);
         }
     }
 
@@ -111,6 +111,12 @@ public class Summon : Pooling
 
         if (hasTarget)
         {
+            if (!isHit && onHit)
+            {
+                isHit = true;
+                tower.Hit(target, targetIndex, targetPos, true);
+            }
+
             target = null;
             targetIndex = 0;
             targetPos = default;

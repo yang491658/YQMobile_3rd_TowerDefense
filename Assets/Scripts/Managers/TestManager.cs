@@ -213,7 +213,7 @@ public class TestManager : MonoBehaviour
     {
         IsAuto = _on;
 
-        //GameManager.Instance?.SetSpeed(_on ? GameManager.Instance.GetMaxSpeed() : 1f); 
+        GameManager.Instance?.SetSpeed(_on ? GameManager.Instance.GetMaxSpeed() : 1f);
     }
 
     private void AutoPlay()
@@ -224,18 +224,18 @@ public class TestManager : MonoBehaviour
         if (GameManager.Instance.EnoughGold())
         {
             if (EntityManager.Instance.HasEmptyField())
-                EntityManager.Instance?.SpawnTower(refTower.value == 0 ? 0 : DataManager.Instance.GetTowerID(refTower.value));
-            else MergeRandom();
+				TowerStore.Instance?.AutoPurchase(refTower.value == 0 ? 0 : DataManager.Instance.GetTowerID(refTower.value));
+			else MergeRandom();
         }
 
-        //int towerCount = EntityManager.Instance.GetTowerCount();
-        //int monsterCount = EntityManager.Instance.GetMonsterCount();
-        //if (towerCount < 30 && monsterCount < 50)
-        //    ChangeGameSpeed(gameSpeed.maxValue);
-        //else if (towerCount < 100 && monsterCount < 200)
-        //    ChangeGameSpeed(GameManager.Instance.GetMaxSpeed());
-        //else
-        //    ChangeGameSpeed(1f);
+        int towerCount = EntityManager.Instance.GetTowerCount();
+        int monsterCount = EntityManager.Instance.GetMonsterCount();
+        if (towerCount < 30 && monsterCount < 50)
+            ChangeGameSpeed(gameSpeed.maxValue);
+        else if (towerCount < 100 && monsterCount < 200)
+            ChangeGameSpeed(GameManager.Instance.GetMaxSpeed());
+        else
+            ChangeGameSpeed(1f);
     }
 
     private IEnumerator AutoReplay()
