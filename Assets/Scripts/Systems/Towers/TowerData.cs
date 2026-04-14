@@ -17,7 +17,7 @@ public struct SkillConfig
 public class TowerData : ScriptableObject
 {
     [Header("Base")]
-    public Sprite Image;
+    public Sprite Icon;
     public int ID;
     public string Name;
     public Sprite Symbol;
@@ -34,7 +34,7 @@ public class TowerData : ScriptableObject
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        AutoImage();
+        AutoIcon();
         AutoName();
         AutoSymbol();
         AutoValue();
@@ -42,7 +42,7 @@ public class TowerData : ScriptableObject
         EditorUtility.SetDirty(this);
     }
 
-    private void AutoImage()
+    private void AutoIcon()
     {
         Sprite[] sprites = Resources.LoadAll<Sprite>("Images/Towers");
         List<Sprite> baseSprites = new();
@@ -63,21 +63,21 @@ public class TowerData : ScriptableObject
         foreach (string guid in AssetDatabase.FindAssets("t:TowerData"))
         {
             TowerData data = AssetDatabase.LoadAssetAtPath<TowerData>(AssetDatabase.GUIDToAssetPath(guid));
-            if (data != null && data != this && data.Image != null)
+            if (data != null && data != this && data.Icon != null)
             {
-                string path = AssetDatabase.GetAssetPath(data.Image);
+                string path = AssetDatabase.GetAssetPath(data.Icon);
                 string dir = Path.GetDirectoryName(path);
                 if (string.IsNullOrEmpty(dir)) continue;
 
                 dir = dir.Replace("\\", "/");
                 if (!dir.EndsWith("/Images/Towers")) continue;
 
-                used.Add(data.Image.name);
+                used.Add(data.Icon.name);
             }
         }
 
         Sprite pick = null;
-        if (Image == null || used.Contains(Image.name))
+        if (Icon == null || used.Contains(Icon.name))
         {
             for (int i = 0; i < baseSprites.Count; i++)
             {
@@ -87,21 +87,21 @@ public class TowerData : ScriptableObject
                 pick = sprite;
                 break;
             }
-            Image = pick;
+            Icon = pick;
         }
     }
 
     private void AutoName()
     {
-        if (Image != null)
+        if (Icon != null)
         {
-            string[] split = Image.name.Split('.', 2);
+            string[] split = Icon.name.Split('.', 2);
             int number = 0;
             if (split.Length > 0)
                 int.TryParse(split[0], out number);
 
             ID = (int)Grade * 1000 + (int)Role * 100 + number % 100;
-            Name = split.Length > 1 ? split[1] : Image.name;
+            Name = split.Length > 1 ? split[1] : Icon.name;
         }
         else
         {

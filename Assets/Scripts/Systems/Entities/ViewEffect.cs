@@ -15,7 +15,7 @@ public class ViewEffect : Pooling
     {
         transform.localScale = Vector3.one * _scale;
         sr.color = _tower.GetColor();
-        sr.sprite = _tower.GetImage();
+        sr.sprite = _tower.GetIcon();
 
         if (routine != null)
         {

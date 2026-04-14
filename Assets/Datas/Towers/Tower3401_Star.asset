@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abf7c14b1ff5e1746b8923d9ca7ebcef, type: 3}
   m_Name: Tower3401_Star
   m_EditorClassIdentifier: 
-  Image: {fileID: 21300000, guid: 43d7426ee523ce84280f0fe712a46277, type: 3}
+  Icon: {fileID: 21300000, guid: 43d7426ee523ce84280f0fe712a46277, type: 3}
   ID: 3401
   Name: Star
   Symbol: {fileID: 21300000, guid: abd5339a5aa65ed4f9a574da56804441, type: 3}

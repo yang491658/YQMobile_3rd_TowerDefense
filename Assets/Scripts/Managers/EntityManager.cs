@@ -35,7 +35,6 @@ public class EntityManager : MonoBehaviour
     [SerializeField] private Transform mapField;
     private Tilemap mapFieldTilemap;
     private readonly List<Vector3Int> fieldCells = new();
-    private readonly HashSet<Vector3Int> fieldCellSet = new();
     private Vector3Int entryCell;
     private Vector3Int exitCell;
     private Coroutine mapRoutine;
@@ -539,13 +538,13 @@ public class EntityManager : MonoBehaviour
     private IEnumerator MapCoroutine(Vector3 _target, float _time)
     {
         Vector3 start = inGame.position;
-        float timer2 = 0f;
+        float timer = 0f;
         IsMoving = true;
 
-        while (timer2 < _time)
+        while (timer < _time)
         {
-            timer2 += Time.deltaTime;
-            inGame.position = Vector3.Lerp(start, _target, Mathf.Clamp01(timer2 / _time));
+            timer += Time.deltaTime;
+            inGame.position = Vector3.Lerp(start, _target, Mathf.Clamp01(timer / _time));
             yield return null;
         }
 
@@ -637,7 +636,6 @@ public class EntityManager : MonoBehaviour
     private void SetCell()
     {
         fieldCells.Clear();
-        fieldCellSet.Clear();
 
         mapFieldTilemap.CompressBounds();
         BoundsInt bounds = mapFieldTilemap.cellBounds;
@@ -677,12 +675,7 @@ public class EntityManager : MonoBehaviour
         {
             Vector3Int cell = fieldCells[i];
             if (cell == entryCell)
-            {
                 fieldCells.RemoveAt(i);
-                continue;
-            }
-
-            fieldCellSet.Add(cell);
         }
 
         TileFlags entryFlags = mapFieldTilemap.GetTileFlags(entryCell);

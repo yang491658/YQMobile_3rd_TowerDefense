@@ -39,7 +39,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject bossUI;
     [SerializeField] private Image bossImage;
 
-    [Header("InGame UI / Player + Store")]
+    [Header("InGame UI / Player + Tower")]
     [SerializeField] private RectTransform mapUI;
     [SerializeField] private RectTransform playerUI;
     private float playerHeight = 0f;
@@ -56,10 +56,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject goldImage;
     [SerializeField] private GameObject loanImage;
     [Space]
-    [SerializeField] private GameObject storeUI;
+    [SerializeField] private GameObject towerUI;
     [SerializeField] private TextMeshProUGUI[] chanceText;
 
-    [Header("InGame UI / Tower")]
+    [Header("InGame UI / Drag")]
     [SerializeField] private RectTransform drag;
     [SerializeField] private Image dragOutline;
     [SerializeField] private Image dragSymbol;
@@ -158,15 +158,15 @@ public class UIManager : MonoBehaviour
         if (loanImage == null)
             loanImage = GameObject.Find("InGameUI/Player/Level+Gold/LoanImage");
 
-        if (storeUI == null)
-            storeUI = GameObject.Find("InGameUI/Player/Store");
+        if (towerUI == null)
+            towerUI = GameObject.Find("InGameUI/Player/Tower");
         if (chanceText == null || chanceText.Length == 0)
-            chanceText = GameObject.Find("InGameUI/Player/Store/Chance").GetComponentsInChildren<TextMeshProUGUI>();
+            chanceText = GameObject.Find("InGameUI/Player/Tower/Chance").GetComponentsInChildren<TextMeshProUGUI>();
 
         if (drag == null)
             drag = GameObject.Find("InGameUI/Drag")?.GetComponent<RectTransform>();
         if (dragOutline == null)
-            dragOutline = GameObject.Find("InGameUI/Drag/OutLine")?.GetComponent<Image>();
+            dragOutline = GameObject.Find("InGameUI/Drag/Outline")?.GetComponent<Image>();
         if (dragSymbol == null)
             dragSymbol = GameObject.Find("InGameUI/Drag/Symbol")?.GetComponent<Image>();
 
@@ -503,7 +503,7 @@ public class UIManager : MonoBehaviour
         {
             waveUI.SetActive(false);
             bossUI.SetActive(false);
-            storeUI.SetActive(true);
+            towerUI.SetActive(true);
             return;
         }
         waveUI.SetActive(true);
@@ -520,7 +520,7 @@ public class UIManager : MonoBehaviour
                 wave.image.sprite = MonsterWave.Instance?.GetBoss().Image;
                 wave.text.gameObject.SetActive(false);
                 bossUI.SetActive(false);
-                storeUI.SetActive(true);
+                towerUI.SetActive(true);
                 break;
             case Phase.Boss:
                 wave.image.gameObject.SetActive(false);
@@ -532,13 +532,13 @@ public class UIManager : MonoBehaviour
                     bossImage.sprite = MonsterWave.Instance?.GetBoss().Image;
                 }
                 else bossUI.SetActive(false);
-                storeUI.SetActive(false);
+                towerUI.SetActive(false);
                 break;
             default:
                 wave.image.gameObject.SetActive(false);
                 wave.text.gameObject.SetActive(false);
                 bossUI.SetActive(false);
-                storeUI.SetActive(true);
+                towerUI.SetActive(true);
                 break;
         }
     }

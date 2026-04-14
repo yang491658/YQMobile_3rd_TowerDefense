@@ -127,7 +127,7 @@ public class Summon : Pooling
     public void SetSummon(TowerSkill _skill, Tower _tower, float _scale = 1f, float _rate = 1f)
     {
         transform.localScale = _tower.transform.localScale * _scale;
-        sr.sprite = _tower.GetImage();
+        sr.sprite = _tower.GetIcon();
         sr.color = _tower.GetColor();
 
         ID = _skill.ID;

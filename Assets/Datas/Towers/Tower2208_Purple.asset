@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abf7c14b1ff5e1746b8923d9ca7ebcef, type: 3}
   m_Name: Tower2208_Purple
   m_EditorClassIdentifier: 
-  Image: {fileID: 21300000, guid: f04742dd80ceda94b98ca51a1dd4a12b, type: 3}
+  Icon: {fileID: 21300000, guid: f04742dd80ceda94b98ca51a1dd4a12b, type: 3}
   ID: 2208
   Name: Purple
   Symbol: {fileID: 21300000, guid: d5368b4bf7fca394dbb5d84089d73b73, type: 3}

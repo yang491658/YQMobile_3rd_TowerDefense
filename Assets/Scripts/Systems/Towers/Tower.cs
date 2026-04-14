@@ -94,7 +94,7 @@ public class Tower : Entity
             if (!IsMax)
             {
                 symbol.localScale = Vector3.one * maxSize;
-                symbolSR.sprite = data.Image;
+                symbolSR.sprite = data.Icon;
                 IsMax = true;
             }
             return;
@@ -164,14 +164,14 @@ public class Tower : Entity
 
         if (rank >= MaxRank)
         {
-            _symbol.rectTransform.localScale = Vector3.one * maxSize * 100f;
+            _symbol.rectTransform.localScale = Vector3.one * maxSize;
             _symbol.rectTransform.anchoredPosition = Vector2.zero;
             return;
         }
 
-        _symbol.rectTransform.localScale = Vector3.one * baseSize * 100f;
+        _symbol.rectTransform.localScale = Vector3.one * baseSize;
 
-        Vector2[] positions = SymbolPos(rank, _symbol.rectTransform.localScale.x);
+        Vector2[] positions = SymbolPos(rank, _symbol.rectTransform.localScale.x * 100f);
         _symbol.rectTransform.anchoredPosition = positions[0];
 
         for (int i = 1; i < positions.Length; i++)
@@ -457,7 +457,7 @@ public class Tower : Entity
 
     #region GET
     public TowerData GetData() => data;
-    public Sprite GetImage() => data.Image;
+    public Sprite GetIcon() => data.Icon;
     public int GetID() => data.ID;
     public Sprite GetSymbol() => data.Symbol;
     public Color GetColor() => data.Color;
