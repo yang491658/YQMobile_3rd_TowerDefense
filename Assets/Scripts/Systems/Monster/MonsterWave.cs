@@ -17,7 +17,7 @@ public sealed class MonsterWave : MonoBehaviour
     [Header("Normal")]
     [SerializeField][Min(0.1f)] private float normalTime = 180f;
     private float normalTimer;
-    [SerializeField] private Vector2 spawnRange = new Vector2(0.3f, 3f);
+    [SerializeField] private Vector2 spawnRange = new Vector2(1f, 3f);
     private float spawnDelay;
     private float spawnTimer;
     [SerializeField] private float spawnPeak = 30f;

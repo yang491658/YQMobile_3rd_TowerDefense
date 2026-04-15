@@ -186,7 +186,7 @@ public class TowerStore : MonoBehaviour
     {
         TowerSlot result = null;
 
-        int count = 0;
+        int match = 0;
         for (int i = 0; i < slots.Length; i++)
         {
             TowerSlot slot = slots[i];
@@ -194,8 +194,8 @@ public class TowerStore : MonoBehaviour
             if (slot.IsComplete) continue;
             if (_id != 0 && slot.GetID() != _id) continue;
 
-            count++;
-            if (Random.Range(0, count) == 0)
+            match++;
+            if (Random.Range(0, match) == 0)
                 result = slot;
         }
 
