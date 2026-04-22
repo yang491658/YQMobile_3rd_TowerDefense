@@ -20,7 +20,7 @@ public sealed class MonsterWave : MonoBehaviour
     [SerializeField] private Vector2 spawnRange = new Vector2(1f, 3f);
     private float spawnDelay;
     private float spawnTimer;
-    [SerializeField] private float spawnPeak = 30f;
+    [SerializeField][Min(0f)] private float spawnPeak = 30f;
     private float spawnDecrease;
 
     [Header("Warning")]
@@ -44,6 +44,20 @@ public sealed class MonsterWave : MonoBehaviour
     private float rewardTimer;
     [SerializeField][Min(0)] private int rewardExp;
     [SerializeField][Min(0)] private int rewardGold;
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (spawnPeak > normalTime)
+            spawnPeak = normalTime;
+
+        if (spawnRange.x < 0f)
+            spawnRange.x = 0f;
+
+        if (spawnRange.y < spawnRange.x)
+            spawnRange.y = spawnRange.x;
+    }
+#endif
 
     private void Awake()
     {

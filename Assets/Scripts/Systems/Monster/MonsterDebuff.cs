@@ -99,6 +99,7 @@ public class MonsterDebuff : MonoBehaviour
     private float tickTimer;
     [SerializeField] private Debuff damageAmp;
     [SerializeField] private Debuff speedControl;
+    [SerializeField] private Debuff directionControl;
 
     private void Awake()
     {
@@ -109,6 +110,7 @@ public class MonsterDebuff : MonoBehaviour
         tickDamage.SetBoss(boss);
         damageAmp.SetBoss(boss);
         speedControl.SetBoss(boss);
+        directionControl.SetBoss(boss);
     }
 
     private void Update()
@@ -117,6 +119,7 @@ public class MonsterDebuff : MonoBehaviour
             return;
 
         float dt = Time.deltaTime;
+        UpdateDirection(dt);
         UpdateSpeed(dt);
         UpdateDamage(dt);
         UpdateTick(dt);
@@ -125,11 +128,11 @@ public class MonsterDebuff : MonoBehaviour
     public void Clear()
     {
         tickDamage.Reset();
-        tickTimer = 0f;
-
         damageAmp.Reset();
-
         speedControl.Reset();
+        directionControl.Reset();
+
+        tickTimer = 0f;
         monster.SetSpeed(baseSpeed);
     }
 
@@ -207,11 +210,51 @@ public class MonsterDebuff : MonoBehaviour
     }
     #endregion
 
+    #region 이동방향 제어
+    public void ActiveDirection() => directionControl.Active();
+
+    public void ApplyDirection(int _dir, float _duration, ViewEffect _effect)
+    {
+        if (_dir == 0)
+            _dir = Random.Range(1, 5);
+
+        directionControl.Apply(_dir, _duration, _effect);
+    }
+
+    private void UpdateDirection(float _deltaTime)
+        => directionControl.Update(_deltaTime);
+
+    public bool CalcDirection(Vector3Int _current, out Vector3Int _next)
+    {
+        _next = default;
+
+        if (!directionControl.IsActive) return false;
+
+        Vector3Int offset = directionControl.Value switch
+        {
+            1 => Vector3Int.right,
+            2 => Vector3Int.down,
+            3 => Vector3Int.left,
+            4 => Vector3Int.up,
+            _ => default,
+        };
+
+        if (offset == default) return false;
+
+        Vector3Int next = _current + offset;
+        if (!EntityManager.Instance.CanMoveCell(next)) return false;
+
+        _next = next;
+        return true;
+    }
+    #endregion
+
     #region GET
     public bool HasTickDamage() => tickDamage.IsActive;
     public bool HasDamageAmp() => damageAmp.IsActive;
     public bool HasSpeedControl() => speedControl.IsActive;
+    public bool HasDirectionControl() => directionControl.IsActive;
     public bool HasDebuff()
-        => tickDamage.IsActive || damageAmp.IsActive || speedControl.IsActive;
+        => tickDamage.IsActive || damageAmp.IsActive || speedControl.IsActive || directionControl.IsActive;
     #endregion
 }

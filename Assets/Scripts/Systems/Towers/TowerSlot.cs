@@ -51,7 +51,7 @@ public class TowerSlot : MonoBehaviour
 
     public void Reroll()
     {
-        SetSlot(DataManager.Instance?.GetRandomTower());
+        data = DataManager.Instance?.GetRandomTower();
         Ready();
     }
 
@@ -99,7 +99,11 @@ public class TowerSlot : MonoBehaviour
     }
     #endregion
 
-    private void OnClickSlot() => TowerStore.Instance?.SelectSlot(this);
+    private void OnClickSlot()
+    {
+        SoundManager.Instance?.Button();
+        TowerStore.Instance?.SelectSlot(this);
+    }
 
     #region SET
     private void SetSlot(TowerData _data)

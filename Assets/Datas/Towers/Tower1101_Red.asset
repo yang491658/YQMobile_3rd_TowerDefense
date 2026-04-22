@@ -25,8 +25,8 @@ MonoBehaviour:
     values:
     - valueType: 101
       baseValue: 5
-      rankType: 2
-      rankBonus: 0
+      rankType: 3
+      rankBonus: 1
     - valueType: 301
       baseValue: 1
       rankType: 0

@@ -51,7 +51,6 @@ public class EntityManager : MonoBehaviour
     private readonly Dictionary<Vector3Int, Vector3Int> pathDic = new();
     private readonly Dictionary<Tower, Vector3Int> towerDic = new();
 
-
     public bool IsMoving { private set; get; } = false;
 
 #if UNITY_EDITOR
@@ -99,7 +98,8 @@ public class EntityManager : MonoBehaviour
 
     private void Update()
     {
-        ShowPlaceField(TowerStore.Instance.IsPlacing);
+        if (TowerStore.Instance.IsPlacing)
+            ShowPlaceField(true);
     }
 
     #region 필드
@@ -248,6 +248,14 @@ public class EntityManager : MonoBehaviour
         return CanReachExit(_cell);
     }
 
+    public bool CanMoveCell(Vector3Int _cell)
+    {
+        if (!mapFieldTilemap.HasTile(_cell)) return false;
+        if (HasTower(_cell)) return false;
+
+        return true;
+    }
+
     private bool PickRandom(out Vector3Int _cell, bool _forTower = true)
     {
         _cell = default;
@@ -381,17 +389,6 @@ public class EntityManager : MonoBehaviour
         return SpawnTower(id, rank + 1, pos, false);
     }
 
-    public void DespawnTower(Tower _tower)
-    {
-        _tower.ClearSummon();
-
-        towers.Remove(_tower);
-        towerDic.Remove(_tower);
-        Destroy(_tower.gameObject);
-
-        SetPath();
-    }
-
     public void SellTower(Tower _tower)
     {
         GameManager.Instance?.GoldUp(GameManager.Instance.GetSellGold(_tower));
@@ -399,6 +396,16 @@ public class EntityManager : MonoBehaviour
         UIManager.Instance?.UpdateDrag(null);
 
         DespawnTower(_tower);
+        SetPath();
+    }
+
+    public void DespawnTower(Tower _tower)
+    {
+        _tower.ClearSummon();
+
+        towers.Remove(_tower);
+        towerDic.Remove(_tower);
+        Destroy(_tower.gameObject);
     }
     #endregion
 
@@ -508,7 +515,7 @@ public class EntityManager : MonoBehaviour
 
         effect.SetEffect(_tower, 0.8f, _duration);
         effect.GetSR().sortingLayerID = _entity.GetSR().sortingLayerID;
-        effect.GetSR().sortingOrder = _entity.GetSR().sortingOrder + 1;
+        effect.GetSR().sortingOrder = _entity.GetSR().sortingOrder;
 
         return effect;
     }
@@ -591,6 +598,7 @@ public class EntityManager : MonoBehaviour
             DespawnMonster(monsters[i]);
 
         ClearMap();
+        SetPath();
     }
 
     #region SET
@@ -704,13 +712,7 @@ public class EntityManager : MonoBehaviour
         if (!hasTile) return;
 
         entryCell = new Vector3Int(minX, maxY, 0);
-
-        for (int i = fieldCells.Count - 1; i >= 0; i--)
-        {
-            Vector3Int cell = fieldCells[i];
-            if (cell == entryCell)
-                fieldCells.RemoveAt(i);
-        }
+        fieldCells.Remove(entryCell);
 
         TileFlags entryFlags = mapFieldTilemap.GetTileFlags(entryCell);
         mapFieldTilemap.SetTileFlags(entryCell, entryFlags & ~TileFlags.LockColor);
@@ -1024,32 +1026,23 @@ public class EntityManager : MonoBehaviour
     public List<Monster> GetMonsters(System.Predicate<Monster> _filter)
     {
         List<Monster> targets = new(monsters.Count);
+        List<Monster> preferred = null;
 
-        if (_filter == null)
-        {
-            for (int i = 0; i < monsters.Count; i++)
-            {
-                Monster monster = monsters[i];
-                if (monster.IsExclude()) continue;
-
-                targets.Add(monster);
-            }
-
-            return targets;
-        }
-
-        List<Monster> preferred = new(monsters.Count);
         for (int i = 0; i < monsters.Count; i++)
         {
             Monster monster = monsters[i];
             if (monster.IsExclude()) continue;
 
             targets.Add(monster);
-            if (_filter(monster))
+
+            if (_filter != null && _filter(monster))
+            {
+                preferred ??= new List<Monster>(monsters.Count);
                 preferred.Add(monster);
+            }
         }
 
-        return preferred.Count > 0 ? preferred : targets;
+        return preferred ?? targets;
     }
 
     public Monster GetMonsterRandom(System.Predicate<Monster> _filter = null)

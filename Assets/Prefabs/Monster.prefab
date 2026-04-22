@@ -208,6 +208,11 @@ MonoBehaviour:
     duration: 0
     timer: 0
     immune: 0
+  directionControl:
+    value: 0
+    duration: 0
+    timer: 0
+    immune: 0
 --- !u!1 &2763303897271735171
 GameObject:
   m_ObjectHideFlags: 0

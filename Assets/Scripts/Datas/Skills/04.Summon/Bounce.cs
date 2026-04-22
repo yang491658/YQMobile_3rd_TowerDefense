@@ -7,9 +7,6 @@ public class Bounce : TowerSkill
     [Header("Value")]
     [SerializeField][Min(0)] private int count;
 
-    private Monster target;
-    private int targetIndex;
-
     private const float scale = 0.5f;
     private const float rate = 0.1f;
     private const float rotate = 1800f;
@@ -26,35 +23,24 @@ public class Bounce : TowerSkill
         count = _tower.GetValueInt(this, ValueType.Count);
     }
 
-    public override void OnUpdate(Tower _tower, float _deltaTime)
+    public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
     {
         if (_tower.GetSummonCount(this) > 0) return;
+        if (_target == null || _target.IsInvalid()) return;
 
-        if (target == null || target.IsInvalid(targetIndex))
-        {
-            target = EntityManager.Instance?.GetMonsterNearest(_tower.transform.position);
-            targetIndex = target != null ? target.Index : 0;
-        }
-        if (target == null || target.IsInvalid(targetIndex)) return;
-
-        _tower.StartCoroutine(SummonCoroutine(_tower));
+        EntityManager.Instance?.StartCoroutine(SummonCoroutine(_tower, _target));
     }
 
-    private IEnumerator SummonCoroutine(Tower _tower)
+    private IEnumerator SummonCoroutine(Tower _tower, Monster _target)
     {
         Vector3 pos = _tower.transform.position;
 
         for (int i = 0; i < count; i++)
         {
-            if (target == null || target.IsInvalid(targetIndex))
-            {
-                target = EntityManager.Instance?.GetMonsterNearest(pos);
-                targetIndex = target != null ? target.Index : 0;
-            }
-            if (target == null || target.IsInvalid(targetIndex)) yield break;
+            if (_target == null || _target.IsInvalid()) yield break;
 
             EntityManager.Instance?.MakeSummon(this, _tower, pos, scale, rate)
-                ?.SetBounce(target, rotate);
+                ?.SetBounce(_target, rotate);
 
             yield return new WaitForSeconds(interval);
         }

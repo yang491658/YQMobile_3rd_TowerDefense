@@ -4,7 +4,7 @@ using UnityEngine;
 public class Zone : TowerSkill
 {
     [Header("Value")]
-    [SerializeField][Min(0)] private float scale;
+    [SerializeField][Min(0f)] private float scale;
     [SerializeField][Min(0f)] private float duration;
     [SerializeField][Min(0f)] private float cooldown;
 
@@ -23,8 +23,9 @@ public class Zone : TowerSkill
         cooldown = _tower.GetValue(this, ValueType.Cooldown);
     }
 
-    public override void OnAttack(Tower _tower, Monster _target, ref bool _instead)
+    public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
     {
+        if (_target == null || _target.IsInvalid()) return;
         if (IsCooldown()) return;
 
         EntityManager.Instance?.MakeSummon(this, _tower, _target.transform.position, scale)

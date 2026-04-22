@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abf7c14b1ff5e1746b8923d9ca7ebcef, type: 3}
+  m_Name: Tower2209_Pink
+  m_EditorClassIdentifier: 
+  Icon: {fileID: 21300000, guid: 9bc6d89e4227d0a47ae886c8626a14d4, type: 3}
+  ID: 2209
+  Name: Pink
+  Symbol: {fileID: 21300000, guid: d5368b4bf7fca394dbb5d84089d73b73, type: 3}
+  Color: {r: 1, g: 0, b: 1, a: 1}
+  Grade: 2
+  Role: 2
+  Target: 4
+  Skills:
+  - skill: {fileID: 11400000, guid: 940e95316d2c5304fbf3f37963bff4b4, type: 2}
+    values:
+    - valueType: 201
+      baseValue: 10
+      rankType: 3
+      rankBonus: 1
+    - valueType: 401
+      baseValue: 2
+      rankType: 1
+      rankBonus: 1

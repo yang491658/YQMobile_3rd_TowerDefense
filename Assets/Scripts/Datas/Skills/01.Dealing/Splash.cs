@@ -23,10 +23,10 @@ public class Splash : TowerSkill
     public override void OnHit(Tower _tower, Monster _target, ref bool _instead)
     {
         Vector3 pos = _target.transform.position;
+        List<Monster> monsters = EntityManager.Instance?.GetMonstersInRange(pos, range);
 
         EntityManager.Instance?.MakeEffect(_tower, pos, range * 2f);
 
-        List<Monster> monsters = EntityManager.Instance?.GetMonstersInRange(pos, range);
         for (int i = 0; i < monsters.Count; i++)
         {
             Monster monster = monsters[i];

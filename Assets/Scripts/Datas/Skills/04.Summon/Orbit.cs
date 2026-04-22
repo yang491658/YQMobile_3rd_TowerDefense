@@ -20,7 +20,7 @@ public class Orbit : TowerSkill
         count = _tower.GetValueInt(this, ValueType.Count);
     }
 
-    public override void OnUpdate(Tower _tower, float _deltaTime)
+    public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
     {
         if (_tower.GetSummonCount(this) == count) return;
 

@@ -296,9 +296,8 @@ public class HandleManager : MonoBehaviour
         }
 
         Collider2D[] hits = Physics2D.OverlapPointAll(_end, layer);
-
-        Tower target = null;
         Collider2D selfCol = select.GetCol();
+        Tower target = null;
 
         for (int i = 0; i < hits.Length; i++)
         {
@@ -310,11 +309,7 @@ public class HandleManager : MonoBehaviour
             { target = other; break; }
         }
 
-        Tower merge = null;
-        if (target != null)
-            merge = select.Merge(target);
-
-        if (merge == null)
+        if (target == null || select.Merge(target) == null)
         {
             select.transform.position = dragStart + offset;
             select.DragOn(false);

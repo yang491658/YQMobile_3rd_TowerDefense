@@ -8406,9 +8406,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   towerDatas:
   - {fileID: 11400000, guid: f9a3b74caadae4d49a9f1fbf22b01a2a, type: 2}
+  - {fileID: 11400000, guid: c40a3fb6a7b19694594980de3c959ab5, type: 2}
+  - {fileID: 11400000, guid: c3452bd1b2b9baf4faa9320fe5d3203f, type: 2}
+  - {fileID: 11400000, guid: 78742e5c9007a7743aba200a96fb8867, type: 2}
+  - {fileID: 11400000, guid: 5172e77efa835e64a976e37e14fc109e, type: 2}
   - {fileID: 11400000, guid: a7e0c7e323262844f9519c3ef4271179, type: 2}
   - {fileID: 11400000, guid: fb669c1f6dccf4a418934ea233422b75, type: 2}
   - {fileID: 11400000, guid: 46ce558b0e897084d85a7f2076ff5d2d, type: 2}
+  - {fileID: 11400000, guid: 3496d7d4b75bd394fa177e17ac89118e, type: 2}
+  - {fileID: 11400000, guid: 7eef52e1b2ec7074390baa8d34c23884, type: 2}
   - {fileID: 11400000, guid: 0ba24f80aa75b284cb99d689011905f7, type: 2}
   - {fileID: 11400000, guid: 1c6ed796f573f6f459946f24ab455924, type: 2}
   - {fileID: 11400000, guid: 8c11b998fd6539148a0fd4b4f9e113b8, type: 2}

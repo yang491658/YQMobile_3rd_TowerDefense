@@ -56,11 +56,17 @@ public class Monster : Pooling
     private void UpdateMove(float _deltaTime)
     {
         Vector3Int currentCell = Vector3Int.RoundToInt(current);
+        bool direction = debuff.CalcDirection(currentCell, out Vector3Int directionCell);
 
-        if (!EntityManager.Instance.GetNextCell(currentCell, out Vector3Int nextCell))
-        { OnGoal(); return; }
+        if (!direction)
+        {
+            if (!EntityManager.Instance.GetNextCell(currentCell, out Vector3Int nextCell))
+            { OnGoal(); return; }
 
-        target = nextCell;
+            target = nextCell;
+        }
+        else
+            target = directionCell;
 
         Vector3 targetPos = EntityManager.Instance.GetCellPos(Vector3Int.RoundToInt(target));
         Vector3 delta = targetPos - transform.position;
@@ -70,7 +76,9 @@ public class Monster : Pooling
         {
             transform.position = targetPos;
 
-            current = Vector3Int.RoundToInt(target);
+            if (!direction)
+                current = Vector3Int.RoundToInt(target);
+
             target = current;
             moveDirection = Vector3.zero;
 
@@ -189,8 +197,6 @@ public class Monster : Pooling
     {
         base.OnSpawnPool();
 
-        Index++;
-
         int order = ++sorting;
         sr.sortingOrder = order;
         if (canvas != null)
@@ -198,11 +204,23 @@ public class Monster : Pooling
 
         reserve = 0;
         IsDead = false;
+
+        Index = order;
     }
 
     public override void ResetPool()
     {
         base.ResetPool();
+
+        Pooling[] poolings = GetComponentsInChildren<Pooling>(true);
+        for (int i = 0; i < poolings.Length; i++)
+        {
+            Pooling pooling = poolings[i];
+            if (pooling == this) continue;
+            if (pooling.IsDespawn) continue;
+
+            EntityManager.Instance?.DespawnPool(pooling);
+        }
 
         current = default;
         target = default;

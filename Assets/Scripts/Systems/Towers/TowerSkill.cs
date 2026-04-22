@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public abstract class TowerSkill : ScriptableObject
 {
@@ -8,9 +9,7 @@ public abstract class TowerSkill : ScriptableObject
 
 #if UNITY_EDITOR
     private void OnValidate() => SetID();
-
     public virtual void SetID() => ID = 0;
-
     public virtual ValueType[] GetValues() => default;
 #endif
 
@@ -20,9 +19,7 @@ public abstract class TowerSkill : ScriptableObject
 
     public virtual void OnGenerate(Tower _tower) { }
 
-    public virtual void OnUpdate(Tower _tower, float _deltaTime) { }
-
-    public virtual void OnRankUp(Tower _tower, int _amount = 1) { }
+    public virtual void OnUpdate(Tower _tower, Monster _target, float _deltaTime) { }
 
     public virtual void OnAttack(Tower _tower, Monster _target, ref bool _instead) { }
 
@@ -32,21 +29,51 @@ public abstract class TowerSkill : ScriptableObject
 
     public virtual void OnMerge(Tower _tower, Tower _target) { }
 
+    public virtual void OnRankUp(Tower _tower, int _amount = 1) { }
+
     public virtual void OnSell(Tower _tower) { }
 
     protected bool IsCooldown() => cooldownRoutine != null;
 
-    protected void StartCooldown(Tower _tower, float _time)
+    protected void StartCooldown(Tower _tower, float _cooldown)
     {
         if (cooldownRoutine != null)
-            _tower.StopCoroutine(cooldownRoutine);
+            EntityManager.Instance?.StopCoroutine(cooldownRoutine);
 
-        cooldownRoutine = _tower.StartCoroutine(CooldownCoroutine(_time));
+        cooldownRoutine = EntityManager.Instance?.StartCoroutine(CooldownCoroutine(_tower, _cooldown));
     }
 
-    protected IEnumerator CooldownCoroutine(float _time)
+    private IEnumerator CooldownCoroutine(Tower _tower, float _cooldown)
     {
-        yield return new WaitForSeconds(_time);
+        if (_tower == null)
+        { cooldownRoutine = null; yield break; }
+
+        Image timerUI = _tower.GetTimerUI();
+        if (timerUI != null)
+        {
+            timerUI.gameObject.SetActive(true);
+            timerUI.fillAmount = 1f;
+        }
+
+        float time = 0f;
+        while (time < _cooldown)
+        {
+            if (timerUI == null)
+            { cooldownRoutine = null; yield break; }
+
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / _cooldown);
+            timerUI.fillAmount = 1f - t;
+
+            yield return null;
+        }
+
+        if (timerUI != null)
+        {
+            timerUI.fillAmount = 0f;
+            timerUI.gameObject.SetActive(false);
+        }
+
         cooldownRoutine = null;
     }
 }

@@ -208,3 +208,8 @@ MonoBehaviour:
     duration: 0
     timer: 0
     immune: 0
+  directionControl:
+    value: 0
+    duration: 0
+    timer: 0
+    immune: 0

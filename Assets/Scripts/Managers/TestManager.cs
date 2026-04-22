@@ -213,7 +213,7 @@ public class TestManager : MonoBehaviour
     {
         IsAuto = _on;
 
-        GameManager.Instance?.SetSpeed(_on ? GameManager.Instance.GetMaxSpeed() : 1f);
+        //GameManager.Instance?.SetSpeed(_on ? GameManager.Instance.GetMaxSpeed() : 1f);
     }
 
     private void AutoPlay()
@@ -228,14 +228,14 @@ public class TestManager : MonoBehaviour
             else MergeRandom();
         }
 
-        int towerCount = EntityManager.Instance.GetTowerCount();
-        int monsterCount = EntityManager.Instance.GetMonsterCount();
-        if (towerCount < 30 && monsterCount < 50)
-            ChangeGameSpeed(gameSpeed.maxValue);
-        else if (towerCount < 100 && monsterCount < 200)
-            ChangeGameSpeed(GameManager.Instance.GetMaxSpeed());
-        else
-            ChangeGameSpeed(1f);
+        //int towerCount = EntityManager.Instance.GetTowerCount();
+        //int monsterCount = EntityManager.Instance.GetMonsterCount();
+        //if (towerCount < 30 && monsterCount < 50)
+        //    ChangeGameSpeed(gameSpeed.maxValue);
+        //else if (towerCount < 100 && monsterCount < 200)
+        //    ChangeGameSpeed(GameManager.Instance.GetMaxSpeed());
+        //else
+        //    ChangeGameSpeed(1f);
     }
 
     private IEnumerator AutoReplay()
@@ -403,7 +403,11 @@ public class TestManager : MonoBehaviour
     private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, _v => GameManager.Instance?.SetSpeed(_v, true));
 
     private void ChangeRefRank(float _value) => ApplySlider(ref refRank, _value);
-    private void ChangeRefTower(float _value) => ApplySlider(ref refTower, _value);
+    private void ChangeRefTower(float _value) => ApplySlider(ref refTower, _value, _v =>
+    {
+        OnClickReset();
+        GameManager.Instance?.Replay();
+    });
 
     private void UpdateTestUI()
     {

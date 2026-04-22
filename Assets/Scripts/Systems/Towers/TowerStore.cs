@@ -171,6 +171,8 @@ public class TowerStore : MonoBehaviour
         IsPlacing = _on;
         IsMoving = !_on;
 
+        EntityManager.Instance?.ShowPlaceField(_on);
+
         if (_on) return;
 
         for (int i = 0; i < slots.Length; i++)

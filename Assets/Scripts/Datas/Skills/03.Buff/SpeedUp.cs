@@ -28,9 +28,10 @@ public class SpeedUp : TowerSkill
         targets.Clear();
     }
 
-    public override void OnUpdate(Tower _tower, float _deltaTime)
+    public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
     {
         List<Tower> current = EntityManager.Instance?.GetTowersInRange(_tower.transform.position, range);
+
         currents.Clear();
         for (int i = 0; i < current.Count; i++) currents.Add(current[i]);
 

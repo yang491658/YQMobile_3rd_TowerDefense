@@ -19,7 +19,7 @@ MonoBehaviour:
   Color: {r: 0.47058824, g: 0.47058824, b: 0.47058824, a: 1}
   Grade: 3
   Role: 4
-  Target: 6
+  Target: 2
   Skills:
   - skill: {fileID: 11400000, guid: 7f53c3340f07d0948b8a44b147e4e33e, type: 2}
     values:
