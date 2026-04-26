@@ -255,38 +255,44 @@ public class TestManager : MonoBehaviour
 
     private void AutoPlay()
     {
-        int refID = DataManager.Instance.GetTowerID(refTower.value);
-        int refCount = 10;
-
         playTime += Time.deltaTime;
 
         AutoMerge();
+        if (Mode == TestMode.None)
+        {
+            if (GameManager.Instance.EnoughGold())
+            {
+                if (EntityManager.Instance.HasEmptyField())
+                    TowerStore.Instance?.AutoPurchase
+                        (refTower.value == 0 ? 0 : DataManager.Instance.GetTowerID(refTower.value));
+                else MergeRandom();
+            }
+        }
+        else TestPlay();
+    }
+
+    private void TestPlay()
+    {
+        int refID = DataManager.Instance.GetTowerID(refTower.value);
+
         switch (Mode)
         {
-            case TestMode.None:
-                if (GameManager.Instance.EnoughGold())
-                {
-                    if (EntityManager.Instance.HasEmptyField())
-                        TowerStore.Instance?.AutoPurchase
-                            (refTower.value == 0 ? 0 : DataManager.Instance.GetTowerID(refTower.value));
-                    else MergeRandom();
-                }
-                break;
-
             case TestMode.Wave:
-                if (EntityManager.Instance?.GetTowerCount(refID) < refCount)
-                    EntityManager.Instance?.SpawnTower(refID, refRank.value, _useGold: false);
+                Vector3? posWave = EntityManager.Instance?.GetLShapePos();
+                if (posWave.HasValue)
+                    EntityManager.Instance?.SpawnTower(refID, refRank.value, posWave.Value, _useGold: false);
                 SyncBasic();
                 break;
 
             case TestMode.Solo:
                 MonsterWave.Instance?.StopWave();
-                if (EntityManager.Instance?.GetTowerCount(refID) < refCount)
-                    EntityManager.Instance?.SpawnTower(refID, refRank.value, _useGold: false);
+                Vector3? posSolo = EntityManager.Instance?.GetLShapePos();
+                if (posSolo.HasValue)
+                    EntityManager.Instance?.SpawnTower(refID, refRank.value, posSolo.Value, _useGold: false);
                 if (EntityManager.Instance?.GetMonsterCount() == 0)
                     EntityManager.Instance?.SpawnBoss();
                 SyncBasic();
-                return;
+                break;
 
             case TestMode.Boss:
                 if (!bossInit)
@@ -298,14 +304,12 @@ public class TestManager : MonoBehaviour
                 break;
 
             case TestMode.Snake:
-                Vector3? pos = EntityManager.Instance?.GetSnakePos();
-                if (pos.HasValue)
-                    EntityManager.Instance?.SpawnTower(refID, refRank.value, pos.Value, _useGold: false);
+                Vector3? posSnake = EntityManager.Instance?.GetSnakePos();
+                if (posSnake.HasValue)
+                    EntityManager.Instance?.SpawnTower(refID, refRank.value, posSnake.Value, _useGold: false);
                 break;
 
             case TestMode.Full:
-                //if (GameManager.Instance?.GetScore() < int.MaxValue / 10)
-                //    GameManager.Instance?.ScoreUp();
                 if (EntityManager.Instance.HasEmptyField())
                     EntityManager.Instance?.SpawnTower(refID, refRank.value, _useGold: false);
                 SyncBasic();
@@ -502,7 +506,10 @@ public class TestManager : MonoBehaviour
 
             while (list.Count < need)
             {
-                Tower spawned = EntityManager.Instance?.SpawnTower(0, rank, _useGold: false);
+                Vector3? pos = EntityManager.Instance?.GetLShapePos();
+                if (!pos.HasValue) break;
+
+                Tower spawned = EntityManager.Instance?.SpawnTower(0, rank, pos.Value, _useGold: false);
                 if (spawned == null) break;
 
                 list.Add(spawned);

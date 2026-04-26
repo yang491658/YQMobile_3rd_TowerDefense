@@ -909,6 +909,51 @@ public class EntityManager : MonoBehaviour
     public Vector3 GetCellPos(Vector3Int _cell)
         => mapFieldTilemap.GetCellCenterWorld(_cell);
 
+    public Vector3? GetLShapePos()
+    {
+        if (fieldCells.Count == 0) return null;
+
+        int minX = fieldCells[0].x; int maxX = fieldCells[0].x;
+        int minY = fieldCells[0].y; int maxY = fieldCells[0].y;
+
+        for (int i = 1; i < fieldCells.Count; i++)
+        {
+            Vector3Int cell = fieldCells[i];
+
+            if (cell.x < minX) minX = cell.x;
+            if (cell.x > maxX) maxX = cell.x;
+            if (cell.y < minY) minY = cell.y;
+            if (cell.y > maxY) maxY = cell.y;
+        }
+
+        int lineY = maxY - 1;
+        int lineX = maxX - 1;
+
+        bool found = false;
+        int count = 0;
+        Vector3 result = Vector3.zero;
+
+        for (int i = 0; i < fieldCells.Count; i++)
+        {
+            Vector3Int cell = fieldCells[i];
+
+            bool horizontal = cell.y == lineY && cell.x >= minX && cell.x <= lineX;
+            bool vertical = cell.x == lineX && cell.y >= minY && cell.y <= lineY;
+
+            if (!horizontal && !vertical) continue;
+            if (!CanPlaceTower(cell)) continue;
+
+            count++;
+            if (Random.Range(0, count) == 0)
+            {
+                result = mapFieldTilemap.GetCellCenterWorld(cell);
+                found = true;
+            }
+        }
+
+        return found ? result : null;
+    }
+
     public Vector3? GetSnakePos()
     {
         if (fieldCells.Count == 0) return null;
