@@ -49,7 +49,6 @@ public class UIManager : MonoBehaviour
     private Color sellColor;
     [Space]
     [SerializeField] private SliderUI life;
-    [SerializeField] private GameObject expUI;
     [SerializeField] private SliderUI exp;
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI goldText;
@@ -140,8 +139,6 @@ public class UIManager : MonoBehaviour
         if (life.btn == null)
             life.btn = GameObject.Find("InGameUI/Player/Life/LifeBtn")?.GetComponent<Button>();
 
-        if (expUI == null)
-            expUI = GameObject.Find("InGameUI/Player/Exp");
         if (exp.slider == null)
             exp.slider = GameObject.Find("InGameUI/Player/Exp/ExpSlider")?.GetComponent<Slider>();
         if (exp.text == null)
@@ -499,6 +496,17 @@ public class UIManager : MonoBehaviour
 
     private void UpdateWave()
     {
+#if TEST_Manager
+        if (TestManager.Instance?.Mode == TestMode.Wave
+            || TestManager.Instance?.Mode == TestMode.Solo)
+        {
+            waveUI.SetActive(false);
+            bossUI.SetActive(false);
+            towerUI.SetActive(false);
+            return;
+        }
+#endif
+
         if (!MonsterWave.Instance.IsRunning || MonsterWave.Instance.IsFinished)
         {
             waveUI.SetActive(false);
@@ -799,6 +807,8 @@ public class UIManager : MonoBehaviour
 
     public Vector3 GetPlayerOffset(float _z = 0f)
     {
+        UpdateWave();
+
         Canvas.ForceUpdateCanvases();
         LayoutRebuilder.ForceRebuildLayoutImmediate(playerUI);
 

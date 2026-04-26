@@ -5,6 +5,8 @@ using UnityEngine;
 [RequireComponent(typeof(RectTransform), typeof(TextMeshProUGUI))]
 public class TextEffect : MonoBehaviour, IPoolable
 {
+    private Camera cam;
+
     private RectTransform rect;
     private TextMeshProUGUI text;
 
@@ -111,7 +113,6 @@ public class TextEffect : MonoBehaviour, IPoolable
     private bool CameraOut()
     {
         Rect localRect = rect.rect;
-        Camera cam = Camera.main;
         float z = -cam.transform.position.z;
 
         float minX = float.MaxValue;
@@ -163,7 +164,7 @@ public class TextEffect : MonoBehaviour, IPoolable
     }
     public void SetMove(Vector3 _target, float _time)
     {
-        Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(Camera.main, _target);
+        Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, _target);
         RectTransformUtility.ScreenPointToLocalPointInRectangle(rect.parent as RectTransform, screenPos, null, out Vector2 targetPos);
 
         moveType = false;
@@ -186,6 +187,7 @@ public class TextEffect : MonoBehaviour, IPoolable
     {
         IsDespawn = false;
 
+        cam = Camera.main;
         colorTimer = 0f;
     }
 

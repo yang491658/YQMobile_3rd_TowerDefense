@@ -299,19 +299,19 @@ public class Tower : Entity
 
     public void Hit(Monster _target, int _index, Vector3 _pos, bool _onHit = true)
     {
-        bool invalid = _target != null && !_target.IsInvalid(_index);
+        bool valid = _target != null && !_target.IsInvalid(_index);
         bool instead = false;
 
         if (_onHit)
         {
             for (int i = 0; i < skills.Count; i++)
             {
-                if (invalid) skills[i].OnHit(this, _target, ref instead);
+                if (valid) skills[i].OnHit(this, _target, ref instead);
                 else skills[i].OnHit(this, _pos, ref instead);
             }
         }
 
-        if (!invalid || instead) return;
+        if (!valid || instead) return;
 
         HitDamage(_target);
     }
@@ -392,9 +392,27 @@ public class Tower : Entity
     }
 
     #region SET
+    private TowerData BasicData()
+    {
+        TowerData basic = ScriptableObject.CreateInstance<TowerData>();
+
+        basic.ID = 0;
+        basic.Name = "Basic";
+        basic.Icon = symbolSR.sprite;
+        basic.Symbol = symbolSR.sprite;
+        basic.Color = Color.black;
+
+        basic.Grade = TowerGrade.Normal;
+        basic.Role = TowerRole.Dealer;
+        basic.Target = AttackTarget.First;
+        basic.Skills = new();
+
+        return basic;
+    }
+
     public void SetTower(TowerData _data, int _rank = 1)
     {
-        data = _data;
+        data = _data != null ? _data : BasicData();
 
         gameObject.name = data.Name;
         outlineSR.color = DataManager.Instance.GetGradeColor(data.Grade);

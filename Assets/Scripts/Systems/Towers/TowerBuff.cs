@@ -88,7 +88,7 @@ public class TowerBuff : MonoBehaviour
                 for (int i = 0; i < buffs.Count; i++)
                 {
                     Buff buff = buffs[i];
-                    if (buff.IsSame(_tower, _skill, BuffType.Stat, _sub) == false) continue;
+                    if (!buff.IsSame(_tower, _skill, BuffType.Stat, _sub)) continue;
 
                     buff.Refresh(_value, _duration);
                     return;
@@ -124,7 +124,7 @@ public class TowerBuff : MonoBehaviour
         {
             Buff buff = buffs[i];
             if (buff.Type != BuffType.Stat) continue;
-            if (buff.Sub != _sub || buff.IsActive == false) continue;
+            if (buff.Sub != _sub || !buff.IsActive) continue;
 
             bonus += buff.Value;
         }
@@ -158,9 +158,7 @@ public class TowerBuff : MonoBehaviour
         for (int i = buffs.Count - 1; i >= 0; i--)
         {
             Buff buff = buffs[i];
-            if (buff.Type != BuffType.Stat) continue;
-            if (_sub != null && buff.Sub != _sub.Value) continue;
-            if (buff.IsSame(_tower, _skill, BuffType.Stat, buff.Sub) == false) continue;
+            if (!buff.IsSame(_tower, _skill, BuffType.Stat, _sub)) continue;
 
             buffs.RemoveAt(i);
         }

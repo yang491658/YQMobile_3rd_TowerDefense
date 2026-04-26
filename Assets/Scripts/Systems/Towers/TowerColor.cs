@@ -21,7 +21,7 @@ public class TowerColor : ScriptableObject
             TowerGrade.Unique => unique,
             TowerGrade.Legend => legend,
             TowerGrade.Mythic => mythic,
-            _ => Color.white,
+            _ => Color.black,
         };
     #endregion
 }

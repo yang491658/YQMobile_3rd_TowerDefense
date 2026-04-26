@@ -21,6 +21,16 @@ public class Boss : Monster
     {
         StopAllCoroutines();
 
+#if TEST_Manager
+        if (TestManager.Instance?.Mode == TestMode.Solo)
+        {
+            SetSpeed(1f);
+            maxHealth = int.MaxValue;
+            SetHealth(maxHealth);
+            return;
+        }
+#endif
+
         data = _data;
 
         SetSpeed(data.MoveSpeed);

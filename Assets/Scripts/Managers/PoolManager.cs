@@ -302,6 +302,9 @@ public class PoolManager : MonoBehaviour
     }
 
 #if TEST_Manager
+    public int GetOtherCount()
+        => bulletPolicy.active + summonPolicy.active + effectPolicy.active;
+
     private void UpdateStatistics()
     {
         if (monsterPolicy != null) { monsterPolicy.active = 0; monsterPolicy.wait = 0; }

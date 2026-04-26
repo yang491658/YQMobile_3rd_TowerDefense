@@ -9,6 +9,7 @@ public class SpeedUp : TowerSkill
     [SerializeField][Min(0)] private int factor;
 
     private readonly List<Tower> targets = new();
+    private readonly HashSet<Tower> targetSet = new();
     private readonly HashSet<Tower> currents = new();
 
 #if UNITY_EDITOR
@@ -26,6 +27,7 @@ public class SpeedUp : TowerSkill
     public override void OnGenerate(Tower _tower)
     {
         targets.Clear();
+        targetSet.Clear();
     }
 
     public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
@@ -33,7 +35,8 @@ public class SpeedUp : TowerSkill
         List<Tower> current = EntityManager.Instance?.GetTowersInRange(_tower.transform.position, range);
 
         currents.Clear();
-        for (int i = 0; i < current.Count; i++) currents.Add(current[i]);
+        for (int i = 0; i < current.Count; i++)
+            currents.Add(current[i]);
 
         for (int i = targets.Count - 1; i >= 0; i--)
         {
@@ -43,6 +46,8 @@ public class SpeedUp : TowerSkill
             TowerBuff buff = target.GetBuff();
             buff.RemoveStat(_tower, this, TowerBuff.SubType.Speed);
             buff.RemoveStat(_tower, this, TowerBuff.SubType.Chance);
+
+            targetSet.Remove(target);
             targets.RemoveAt(i);
         }
 
@@ -54,9 +59,10 @@ public class SpeedUp : TowerSkill
             buff.ApplyStat(_tower, this, TowerBuff.SubType.Speed, factor, 0f, TowerBuff.ApplyType.Refresh);
             buff.ApplyStat(_tower, this, TowerBuff.SubType.Chance, factor, 0f, TowerBuff.ApplyType.Refresh);
 
-            if (targets.Contains(target)) continue;
+            if (targetSet.Contains(target)) continue;
 
             EntityManager.Instance?.MakeEffect(_tower, target);
+            targetSet.Add(target);
             targets.Add(target);
         }
     }
@@ -83,5 +89,6 @@ public class SpeedUp : TowerSkill
         }
 
         targets.Clear();
+        targetSet.Clear();
     }
 }

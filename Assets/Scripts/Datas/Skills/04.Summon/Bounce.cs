@@ -37,6 +37,7 @@ public class Bounce : TowerSkill
 
         for (int i = 0; i < count; i++)
         {
+            if (_tower == null) yield break;
             if (_target == null || _target.IsInvalid()) yield break;
 
             EntityManager.Instance?.MakeSummon(this, _tower, pos, scale, rate)

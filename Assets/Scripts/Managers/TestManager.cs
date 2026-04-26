@@ -8,12 +8,12 @@ using UnityEngine.UI;
 [System.Serializable]
 public struct TestResult
 {
-    [Min(0)] public int score;
+    [Min(0)] public long value;
     [Min(0f)] public float playTime;
 
-    public TestResult(int _score, float _playTime)
+    public TestResult(long _value, float _playTime)
     {
-        score = _score;
+        value = _value;
         playTime = _playTime;
     }
 }
@@ -39,6 +39,8 @@ public struct SliderConfig
     }
 }
 
+public enum TestMode { None, Wave, Solo, Boss, Snake, Full, }
+
 public class TestManager : MonoBehaviour
 {
     public static TestManager Instance { private set; get; }
@@ -46,6 +48,7 @@ public class TestManager : MonoBehaviour
     [Header("Game Test")]
     [SerializeField] private List<TestResult> testResults = new();
     [SerializeField][Min(0f)] private float playTime = 0f;
+    [SerializeField][Min(0)] private long runDamage = 0;
     [Space]
     [SerializeField][Min(0f)] private float autoReplay = 0f;
     private Coroutine autoRoutine;
@@ -55,22 +58,36 @@ public class TestManager : MonoBehaviour
     [Header("Sound Test")]
     [SerializeField] private bool onPauseBgm = false;
 
+    [Header("Test Text")]
+    [SerializeField] private TextMeshProUGUI testText;
+    private float timer = 0f;
+    private int frame = 0;
+
     [Header("Test UI")]
     [SerializeField] private GameObject testUI;
     [Space]
     [SerializeField] private SliderConfig gameSpeed = new(1, 1, 20, "배속 × {0}");
     [Space]
     [SerializeField] private TextMeshProUGUI testCountNum;
-    [SerializeField] private TextMeshProUGUI score10Num;
-    [SerializeField] private TextMeshProUGUI averageScoreNum;
     [SerializeField] private TextMeshProUGUI averagePlayNum;
+    [SerializeField] private TextMeshProUGUI averageValueName;
+    [SerializeField] private TextMeshProUGUI averageValueNum;
+    [SerializeField] private TextMeshProUGUI value10Num;
     [Space]
     [SerializeField] private SliderConfig refRank = new(3, 0, 0, "기준 랭크 : {0}");
     [SerializeField] private SliderConfig refTower = new(0, 0, 0, "기준 타워 : {0}");
+    [SerializeField] private SliderConfig refBoss = new(0, 0, 0, "기준 보스 : {0}");
+    public int RefBoss => refBoss.value;
+    private bool bossInit = false;
+    private int needTower = 1;
+
+    public TestMode Mode { private set; get; } = TestMode.None;
 
 #if UNITY_EDITOR
     private void OnValidate()
     {
+        if (testText == null)
+            testText = GameObject.Find("TestText")?.GetComponent<TextMeshProUGUI>();
         if (testUI == null)
             testUI = GameObject.Find("TestUI");
 
@@ -81,21 +98,27 @@ public class TestManager : MonoBehaviour
 
         if (testCountNum == null)
             testCountNum = GameObject.Find("TestUI/TestCount/TestNum")?.GetComponent<TextMeshProUGUI>();
-        if (score10Num == null)
-            score10Num = GameObject.Find("TestUI/Score10/TestNum")?.GetComponent<TextMeshProUGUI>();
-        if (averageScoreNum == null)
-            averageScoreNum = GameObject.Find("TestUI/AverageScore/TestNum")?.GetComponent<TextMeshProUGUI>();
         if (averagePlayNum == null)
             averagePlayNum = GameObject.Find("TestUI/AveragePlay/TestNum")?.GetComponent<TextMeshProUGUI>();
+        if (averageValueName == null)
+            averageValueName = GameObject.Find("TestUI/AverageValue/TestName")?.GetComponent<TextMeshProUGUI>();
+        if (averageValueNum == null)
+            averageValueNum = GameObject.Find("TestUI/AverageValue/TestNum")?.GetComponent<TextMeshProUGUI>();
+        if (value10Num == null)
+            value10Num = GameObject.Find("TestUI/Value10/TestNum")?.GetComponent<TextMeshProUGUI>();
 
-        if (refTower.TMP == null)
-            refTower.TMP = GameObject.Find("TestUI/RefTower/TestText")?.GetComponent<TextMeshProUGUI>();
-        if (refTower.slider == null)
-            refTower.slider = GameObject.Find("TestUI/RefTower/TestSlider")?.GetComponent<Slider>();
         if (refRank.TMP == null)
             refRank.TMP = GameObject.Find("TestUI/RefRank/TestText")?.GetComponent<TextMeshProUGUI>();
         if (refRank.slider == null)
             refRank.slider = GameObject.Find("TestUI/RefRank/TestSlider")?.GetComponent<Slider>();
+        if (refTower.TMP == null)
+            refTower.TMP = GameObject.Find("TestUI/RefTower/TestText")?.GetComponent<TextMeshProUGUI>();
+        if (refTower.slider == null)
+            refTower.slider = GameObject.Find("TestUI/RefTower/TestSlider")?.GetComponent<Slider>();
+        if (refBoss.TMP == null)
+            refBoss.TMP = GameObject.Find("TestUI/RefBoss/TestText")?.GetComponent<TextMeshProUGUI>();
+        if (refBoss.slider == null)
+            refBoss.slider = GameObject.Find("TestUI/RefBoss/TestSlider")?.GetComponent<Slider>();
     }
 #endif
 
@@ -164,7 +187,7 @@ public class TestManager : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.T))
+        if (Input.GetKey(KeyCode.T))
         {
             int refID = DataManager.Instance.GetTowerID(refTower.value);
             Vector3 pos = Input.mousePosition;
@@ -198,13 +221,27 @@ public class TestManager : MonoBehaviour
             else AutoPlay();
         }
         if (Input.GetKeyDown(KeyCode.UpArrow))
-            ChangeGameSpeed(gameSpeed.value == gameSpeed.maxValue ? GameManager.Instance.GetMaxSpeed() : gameSpeed.maxValue);
+            ChangeGameSpeed(gameSpeed.value == gameSpeed.maxValue
+                ? GameManager.Instance.GetMaxSpeed()
+                : gameSpeed.maxValue);
         if (Input.GetKeyDown(KeyCode.DownArrow))
-            ChangeGameSpeed(gameSpeed.value == gameSpeed.minValue ? GameManager.Instance.GetMaxSpeed() : gameSpeed.minValue);
+            ChangeGameSpeed(gameSpeed.value == gameSpeed.minValue
+                ? GameManager.Instance.GetMaxSpeed()
+                : gameSpeed.minValue);
         if (Input.GetKeyDown(KeyCode.LeftArrow))
-            ChangeRefTower(--refTower.value);
+            if (Mode != TestMode.Boss) ChangeRefTower(--refTower.value);
+            else ChangeRefBoss(--refBoss.value);
         if (Input.GetKeyDown(KeyCode.RightArrow))
-            ChangeRefTower(++refTower.value);
+            if (Mode != TestMode.Boss) ChangeRefTower(++refTower.value);
+            else ChangeRefBoss(++refBoss.value);
+
+        if (Input.GetKeyDown(KeyCode.J)) ToggleMode(TestMode.Wave);
+        if (Input.GetKeyDown(KeyCode.K)) ToggleMode(TestMode.Solo);
+        if (Input.GetKeyDown(KeyCode.L)) ToggleMode(TestMode.Boss);
+        if (Input.GetKeyDown(KeyCode.Semicolon)) ToggleMode(TestMode.Snake);
+        if (Input.GetKeyDown(KeyCode.Quote)) ToggleMode(TestMode.Full);
+
+        UpdateTestText();
         #endregion
     }
 
@@ -213,29 +250,67 @@ public class TestManager : MonoBehaviour
     {
         IsAuto = _on;
 
-        //GameManager.Instance?.SetSpeed(_on ? GameManager.Instance.GetMaxSpeed() : 1f);
+        if (!_on) Mode = TestMode.None;
     }
 
     private void AutoPlay()
     {
+        int refID = DataManager.Instance.GetTowerID(refTower.value);
+        int refCount = 10;
+
         playTime += Time.deltaTime;
 
         AutoMerge();
-        if (GameManager.Instance.EnoughGold())
+        switch (Mode)
         {
-            if (EntityManager.Instance.HasEmptyField())
-                TowerStore.Instance?.AutoPurchase(refTower.value == 0 ? 0 : DataManager.Instance.GetTowerID(refTower.value));
-            else MergeRandom();
-        }
+            case TestMode.None:
+                if (GameManager.Instance.EnoughGold())
+                {
+                    if (EntityManager.Instance.HasEmptyField())
+                        TowerStore.Instance?.AutoPurchase
+                            (refTower.value == 0 ? 0 : DataManager.Instance.GetTowerID(refTower.value));
+                    else MergeRandom();
+                }
+                break;
 
-        //int towerCount = EntityManager.Instance.GetTowerCount();
-        //int monsterCount = EntityManager.Instance.GetMonsterCount();
-        //if (towerCount < 30 && monsterCount < 50)
-        //    ChangeGameSpeed(gameSpeed.maxValue);
-        //else if (towerCount < 100 && monsterCount < 200)
-        //    ChangeGameSpeed(GameManager.Instance.GetMaxSpeed());
-        //else
-        //    ChangeGameSpeed(1f);
+            case TestMode.Wave:
+                if (EntityManager.Instance?.GetTowerCount(refID) < refCount)
+                    EntityManager.Instance?.SpawnTower(refID, refRank.value, _useGold: false);
+                SyncBasic();
+                break;
+
+            case TestMode.Solo:
+                MonsterWave.Instance?.StopWave();
+                if (EntityManager.Instance?.GetTowerCount(refID) < refCount)
+                    EntityManager.Instance?.SpawnTower(refID, refRank.value, _useGold: false);
+                if (EntityManager.Instance?.GetMonsterCount() == 0)
+                    EntityManager.Instance?.SpawnBoss();
+                SyncBasic();
+                return;
+
+            case TestMode.Boss:
+                if (!bossInit)
+                {
+                    for (int i = 0; i < needTower; i++)
+                        EntityManager.Instance?.SpawnTower(0, 1, _useGold: false);
+                    bossInit = true;
+                }
+                break;
+
+            case TestMode.Snake:
+                Vector3? pos = EntityManager.Instance?.GetSnakePos();
+                if (pos.HasValue)
+                    EntityManager.Instance?.SpawnTower(refID, refRank.value, pos.Value, _useGold: false);
+                break;
+
+            case TestMode.Full:
+                //if (GameManager.Instance?.GetScore() < int.MaxValue / 10)
+                //    GameManager.Instance?.ScoreUp();
+                if (EntityManager.Instance.HasEmptyField())
+                    EntityManager.Instance?.SpawnTower(refID, refRank.value, _useGold: false);
+                SyncBasic();
+                break;
+        }
     }
 
     private IEnumerator AutoReplay()
@@ -244,16 +319,60 @@ public class TestManager : MonoBehaviour
 
         if (GameManager.Instance.IsGameOver)
         {
-            int score = GameManager.Instance.GetScore();
+            long value = GameManager.Instance.GetScore();
 
-            testResults.Add(new TestResult(score, playTime));
-            playTime = 0f;
+            if (Mode == TestMode.Boss)
+            {
+                if (EntityManager.Instance?.GetMonsterCount() > 0)
+                {
+                    playTime = 0f;
+                    runDamage = 0;
+                    needTower++;
+                }
+                else
+                {
+                    testResults.Add(new TestResult(needTower, playTime));
+                    playTime = 0f;
+                    runDamage = 0;
+                    needTower = Mathf.Max(needTower - 1, 1);
+                }
+                bossInit = false;
+            }
+            else
+            {
+                if (Mode == TestMode.Solo)
+                    value = runDamage;
+
+                testResults.Add(new TestResult(value, playTime));
+
+                playTime = 0f;
+                runDamage = 0;
+            }
 
             GameManager.Instance?.Replay();
-
             UpdateTestUI();
         }
         autoRoutine = null;
+    }
+
+    private void ToggleMode(TestMode _mode)
+    {
+        if (Mode != _mode)
+            switch (_mode)
+            {
+                case TestMode.Wave:
+                case TestMode.Solo:
+                    ChangeRefBoss(0);
+                    break;
+                case TestMode.Boss:
+                    ChangeRefTower(0);
+                    if (refBoss.value == 0) ChangeRefBoss(1);
+                    break;
+            }
+
+        Mode = Mode == _mode ? TestMode.None : _mode;
+        OnClickReset();
+        GameManager.Instance?.Replay();
     }
 
     private void AutoMerge()
@@ -346,6 +465,71 @@ public class TestManager : MonoBehaviour
             }
         }
     }
+
+    private void SyncBasic()
+    {
+        if (refTower.value == 0) return;
+
+        int refID = DataManager.Instance.GetTowerID(refTower.value);
+        TowerData refData = DataManager.Instance?.SearchTower(refID);
+        if (refData.Role != TowerRole.Buff && refData.Role != TowerRole.Debuff) return;
+
+        List<Tower> towers = EntityManager.Instance?.GetTowers();
+        int maxRank = Tower.MaxRank;
+
+        int[] target = new int[maxRank + 1];
+        List<Tower>[] basics = new List<Tower>[maxRank + 1];
+
+        for (int r = 0; r <= maxRank; r++)
+            basics[r] = new();
+
+        for (int i = 0; i < towers.Count; i++)
+        {
+            Tower tower = towers[i];
+            if (tower == null || tower.IsDragging) continue;
+
+            int id = tower.GetID();
+            int rank = tower.GetRank();
+
+            if (id == refID) target[rank]++;
+            else if (id == 0) basics[rank].Add(tower);
+        }
+
+        for (int rank = 1; rank <= maxRank; rank++)
+        {
+            List<Tower> list = basics[rank];
+            int need = target[rank];
+
+            while (list.Count < need)
+            {
+                Tower spawned = EntityManager.Instance?.SpawnTower(0, rank, _useGold: false);
+                if (spawned == null) break;
+
+                list.Add(spawned);
+            }
+
+            while (list.Count > need)
+            {
+                if (rank < maxRank && list.Count - need >= 2)
+                {
+                    int last = list.Count - 1; Tower a = list[last]; list.RemoveAt(last);
+                    last = list.Count - 1; Tower b = list[last]; list.RemoveAt(last);
+
+                    Tower merged = a.Merge(b);
+                    if (merged != null) basics[rank + 1].Add(merged);
+                    else break;
+                }
+                else
+                {
+                    int last = list.Count - 1; Tower remove = list[last]; list.RemoveAt(last);
+
+                    EntityManager.Instance?.DespawnTower(remove);
+                }
+            }
+        }
+    }
+
+    public void AddDamage(int _damage) => runDamage += _damage;
     #endregion
 
     #region 테스트 UI
@@ -359,6 +543,8 @@ public class TestManager : MonoBehaviour
         InitSlider(refRank, ChangeRefRank);
         refTower.maxValue = DataManager.Instance.GetTowerDatas().Length;
         InitSlider(refTower, ChangeRefTower);
+        refBoss.maxValue = DataManager.Instance.GetBossDatas().Length;
+        InitSlider(refBoss, ChangeRefBoss);
     }
 
     private void OnDisable()
@@ -367,6 +553,7 @@ public class TestManager : MonoBehaviour
 
         refRank.slider.onValueChanged.RemoveListener(ChangeRefRank);
         refTower.slider.onValueChanged.RemoveListener(ChangeRefTower);
+        refBoss.slider.onValueChanged.RemoveListener(ChangeRefBoss);
     }
 
     private void InitSlider(SliderConfig _config, UnityEngine.Events.UnityAction<float> _action)
@@ -400,61 +587,88 @@ public class TestManager : MonoBehaviour
         _config.slider.value = _config.value;
     }
 
-    private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, _v => GameManager.Instance?.SetSpeed(_v, true));
+    private void ChangeGameSpeed(float _value)
+        => ApplySlider(ref gameSpeed, _value, _v => GameManager.Instance?.SetSpeed(_v, true));
 
     private void ChangeRefRank(float _value) => ApplySlider(ref refRank, _value);
     private void ChangeRefTower(float _value) => ApplySlider(ref refTower, _value, _v =>
     {
+        if (Mode == TestMode.None) return;
         OnClickReset();
         GameManager.Instance?.Replay();
     });
+    private void ChangeRefBoss(float _value) => ApplySlider(ref refBoss, _value, _v =>
+    {
+        if (_v == 0) { ToggleMode(TestMode.None); return; }
+        OnClickReset();
+        GameManager.Instance?.Replay();
+    });
+
+    private void UpdateTestText()
+    {
+        timer += Time.unscaledDeltaTime;
+        frame++;
+
+        if (timer < 0.1f) return;
+
+        testText.text =
+            $"FPS : {frame / timer:0.0}\n" +
+            $"MS : {timer * 1000f / frame:0.0}\n\n" +
+            $"Tower : {EntityManager.Instance?.GetTowerCount()}\n" +
+            $"Monster : {EntityManager.Instance?.GetMonsterCount()}\n" +
+            $"Others : {PoolManager.Instance?.GetOtherCount()}";
+
+        timer = 0f;
+        frame = 0;
+    }
 
     private void UpdateTestUI()
     {
         int count = testResults.Count;
 
-        List<int> scores = new(count);
-        int totalScore = 0;
+        List<long> values = new(count);
+        long totalValue = 0;
         float totalPlay = 0f;
-        double scoreSqSum = 0d;
+        double valueSqSum = 0d;
 
         for (int i = 0; i < count; i++)
         {
             TestResult r = testResults[i];
 
-            scores.Add(r.score);
-            totalScore += r.score;
+            values.Add(r.value);
+            totalValue += r.value;
             totalPlay += r.playTime;
-            scoreSqSum += (double)r.score * r.score;
+            valueSqSum += (double)r.value * r.value;
         }
 
-        int topAvg = 0; int bottomAvg = 0;
+        long topAvg = 0;
+        long bottomAvg = 0;
         if (count > 0)
         {
-            scores.Sort();
+            values.Sort();
             int group = Mathf.Max(Mathf.CeilToInt(count * 0.1f), 1);
 
             long sumBottom = 0;
-            for (int i = 0; i < group; i++) sumBottom += scores[i];
+            for (int i = 0; i < group; i++) sumBottom += values[i];
 
             long sumTop = 0;
-            for (int i = count - group; i < count; i++) sumTop += scores[i];
+            for (int i = count - group; i < count; i++) sumTop += values[i];
 
-            bottomAvg = Mathf.RoundToInt((float)sumBottom / group);
-            topAvg = Mathf.RoundToInt((float)sumTop / group);
+            bottomAvg = (long)System.Math.Round((double)sumBottom / group);
+            topAvg = (long)System.Math.Round((double)sumTop / group);
         }
 
-        int averageScore = count > 0 ? totalScore / count : 0;
+        long averageValue = count > 0 ? (long)System.Math.Round((double)totalValue / count) : 0;
         float averagePlay = count > 0 ? totalPlay / count : 0f;
 
-        double cvScore = 0d;
+        double cvValue = 0d;
         if (count > 1)
         {
-            double meanScore = (double)totalScore / count;
-            double varScore = scoreSqSum / count - meanScore * meanScore;
-            if (varScore < 0d) varScore = 0d;
-            double stdScore = System.Math.Sqrt(varScore);
-            cvScore = meanScore != 0d ? (stdScore / meanScore) * 100d : 0d;
+            double meanValue = (double)totalValue / count;
+            double varValue = valueSqSum / count - meanValue * meanValue;
+            if (varValue < 0d) varValue = 0d;
+            double stdValue = System.Math.Sqrt(varValue);
+            cvValue = meanValue != 0d ? (stdValue / meanValue) * 100d : 0d;
         }
 
         int totalSeconds = Mathf.RoundToInt(averagePlay);
@@ -462,11 +676,22 @@ public class TestManager : MonoBehaviour
         int seconds = totalSeconds % 60;
 
         testCountNum.text = count.ToString();
-        score10Num.text = $"{topAvg:#,0} / {bottomAvg:#,0}";
-        averageScoreNum.text = $"{averageScore:#,0} ({cvScore:0.#}%)";
         averagePlayNum.text = minutes.ToString("00") + ":" + seconds.ToString("00");
+        averageValueName.text = Mode switch
+        {
+            TestMode.Solo => "누적 데미지",
+            TestMode.Boss => "필요 타워 수",
+            _ => "평균점수"
+        };
+        averageValueNum.text = Mode == TestMode.Boss
+            ? $"{averageValue:#,0}"
+            : $"{averageValue:#,0} ({cvValue:0.#}%)";
+        value10Num.text = $"{topAvg:#,0} / {bottomAvg:#,0}";
 
         UpdateSliderUI(gameSpeed);
+        UpdateSliderUI(refRank);
+        UpdateSliderUI(refTower);
+        UpdateSliderUI(refBoss);
     }
 
     public void OnClickTest()
@@ -478,6 +703,16 @@ public class TestManager : MonoBehaviour
     {
         testResults.Clear();
         playTime = 0f;
+        runDamage = 0;
+
+        if (autoRoutine != null)
+        {
+            StopCoroutine(autoRoutine);
+            autoRoutine = null;
+        }
+
+        needTower = 1;
+        bossInit = false;
 
         UpdateTestUI();
     }

@@ -346,10 +346,17 @@ public class EntityManager : MonoBehaviour
     #region 타워
     public Tower SpawnTower(int _id = 0, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
     {
-        int id = _id > 0 ? _id : DataManager.Instance.GetRandomTower().ID;
+        TowerData data = null;
 
-        TowerData data = DataManager.Instance?.SearchTower(id);
-        if (data == null) return null;
+#if TEST_Manager
+        if (TestManager.Instance?.Mode != TestMode.None && _id == 0) { }
+        else
+#endif
+        {
+            int id = _id > 0 ? _id : DataManager.Instance.GetRandomTower().ID;
+            data = DataManager.Instance?.SearchTower(id);
+            if (data == null) return null;
+        }
 
         if (_useGold && !GameManager.Instance.EnoughGold()) return null;
 
@@ -461,6 +468,23 @@ public class EntityManager : MonoBehaviour
 
         return boss;
     }
+
+#if TEST_Manager
+    public Boss SpawnBoss()
+    {
+        Vector3 pos = mapFieldTilemap.GetCellCenterWorld(entryCell);
+
+        Boss boss = SpawnPool<Boss>(bossBase, pos, monsterTrans);
+        if (boss == null) return null;
+
+        boss.SetBoss(null);
+        boss.SetMove(mapFieldTilemap.WorldToCell(pos));
+        boss.transform.localScale = map.localScale;
+        monsters.Add(boss);
+
+        return boss;
+    }
+#endif
 
     public void DespawnMonster(Monster _monster)
     {
@@ -884,6 +908,51 @@ public class EntityManager : MonoBehaviour
 
     public Vector3 GetCellPos(Vector3Int _cell)
         => mapFieldTilemap.GetCellCenterWorld(_cell);
+
+    public Vector3? GetSnakePos()
+    {
+        if (fieldCells.Count == 0) return null;
+
+        int minX = entryCell.x; int maxX = entryCell.x;
+        int minY = entryCell.y; int maxY = entryCell.y;
+
+        for (int i = 0; i < fieldCells.Count; i++)
+        {
+            Vector3Int cell = fieldCells[i];
+
+            if (cell.x < minX) minX = cell.x;
+            if (cell.x > maxX) maxX = cell.x;
+            if (cell.y < minY) minY = cell.y;
+            if (cell.y > maxY) maxY = cell.y;
+        }
+
+        bool found = false;
+        int count = 0;
+        Vector3 result = Vector3.zero;
+
+        for (int i = 0; i < fieldCells.Count; i++)
+        {
+            Vector3Int cell = fieldCells[i];
+            int col = cell.x - minX;
+
+            if (col % 2 == 0) continue;
+
+            bool bottomOpen = (col / 2) % 2 == 0;
+            int openY = bottomOpen ? minY : maxY;
+
+            if (cell.y == openY) continue;
+            if (!CanPlaceTower(cell)) continue;
+
+            count++;
+            if (Random.Range(0, count) == 0)
+            {
+                result = mapFieldTilemap.GetCellCenterWorld(cell);
+                found = true;
+            }
+        }
+
+        return found ? result : null;
+    }
     #endregion
 
     #region GET_공통
@@ -998,8 +1067,21 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region GET_타워
-    public int GetTowerCount() => towers.Count;
     public List<Tower> GetTowers() => towers;
+    public int GetTowerCount(int _id = 0)
+    {
+        if (_id == 0) return towers.Count;
+
+        int count = 0;
+        for (int i = 0; i < towers.Count; i++)
+        {
+            Tower t = towers[i];
+            if (t == null) continue;
+
+            if (t.GetID() == _id) count++;
+        }
+        return count;
+    }
 
     public Tower GetTowerRandom()
         => GetRandom(towers);
@@ -1021,7 +1103,6 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region GET_몬스터
-    public int GetMonsterCount() => monsters.Count;
     public List<Monster> GetMonsters() => monsters;
     public List<Monster> GetMonsters(System.Predicate<Monster> _filter)
     {
@@ -1044,6 +1125,7 @@ public class EntityManager : MonoBehaviour
 
         return preferred ?? targets;
     }
+    public int GetMonsterCount() => monsters.Count;
 
     public Monster GetMonsterRandom(System.Predicate<Monster> _filter = null)
         => GetRandom(GetMonsters(_filter));

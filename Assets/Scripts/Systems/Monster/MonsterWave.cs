@@ -17,7 +17,7 @@ public sealed class MonsterWave : MonoBehaviour
     [Header("Normal")]
     [SerializeField][Min(0.1f)] private float normalTime = 180f;
     private float normalTimer;
-    [SerializeField] private Vector2 spawnRange = new Vector2(1f, 3f);
+    [SerializeField] private Vector2 spawnRange = new Vector2(0.3f, 3f);
     private float spawnDelay;
     private float spawnTimer;
     [SerializeField][Min(0f)] private float spawnPeak = 30f;
@@ -74,6 +74,11 @@ public sealed class MonsterWave : MonoBehaviour
         if (GameManager.Instance.IsGameOver) return;
         if (IsPause) return;
 
+#if TEST_Manager
+        if (TestManager.Instance?.Mode == TestMode.Boss)
+            phase = Phase.Boss;
+#endif
+
         float dt = Time.deltaTime;
         switch (phase)
         {
@@ -84,7 +89,7 @@ public sealed class MonsterWave : MonoBehaviour
         }
     }
 
-    #region 웨이브
+    #region 웨이브 진행
     public void ResetWave()
     {
         phaseTimer = 0f;
@@ -126,6 +131,10 @@ public sealed class MonsterWave : MonoBehaviour
     #region 노말 페이즈
     private void NormalPhase(float _deltaTime)
     {
+#if TEST_Manager
+        if (TestManager.Instance?.Mode == TestMode.Solo) return;
+#endif
+
         spawnTimer -= _deltaTime;
         if (spawnTimer <= 0f)
         {
@@ -135,6 +144,10 @@ public sealed class MonsterWave : MonoBehaviour
 
         if (spawnDelay > spawnRange.x)
             spawnDelay = Mathf.Max(spawnDelay - _deltaTime / spawnDecrease, spawnRange.x);
+
+#if TEST_Manager
+        if (TestManager.Instance?.Mode == TestMode.Wave) return;
+#endif
 
         if (IsFinished) return;
 
@@ -190,6 +203,25 @@ public sealed class MonsterWave : MonoBehaviour
     #region 보스 페이즈
     private void BossPhase(float _deltaTime)
     {
+        int order = bossOrder;
+
+#if TEST_Manager
+        if (TestManager.Instance?.Mode == TestMode.Boss)
+        {
+            order = TestManager.Instance.RefBoss;
+            if (!onBoss)
+            {
+                Vector3 offset = UIManager.Instance.GetPlayerOffset();
+                EntityManager.Instance?.MoveMap(offset, 0f);
+
+                phaseTimer = 0f;
+                onText = true;
+                onBoss = true;
+                return;
+            }
+        }
+#endif
+
         if (!onBoss)
         {
             Vector3 offset = UIManager.Instance.GetPlayerOffset();
@@ -217,7 +249,9 @@ public sealed class MonsterWave : MonoBehaviour
             phaseTimer -= _deltaTime;
             if (phaseTimer > 0f) return;
 
-            boss = EntityManager.Instance?.SpawnBoss(bossOrder);
+            boss = EntityManager.Instance?.SpawnBoss(order);
+            if (boss == null) return;
+
             IsSpawned = true;
 
             BossData data = boss.GetData();
@@ -228,6 +262,14 @@ public sealed class MonsterWave : MonoBehaviour
 
         if (boss.IsDead)
         {
+#if TEST_Manager
+            if (TestManager.Instance?.Mode == TestMode.Boss)
+            {
+                GameManager.Instance?.GameOver();
+                return;
+            }
+#endif
+
             phase = Phase.Reward;
             onText = false;
             boss = null;
@@ -327,7 +369,14 @@ public sealed class MonsterWave : MonoBehaviour
 
     #region GET
     public BossData GetBoss()
-        => DataManager.Instance?.SearchBossByOrder(bossOrder);
+    {
+#if TEST_Manager
+        if (TestManager.Instance?.Mode == TestMode.Boss)
+            return DataManager.Instance?.SearchBossByOrder(TestManager.Instance.RefBoss);
+#endif
+
+        return DataManager.Instance?.SearchBossByOrder(bossOrder);
+    }
 
     public void GetPhaseValue(out Phase _phase, out float _value, out float _maxValue, out Color _color)
     {

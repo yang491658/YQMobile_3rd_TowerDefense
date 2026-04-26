@@ -162,9 +162,9 @@ public static class ScriptEditor
         {
             typeof(Tower),
             typeof(TowerBuff),
+            typeof(Boss),
             typeof(Monster),
             typeof(MonsterDebuff),
-            typeof(Boss),
             typeof(Bullet),
             typeof(Summon),
             typeof(ViewEffect),

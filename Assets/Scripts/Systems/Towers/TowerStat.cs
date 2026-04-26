@@ -47,7 +47,7 @@ public class TowerStat : ScriptableObject
 
     public int GetGradeStat(TowerGrade _grade) => _grade switch
     {
-        TowerGrade.Normal or TowerGrade.Temp => normal,
+        TowerGrade.Normal => normal,
         TowerGrade.Rare => rare,
         TowerGrade.Epic => epic,
         TowerGrade.Unique => unique,

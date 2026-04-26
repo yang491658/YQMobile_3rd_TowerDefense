@@ -96,11 +96,17 @@ public class Monster : Pooling
     {
         if (IsDead) return false;
 
-        int damage = debuff.CalcDamage(_damage);
-
         if (!_direct) ReserveDown(_damage);
 
-        SetHealth(health - damage);
+        int damage = debuff.CalcDamage(_damage);
+
+#if TEST_Manager
+        TestManager.Instance?.AddDamage(damage);
+
+        if (TestManager.Instance?.Mode == TestMode.Solo && this is Boss) { }
+        else
+#endif
+            SetHealth(health - damage);
         CreateDamage(damage, _isCritical);
 
         if (health <= 0) Die();
@@ -115,7 +121,7 @@ public class Monster : Pooling
         float font = _isCritical ? 65f : 50f;
         Color color = _isCritical ? Color.red : Color.black;
 
-        Vector3 from = transform.position + Vector3.up * 0.3f;
+        Vector3 from = transform.position + Vector3.up * 0.5f;
         Vector3 to = new Vector3(0f, AutoCamera.WorldRect.yMax, 0f);
         Vector3 dir = (to - from).normalized;
 
@@ -172,9 +178,8 @@ public class Monster : Pooling
     public void SetHealth(int _health)
     {
         health = Mathf.Max(_health, 0);
-
         if (healthText != null)
-            healthText.text = health < int.MaxValue ? UIManager.Instance?.FormatNumber(health) : "ㄱ-";
+            healthText.text = UIManager.Instance?.FormatNumber(health);
     }
     #endregion
 
