@@ -607,7 +607,8 @@ public class UIManager : MonoBehaviour
         UpdateGold(GameManager.Instance.GetGold(), GameManager.Instance.GetNeedGold());
     }
 
-    private void UpdateLife(int _life, int _maxLife) => UpdateSlider(ref life, _life, _maxLife, GameManager.Instance.CanBuyLife());
+    private void UpdateLife(int _life, int _maxLife)
+        => UpdateSlider(ref life, _life, _maxLife, GameManager.Instance.CanBuyLife());
 
     private void UpdateExp(int _exp, int _needExp)
     {

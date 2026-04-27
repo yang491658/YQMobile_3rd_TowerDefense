@@ -90,6 +90,57 @@ public class DataManager : MonoBehaviour
         => (_order > 0 && _order <= bossDatas.Length) ? bossDatas[_order - 1] : null;
     #endregion
 
+    #region 상점 시스템
+    public bool IsUnlocked(int _id)
+    {
+        if (_id == 0) return true;
+        if (!towerDic.TryGetValue(_id, out var data)) return false;
+
+        IReadOnlyList<TowerChance.GradeChance> chances = GetGradeChance(GameManager.Instance.GetLevel());
+
+        for (int i = 0; i < chances.Count; i++)
+        {
+            TowerChance.GradeChance chance = chances[i];
+            if (chance.grade == data.Grade)
+                return chance.weight > 0;
+        }
+
+        return false;
+    }
+
+    public int GetBestLevel(int _id)
+    {
+        if (_id == 0) return 1;
+        if (!towerDic.TryGetValue(_id, out var data)) return 0;
+
+        int result = 0;
+        float bestChance = 0f;
+        int maxLevel = GameManager.Instance.GetMaxLevel();
+
+        for (int level = 1; level <= maxLevel; level++)
+        {
+            IReadOnlyList<TowerChance.GradeChance> chances = GetGradeChance(level);
+
+            int total = 0; int weight = 0;
+
+            for (int i = 0; i < chances.Count; i++)
+            {
+                TowerChance.GradeChance chance = chances[i];
+
+                if (chance.weight > 0) total += chance.weight;
+                if (chance.grade == data.Grade) weight = chance.weight;
+            }
+
+            float value = total > 0 ? (float)weight / total : 0f;
+
+            if (value > bestChance)
+            { bestChance = value; result = level; }
+        }
+
+        return result;
+    }
+    #endregion
+
     #region SET
     private void SetDictionary()
     {

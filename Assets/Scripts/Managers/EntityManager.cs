@@ -343,6 +343,59 @@ public class EntityManager : MonoBehaviour
     }
     #endregion
 
+    #region 맵
+    public void ClearMap()
+    {
+        Pooling[] poolings = inGame.GetComponentsInChildren<Pooling>(true);
+
+        for (int i = 0; i < poolings.Length; i++)
+        {
+            Pooling pooling = poolings[i];
+
+            if (pooling is Bullet || pooling is Summon || pooling is ViewEffect)
+                pooling.Despawn();
+        }
+    }
+
+    public void MoveMap(Vector3 _target, float _time = 0f)
+    {
+        if (mapRoutine != null)
+        {
+            StopCoroutine(mapRoutine);
+            mapRoutine = null;
+            IsMoving = false;
+        }
+
+        ClearMap();
+
+        if (_time <= 0f)
+        {
+            inGame.position = _target;
+            return;
+        }
+
+        mapRoutine = StartCoroutine(MapCoroutine(_target, _time));
+    }
+
+    private IEnumerator MapCoroutine(Vector3 _target, float _time)
+    {
+        Vector3 start = inGame.position;
+        float timer = 0f;
+        IsMoving = true;
+
+        while (timer < _time)
+        {
+            timer += Time.deltaTime;
+            inGame.position = Vector3.Lerp(start, _target, Mathf.Clamp01(timer / _time));
+            yield return null;
+        }
+
+        inGame.position = _target;
+        mapRoutine = null;
+        IsMoving = false;
+    }
+    #endregion
+
     #region 타워
     public Tower SpawnTower(int _id = 0, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
     {
@@ -558,59 +611,6 @@ public class EntityManager : MonoBehaviour
         Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(Camera.main, _worldPos);
         RectTransformUtility.ScreenPointToLocalPointInRectangle(effectTrans, screenPos, null, out Vector2 uiPos);
         return uiPos;
-    }
-    #endregion
-
-    #region 맵
-    public void ClearMap()
-    {
-        Pooling[] poolings = inGame.GetComponentsInChildren<Pooling>(true);
-
-        for (int i = 0; i < poolings.Length; i++)
-        {
-            Pooling pooling = poolings[i];
-
-            if (pooling is Bullet || pooling is Summon || pooling is ViewEffect)
-                pooling.Despawn();
-        }
-    }
-
-    public void MoveMap(Vector3 _target, float _time = 0f)
-    {
-        if (mapRoutine != null)
-        {
-            StopCoroutine(mapRoutine);
-            mapRoutine = null;
-            IsMoving = false;
-        }
-
-        ClearMap();
-
-        if (_time <= 0f)
-        {
-            inGame.position = _target;
-            return;
-        }
-
-        mapRoutine = StartCoroutine(MapCoroutine(_target, _time));
-    }
-
-    private IEnumerator MapCoroutine(Vector3 _target, float _time)
-    {
-        Vector3 start = inGame.position;
-        float timer = 0f;
-        IsMoving = true;
-
-        while (timer < _time)
-        {
-            timer += Time.deltaTime;
-            inGame.position = Vector3.Lerp(start, _target, Mathf.Clamp01(timer / _time));
-            yield return null;
-        }
-
-        inGame.position = _target;
-        mapRoutine = null;
-        IsMoving = false;
     }
     #endregion
 

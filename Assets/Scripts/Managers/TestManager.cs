@@ -255,20 +255,78 @@ public class TestManager : MonoBehaviour
 
     private void AutoPlay()
     {
+        int refID = DataManager.Instance.GetTowerID(refTower.value);
+
         playTime += Time.deltaTime;
 
         AutoMerge();
         if (Mode == TestMode.None)
         {
-            if (GameManager.Instance.EnoughGold())
+            if (GameManager.Instance.BuyLife()) return;
+
+            if (!DataManager.Instance.IsUnlocked(refID))
+            {
+                if (GameManager.Instance.BuyExp()) return;
+                if (TryPurchase(0)) return;
+                return;
+            }
+
+            int level = GameManager.Instance.GetLevel();
+            int best = DataManager.Instance.GetBestLevel(refID);
+
+            if (level < best)
+            {
+                if (TowerStore.Instance.HasSlot(refID))
+                    TryPurchase(refID);
+                else GameManager.Instance?.BuyExp();
+
+                return;
+            }
+
+            if (TowerStore.Instance.HasSlot(refID))
             {
                 if (EntityManager.Instance.HasEmptyField())
-                    TowerStore.Instance?.AutoPurchase
-                        (refTower.value == 0 ? 0 : DataManager.Instance.GetTowerID(refTower.value));
-                else MergeRandom();
+                    TryPurchase(refID);
+                else if (TrySell(refID))
+                    TryPurchase(refID);
+
+                return;
             }
         }
         else TestPlay();
+    }
+
+    private bool TryPurchase(int _id)
+    {
+        if (GameManager.Instance.EnoughGold())
+        {
+            if (EntityManager.Instance.HasEmptyField())
+                return TowerStore.Instance.AutoPurchase(_id);
+            else MergeRandom();
+        }
+        return false;
+    }
+
+    private bool TrySell(int _id)
+    {
+        List<Tower> towers = EntityManager.Instance?.GetTowers();
+        if (towers == null || towers.Count == 0) return false;
+
+        Tower target = null;
+        for (int i = 0; i < towers.Count; i++)
+        {
+            Tower tower = towers[i];
+            if (tower == null || tower.IsDragging) continue;
+            if (tower.GetID() == _id) continue;
+
+            if (target == null || tower.GetRank() < target.GetRank())
+                target = tower;
+        }
+        if (target == null) return false;
+
+        target.Sell();
+
+        return true;
     }
 
     private void TestPlay()

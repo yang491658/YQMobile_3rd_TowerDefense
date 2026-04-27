@@ -184,6 +184,8 @@ public class TowerStore : MonoBehaviour
     #endregion
 
     #region 자동 구매
+    public bool HasSlot(int _id) => AutoSlot(_id) != null;
+
     private TowerSlot AutoSlot(int _id = 0)
     {
         TowerSlot result = null;

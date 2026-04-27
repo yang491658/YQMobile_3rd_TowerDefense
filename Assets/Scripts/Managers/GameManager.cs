@@ -7,43 +7,43 @@ using System.Runtime.InteropServices;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance { private set; get; }
+	public static GameManager Instance { private set; get; }
 
-    [Header("Speed")]
-    [SerializeField][Min(0f)] private float speed = 1f;
-    [SerializeField][Min(0f)] private float minSpeed = 0.5f;
-    [SerializeField][Min(0f)] private float maxSpeed = 3f;
-    public event System.Action<float> OnChangeSpeed;
+	[Header("Speed")]
+	[SerializeField][Min(0f)] private float speed = 1f;
+	[SerializeField][Min(0f)] private float minSpeed = 0.5f;
+	[SerializeField][Min(0f)] private float maxSpeed = 3f;
+	public event System.Action<float> OnChangeSpeed;
 
-    public bool IsPaused { private set; get; } = false;
-    public bool IsGameOver { private set; get; } = false;
+	public bool IsPaused { private set; get; } = false;
+	public bool IsGameOver { private set; get; } = false;
 
-    [Header("Score")]
-    [SerializeField] private int score = 0;
-    private int scoreStack = 0;
-    public event System.Action<int> OnChangeScore;
+	[Header("Score")]
+	[SerializeField] private int score = 0;
+	private int scoreStack = 0;
+	public event System.Action<int> OnChangeScore;
 
-    [Header("Life")]
-    [SerializeField][Min(0)] private int life = 0;
-    [SerializeField][Min(0)] private int maxLife = 20;
-    [SerializeField][Min(0)] private int lifeGold = 100;
-    public event System.Action<int, int> OnChangeLife;
+	[Header("Life")]
+	[SerializeField][Min(0)] private int life = 0;
+	[SerializeField][Min(0)] private int maxLife = 20;
+	[SerializeField][Min(0)] private int lifeGold = 100;
+	public event System.Action<int, int> OnChangeLife;
 
-    [Header("Exp")]
-    [SerializeField][Min(0)] private int exp = 0;
-    [SerializeField][Min(0)] private int needExp = 100;
-    [SerializeField][Min(0)] private int expScore = 1000;
-    public event System.Action<int, int> OnChangeExp;
+	[Header("Exp")]
+	[SerializeField][Min(0)] private int exp = 0;
+	[SerializeField][Min(0)] private int needExp = 100;
+	[SerializeField][Min(0)] private int expScore = 1000;
+	public event System.Action<int, int> OnChangeExp;
 
-    [Header("Level")]
-    [SerializeField][Min(1)] private int level = 1;
-    [SerializeField][Min(1)] private int maxLevel = 10;
-    public event System.Action<int> OnChangeLevel;
+	[Header("Level")]
+	[SerializeField][Min(1)] private int level = 1;
+	[SerializeField][Min(1)] private int maxLevel = 10;
+	public event System.Action<int> OnChangeLevel;
 
-    [Header("Gold")]
-    [SerializeField] private int gold = 100;
-    [SerializeField][Min(0)] private int needGold = 0;
-    public event System.Action<int, int> OnChangeGold;
+	[Header("Gold")]
+	[SerializeField] private int gold = 100;
+	[SerializeField][Min(0)] private int needGold = 0;
+	public event System.Action<int, int> OnChangeGold;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
     [DllImport("__Internal")] private static extern void GameOverReact();
@@ -51,300 +51,304 @@ public class GameManager : MonoBehaviour
 #endif
 
 #if UNITY_EDITOR
-    private void OnValidate()
-    {
-        minSpeed = Mathf.Clamp(minSpeed, 0.05f, 1f);
-        maxSpeed = Mathf.Clamp(maxSpeed, 1f, 100f);
-        if (minSpeed > maxSpeed) minSpeed = maxSpeed;
-        speed = Mathf.Clamp(speed, minSpeed, maxSpeed);
-    }
+	private void OnValidate()
+	{
+		minSpeed = Mathf.Clamp(minSpeed, 0.05f, 1f);
+		maxSpeed = Mathf.Clamp(maxSpeed, 1f, 100f);
+		if (minSpeed > maxSpeed) minSpeed = maxSpeed;
+		speed = Mathf.Clamp(speed, minSpeed, maxSpeed);
+	}
 #endif
 
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
+	private void Awake()
+	{
+		if (Instance != null && Instance != this)
+		{
+			Destroy(gameObject);
+			return;
+		}
+		Instance = this;
+		DontDestroyOnLoad(gameObject);
+	}
 
-    private void OnEnable()
-    {
-        SceneManager.sceneLoaded += LoadGame;
-    }
+	private void OnEnable()
+	{
+		SceneManager.sceneLoaded += LoadGame;
+	}
 
-    private void OnDisable()
-    {
-        SceneManager.sceneLoaded -= LoadGame;
-    }
+	private void OnDisable()
+	{
+		SceneManager.sceneLoaded -= LoadGame;
+	}
 
-    private void LoadGame(Scene _scene, LoadSceneMode _mode)
-    {
-        Pause(false);
-        IsGameOver = false;
+	private void LoadGame(Scene _scene, LoadSceneMode _mode)
+	{
+		Pause(false);
+		IsGameOver = false;
 
-        ResetScore();
-        ResetLife();
-        ResetLevel();
-        ResetGold();
+		ResetScore();
+		ResetLife();
+		ResetLevel();
+		ResetGold();
 
-        EntityManager.Instance?.ResetEntity();
-        UIManager.Instance?.ResetUI();
+		EntityManager.Instance?.ResetEntity();
+		UIManager.Instance?.ResetUI();
 
 #if TEST_Manager
-        if (TestManager.Instance.IsAuto) TestManager.Instance?.SetAuto();
+		if (TestManager.Instance.IsAuto) TestManager.Instance?.SetAuto();
 #endif
-    }
+	}
 
-    #region 진행
-    public void Pause(bool _pause)
-    {
-        if (IsPaused == _pause) return;
+	#region 진행
+	public void Pause(bool _pause)
+	{
+		if (IsPaused == _pause) return;
 
-        IsPaused = _pause;
-        Time.timeScale = _pause ? 0f : speed;
+		IsPaused = _pause;
+		Time.timeScale = _pause ? 0f : speed;
 
-        if (_pause)
-            HandleManager.Instance?.CancelDrag();
-    }
+		if (_pause)
+			HandleManager.Instance?.CancelDrag();
+	}
 
-    private void ActWithReward(System.Action _act)
-    {
-        if (ADManager.Instance != null) ADManager.Instance?.ShowReward(_act);
-        else _act?.Invoke();
-    }
+	private void ActWithReward(System.Action _act)
+	{
+		if (ADManager.Instance != null) ADManager.Instance?.ShowReward(_act);
+		else _act?.Invoke();
+	}
 
-    public void Replay()
-    {
+	public void Replay()
+	{
 #if UNITY_WEBGL && !UNITY_EDITOR
         ReplayReact();
 #else
-        ActWithReward(ReplayGame);
+		ActWithReward(ReplayGame);
 #endif
-    }
-    private void ReplayGame() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+	}
+	private void ReplayGame() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 
-    public void Quit() => ActWithReward(QuitGame);
-    private void QuitGame()
-    {
-        Time.timeScale = 1f;
+	public void Quit() => ActWithReward(QuitGame);
+	private void QuitGame()
+	{
+		Time.timeScale = 1f;
 #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
+		UnityEditor.EditorApplication.isPlaying = false;
 #else
         Application.Quit();
 #endif
-    }
+	}
 
-    public void GameOver()
-    {
-        if (IsGameOver) return;
-        IsGameOver = true;
+	public void GameOver()
+	{
+		if (IsGameOver) return;
+		IsGameOver = true;
 
-        Pause(true);
-        SoundManager.Instance?.GameOver();
-        UIManager.Instance?.OpenResult(true);
+		Pause(true);
+		SoundManager.Instance?.GameOver();
+		UIManager.Instance?.OpenResult(true);
 
 #if UNITY_WEBGL && !UNITY_EDITOR
         GameOverReact();
 #endif
-    }
-    #endregion
+	}
+	#endregion
 
-    #region 점수
-    public void ScoreUp(int _score = 1)
-    {
-        score += _score;
-        OnChangeScore?.Invoke(score);
+	#region 점수
+	public void ScoreUp(int _score = 1)
+	{
+		score += _score;
+		OnChangeScore?.Invoke(score);
 
-        if (level < maxLevel)
-        {
-            scoreStack += _score;
-            while (scoreStack >= expScore)
-            {
-                scoreStack -= expScore;
-                ExpUp(expScore / 10);
-            }
-        }
-    }
+		if (level < maxLevel)
+		{
+			scoreStack += _score;
+			while (scoreStack >= expScore)
+			{
+				scoreStack -= expScore;
+				ExpUp(expScore / 10);
+			}
+		}
+	}
 
-    public void ResetScore()
-    {
-        score = 0;
-        scoreStack = 0;
-        OnChangeScore?.Invoke(score);
-    }
-    #endregion
+	public void ResetScore()
+	{
+		score = 0;
+		scoreStack = 0;
+		OnChangeScore?.Invoke(score);
+	}
+	#endregion
 
-    #region 생명
-    public void LifeUp(int _life = 1)
-    {
-        life = Mathf.Min(life + _life, maxLife);
-        OnChangeLife?.Invoke(life, maxLife);
-    }
+	#region 생명
+	public void LifeUp(int _life = 1)
+	{
+		life = Mathf.Min(life + _life, maxLife);
+		OnChangeLife?.Invoke(life, maxLife);
+	}
 
-    public void LifeDown(int _life = 1)
-    {
-        if (IsGameOver) return;
+	public void LifeDown(int _life = 1)
+	{
+		if (IsGameOver) return;
 
-        life = Mathf.Max(life - _life, 0);
-        OnChangeLife?.Invoke(life, maxLife);
+		life = Mathf.Max(life - _life, 0);
+		OnChangeLife?.Invoke(life, maxLife);
 
-        if (life <= 0) GameOver();
-    }
+		if (life <= 0) GameOver();
+	}
 
-    public void BuyLife()
-    {
-        if (!CanBuyLife()) return;
+	public bool BuyLife()
+	{
+		if (!CanBuyLife()) return false;
 
-        GoldDown(gold + lifeGold, true);
+		GoldDown(gold + lifeGold, true);
 
-        life = ++maxLife;
-        lifeGold *= 2;
-        OnChangeLife?.Invoke(life, maxLife);
-    }
+		life = ++maxLife;
+		lifeGold *= 2;
+		OnChangeLife?.Invoke(life, maxLife);
 
-    public void ResetLife()
-    {
-        maxLife = 20;
-        life = maxLife;
-        lifeGold = 100;
-        OnChangeLife?.Invoke(life, maxLife);
-    }
-    #endregion
+		return true;
+	}
 
-    #region 경험치
-    public void ExpUp(int _exp = 1)
-    {
-        if (level >= maxLevel) return;
+	public void ResetLife()
+	{
+		maxLife = 20;
+		life = maxLife;
+		lifeGold = 100;
+		OnChangeLife?.Invoke(life, maxLife);
+	}
+	#endregion
 
-        exp += _exp;
-        while (level < maxLevel && exp >= needExp)
-        {
-            exp -= needExp;
-            LevelUp();
-        }
-        if (level >= maxLevel) exp = 0;
-        OnChangeExp?.Invoke(exp, needExp);
-    }
+	#region 경험치
+	public void ExpUp(int _exp = 1)
+	{
+		if (level >= maxLevel) return;
 
-    public void BuyExp()
-    {
-        if (!CanBuyExp()) return;
+		exp += _exp;
+		while (level < maxLevel && exp >= needExp)
+		{
+			exp -= needExp;
+			LevelUp();
+		}
+		if (level >= maxLevel) exp = 0;
+		OnChangeExp?.Invoke(exp, needExp);
+	}
 
-        int cost = needExp;
-        ExpUp(cost / 10);
-        GoldDown(cost);
-    }
-    #endregion
+	public bool BuyExp()
+	{
+		if (!CanBuyExp()) return false;
 
-    #region 레벨
-    public void LevelUp(int _level = 1)
-    {
-        if (level >= maxLevel) return;
+		int cost = needExp;
+		ExpUp(cost / 10);
+		GoldDown(cost);
 
-        level = Mathf.Min(level + _level, maxLevel);
-        OnChangeLevel?.Invoke(level);
+		return true;
+	}
+	#endregion
 
-        needExp = 100 * level * (level + 1) / 2;
-        OnChangeExp?.Invoke(exp, needExp);
+	#region 레벨
+	public void LevelUp(int _level = 1)
+	{
+		if (level >= maxLevel) return;
 
-        LevelText();
-    }
+		level = Mathf.Min(level + _level, maxLevel);
+		OnChangeLevel?.Invoke(level);
 
-    private void LevelText()
-    {
-        Rect mapRect = UIManager.Instance.GetMapAreaRect();
-        Vector3 pos = new Vector3(0f, mapRect.yMin, 0f);
-        Vector3 offset = UIManager.Instance.GetPlayerOffset();
+		needExp = 100 * level * (level + 1) / 2;
+		OnChangeExp?.Invoke(exp, needExp);
 
-        TextEffect effect = EntityManager.Instance?.MakeText(pos + offset);
-        if (effect == null) return;
+		LevelText();
+	}
 
-        effect.SetText("레벨업", 80f, Color.blue, 0.1f);
-        effect.SetColor(Color.white);
-        effect.SetMove(150f, Vector3.up);
-        effect.SetDuration(1f);
-    }
+	private void LevelText()
+	{
+		Rect mapRect = UIManager.Instance.GetMapAreaRect();
+		Vector3 pos = new Vector3(0f, mapRect.yMin, 0f);
+		Vector3 offset = UIManager.Instance.GetPlayerOffset();
 
-    public void ResetLevel()
-    {
-        level = 1;
-        OnChangeLevel?.Invoke(level);
+		TextEffect effect = EntityManager.Instance?.MakeText(pos + offset);
+		if (effect == null) return;
 
-        exp = 0;
-        needExp = 100;
-        OnChangeExp?.Invoke(exp, needExp);
-    }
-    #endregion
+		effect.SetText("레벨업", 80f, Color.blue, 0.1f);
+		effect.SetColor(Color.white);
+		effect.SetMove(150f, Vector3.up);
+		effect.SetDuration(1f);
+	}
 
-    #region 골드
-    public void GoldUp(int _gold = 1)
-    {
-        gold += _gold;
-        OnChangeGold?.Invoke(gold, needGold);
-    }
+	public void ResetLevel()
+	{
+		level = 1;
+		OnChangeLevel?.Invoke(level);
 
-    public void GoldDown(int _gold = 1, bool _force = false)
-    {
-        if (!_force && gold < _gold) return;
+		exp = 0;
+		needExp = 100;
+		OnChangeExp?.Invoke(exp, needExp);
+	}
+	#endregion
 
-        gold -= _gold;
-        OnChangeGold?.Invoke(gold, needGold);
-    }
+	#region 골드
+	public void GoldUp(int _gold = 1)
+	{
+		gold += _gold;
+		OnChangeGold?.Invoke(gold, needGold);
+	}
 
-    public void ResetGold()
-    {
-        gold = 100;
-        needGold = 0;
-        OnChangeGold?.Invoke(gold, needGold);
-    }
+	public void GoldDown(int _gold = 1, bool _force = false)
+	{
+		if (!_force && gold < _gold) return;
 
-    public void UseGold(bool _useGold)
-    {
-        if (!_useGold || !EnoughGold()) return;
+		gold -= _gold;
+		OnChangeGold?.Invoke(gold, needGold);
+	}
 
-        gold -= needGold;
-        needGold += 10;
-        OnChangeGold?.Invoke(gold, needGold);
-    }
-    #endregion
+	public void ResetGold()
+	{
+		gold = 100;
+		needGold = 0;
+		OnChangeGold?.Invoke(gold, needGold);
+	}
 
-    #region SET
-    public void SetSpeed(float _speed) => SetSpeed(_speed, false);
-    public void SetSpeed(float _speed, bool _force)
-    {
-        speed = _force ? _speed : Mathf.Clamp(_speed, minSpeed, maxSpeed);
-        if (!IsPaused) Time.timeScale = speed;
-        OnChangeSpeed?.Invoke(speed);
-    }
-    #endregion
+	public void UseGold(bool _useGold)
+	{
+		if (!_useGold || !EnoughGold()) return;
 
-    #region GET
-    public float GetSpeed() => speed;
-    public float GetMinSpeed() => minSpeed;
-    public float GetMaxSpeed() => maxSpeed;
+		gold -= needGold;
+		needGold += 10;
+		OnChangeGold?.Invoke(gold, needGold);
+	}
+	#endregion
 
-    public int GetScore() => score;
+	#region SET
+	public void SetSpeed(float _speed) => SetSpeed(_speed, false);
+	public void SetSpeed(float _speed, bool _force)
+	{
+		speed = _force ? _speed : Mathf.Clamp(_speed, minSpeed, maxSpeed);
+		if (!IsPaused) Time.timeScale = speed;
+		OnChangeSpeed?.Invoke(speed);
+	}
+	#endregion
 
-    public int GetLife() => life;
-    public int GetMaxLife() => maxLife;
-    public bool CanBuyLife() => gold > 0 && life <= maxLife / 2;
+	#region GET
+	public float GetSpeed() => speed;
+	public float GetMinSpeed() => minSpeed;
+	public float GetMaxSpeed() => maxSpeed;
 
-    public int GetExp() => exp;
-    public int GetNeedExp() => needExp;
-    public bool CanBuyExp() => gold >= needExp && level < maxLevel;
+	public int GetScore() => score;
 
-    public int GetLevel() => level;
-    public int GetMaxLevel() => maxLevel;
-    public bool IsMaxLevel() => level >= maxLevel;
+	public int GetLife() => life;
+	public int GetMaxLife() => maxLife;
+	public bool CanBuyLife() => gold > 0 && life <= maxLife / 2;
 
-    public int GetGold() => gold;
-    public int GetNeedGold() => needGold;
-    public int GetSellGold(Tower _tower)
-        => needGold * _tower.GetRank() * DataManager.Instance.GetGradeStat(_tower.GetGrade()) / 2;
-    public bool EnoughGold() => gold >= needGold;
-    #endregion
+	public int GetExp() => exp;
+	public int GetNeedExp() => needExp;
+	public bool CanBuyExp() => gold >= needExp && level < maxLevel;
+
+	public int GetLevel() => level;
+	public int GetMaxLevel() => maxLevel;
+	public bool IsMaxLevel() => level >= maxLevel;
+
+	public int GetGold() => gold;
+	public int GetNeedGold() => needGold;
+	public int GetSellGold(Tower _tower)
+		=> needGold * _tower.GetRank() * DataManager.Instance.GetGradeStat(_tower.GetGrade()) / 2;
+	public bool EnoughGold() => gold >= needGold;
+	#endregion
 }
