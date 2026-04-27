@@ -539,7 +539,7 @@ public class EntityManager : MonoBehaviour
         ViewEffect effect = SpawnPool<ViewEffect>(viewBase, parent.position, parent);
         if (effect == null) return null;
 
-        effect.SetEffect(_tower, 0.8f, _duration);
+        effect.SetEffect(_tower, 0.7f, _duration);
         effect.GetSR().sortingLayerID = _entity.GetSR().sortingLayerID;
         effect.GetSR().sortingOrder = _entity.GetSR().sortingOrder;
 
