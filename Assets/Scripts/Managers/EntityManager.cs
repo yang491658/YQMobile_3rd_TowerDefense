@@ -130,60 +130,10 @@ public class EntityManager : MonoBehaviour
         return false;
     }
 
-    private Vector3Int SelectExit(HashSet<Vector3Int> _towerCells)
-    {
-        Queue<Vector3Int> queue = new();
-        Dictionary<Vector3Int, int> distDic = new();
-
-        queue.Enqueue(entryCell);
-        distDic.Add(entryCell, 0);
-
-        Vector3Int bestCell = entryCell;
-        int bestX = int.MinValue;
-        int bestDist = 0;
-
-        while (queue.Count > 0)
-        {
-            Vector3Int cell = queue.Dequeue();
-            int dist = distDic[cell];
-
-            if (cell != entryCell && !_towerCells.Contains(cell))
-            {
-                int x = cell.x;
-
-                if (x > bestX)
-                {
-                    bestX = x;
-                    bestDist = dist;
-                    bestCell = cell;
-                }
-                else if (x == bestX && dist > bestDist)
-                {
-                    bestDist = dist;
-                    bestCell = cell;
-                }
-            }
-
-            for (int i = 0; i < moveDirs.Length; i++)
-            {
-                Vector3Int next = cell + moveDirs[i];
-
-                if (!mapFieldTilemap.HasTile(next)) continue;
-                if (_towerCells.Contains(next)) continue;
-                if (distDic.ContainsKey(next)) continue;
-
-                distDic.Add(next, dist + 1);
-                queue.Enqueue(next);
-            }
-        }
-
-        return bestCell;
-    }
-
     private bool CanReachExit(Vector3Int _block)
     {
-        if (!mapFieldTilemap.HasTile(entryCell))
-            return false;
+        if (!mapFieldTilemap.HasTile(entryCell)) return false;
+        if (!mapFieldTilemap.HasTile(exitCell)) return false;
 
         HashSet<Vector3Int> towerCells = new();
 
@@ -198,14 +148,13 @@ public class EntityManager : MonoBehaviour
 
         towerCells.Add(_block);
 
-        Vector3Int selectedExit = SelectExit(towerCells);
-        if (selectedExit == entryCell) return false;
+        if (towerCells.Contains(exitCell)) return false;
 
         Queue<Vector3Int> queue = new();
         HashSet<Vector3Int> visited = new();
 
-        queue.Enqueue(selectedExit);
-        visited.Add(selectedExit);
+        queue.Enqueue(exitCell);
+        visited.Add(exitCell);
 
         while (queue.Count > 0)
         {
@@ -241,7 +190,7 @@ public class EntityManager : MonoBehaviour
     private bool CanPlaceTower(Vector3Int _cell)
     {
         if (!mapFieldTilemap.HasTile(_cell)) return false;
-        if (_cell == entryCell) return false;
+        if (_cell == entryCell || _cell == exitCell) return false;
         if (HasTower(_cell)) return false;
         if (HasMonster(_cell)) return false;
 
@@ -313,6 +262,10 @@ public class EntityManager : MonoBehaviour
         mapOverlayTilemap.SetTileFlags(entryCell, entryFlags & ~TileFlags.LockColor);
         mapOverlayTilemap.SetColor(entryCell, Color.clear);
 
+        TileFlags exitFlags = mapOverlayTilemap.GetTileFlags(exitCell);
+        mapOverlayTilemap.SetTileFlags(exitCell, exitFlags & ~TileFlags.LockColor);
+        mapOverlayTilemap.SetColor(exitCell, Color.clear);
+
         for (int i = 0; i < fieldCells.Count; i++)
         {
             Vector3Int cell = fieldCells[i];
@@ -325,6 +278,7 @@ public class EntityManager : MonoBehaviour
         if (!_on) return;
 
         mapOverlayTilemap.SetColor(entryCell, Color.red);
+        mapOverlayTilemap.SetColor(exitCell, Color.red);
 
         for (int i = 0; i < fieldCells.Count; i++)
         {
@@ -731,11 +685,18 @@ public class EntityManager : MonoBehaviour
         if (!hasTile) return;
 
         entryCell = new Vector3Int(minX, maxY, 0);
+        exitCell = new Vector3Int(maxX, minY, 0);
+
         fieldCells.Remove(entryCell);
+        fieldCells.Remove(exitCell);
 
         TileFlags entryFlags = mapFieldTilemap.GetTileFlags(entryCell);
         mapFieldTilemap.SetTileFlags(entryCell, entryFlags & ~TileFlags.LockColor);
         mapFieldTilemap.SetColor(entryCell, entryColor);
+
+        TileFlags exitFlags = mapFieldTilemap.GetTileFlags(exitCell);
+        mapFieldTilemap.SetTileFlags(exitCell, exitFlags & ~TileFlags.LockColor);
+        mapFieldTilemap.SetColor(exitCell, exitColor);
     }
 
     private void SetPath()
@@ -743,6 +704,8 @@ public class EntityManager : MonoBehaviour
         pathDic.Clear();
 
         if (!mapFieldTilemap.HasTile(entryCell))
+            return;
+        if (!mapFieldTilemap.HasTile(exitCell))
             return;
 
         HashSet<Vector3Int> towerCells = new();
@@ -756,10 +719,7 @@ public class EntityManager : MonoBehaviour
                 towerCells.Add(c);
         }
 
-        Vector3Int selectedExit = SelectExit(towerCells);
-        if (selectedExit == entryCell) return;
-
-        exitCell = selectedExit;
+        if (towerCells.Contains(exitCell)) return;
 
         Dictionary<Vector3Int, Vector3Int> nextExitDic = new();
 

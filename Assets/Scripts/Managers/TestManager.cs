@@ -366,15 +366,13 @@ public class TestManager : MonoBehaviour
                 Vector3? posSnake = EntityManager.Instance?.GetSnakePos();
                 if (posSnake.HasValue)
                     EntityManager.Instance?.SpawnTower(refID, _pos: posSnake.Value);
-                else MergeRandom();
-                SyncBasic();
+                else MergeByOrder();
                 break;
 
             case TestMode.Full:
                 if (EntityManager.Instance.HasEmptyField())
                     EntityManager.Instance?.SpawnTower(refID);
                 else MergeRandom();
-                SyncBasic();
                 break;
         }
     }
@@ -528,6 +526,29 @@ public class TestManager : MonoBehaviour
 
                     if (a.Merge(b) != null) return;
                 }
+            }
+        }
+    }
+
+    private void MergeByOrder()
+    {
+        List<Tower> towers = EntityManager.Instance?.GetTowers();
+        if (towers == null || towers.Count < 2) return;
+
+        for (int olderIndex = 0; olderIndex < towers.Count - 1; olderIndex++)
+        {
+            Tower older = towers[olderIndex];
+            if (older == null || older.IsDragging || older.IsMax) continue;
+
+            for (int newerIndex = towers.Count - 1; newerIndex > olderIndex; newerIndex--)
+            {
+                Tower newer = towers[newerIndex];
+                if (newer == null || newer.IsDragging || newer.IsMax) continue;
+                if (newer.GetID() != older.GetID()) continue;
+                if (newer.GetRank() != older.GetRank()) continue;
+
+                newer.Merge(older);
+                return;
             }
         }
     }

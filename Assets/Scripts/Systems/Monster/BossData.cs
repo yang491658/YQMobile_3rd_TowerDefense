@@ -15,7 +15,6 @@ public class BossData : ScriptableObject
     public string Name;
 
     [Header("Stat")]
-    [Min(0f)] public float MoveSpeed = 1f;
     [Min(0)] public int MaxHealth;
 
     [Header("Reward")]

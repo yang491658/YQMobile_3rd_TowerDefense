@@ -15,7 +15,6 @@ MonoBehaviour:
   Image: {fileID: 0}
   ID: 3
   Name: Temp
-  MoveSpeed: 1
   MaxHealth: 3000
   Exp: 300
   Gold: 300
