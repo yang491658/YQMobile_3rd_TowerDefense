@@ -103,8 +103,7 @@ public class Monster : Pooling
 #if TEST_Manager
         TestManager.Instance?.AddDamage(damage);
 
-        if (TestManager.Instance?.Mode == TestMode.Solo && this is Boss) { }
-        else
+        if (!(TestManager.Instance?.Mode == TestMode.Solo && this is Boss))
 #endif
             SetHealth(health - damage);
         CreateDamage(damage, _isCritical);

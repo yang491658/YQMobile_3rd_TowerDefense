@@ -92,7 +92,7 @@ public class TestManager : MonoBehaviour
             testUI = GameObject.Find("TestUI");
 
         if (gameSpeed.TMP == null)
-            gameSpeed.TMP = GameObject.Find("TestUI/GameSpeed/TestText")?.GetComponent<TextMeshProUGUI>();
+            gameSpeed.TMP = GameObject.Find("TestUI/GameSpeed/TestName")?.GetComponent<TextMeshProUGUI>();
         if (gameSpeed.slider == null)
             gameSpeed.slider = GameObject.Find("TestUI/GameSpeed/TestSlider")?.GetComponent<Slider>();
 
@@ -108,15 +108,15 @@ public class TestManager : MonoBehaviour
             value10Num = GameObject.Find("TestUI/Value10/TestNum")?.GetComponent<TextMeshProUGUI>();
 
         if (refRank.TMP == null)
-            refRank.TMP = GameObject.Find("TestUI/RefRank/TestText")?.GetComponent<TextMeshProUGUI>();
+            refRank.TMP = GameObject.Find("TestUI/RefRank/TestName")?.GetComponent<TextMeshProUGUI>();
         if (refRank.slider == null)
             refRank.slider = GameObject.Find("TestUI/RefRank/TestSlider")?.GetComponent<Slider>();
         if (refTower.TMP == null)
-            refTower.TMP = GameObject.Find("TestUI/RefTower/TestText")?.GetComponent<TextMeshProUGUI>();
+            refTower.TMP = GameObject.Find("TestUI/RefTower/TestName")?.GetComponent<TextMeshProUGUI>();
         if (refTower.slider == null)
             refTower.slider = GameObject.Find("TestUI/RefTower/TestSlider")?.GetComponent<Slider>();
         if (refBoss.TMP == null)
-            refBoss.TMP = GameObject.Find("TestUI/RefBoss/TestText")?.GetComponent<TextMeshProUGUI>();
+            refBoss.TMP = GameObject.Find("TestUI/RefBoss/TestName")?.GetComponent<TextMeshProUGUI>();
         if (refBoss.slider == null)
             refBoss.slider = GameObject.Find("TestUI/RefBoss/TestSlider")?.GetComponent<Slider>();
     }
@@ -138,6 +138,7 @@ public class TestManager : MonoBehaviour
     private void Start()
     {
         SoundManager.Instance?.ToggleBGM();
+        SoundManager.Instance?.ToggleSFX();
 
         SetAuto();
         UpdateTestUI();
@@ -364,12 +365,15 @@ public class TestManager : MonoBehaviour
             case TestMode.Snake:
                 Vector3? posSnake = EntityManager.Instance?.GetSnakePos();
                 if (posSnake.HasValue)
-                    EntityManager.Instance?.SpawnTower(refID, refRank.value, posSnake.Value, _useGold: false);
+                    EntityManager.Instance?.SpawnTower(refID, _pos: posSnake.Value);
+                else MergeRandom();
+                SyncBasic();
                 break;
 
             case TestMode.Full:
                 if (EntityManager.Instance.HasEmptyField())
-                    EntityManager.Instance?.SpawnTower(refID, refRank.value, _useGold: false);
+                    EntityManager.Instance?.SpawnTower(refID);
+                else MergeRandom();
                 SyncBasic();
                 break;
         }
@@ -469,7 +473,7 @@ public class TestManager : MonoBehaviour
                     if (b == null) continue;
                     if (a.GetID() != b.GetID()) continue;
 
-                    if (a.Merge(b) != null) return;
+                    if (b.Merge(a) != null) return;
                 }
             }
         }
@@ -781,7 +785,11 @@ public class TestManager : MonoBehaviour
 
         UpdateTestUI();
     }
-    public void OnClickReplay() => GameManager.Instance?.Replay();
+    public void OnClickReplay()
+    {
+        OnClickReset();
+        GameManager.Instance?.Replay();
+    }
     #endregion
 }
 #endif

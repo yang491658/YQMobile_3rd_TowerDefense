@@ -228,8 +228,7 @@ public class HandleManager : MonoBehaviour
     {
         if (select != null)
         {
-            select.transform.position = dragStart + offset;
-            select.DragOn(false);
+            select.Drag(false);
             select = null;
         }
 
@@ -264,7 +263,7 @@ public class HandleManager : MonoBehaviour
         { select = null; return; }
 
         select = hit.GetComponent<Tower>();
-        select.DragOn(true);
+        select.Drag(true);
 
         offset = select.transform.position - _pos;
 
@@ -310,10 +309,7 @@ public class HandleManager : MonoBehaviour
         }
 
         if (target == null || select.Merge(target) == null)
-        {
-            select.transform.position = dragStart + offset;
-            select.DragOn(false);
-        }
+            select.Drag(false);
 
         select = null;
 

@@ -18,6 +18,8 @@ public class Tower : Entity
     [SerializeField] private float maxSize = 0.65f;
 
     [Header("Control")]
+    [SerializeField] private Vector3Int cell;
+
     public bool IsDragging { private set; get; } = false;
 
     [Header("Rank")]
@@ -184,9 +186,12 @@ public class Tower : Entity
         }
     }
 
-    public void DragOn(bool _on)
+    public void Drag(bool _on)
     {
         IsDragging = _on;
+
+        if (!_on)
+            transform.position = EntityManager.Instance.GetCellPos(cell);
 
         int baseOrder = _on ? 1000 : 0;
 
@@ -417,6 +422,8 @@ public class Tower : Entity
         gameObject.name = data.Name;
         outlineSR.color = DataManager.Instance.GetGradeColor(data.Grade);
         symbolSR.color = data.Color;
+
+        cell = EntityManager.Instance.GetCell(transform.position);
 
         for (int i = 0; i < skills.Count; i++)
             Destroy(skills[i]);

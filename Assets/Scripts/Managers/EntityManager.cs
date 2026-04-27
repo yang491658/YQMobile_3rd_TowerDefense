@@ -260,7 +260,6 @@ public class EntityManager : MonoBehaviour
     {
         _cell = default;
 
-        bool found = false;
         int count = 0;
 
         for (int i = 0; i < fieldCells.Count; i++)
@@ -271,13 +270,10 @@ public class EntityManager : MonoBehaviour
 
             count++;
             if (Random.Range(0, count) == 0)
-            {
                 _cell = cell;
-                found = true;
-            }
         }
 
-        return found;
+        return count > 0;
     }
 
     public Vector3 SelectField(Vector3? _pos = null, bool _forTower = true)
@@ -402,8 +398,7 @@ public class EntityManager : MonoBehaviour
         TowerData data = null;
 
 #if TEST_Manager
-        if (TestManager.Instance?.Mode != TestMode.None && _id == 0) { }
-        else
+        if (!(TestManager.Instance?.Mode != TestMode.None && _id == 0))
 #endif
         {
             int id = _id > 0 ? _id : DataManager.Instance.GetRandomTower().ID;
@@ -422,7 +417,7 @@ public class EntityManager : MonoBehaviour
         tower.SetTower(data, _rank);
         tower.transform.localScale = map.localScale;
         towers.Add(tower);
-        towerDic[tower] = mapFieldTilemap.WorldToCell(pos);
+        towerDic[tower] = GetCell(pos);
 
         SetPath();
 
@@ -906,6 +901,9 @@ public class EntityManager : MonoBehaviour
         return false;
     }
 
+    public Vector3Int GetCell(Vector3 _pos)
+        => mapFieldTilemap.WorldToCell(_pos);
+
     public Vector3 GetCellPos(Vector3Int _cell)
         => mapFieldTilemap.GetCellCenterWorld(_cell);
 
@@ -929,39 +927,33 @@ public class EntityManager : MonoBehaviour
         int lineY = maxY - 1;
         int lineX = maxX - 1;
 
-        bool found = false;
-        int count = 0;
-        Vector3 result = Vector3.zero;
-
-        for (int i = 0; i < fieldCells.Count; i++)
+        for (int x = minX; x <= maxX; x++)
         {
-            Vector3Int cell = fieldCells[i];
-
-            bool horizontal = cell.y == lineY && cell.x >= minX && cell.x <= lineX;
-            bool vertical = cell.x == lineX && cell.y >= minY && cell.y <= lineY;
-
-            if (!horizontal && !vertical) continue;
-            if (!CanPlaceTower(cell)) continue;
-
-            count++;
-            if (Random.Range(0, count) == 0)
+            for (int y = maxY; y >= minY; y--)
             {
-                result = mapFieldTilemap.GetCellCenterWorld(cell);
-                found = true;
+                Vector3Int cell = new(x, y, 0);
+
+                bool horizontal = cell.y == lineY && cell.x >= minX && cell.x <= lineX;
+                bool vertical = cell.x == lineX && cell.y >= minY && cell.y <= lineY;
+
+                if (!horizontal && !vertical) continue;
+                if (!CanPlaceTower(cell)) continue;
+
+                return GetCellPos(cell);
             }
         }
 
-        return found ? result : null;
+        return null;
     }
 
     public Vector3? GetSnakePos()
     {
         if (fieldCells.Count == 0) return null;
 
-        int minX = entryCell.x; int maxX = entryCell.x;
-        int minY = entryCell.y; int maxY = entryCell.y;
+        int minX = fieldCells[0].x; int maxX = fieldCells[0].x;
+        int minY = fieldCells[0].y; int maxY = fieldCells[0].y;
 
-        for (int i = 0; i < fieldCells.Count; i++)
+        for (int i = 1; i < fieldCells.Count; i++)
         {
             Vector3Int cell = fieldCells[i];
 
@@ -971,32 +963,40 @@ public class EntityManager : MonoBehaviour
             if (cell.y > maxY) maxY = cell.y;
         }
 
-        bool found = false;
-        int count = 0;
-        Vector3 result = Vector3.zero;
+        int height = maxY - minY + 1;
 
-        for (int i = 0; i < fieldCells.Count; i++)
+        for (int row = 1; row < height; row += 2)
         {
-            Vector3Int cell = fieldCells[i];
-            int col = cell.x - minX;
+            int y = maxY - row;
+            bool rightOpen = (row / 2) % 2 == 0;
 
-            if (col % 2 == 0) continue;
-
-            bool bottomOpen = (col / 2) % 2 == 0;
-            int openY = bottomOpen ? minY : maxY;
-
-            if (cell.y == openY) continue;
-            if (!CanPlaceTower(cell)) continue;
-
-            count++;
-            if (Random.Range(0, count) == 0)
+            if (rightOpen)
             {
-                result = mapFieldTilemap.GetCellCenterWorld(cell);
-                found = true;
+                for (int x = minX; x <= maxX; x++)
+                {
+                    if (x == maxX) continue;
+
+                    Vector3Int cell = new(x, y, 0);
+                    if (!CanPlaceTower(cell)) continue;
+
+                    return GetCellPos(cell);
+                }
+            }
+            else
+            {
+                for (int x = maxX; x >= minX; x--)
+                {
+                    if (x == minX) continue;
+
+                    Vector3Int cell = new(x, y, 0);
+                    if (!CanPlaceTower(cell)) continue;
+
+                    return GetCellPos(cell);
+                }
             }
         }
 
-        return found ? result : null;
+        return null;
     }
     #endregion
 
