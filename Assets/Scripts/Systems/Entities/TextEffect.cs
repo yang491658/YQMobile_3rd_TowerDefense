@@ -81,8 +81,7 @@ public class TextEffect : MonoBehaviour, IPoolable
         {
             if (moveSpeed <= 0f) return;
 
-            Vector2 dir = moveDirection.normalized;
-            rect.anchoredPosition += dir * moveSpeed * _deltaTime;
+            rect.anchoredPosition += (Vector2)moveDirection * moveSpeed * _deltaTime;
 
             if (CameraOut())
                 Despawn();
@@ -160,7 +159,7 @@ public class TextEffect : MonoBehaviour, IPoolable
     {
         moveType = true;
         moveSpeed = _speed;
-        moveDirection = _direction;
+        moveDirection = _direction.normalized;
     }
     public void SetMove(Vector3 _target, float _time)
     {

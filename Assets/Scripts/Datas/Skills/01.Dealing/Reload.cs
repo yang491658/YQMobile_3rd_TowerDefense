@@ -78,13 +78,12 @@ public class Reload : TowerSkill
     {
         _instead = true;
 
-        if (!ready)
-            hit = true;
-        else
+        hit = true;
+
+        if (ready)
         {
             stack = count - 1;
             ready = false;
-            hit = true;
         }
     }
 }
