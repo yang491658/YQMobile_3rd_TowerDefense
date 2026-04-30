@@ -172,6 +172,7 @@ public class TowerStore : MonoBehaviour
         IsMoving = !_on;
 
         EntityManager.Instance?.ShowPlaceField(_on);
+        UIManager.Instance?.UpdateStore(_on ? 1 : 0);
 
         if (_on) return;
 

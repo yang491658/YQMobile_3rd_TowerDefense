@@ -401,7 +401,7 @@ public class EntityManager : MonoBehaviour
     public void SellTower(Tower _tower)
     {
         GameManager.Instance?.GoldUp(GameManager.Instance.GetSellGold(_tower));
-        UIManager.Instance?.UpdateSell(false);
+        UIManager.Instance?.UpdateStore(0);
         UIManager.Instance?.UpdateDrag(null);
 
         DespawnTower(_tower);
@@ -857,13 +857,7 @@ public class EntityManager : MonoBehaviour
 
     #region GET_기타
     public bool GetNextCell(Vector3Int _cell, out Vector3Int _next)
-    {
-        if (pathDic.TryGetValue(_cell, out _next))
-            return true;
-
-        _next = default;
-        return false;
-    }
+        => pathDic.TryGetValue(_cell, out _next);
 
     public Vector3Int GetCell(Vector3 _pos)
         => mapFieldTilemap.WorldToCell(_pos);

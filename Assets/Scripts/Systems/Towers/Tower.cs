@@ -251,25 +251,18 @@ public class Tower : Entity
             if (filter != null) break;
         }
 
-        switch (data.Target)
+        attackTarget = data.Target switch
         {
-            case AttackTarget.None:
-                attackTarget = null; break;
-            case AttackTarget.Random:
-                attackTarget = EntityManager.Instance?.GetMonsterRandom(filter); break;
-            case AttackTarget.First:
-                attackTarget = EntityManager.Instance?.GetMonsterFirst(filter); break;
-            case AttackTarget.Last:
-                attackTarget = EntityManager.Instance?.GetMonsterLast(filter); break;
-            case AttackTarget.Near:
-                attackTarget = EntityManager.Instance?.GetMonsterNearest(transform.position, 0, filter); break;
-            case AttackTarget.Far:
-                attackTarget = EntityManager.Instance?.GetMonsterFarthest(transform.position, 0, filter); break;
-            case AttackTarget.Strong:
-                attackTarget = EntityManager.Instance?.GetMonsterHighHealth(filter); break;
-            case AttackTarget.Weak:
-                attackTarget = EntityManager.Instance?.GetMonsterLowHealth(filter); break;
-        }
+            AttackTarget.None => null,
+            AttackTarget.Random => EntityManager.Instance?.GetMonsterRandom(filter),
+            AttackTarget.First => EntityManager.Instance?.GetMonsterFirst(filter),
+            AttackTarget.Last => EntityManager.Instance?.GetMonsterLast(filter),
+            AttackTarget.Near => EntityManager.Instance?.GetMonsterNearest(transform.position, 0, filter),
+            AttackTarget.Far => EntityManager.Instance?.GetMonsterFarthest(transform.position, 0, filter),
+            AttackTarget.Strong => EntityManager.Instance?.GetMonsterHighHealth(filter),
+            AttackTarget.Weak => EntityManager.Instance?.GetMonsterLowHealth(filter),
+            _ => attackTarget
+        };
 
         targetIndex = attackTarget != null ? attackTarget.Index : 0;
     }

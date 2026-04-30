@@ -234,7 +234,7 @@ public class HandleManager : MonoBehaviour
 
         ResetDrag();
 
-        UIManager.Instance?.UpdateSell(false);
+        UIManager.Instance?.UpdateStore(0);
         UIManager.Instance?.UpdateDrag(null);
     }
 
@@ -276,10 +276,10 @@ public class HandleManager : MonoBehaviour
 
         select.transform.position = _current + offset;
 
-        bool isSell = UIManager.Instance.IsSell(_current);
-        int sellGold = GameManager.Instance.GetSellGold(select);
+        bool isStore = UIManager.Instance.IsStore(_current);
+        int storeGold = GameManager.Instance.GetSellGold(select);
 
-        UIManager.Instance?.UpdateSell(isSell, sellGold);
+        UIManager.Instance?.UpdateStore(isStore ? -1 : 0, storeGold);
         UIManager.Instance?.UpdateDrag(select, select.transform.position);
     }
 
@@ -287,7 +287,7 @@ public class HandleManager : MonoBehaviour
     {
         if (select == null) return;
 
-        if (UIManager.Instance.IsSell(_end))
+        if (UIManager.Instance.IsStore(_end))
         {
             select.Sell();
             select = null;
@@ -313,7 +313,7 @@ public class HandleManager : MonoBehaviour
 
         select = null;
 
-        UIManager.Instance?.UpdateSell(false);
+        UIManager.Instance?.UpdateStore(0);
         UIManager.Instance?.UpdateDrag(null);
     }
 

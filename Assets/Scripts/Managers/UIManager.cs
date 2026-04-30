@@ -43,10 +43,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private RectTransform mapUI;
     [SerializeField] private RectTransform playerUI;
     private float playerHeight = 0f;
-    private bool onSell = false;
-    private int sellGold = 0;
-    private Image sellImage;
-    private Color sellColor;
+    private int onStore = 0;
+    private int storeGold = 0;
+    private Image storeImage;
+    private Color storeColor;
     [Space]
     [SerializeField] private SliderUI life;
     [SerializeField] private SliderUI exp;
@@ -237,8 +237,8 @@ public class UIManager : MonoBehaviour
         Canvas.ForceUpdateCanvases();
         LayoutRebuilder.ForceRebuildLayoutImmediate(playerUI);
         playerHeight = playerUI.rect.height;
-        sellImage = playerUI.GetComponent<Image>();
-        sellColor = sellImage.color;
+        storeImage = playerUI.GetComponent<Image>();
+        storeColor = storeImage.color;
 
         life.fill = life.slider.fillRect.GetComponent<Image>();
         life.color = life.fill.color;
@@ -446,7 +446,7 @@ public class UIManager : MonoBehaviour
         UpdatePlayTime();
         UpdateScore(GameManager.Instance.GetScore());
 
-        UpdateSell(false);
+        UpdateStore(0);
         UpdateLife(GameManager.Instance.GetLife(), GameManager.Instance.GetMaxLife());
         UpdateExp(GameManager.Instance.GetExp(), GameManager.Instance.GetNeedExp());
         UpdateLevel(GameManager.Instance.GetLevel());
@@ -589,18 +589,18 @@ public class UIManager : MonoBehaviour
         _ui.routine = StartCoroutine(FlashCoroutine(_ui));
     }
 
-    public bool IsSell(Vector3 _pos)
+    public bool IsStore(Vector3 _pos)
     {
         Camera cam = Camera.main;
         Vector3 pos = cam.WorldToScreenPoint(_pos);
         return RectTransformUtility.RectangleContainsScreenPoint(playerUI, pos);
     }
 
-    public void UpdateSell(bool _on, int _gold = 0)
+    public void UpdateStore(int _store, int _gold = 0)
     {
-        onSell = _on;
-        sellGold = _gold;
-        sellImage.color = onSell ? Color.cyan : sellColor;
+        onStore = Mathf.Clamp(_store, -1, 1);
+        storeGold = _gold;
+        storeImage.color = onStore != 0 ? Color.cyan : storeColor;
 
         UpdateGold(GameManager.Instance.GetGold(), GameManager.Instance.GetNeedGold());
     }
@@ -640,13 +640,19 @@ public class UIManager : MonoBehaviour
         if (exp.btn.gameObject.activeSelf)
             exp.btn.interactable = GameManager.Instance.CanBuyExp();
 
-        int totalGold = _gold + sellGold;
-        int showGold = onSell ? totalGold : _gold;
-
-        if (onSell)
+        if (onStore < 0)
         {
-            goldText.text = $"{FormatNumber(showGold)}(+{FormatNumber(sellGold)})/{FormatNumber(_needGold)}";
+            int showGold = _gold + storeGold;
+
+            goldText.text = $"{FormatNumber(showGold)}(+{FormatNumber(storeGold)})/{FormatNumber(_needGold)}";
             goldText.color = showGold >= 0 ? Color.blue : Color.red;
+        }
+        else if (onStore > 0)
+        {
+            int showGold = _gold - _needGold;
+
+            goldText.text = $"{FormatNumber(showGold)}(-{FormatNumber(_needGold)})/{FormatNumber(_needGold)}";
+            goldText.color = Color.red;
         }
         else
         {

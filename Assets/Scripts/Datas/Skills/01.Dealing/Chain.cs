@@ -54,12 +54,8 @@ public class Chain : TowerSkill
             if (target == null) yield break;
 
             index = target.Index;
-            Vector3 pos = target.transform.position;
 
-            if (target == null || target.IsInvalid(index))
-                EntityManager.Instance?.MakeEffect(_tower, pos, 0.85f);
-            else EntityManager.Instance?.MakeEffect(_tower, target);
-
+            EntityManager.Instance?.MakeEffect(_tower, target);
             target.TakeDamage(damage, _direct: true);
 
             if (++hit < count)
