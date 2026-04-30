@@ -179,7 +179,7 @@ public class HandleManager : MonoBehaviour
             }
         }
 
-        if (Time.unscaledTime - clickTimer < doubleClick)
+        if (Time.unscaledTime - clickTimer <= doubleClick)
         {
             isDoubleClick = false;
             clickTimer = 0;

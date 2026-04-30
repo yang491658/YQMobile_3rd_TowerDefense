@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Monster))]
@@ -15,6 +16,7 @@ public class MonsterDebuff : MonoBehaviour
         [SerializeField] private float immune;
 
         public int Value => value;
+        public ViewEffect Effect => effect;
         public bool IsActive => reserve > 0 || timer > 0f;
 
         public void SetBoss(bool _boss) => boss = _boss;
@@ -101,6 +103,12 @@ public class MonsterDebuff : MonoBehaviour
     [SerializeField] private Debuff speedControl;
     [SerializeField] private Debuff directionControl;
 
+    [Header("Effect")]
+    [SerializeField] private List<ViewEffect> effects = new();
+    private int index;
+    [SerializeField] private float interval = 0.35f;
+    private float timer;
+
     private void Awake()
     {
         monster = GetComponent<Monster>();
@@ -123,6 +131,8 @@ public class MonsterDebuff : MonoBehaviour
         UpdateSpeed(dt);
         UpdateDamage(dt);
         UpdateTick(dt);
+
+        UpdateEffect(dt);
     }
 
     public void Clear()
@@ -134,6 +144,10 @@ public class MonsterDebuff : MonoBehaviour
 
         tickTimer = 0f;
         monster.SetSpeed(baseSpeed);
+
+        effects.Clear();
+        index = 0;
+        timer = 0f;
     }
 
     #region 지속 데미지
@@ -142,7 +156,10 @@ public class MonsterDebuff : MonoBehaviour
     public void ApplyTick(int _damage, float _duration, ViewEffect _effect)
     {
         if (tickDamage.Apply(_damage, _duration, _effect))
+        {
             tickTimer = 1f;
+            AddEffect(tickDamage.Effect);
+        }
     }
 
     private void UpdateTick(float _deltaTime)
@@ -163,7 +180,10 @@ public class MonsterDebuff : MonoBehaviour
     public void ActiveDamage() => damageAmp.Active();
 
     public void ApplyDamage(int _factor, float _duration, ViewEffect _effect)
-        => damageAmp.Apply(_factor, _duration, _effect);
+    {
+        if (damageAmp.Apply(_factor, _duration, _effect))
+            AddEffect(damageAmp.Effect);
+    }
 
     private void UpdateDamage(float _deltaTime)
         => damageAmp.Update(_deltaTime);
@@ -195,7 +215,8 @@ public class MonsterDebuff : MonoBehaviour
                 speedControl.Reset();
         }
 
-        speedControl.Apply(_factor, _duration, _effect);
+        if (speedControl.Apply(_factor, _duration, _effect))
+            AddEffect(speedControl.Effect);
     }
 
     private void UpdateSpeed(float _deltaTime)
@@ -218,7 +239,8 @@ public class MonsterDebuff : MonoBehaviour
         if (_dir == 0)
             _dir = Random.Range(1, 5);
 
-        directionControl.Apply(_dir, _duration, _effect);
+        if (directionControl.Apply(_dir, _duration, _effect))
+            AddEffect(directionControl.Effect);
     }
 
     private void UpdateDirection(float _deltaTime)
@@ -246,6 +268,68 @@ public class MonsterDebuff : MonoBehaviour
 
         _next = next;
         return true;
+    }
+    #endregion
+
+    #region 이펙트 관리
+    private void AddEffect(ViewEffect _effect)
+    {
+        CleanEffect();
+
+        effects.Remove(_effect);
+        effects.Insert(0, _effect);
+
+        index = 0;
+        timer = interval;
+
+        ShowEffect();
+    }
+
+    private void UpdateEffect(float _deltaTime)
+    {
+        CleanEffect();
+
+        if (effects.Count <= 0)
+        {
+            index = 0;
+            timer = 0f;
+            return;
+        }
+
+        timer -= _deltaTime;
+        if (timer > 0f) return;
+
+        index = (index + 1) % effects.Count;
+        timer = interval;
+
+        ShowEffect();
+    }
+
+    private void ShowEffect()
+    {
+        if (effects.Count <= 0) return;
+
+        if (index >= effects.Count)
+            index = 0;
+
+        for (int i = 0; i < effects.Count; i++)
+            effects[i].SetVisible(i == index);
+    }
+
+    private void CleanEffect()
+    {
+        for (int i = effects.Count - 1; i >= 0; i--)
+        {
+            if (!effects[i].IsDespawn) continue;
+
+            effects.RemoveAt(i);
+
+            if (i <= index)
+                index--;
+        }
+
+        if (index < 0 || index >= effects.Count)
+            index = 0;
     }
     #endregion
 

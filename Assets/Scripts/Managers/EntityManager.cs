@@ -333,7 +333,7 @@ public class EntityManager : MonoBehaviour
         float timer = 0f;
         IsMoving = true;
 
-        while (timer < _time)
+        while (timer <= _time)
         {
             timer += Time.deltaTime;
             inGame.position = Vector3.Lerp(start, _target, Mathf.Clamp01(timer / _time));
@@ -520,7 +520,7 @@ public class EntityManager : MonoBehaviour
         return summon;
     }
 
-    public ViewEffect MakeEffect(Tower _tower, Vector3 _pos, float _scale, float _duration = 0.5f)
+    public ViewEffect MakeEffect(Tower _tower, Vector3 _pos, float _scale, float _duration = 0.7f)
     {
         ViewEffect effect = SpawnPool<ViewEffect>(viewBase, _pos, otherTrans);
         if (effect == null) return null;
@@ -530,18 +530,22 @@ public class EntityManager : MonoBehaviour
         return effect;
     }
 
-    public ViewEffect MakeEffect(Tower _tower, Entity _entity, float _duration = 0.5f)
+    public ViewEffect MakeEffect(Tower _tower, Entity _entity, float _duration = 0.7f)
     {
         if (_entity == null || !_entity.gameObject.activeInHierarchy) return null;
+
+        float scale = 1f;
+        if (_entity is Tower) scale = 0.85f;
+        else if (_entity is Monster) scale = 0.7f;
 
         Transform parent = _entity.transform;
 
         ViewEffect effect = SpawnPool<ViewEffect>(viewBase, parent.position, parent);
         if (effect == null) return null;
 
-        effect.SetEffect(_tower, 0.7f, _duration);
+        effect.SetEffect(_tower, scale, _duration);
         effect.GetSR().sortingLayerID = _entity.GetSR().sortingLayerID;
-        effect.GetSR().sortingOrder = _entity.GetSR().sortingOrder;
+        effect.GetSR().sortingOrder = _entity.GetSR().sortingOrder + 1;
 
         return effect;
     }
@@ -1103,7 +1107,7 @@ public class EntityManager : MonoBehaviour
     public Tower GetTowerFarthest(Vector3 _pos, int _distance = 0)
         => GetByDistance(towers, _pos, false, _distance);
 
-    public List<Tower> GetTowersInRange(Vector3 _center, int _range, int _count = 0, bool _square = false)
+    public List<Tower> GetTowersInRange(Vector3 _center, int _range = 1, int _count = 0, bool _square = false)
         => GetInRange(towers, _center, _range, _count, _square);
     #endregion
 

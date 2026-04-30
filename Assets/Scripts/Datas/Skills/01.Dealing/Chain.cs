@@ -27,7 +27,18 @@ public class Chain : TowerSkill
     {
         if (_target == null || _target.IsInvalid()) return;
 
+        EntityManager.Instance?.MakeEffect(_tower, _target);
         EntityManager.Instance?.StartCoroutine(ChainRoutine(_tower, _target.Index));
+    }
+
+    public override void OnImpact(Tower _tower, Vector3 _pos)
+    {
+        EntityManager.Instance?.MakeEffect(_tower, _pos, 0.85f);
+
+        Monster target = EntityManager.Instance?.GetMonsterNearest(_pos);
+        if (target == null || target.IsInvalid()) return;
+
+        EntityManager.Instance?.StartCoroutine(ChainRoutine(_tower, target.Index - 1));
     }
 
     private IEnumerator ChainRoutine(Tower _tower, int _start)
@@ -43,14 +54,13 @@ public class Chain : TowerSkill
             if (target == null) yield break;
 
             index = target.Index;
-
             Vector3 pos = target.transform.position;
-            target.TakeDamage(damage, _direct: true);
 
             if (target == null || target.IsInvalid(index))
-                EntityManager.Instance?.MakeEffect(_tower, pos, 0.8f);
-            else
-                EntityManager.Instance?.MakeEffect(_tower, target);
+                EntityManager.Instance?.MakeEffect(_tower, pos, 0.85f);
+            else EntityManager.Instance?.MakeEffect(_tower, target);
+
+            target.TakeDamage(damage, _direct: true);
 
             if (++hit < count)
                 yield return new WaitForSeconds(interval);

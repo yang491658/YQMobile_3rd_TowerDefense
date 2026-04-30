@@ -213,3 +213,5 @@ MonoBehaviour:
     duration: 0
     timer: 0
     immune: 0
+  effects: []
+  interval: 0.35

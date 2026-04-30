@@ -5,28 +5,6 @@ public class ViewEffect : Pooling
 {
     private Coroutine routine;
 
-    private void OnBecameInvisible()
-    {
-        Despawn();
-    }
-
-    #region SET
-    public void SetEffect(Tower _tower, float _scale, float _duration)
-    {
-        transform.localScale = Vector3.one * _scale;
-        sr.color = _tower.GetColor();
-        sr.sprite = _tower.GetIcon();
-
-        if (routine != null)
-        {
-            StopCoroutine(routine);
-            routine = null;
-        }
-
-        if (_duration > 0f)
-            routine = StartCoroutine(EffectCoroutine(sr.color.a, _duration));
-    }
-
     private IEnumerator EffectCoroutine(float _startAlpha, float _duration)
     {
         float time = 0f;
@@ -47,6 +25,25 @@ public class ViewEffect : Pooling
         routine = null;
         Despawn();
     }
+
+    #region SET
+    public void SetEffect(Tower _tower, float _scale, float _duration)
+    {
+        transform.localScale = Vector3.one * _scale;
+        sr.color = _tower.GetColor();
+        sr.sprite = _tower.GetIcon();
+
+        if (routine != null)
+        {
+            StopCoroutine(routine);
+            routine = null;
+        }
+
+        if (_duration > 0f)
+            routine = StartCoroutine(EffectCoroutine(sr.color.a, _duration));
+    }
+
+    public void SetVisible(bool _visible) => sr.enabled = _visible;
     #endregion
 
     #region 풀링
@@ -54,6 +51,7 @@ public class ViewEffect : Pooling
     {
         base.OnSpawnPool();
 
+        sr.enabled = true;
         col.enabled = false;
         rb.simulated = false;
     }

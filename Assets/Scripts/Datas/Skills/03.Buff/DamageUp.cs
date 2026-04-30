@@ -5,22 +5,23 @@ using UnityEngine;
 public class DamageUp : TowerSkill
 {
     [Header("Value")]
-    [SerializeField][Min(0)] private int range;
     [SerializeField][Min(0)] private int factor;
 
     private readonly List<Tower> targets = new();
     private readonly HashSet<Tower> targetSet = new();
     private readonly HashSet<Tower> currents = new();
 
+    private const float interval = 3f;
+    private float timer;
+
 #if UNITY_EDITOR
     public override void SetID() => ID = 301;
     public override ValueType[] GetValues()
-        => new[] { ValueType.Range, ValueType.Factor };
+        => new[] { ValueType.Factor };
 #endif
 
     public override void SetValues(Tower _tower)
     {
-        range = _tower.GetValueInt(this, ValueType.Range);
         factor = _tower.GetValueInt(this, ValueType.Factor);
     }
 
@@ -28,15 +29,22 @@ public class DamageUp : TowerSkill
     {
         targets.Clear();
         targetSet.Clear();
+        timer = 0f;
     }
 
     public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
     {
-        List<Tower> current = EntityManager.Instance?.GetTowersInRange(_tower.transform.position, range);
+        timer -= _deltaTime;
+        List<Tower> current = EntityManager.Instance?.GetTowersInRange(_tower.transform.position, _square: true);
 
         currents.Clear();
         for (int i = 0; i < current.Count; i++)
-            currents.Add(current[i]);
+        {
+            Tower target = current[i];
+            if (target.GetRole() == TowerRole.Buff) continue;
+
+            currents.Add(target);
+        }
 
         for (int i = targets.Count - 1; i >= 0; i--)
         {
@@ -54,6 +62,8 @@ public class DamageUp : TowerSkill
         for (int i = 0; i < current.Count; i++)
         {
             Tower target = current[i];
+            if (target.GetRole() == TowerRole.Buff) continue;
+
             TowerBuff buff = target.GetBuff();
 
             buff.ApplyStat(_tower, this, TowerBuff.SubType.Damage, factor, 0f, TowerBuff.ApplyType.Refresh);
@@ -61,9 +71,15 @@ public class DamageUp : TowerSkill
 
             if (targetSet.Contains(target)) continue;
 
-            EntityManager.Instance?.MakeEffect(_tower, target);
             targetSet.Add(target);
             targets.Add(target);
+        }
+
+        if (timer <= 0f)
+        {
+            timer = interval;
+            for (int i = 0; i < targets.Count; i++)
+                EntityManager.Instance?.MakeEffect(_tower, targets[i]);
         }
     }
 

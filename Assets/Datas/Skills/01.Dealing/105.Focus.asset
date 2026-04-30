@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 055d14e4ed48200429654de0262cda2e, type: 3}
-  m_Name: 105.Rapid
+  m_Name: 105.Focus
   m_EditorClassIdentifier: 
   ID: 0

@@ -36,7 +36,7 @@ public class Splash : TowerSkill
         }
     }
 
-    public override void OnHit(Tower _tower, Vector3 _pos, ref bool _instead)
+    public override void OnImpact(Tower _tower, Vector3 _pos)
     {
         EntityManager.Instance?.MakeEffect(_tower, _pos, range * 2f);
 

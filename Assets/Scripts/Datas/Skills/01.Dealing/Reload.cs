@@ -50,6 +50,13 @@ public class Reload : TowerSkill
         _tower.Shoot(_target);
 
         ready = ++stack >= count;
+        if (ready)
+        {
+            stack = 0;
+            EntityManager.Instance?.MakeEffect(_tower, _tower.transform.position, 1.2f);
+            StartCooldown(_tower, cooldown);
+        }
+
         hit = false;
         timer = 60f / speed;
     }
@@ -57,33 +64,21 @@ public class Reload : TowerSkill
     public override void OnHit(Tower _tower, Monster _target, ref bool _instead)
     {
         _instead = true;
+        if (_tower == null) return;
 
         int damage = _tower.GetDamage() + _tower.GetSpeed();
         int chance = !ready ? 0 : 100;
         int critical = !ready ? 100 : _tower.GetCritical() + _tower.GetChance();
 
         _tower.HitDamage(_target, damage, chance, critical, false);
+
         hit = true;
-
-        if (ready)
-        {
-            stack = 0;
-            ready = false;
-
-            StartCooldown(_tower, cooldown);
-        }
+        ready = false;
     }
 
-    public override void OnHit(Tower _tower, Vector3 _pos, ref bool _instead)
+    public override void OnImpact(Tower _tower, Vector3 _pos)
     {
-        _instead = true;
-
         hit = true;
-
-        if (ready)
-        {
-            stack = count - 1;
-            ready = false;
-        }
+        ready = false;
     }
 }

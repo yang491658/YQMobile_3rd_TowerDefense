@@ -369,24 +369,22 @@ public class UIManager : MonoBehaviour
         if (_number < 10000)
             return _full ? _number.ToString("0000") : _number.ToString();
 
-        for (int i = units.Length; i > 0; i--)
+        float value = _number;
+        int unitIndex = -1;
+
+        while (value >= 1000f && unitIndex < units.Length - 1)
         {
-            float n = Mathf.Pow(1000f, i);
-            if (_number >= n)
-            {
-                float value = _number / n;
-
-                if (value >= 100f)
-                    return Mathf.RoundToInt(value).ToString() + units[i - 1];
-
-                if (value >= 10f)
-                    return value.ToString("0.0") + units[i - 1];
-
-                return value.ToString("0.00") + units[i - 1];
-            }
+            value /= 1000f;
+            unitIndex++;
         }
 
-        return _full ? _number.ToString("0000") : _number.ToString();
+        if (value >= 100f)
+            return Mathf.RoundToInt(value).ToString() + units[unitIndex];
+
+        if (value >= 10f)
+            return value.ToString("0.0") + units[unitIndex];
+
+        return value.ToString("0.00") + units[unitIndex];
     }
     #endregion
 

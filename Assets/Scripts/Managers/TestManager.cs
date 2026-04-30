@@ -290,6 +290,8 @@ public class TestManager : MonoBehaviour
                     TryPurchase(refID);
                 else if (TrySell(refID))
                     TryPurchase(refID);
+                else
+                    MergeRandom();
 
                 return;
             }
@@ -699,7 +701,7 @@ public class TestManager : MonoBehaviour
         timer += Time.unscaledDeltaTime;
         frame++;
 
-        if (timer < 0.1f) return;
+        if (timer <= 0.1f) return;
 
         testText.text =
             $"FPS : {frame / timer:0.0}\n" +

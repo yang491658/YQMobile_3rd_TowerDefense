@@ -11679,7 +11679,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   phase: 0
   normalTime: 180
-  spawnRange: {x: 1, y: 3}
+  spawnRange: {x: 0.3, y: 3}
   spawnPeak: 30
   warningTime: 5
   warningInterval: 0.3

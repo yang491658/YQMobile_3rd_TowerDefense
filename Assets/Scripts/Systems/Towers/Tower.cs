@@ -312,7 +312,7 @@ public class Tower : Entity
             for (int i = 0; i < skills.Count; i++)
             {
                 if (valid) skills[i].OnHit(this, _target, ref instead);
-                else skills[i].OnHit(this, _pos, ref instead);
+                else skills[i].OnImpact(this, _pos);
             }
         }
 

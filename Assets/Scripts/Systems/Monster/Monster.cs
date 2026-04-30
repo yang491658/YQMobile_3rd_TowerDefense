@@ -201,7 +201,7 @@ public class Monster : Pooling
     {
         base.OnSpawnPool();
 
-        int order = ++sorting;
+        int order = ++sorting * 10;
         sr.sortingOrder = order;
         if (canvas != null)
             canvas.sortingOrder = order;
