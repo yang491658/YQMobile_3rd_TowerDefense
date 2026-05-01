@@ -56,7 +56,7 @@ public class Chain : TowerSkill
             index = target.Index;
 
             EntityManager.Instance?.MakeEffect(_tower, target);
-            target.TakeDamage(damage, _direct: true);
+            target.TakeDamage(damage);
 
             if (++hit < count)
                 yield return new WaitForSeconds(interval);

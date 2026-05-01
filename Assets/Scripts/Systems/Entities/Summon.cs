@@ -18,7 +18,6 @@ public class Summon : Pooling
     private bool loop = false;
 
     [Header("Battle")]
-    [SerializeField][Min(0)] private int reserve;
     private bool isHit = false;
     private bool onHit = false;
 
@@ -164,10 +163,8 @@ public class Summon : Pooling
         pathIndex = 0;
         loop = false;
 
-        reserve = tower.GetDamage();
         isHit = false;
         onHit = true;
-        target.ReserveUp(reserve);
 
         rotate = _rotate;
     }
@@ -192,9 +189,6 @@ public class Summon : Pooling
         if (tower != null)
             tower.RemoveSummon(this);
 
-        if (!isHit && reserve > 0 && target != null && !target.IsInvalid(targetIndex))
-            target.ReserveDown(reserve);
-
         base.OnDespawnPool();
     }
 
@@ -215,7 +209,6 @@ public class Summon : Pooling
         pathIndex = 0;
         loop = false;
 
-        reserve = 0;
         isHit = false;
         onHit = false;
 

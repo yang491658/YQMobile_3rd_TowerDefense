@@ -274,7 +274,6 @@ public class Tower : Entity
 
         if (data.Role == TowerRole.Debuff
             || attackTarget == null
-            || attackTarget.IsExclude()
             || attackTarget.IsInvalid(targetIndex))
         {
             FindTarget();

@@ -4,7 +4,6 @@ public class Bullet : Pooling
 {
     [Header("Origin")]
     [SerializeField] private Tower tower;
-    [SerializeField][Min(0)] private int damage;
 
     [Header("Move")]
     [SerializeField] private Monster target;
@@ -69,12 +68,10 @@ public class Bullet : Pooling
 
         tower = _tower;
         tower.AddBullet(this);
-        damage = _tower.GetDamage();
 
         target = _target;
         targetIndex = _target.Index;
         targetPos = _target.transform.position;
-        target.ReserveUp(damage);
     }
     #endregion
 
@@ -91,9 +88,6 @@ public class Bullet : Pooling
         if (tower != null)
             tower.RemoveBullet(this);
 
-        if (!IsHit && damage > 0 && target != null && !target.IsInvalid(targetIndex))
-            target.ReserveDown(damage);
-
         base.OnDespawnPool();
     }
 
@@ -102,8 +96,6 @@ public class Bullet : Pooling
         base.ResetPool();
 
         tower = null;
-        damage = 0;
-
         target = null;
         targetIndex = 0;
         targetPos = default;

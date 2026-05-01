@@ -176,7 +176,6 @@ MonoBehaviour:
   moveDirection: {x: 0, y: 0, z: 0}
   health: 0
   maxHealth: 0
-  reserve: 0
   gold: 0
   debuff: {fileID: 7060836011662514846}
   data: {fileID: 0}

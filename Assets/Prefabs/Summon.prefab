@@ -171,6 +171,5 @@ MonoBehaviour:
   rate: 0
   path: []
   pathIndex: 0
-  reserve: 0
   duration: 0
   rotate: 0

@@ -170,7 +170,7 @@ public class MonsterDebuff : MonoBehaviour
         tickTimer -= _deltaTime;
         while (tickTimer <= 0f)
         {
-            monster.TakeDamage(tickDamage.Value, DamageType.Dot, true);
+            monster.TakeDamage(tickDamage.Value, DamageType.Dot);
             tickTimer += 1f;
         }
     }
