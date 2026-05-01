@@ -92,7 +92,7 @@ public class Monster : Pooling
     #endregion
 
     #region 전투
-    public bool TakeDamage(int _damage, bool _isCritical = false, bool _direct = false)
+    public bool TakeDamage(int _damage, DamageType _type = DamageType.Normal, bool _direct = false)
     {
         if (IsDead) return false;
 
@@ -100,25 +100,30 @@ public class Monster : Pooling
 
         int damage = debuff.CalcDamage(_damage);
 
+        DamageType type = _type;
+        if (type != DamageType.Critical
+            && type != DamageType.Dot
+            && damage > _damage)
+            type = DamageType.Amp;
+
 #if TEST_Manager
         TestManager.Instance?.AddDamage(damage);
 
         if (!(TestManager.Instance?.Mode == TestMode.Solo && this is Boss))
 #endif
             SetHealth(health - damage);
-        CreateDamage(damage, _isCritical);
+        CreateDamage(damage, type);
 
         if (health <= 0) Die();
 
         return true;
     }
 
-    private void CreateDamage(int _damage, bool _isCritical = false)
+    private void CreateDamage(int _damage, DamageType _type = DamageType.Normal)
     {
         if (_damage <= 0) return;
 
-        float font = _isCritical ? 65f : 50f;
-        Color color = _isCritical ? Color.red : Color.black;
+        TowerDamage.DamageData data = DataManager.Instance.GetTowerDamage(_type);
 
         Vector3 from = transform.position + Vector3.up * 0.5f;
         Vector3 to = new Vector3(0f, AutoCamera.WorldRect.yMax, 0f);
@@ -127,7 +132,7 @@ public class Monster : Pooling
         TextEffect text = EntityManager.Instance?.MakeText(from);
         if (text == null) return;
 
-        text.SetText(_damage.ToString(), font, color);
+        text.SetText(_damage.ToString(), data.font, data.color);
         text.SetMove(damageSpeed, dir);
         text.SetDuration(damageDuration);
     }

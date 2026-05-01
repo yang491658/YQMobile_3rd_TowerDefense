@@ -19,6 +19,7 @@ public class DataManager : MonoBehaviour
     [SerializeField] private TowerChance towerChance;
     [SerializeField] private TowerColor towerColor;
     [SerializeField] private TowerStat towerStat;
+    [SerializeField] private TowerDamage towerDamage;
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -29,6 +30,7 @@ public class DataManager : MonoBehaviour
         towerChance = LoadAsset<TowerChance>();
         towerColor = LoadAsset<TowerColor>();
         towerStat = LoadAsset<TowerStat>();
+        towerDamage = LoadAsset<TowerDamage>();
 
         EditorUtility.SetDirty(this);
     }
@@ -205,5 +207,7 @@ public class DataManager : MonoBehaviour
 
     public TowerStat.Stat4 GetBaseStat(TowerRole _role, TowerGrade _grade) => towerStat.GetStat(_role, _grade);
     public int GetGradeStat(TowerGrade _grade) => towerStat.GetGradeStat(_grade);
+
+    public TowerDamage.DamageData GetTowerDamage(DamageType _type) => towerDamage.GetDamage(_type);
     #endregion
 }

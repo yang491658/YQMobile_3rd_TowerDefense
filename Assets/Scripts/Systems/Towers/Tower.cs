@@ -314,7 +314,8 @@ public class Tower : Entity
         HitDamage(_target);
     }
 
-    public void HitDamage(Monster _target, int _damage = -1, int _chance = -1, int _critical = -1, bool _lifeUp = true)
+    public void HitDamage(Monster _target, int _damage = -1, int _chance = -1, int _critical = -1,
+        bool _lifeUp = true, DamageType _type = DamageType.Normal)
     {
         int damage = _damage < 0 ? attackDamage : _damage;
         int chance = _chance < 0 ? criticalChance : _chance;
@@ -323,15 +324,16 @@ public class Tower : Entity
         int overflow = Mathf.Max(chance - 100, 0);
         chance = Mathf.Min(chance, 100);
 
-        bool isCritical = false;
+        DamageType type = _type;
         if (Random.value < chance / 100f)
         {
-            isCritical = true;
+            type = DamageType.Critical;
             damage = damage * critical / 100;
         }
 
-        bool isHit = _target.TakeDamage(damage, isCritical);
-        if (_lifeUp && isHit && isCritical && Random.value < overflow / 1000f)
+        bool isHit = _target.TakeDamage(damage, type);
+        if (_lifeUp && isHit && type == DamageType.Critical
+            && Random.value < overflow / 1000f)
             GameManager.Instance?.LifeUp();
     }
     #endregion
