@@ -219,7 +219,7 @@ public class TestManager : MonoBehaviour
                 if (autoRoutine == null)
                     autoRoutine = StartCoroutine(AutoReplay());
             }
-            else AutoPlay();
+            //else AutoPlay();
         }
         if (Input.GetKeyDown(KeyCode.UpArrow))
             ChangeGameSpeed(gameSpeed.value == gameSpeed.maxValue

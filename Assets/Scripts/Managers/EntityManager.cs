@@ -39,6 +39,7 @@ public class EntityManager : MonoBehaviour
     private readonly List<Vector3Int> fieldCells = new();
     private Vector3Int entryCell;
     private Vector3Int exitCell;
+    private Vector3Int? placeCell;
     private Coroutine mapRoutine;
 
     [Header("Map / Color")]
@@ -256,40 +257,70 @@ public class EntityManager : MonoBehaviour
 
     public bool HasEmptyField() => PickRandom(out _, true);
 
-    public void ShowPlaceField(bool _on)
+    public void ShowPlaceField(bool _on, Vector3? _pos = null)
     {
-        TileFlags entryFlags = mapOverlayTilemap.GetTileFlags(entryCell);
-        mapOverlayTilemap.SetTileFlags(entryCell, entryFlags & ~TileFlags.LockColor);
-        mapOverlayTilemap.SetColor(entryCell, Color.clear);
+        DrawBlock(_on);
+        DrawPlace(_on, _pos);
+    }
 
-        TileFlags exitFlags = mapOverlayTilemap.GetTileFlags(exitCell);
-        mapOverlayTilemap.SetTileFlags(exitCell, exitFlags & ~TileFlags.LockColor);
-        mapOverlayTilemap.SetColor(exitCell, Color.clear);
+    private void DrawBlock(bool _on)
+    {
+        SetTileColor(mapOverlayTilemap, entryCell, Color.clear);
+        SetTileColor(mapOverlayTilemap, exitCell, Color.clear);
+
+        for (int i = 0; i < fieldCells.Count; i++)
+            SetTileColor(mapOverlayTilemap, fieldCells[i], Color.clear);
+
+        if (!_on) return;
+
+        SetTileColor(mapOverlayTilemap, entryCell, Color.red);
+        SetTileColor(mapOverlayTilemap, exitCell, Color.red);
 
         for (int i = 0; i < fieldCells.Count; i++)
         {
             Vector3Int cell = fieldCells[i];
+            if (CanPlaceTower(cell)) continue;
 
-            TileFlags flags = mapOverlayTilemap.GetTileFlags(cell);
-            mapOverlayTilemap.SetTileFlags(cell, flags & ~TileFlags.LockColor);
-            mapOverlayTilemap.SetColor(cell, Color.clear);
+            SetTileColor(mapOverlayTilemap, cell, Color.red);
+        }
+    }
+
+    private void DrawPlace(bool _on, Vector3? _pos)
+    {
+        if (placeCell.HasValue)
+        {
+            Vector3Int prevCell = placeCell.Value;
+            Color color = Color.white;
+
+            if (prevCell == entryCell) color = entryColor;
+            else if (prevCell == exitCell) color = exitColor;
+            else if (towerDic.ContainsValue(prevCell)) color = towerColor;
+            else
+            {
+                Vector3Int pathCell = entryCell;
+
+                for (int i = 0; i < fieldCells.Count + 2; i++)
+                {
+                    if (!pathDic.TryGetValue(pathCell, out Vector3Int nextCell)) break;
+                    if (nextCell == exitCell) break;
+                    if (nextCell == prevCell) { color = pathColor; break; }
+                    pathCell = nextCell;
+                }
+            }
+
+            SetTileColor(mapFieldTilemap, prevCell, color);
+            placeCell = null;
         }
 
         if (!_on) return;
 
-        mapOverlayTilemap.SetColor(entryCell, Color.red);
-        mapOverlayTilemap.SetColor(exitCell, Color.red);
+        Vector3 pos = _pos ?? HandleManager.Instance.ScreenToWorld(Input.mousePosition);
+        Vector3Int cell = mapFieldTilemap.WorldToCell(pos);
 
-        for (int i = 0; i < fieldCells.Count; i++)
-        {
-            Vector3Int cell = fieldCells[i];
+        if (!CanPlaceTower(cell)) return;
 
-            if (CanPlaceTower(cell)) continue;
-
-            TileFlags flags = mapOverlayTilemap.GetTileFlags(cell);
-            mapOverlayTilemap.SetTileFlags(cell, flags & ~TileFlags.LockColor);
-            mapOverlayTilemap.SetColor(cell, Color.red);
-        }
+        SetTileColor(mapFieldTilemap, cell, towerColor);
+        placeCell = cell;
     }
     #endregion
 
@@ -694,23 +725,16 @@ public class EntityManager : MonoBehaviour
         fieldCells.Remove(entryCell);
         fieldCells.Remove(exitCell);
 
-        TileFlags entryFlags = mapFieldTilemap.GetTileFlags(entryCell);
-        mapFieldTilemap.SetTileFlags(entryCell, entryFlags & ~TileFlags.LockColor);
-        mapFieldTilemap.SetColor(entryCell, entryColor);
-
-        TileFlags exitFlags = mapFieldTilemap.GetTileFlags(exitCell);
-        mapFieldTilemap.SetTileFlags(exitCell, exitFlags & ~TileFlags.LockColor);
-        mapFieldTilemap.SetColor(exitCell, exitColor);
+        SetTileColor(mapFieldTilemap, entryCell, entryColor);
+        SetTileColor(mapFieldTilemap, exitCell, exitColor);
     }
 
     private void SetPath()
     {
         pathDic.Clear();
 
-        if (!mapFieldTilemap.HasTile(entryCell))
-            return;
-        if (!mapFieldTilemap.HasTile(exitCell))
-            return;
+        if (!mapFieldTilemap.HasTile(entryCell)) return;
+        if (!mapFieldTilemap.HasTile(exitCell)) return;
 
         HashSet<Vector3Int> towerCells = new();
 
@@ -810,20 +834,10 @@ public class EntityManager : MonoBehaviour
         }
 
         for (int i = 0; i < fieldCells.Count; i++)
-        {
-            Vector3Int cell = fieldCells[i];
-            TileFlags flags = mapFieldTilemap.GetTileFlags(cell);
-            mapFieldTilemap.SetTileFlags(cell, flags & ~TileFlags.LockColor);
-            mapFieldTilemap.SetColor(cell, Color.white);
-        }
+            SetTileColor(mapFieldTilemap, fieldCells[i], Color.white);
 
-        TileFlags entryFlags = mapFieldTilemap.GetTileFlags(entryCell);
-        mapFieldTilemap.SetTileFlags(entryCell, entryFlags & ~TileFlags.LockColor);
-        mapFieldTilemap.SetColor(entryCell, entryColor);
-
-        TileFlags exitFlags = mapFieldTilemap.GetTileFlags(exitCell);
-        mapFieldTilemap.SetTileFlags(exitCell, exitFlags & ~TileFlags.LockColor);
-        mapFieldTilemap.SetColor(exitCell, exitColor);
+        SetTileColor(mapFieldTilemap, entryCell, entryColor);
+        SetTileColor(mapFieldTilemap, exitCell, exitColor);
 
         Vector3Int lineCell = entryCell;
 
@@ -831,19 +845,12 @@ public class EntityManager : MonoBehaviour
         {
             if (nextCell == exitCell) break;
 
-            TileFlags flags = mapFieldTilemap.GetTileFlags(nextCell);
-            mapFieldTilemap.SetTileFlags(nextCell, flags & ~TileFlags.LockColor);
-            mapFieldTilemap.SetColor(nextCell, pathColor);
-
+            SetTileColor(mapFieldTilemap, nextCell, pathColor);
             lineCell = nextCell;
         }
 
         foreach (Vector3Int c in towerCells)
-        {
-            TileFlags flags = mapFieldTilemap.GetTileFlags(c);
-            mapFieldTilemap.SetTileFlags(c, flags & ~TileFlags.LockColor);
-            mapFieldTilemap.SetColor(c, towerColor);
-        }
+            SetTileColor(mapFieldTilemap, c, towerColor);
 
         for (int i = 0; i < monsters.Count; i++)
         {
@@ -852,6 +859,13 @@ public class EntityManager : MonoBehaviour
 
             monster.SetMove(mapFieldTilemap.WorldToCell(monster.transform.position));
         }
+    }
+
+    private void SetTileColor(Tilemap _tilemap, Vector3Int _cell, Color _color)
+    {
+        TileFlags flags = _tilemap.GetTileFlags(_cell);
+        _tilemap.SetTileFlags(_cell, flags & ~TileFlags.LockColor);
+        _tilemap.SetColor(_cell, _color);
     }
     #endregion
 

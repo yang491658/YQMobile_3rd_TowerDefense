@@ -1,7 +1,8 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class TowerSlot : MonoBehaviour
+public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     private enum SlotState { Ready, Select, Complete }
 
@@ -99,11 +100,46 @@ public class TowerSlot : MonoBehaviour
     }
     #endregion
 
+    #region 클릭 및 드래그
     private void OnClickSlot()
     {
         SoundManager.Instance?.Button();
         TowerStore.Instance?.SelectSlot(this);
     }
+
+    public void OnBeginDrag(PointerEventData _eventData)
+    {
+        if (state == SlotState.Complete) return;
+        if (!GameManager.Instance.EnoughGold()) return;
+
+        SoundManager.Instance?.Button();
+        TowerStore.Instance?.SelectSlot(this, true);
+
+        Vector3 pos = HandleManager.Instance.ScreenToWorld(_eventData.position);
+        EntityManager.Instance?.ShowPlaceField(true, pos);
+    }
+
+    public void OnDrag(PointerEventData _eventData)
+    {
+        if (!TowerStore.Instance.IsPlacing) return;
+
+        Vector3 pos = HandleManager.Instance.ScreenToWorld(_eventData.position);
+        EntityManager.Instance?.ShowPlaceField(true, pos);
+    }
+
+    public void OnEndDrag(PointerEventData _eventData)
+    {
+        if (!TowerStore.Instance.IsPlacing) return;
+
+        Vector3 pos = HandleManager.Instance.ScreenToWorld(_eventData.position);
+        Rect mapRect = UIManager.Instance.GetMapAreaRect(pos.z);
+
+        if (mapRect.Contains(new Vector2(pos.x, pos.y)))
+            TowerStore.Instance?.PurchaseSlot(pos);
+        else
+            TowerStore.Instance?.CancelSlot();
+    }
+    #endregion
 
     #region SET
     private void SetSlot(TowerData _data)

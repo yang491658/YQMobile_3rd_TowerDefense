@@ -131,9 +131,9 @@ public class TowerStore : MonoBehaviour
         }
     }
 
-    public void SelectSlot(TowerSlot _slot)
+    public void SelectSlot(TowerSlot _slot, bool _force = false)
     {
-        if (select == _slot)
+        if (select == _slot && !_force)
         {
             select = null;
             PlaceMode(false);
@@ -148,12 +148,21 @@ public class TowerStore : MonoBehaviour
         PlaceMode(true);
     }
 
-    public void PurchaseSlot(Vector3 _pos)
+    public bool PurchaseSlot(Vector3 _pos)
     {
-        if (select == null || !select.Purchase(_pos)) return;
+        if (select == null) return false;
+
+        if (!select.Purchase(_pos))
+        {
+            select = null;
+            PlaceMode(false);
+            return false;
+        }
 
         select = null;
         PlaceMode(false);
+
+        return true;
     }
 
     public void CancelSlot()

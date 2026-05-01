@@ -403,6 +403,9 @@ public class UIManager : MonoBehaviour
         inGameUI.SetActive(!_on);
         settingUI.SetActive(_on);
         OnOpenUI?.Invoke(_on);
+
+        if (TowerStore.Instance.IsPlacing)
+            UpdateStore(1);
     }
 
     public void OpenConfirm(bool _on, string _text = null, System.Action _action = null, bool _pass = false)
