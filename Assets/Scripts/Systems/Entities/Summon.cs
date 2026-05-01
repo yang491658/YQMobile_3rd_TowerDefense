@@ -59,10 +59,10 @@ public class Summon : Pooling
 
         if (_collision.TryGetComponent(out Monster _monster))
         {
+            if (isHit) return;
+
             if (target != null)
             {
-                if (isHit) return;
-
                 if (!target.IsInvalid(targetIndex) && target == _monster)
                 {
                     isHit = true;
@@ -105,11 +105,10 @@ public class Summon : Pooling
 
         if (hasTarget)
         {
-            if (!isHit && onHit)
-            {
-                isHit = true;
+            if (!isHit && onHit && !target.IsInvalid(targetIndex))
                 tower.Hit(target, targetIndex, targetPos, true);
-            }
+
+            isHit = true;
 
             target = null;
             targetIndex = 0;

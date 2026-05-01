@@ -28,17 +28,17 @@ public class Bounce : TowerSkill
         if (_tower.GetSummonCount(this) > 0) return;
         if (_target == null || _target.IsInvalid()) return;
 
-        EntityManager.Instance?.StartCoroutine(SummonCoroutine(_tower, _target));
+        EntityManager.Instance?.StartCoroutine(SummonCoroutine(_tower, _target, _target.Index));
     }
 
-    private IEnumerator SummonCoroutine(Tower _tower, Monster _target)
+    private IEnumerator SummonCoroutine(Tower _tower, Monster _target, int _index)
     {
         Vector3 pos = _tower.transform.position;
 
         for (int i = 0; i < count; i++)
         {
             if (_tower == null) yield break;
-            if (_target == null || _target.IsInvalid()) yield break;
+            if (_target == null || _target.IsInvalid(_index)) yield break;
 
             EntityManager.Instance?.MakeSummon(this, _tower, pos, scale, rate)
                 ?.SetBounce(_target, rotate);

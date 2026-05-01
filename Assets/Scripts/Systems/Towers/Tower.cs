@@ -73,11 +73,12 @@ public class Tower : Entity
         base.Update();
 
         float dt = Time.deltaTime;
-        for (int i = 0; i < skills.Count; i++)
-            skills[i].OnUpdate(this, attackTarget, dt);
 
         UpdateBuff();
-        Attack(dt);
+        if (FindTarget()) Attack(dt);
+
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnUpdate(this, attackTarget, dt);
     }
 
     #region 심볼
@@ -242,8 +243,13 @@ public class Tower : Entity
     #endregion
 
     #region 전투
-    private void FindTarget()
+    private bool FindTarget()
     {
+        if (!(data.Role == TowerRole.Debuff
+            || attackTarget == null
+            || attackTarget.IsInvalid(targetIndex)))
+            return true;
+
         System.Predicate<Monster> filter = null;
         for (int i = 0; i < skills.Count; i++)
         {
@@ -265,20 +271,13 @@ public class Tower : Entity
         };
 
         targetIndex = attackTarget != null ? attackTarget.Index : 0;
+        return attackTarget != null;
     }
 
     private void Attack(float _deltaTime)
     {
         attackTimer -= _deltaTime;
         if (attackTimer > 0f) return;
-
-        if (data.Role == TowerRole.Debuff
-            || attackTarget == null
-            || attackTarget.IsInvalid(targetIndex))
-        {
-            FindTarget();
-            if (attackTarget == null || attackTarget.IsExclude()) return;
-        }
 
         bool instead = data.Role == TowerRole.Summon;
         for (int i = 0; i < skills.Count; i++)
