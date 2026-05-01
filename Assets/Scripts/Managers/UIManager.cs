@@ -643,23 +643,23 @@ public class UIManager : MonoBehaviour
         if (exp.btn.gameObject.activeSelf)
             exp.btn.interactable = GameManager.Instance.CanBuyExp();
 
+        string need = FormatNumber(_needGold);
+
         if (onStore < 0)
         {
             int showGold = _gold + storeGold;
-
-            goldText.text = $"{FormatNumber(showGold)}(+{FormatNumber(storeGold)})/{FormatNumber(_needGold)}";
+            goldText.text = $"{FormatNumber(showGold)}(+{FormatNumber(storeGold)})/{need}";
             goldText.color = showGold >= 0 ? Color.blue : Color.red;
         }
         else if (onStore > 0)
         {
             int showGold = _gold - _needGold;
-
-            goldText.text = $"{FormatNumber(showGold)}(-{FormatNumber(_needGold)})/{FormatNumber(_needGold)}";
+            goldText.text = $"{FormatNumber(showGold)}(-{need})/{need}";
             goldText.color = Color.red;
         }
         else
         {
-            goldText.text = $"{FormatNumber(_gold)}/{FormatNumber(_needGold)}";
+            goldText.text = $"{FormatNumber(_gold)}/{need}";
             goldText.color = _gold >= 0 ? Color.white : Color.red;
         }
 

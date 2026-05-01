@@ -178,8 +178,20 @@ public class DataManager : MonoBehaviour
     {
         int level = GameManager.Instance.GetLevel();
         TowerGrade grade = GetRandomGrade(level);
-        TowerData[] datas = GetTowerDatas(grade);
-        return datas[Random.Range(0, datas.Length)];
+
+        TowerData result = null;
+        int count = 0;
+
+        for (int i = 0; i < towerDatas.Length; i++)
+        {
+            TowerData data = towerDatas[i];
+            if (data == null || data.Grade != grade) continue;
+
+            if (Random.Range(0, ++count) == 0)
+                result = data;
+        }
+
+        return result;
     }
 
     public BossData[] GetBossDatas() => bossDatas;

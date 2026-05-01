@@ -74,11 +74,6 @@ public class Summon : Pooling
         }
     }
 
-    private void OnBecameInvisible()
-    {
-        Despawn();
-    }
-
     private void UpdateMove(float _deltaTime)
     {
         speed = tower.GetSpeed() * rate;

@@ -1020,7 +1020,8 @@ public class EntityManager : MonoBehaviour
         return found ? result : null;
     }
 
-    private List<T> GetInRange<T>(List<T> _list, Vector3 _center, int _range, int _count = 0, bool _square = false) where T : Component
+    private List<T> GetInRange<T>(List<T> _list, Vector3 _center, int _range, int _count = 0, bool _square = false)
+        where T : Component
     {
         List<T> targets = new();
         int total = _list.Count;

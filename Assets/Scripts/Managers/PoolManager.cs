@@ -100,12 +100,15 @@ public class PoolManager : MonoBehaviour
         {
             GameObject obj = pending[i];
 
-            if (obj == null || obj.activeSelf)
-            { pending.RemoveAt(i); continue; }
+            if (obj != null && !obj.activeSelf)
+            {
+                int id = obj.GetInstanceID();
+                obj.transform.SetParent(parent.TryGetValue(id, out var p) ? p : transform, false);
+            }
 
-            int id = obj.GetInstanceID();
-            obj.transform.SetParent(parent.TryGetValue(id, out var p) ? p : transform, false);
-            pending.RemoveAt(i);
+            int last = pending.Count - 1;
+            pending[i] = pending[last];
+            pending.RemoveAt(last);
         }
     }
 

@@ -300,12 +300,7 @@ public class HandleManager : MonoBehaviour
     {
         if (TowerStore.Instance.IsPlacing)
         {
-            Rect mapRect = UIManager.Instance.GetMapAreaRect(_end.z);
-
-            if (mapRect.Contains(new Vector2(_end.x, _end.y)))
-                TowerStore.Instance?.PurchaseSlot(_end);
-            else
-                TowerStore.Instance?.CancelSlot();
+            OnSingle(_end);
             return;
         }
 
