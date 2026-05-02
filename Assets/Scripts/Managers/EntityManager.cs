@@ -265,23 +265,15 @@ public class EntityManager : MonoBehaviour
 
     private void DrawBlock(bool _on)
     {
-        SetTileColor(mapOverlayTilemap, entryCell, Color.clear);
-        SetTileColor(mapOverlayTilemap, exitCell, Color.clear);
+        Color blockColor = _on ? Color.red : Color.clear;
 
-        for (int i = 0; i < fieldCells.Count; i++)
-            SetTileColor(mapOverlayTilemap, fieldCells[i], Color.clear);
-
-        if (!_on) return;
-
-        SetTileColor(mapOverlayTilemap, entryCell, Color.red);
-        SetTileColor(mapOverlayTilemap, exitCell, Color.red);
+        SetTileColor(mapOverlayTilemap, entryCell, blockColor);
+        SetTileColor(mapOverlayTilemap, exitCell, blockColor);
 
         for (int i = 0; i < fieldCells.Count; i++)
         {
             Vector3Int cell = fieldCells[i];
-            if (CanPlaceTower(cell)) continue;
-
-            SetTileColor(mapOverlayTilemap, cell, Color.red);
+            SetTileColor(mapOverlayTilemap, cell, _on && !CanPlaceTower(cell) ? Color.red : Color.clear);
         }
     }
 
