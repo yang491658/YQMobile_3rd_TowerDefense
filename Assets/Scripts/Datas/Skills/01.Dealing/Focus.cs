@@ -9,7 +9,6 @@ public class Focus : TowerSkill
     [SerializeField][Min(0f)] private float duration;
     [SerializeField][Min(0f)] private float cooldown;
 
-    private float timer;
     private int stack;
     private float hold;
 
@@ -29,17 +28,20 @@ public class Focus : TowerSkill
 
     public override void OnGenerate(Tower _tower)
     {
-        timer = 0f;
         stack = 0;
         hold = 0f;
+    }
+
+    public override void OnStat(Tower _tower, ref int _damage, ref int _speed, ref int _chance, ref int _critical)
+    {
+        if (IsCooldown()) return;
+
+        _speed = Mathf.RoundToInt(_speed * (100f + factor * stack) / 100f);
     }
 
     public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
     {
         if (IsCooldown()) return;
-
-        if (timer > 0f)
-            timer -= _deltaTime;
 
         if (hold > 0f)
         {
@@ -47,7 +49,6 @@ public class Focus : TowerSkill
 
             if (hold <= 0f)
             {
-                timer = 0f;
                 stack = 0;
                 StartCooldown(_tower, cooldown);
             }
@@ -56,20 +57,9 @@ public class Focus : TowerSkill
 
     public override void OnAttack(Tower _tower, Monster _target, ref bool _instead)
     {
-        _instead = true;
+        if (IsCooldown())
+        { _instead = true; return; }
 
-        if (_target == null || _target.IsInvalid()) return;
-        if (IsCooldown()) return;
-        if (timer > 0f) return;
-
-        _tower.Shoot(_target);
-        timer = 60f / CalcSpeed(_tower, stack);
-    }
-
-    public override void OnHit(Tower _tower, Monster _target, ref bool _instead)
-    {
-        if (_tower == null) return;
-        if (IsCooldown()) return;
         if (hold > 0f) return;
 
         stack = Mathf.Min(++stack, max);
@@ -79,12 +69,5 @@ public class Focus : TowerSkill
             hold = duration;
             EntityManager.Instance?.MakeEffect(_tower, _tower.transform.position, 1.2f);
         }
-    }
-
-    private int CalcSpeed(Tower _tower, int _stack)
-    {
-        int speed = _tower.GetSpeed();
-        speed = Mathf.RoundToInt(speed * (100f + factor * _stack) / 100f);
-        return Mathf.Min(speed, 6000);
     }
 }

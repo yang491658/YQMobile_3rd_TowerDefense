@@ -8,10 +8,8 @@ public class Reload : TowerSkill
     [SerializeField][Min(0f)] private float cooldown;
 
     private int speed;
-    private float timer;
     private int stack;
     private bool ready;
-    private bool hit;
 
 #if UNITY_EDITOR
     public override void SetID() => ID = 102;
@@ -28,26 +26,25 @@ public class Reload : TowerSkill
     public override void OnGenerate(Tower _tower)
     {
         speed = DataManager.Instance.GetBaseStat(_tower.GetRole(), TowerGrade.Normal).attackSpeed;
-        timer = 0f;
         stack = 0;
         ready = false;
-        hit = true;
     }
 
-    public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
+    public override void OnStat(Tower _tower, ref int _damage, ref int _speed, ref int _chance, ref int _critical)
     {
-        if (timer > 0f)
-            timer -= _deltaTime;
+        int damage = _damage + _speed;
+        int critical = _chance + _critical;
+
+        _damage = damage;
+        _speed = speed;
+        _chance = !ready ? 0 : 100;
+        _critical = !ready ? 100 : critical;
     }
 
     public override void OnAttack(Tower _tower, Monster _target, ref bool _instead)
     {
-        _instead = true;
-
-        if (IsCooldown()) return;
-        if (timer > 0f || !hit) return;
-
-        _tower.Shoot(_target);
+        if (IsCooldown() || ready)
+        { _instead = true; return; }
 
         ready = ++stack >= count;
         if (ready)
@@ -56,29 +53,15 @@ public class Reload : TowerSkill
             EntityManager.Instance?.MakeEffect(_tower, _tower.transform.position, 1.2f);
             StartCooldown(_tower, cooldown);
         }
-
-        hit = false;
-        timer = 60f / speed;
     }
 
     public override void OnHit(Tower _tower, Monster _target, ref bool _instead)
     {
-        _instead = true;
-        if (_tower == null) return;
-
-        int damage = _tower.GetDamage() + _tower.GetSpeed();
-        int chance = !ready ? 0 : 100;
-        int critical = !ready ? 100 : _tower.GetCritical() + _tower.GetChance();
-
-        _tower.HitDamage(_target, damage, chance, critical);
-
-        hit = true;
         ready = false;
     }
 
     public override void OnImpact(Tower _tower, Vector3 _pos)
     {
-        hit = true;
         ready = false;
     }
 }

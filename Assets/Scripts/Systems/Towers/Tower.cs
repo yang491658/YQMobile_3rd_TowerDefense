@@ -283,6 +283,8 @@ public class Tower : Entity
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnAttack(this, attackTarget, ref instead);
 
+        UpdateBuff();
+
         if (!instead)
             Shoot(attackTarget);
 
@@ -357,13 +359,18 @@ public class Tower : Entity
     {
         TowerStat.Stat4 stat = DataManager.Instance.GetBaseStat(data.Role, data.Grade, rank);
 
-        if (data.Target == AttackTarget.None)
-            attackTarget = null;
+        int damage = stat.attackDamage;
+        int speed = stat.attackSpeed;
+        int chance = stat.criticalChance;
+        int critical = stat.criticalDamage;
 
-        int damage = buff.CalcStat(TowerBuff.SubType.Damage, stat.attackDamage);
-        int speed = buff.CalcStat(TowerBuff.SubType.Speed, stat.attackSpeed);
-        int chance = buff.CalcStat(TowerBuff.SubType.Chance, stat.criticalChance);
-        int critical = buff.CalcStat(TowerBuff.SubType.Critical, stat.criticalDamage);
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnStat(this, ref damage, ref speed, ref chance, ref critical);
+
+        damage = buff.CalcStat(TowerBuff.SubType.Damage, damage);
+        speed = buff.CalcStat(TowerBuff.SubType.Speed, speed);
+        chance = buff.CalcStat(TowerBuff.SubType.Chance, chance);
+        critical = buff.CalcStat(TowerBuff.SubType.Critical, critical);
 
         int overChance = Mathf.Max(chance - 100, 0) / 10;
         chance = Mathf.Min(chance, 100);

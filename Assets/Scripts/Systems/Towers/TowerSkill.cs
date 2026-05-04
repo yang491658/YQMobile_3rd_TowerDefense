@@ -19,6 +19,8 @@ public abstract class TowerSkill : ScriptableObject
 
     public virtual void OnGenerate(Tower _tower) { }
 
+    public virtual void OnStat(Tower _tower, ref int _damage, ref int _speed, ref int _chance, ref int _critical) { }
+
     public virtual void OnUpdate(Tower _tower, Monster _target, float _deltaTime) { }
 
     public virtual void OnAttack(Tower _tower, Monster _target, ref bool _instead) { }
