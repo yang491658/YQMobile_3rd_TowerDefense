@@ -11,12 +11,12 @@ public class TowerStat : ScriptableObject
         [Min(0)] public int criticalChance;
         [Min(0)] public int criticalDamage;
 
-        public Stat4(int _damage, int _speed, int _chance, int _critical)
+        public Stat4(int _damage, int _speed)
         {
             attackDamage = Mathf.Max(_damage, 0);
             attackSpeed = Mathf.Max(_speed, 0);
-            criticalChance = attackDamage > 0 ? Mathf.Max(_chance, 0) : 0;
-            criticalDamage = criticalChance > 0 ? Mathf.Max(_critical, 100) : 100;
+            criticalChance = 0;
+            criticalDamage = 150;
         }
     }
 
@@ -29,18 +29,43 @@ public class TowerStat : ScriptableObject
     [SerializeField][Min(0)] private int mythic = 100;
 
     [Header("Role")]
-    [SerializeField] private Stat4 dealer = new(10, 20, 5, 150);
-    [SerializeField] private Stat4 debuff = new(5, 15, 5, 150);
-    [SerializeField] private Stat4 buff = new(0, 0, 0, 100);
-    [SerializeField] private Stat4 summon = new(10, 5, 5, 150);
+    [SerializeField] private Stat4 dealer = new(10, 20);
+    [SerializeField] private Stat4 debuff = new(5, 15);
+    [SerializeField] private Stat4 buff = new(0, 0);
+    [SerializeField] private Stat4 summon = new(10, 5);
 
-    public Stat4 GetStat(TowerRole _role, TowerGrade _grade)
+    public Stat4 GetStat(TowerRole _role, TowerGrade _grade, int _rank)
     {
-        int gradeValue = GetGradeStat(_grade);
         Stat4 stat = GetRoleStat(_role);
+        int gradeValue = GetGradeStat(_grade);
 
-        stat.attackDamage *= gradeValue;
-        stat.attackSpeed *= gradeValue;
+        switch (_role)
+        {
+            case TowerRole.Dealer:
+                stat.attackDamage *= gradeValue * _rank;
+                stat.attackSpeed *= gradeValue * _rank;
+                break;
+
+            case TowerRole.Debuff:
+                stat.attackDamage *= _rank;
+                stat.attackSpeed *= gradeValue * _rank;
+                break;
+
+            case TowerRole.Summon:
+                stat.attackDamage *= gradeValue * _rank;
+                stat.attackSpeed *= _rank;
+                break;
+
+            default:
+                stat.attackDamage *= _rank;
+                stat.attackSpeed *= _rank;
+                break;
+        }
+
+        if (stat.attackDamage > 0)
+            stat.criticalChance = 1 + (_rank - 1) * 4;
+        else
+            stat.criticalDamage = 100;
 
         return stat;
     }

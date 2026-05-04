@@ -205,7 +205,7 @@ public class DataManager : MonoBehaviour
 
     public Color GetGradeColor(TowerGrade _grade) => towerColor.GetColor(_grade);
 
-    public TowerStat.Stat4 GetBaseStat(TowerRole _role, TowerGrade _grade) => towerStat.GetStat(_role, _grade);
+    public TowerStat.Stat4 GetBaseStat(TowerRole _role, TowerGrade _grade, int _rank = 1) => towerStat.GetStat(_role, _grade, _rank);
     public int GetGradeStat(TowerGrade _grade) => towerStat.GetGradeStat(_grade);
 
     public TowerDamage.DamageData GetTowerDamage(DamageType _type) => towerDamage.GetDamage(_type);

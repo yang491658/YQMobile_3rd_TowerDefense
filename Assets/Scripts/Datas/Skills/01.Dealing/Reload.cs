@@ -70,7 +70,7 @@ public class Reload : TowerSkill
         int chance = !ready ? 0 : 100;
         int critical = !ready ? 100 : _tower.GetCritical() + _tower.GetChance();
 
-        _tower.HitDamage(_target, damage, chance, critical, false);
+        _tower.HitDamage(_target, damage, chance, critical);
 
         hit = true;
         ready = false;

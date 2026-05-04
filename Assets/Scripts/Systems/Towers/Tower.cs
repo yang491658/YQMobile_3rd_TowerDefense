@@ -312,15 +312,11 @@ public class Tower : Entity
         HitDamage(_target);
     }
 
-    public void HitDamage(Monster _target, int _damage = -1, int _chance = -1, int _critical = -1,
-        bool _lifeUp = true, DamageType _type = DamageType.Normal)
+    public void HitDamage(Monster _target, int _damage = -1, int _chance = -1, int _critical = -1, DamageType _type = DamageType.Normal)
     {
         int damage = _damage < 0 ? attackDamage : _damage;
         int chance = _chance < 0 ? criticalChance : _chance;
         int critical = _critical < 0 ? criticalDamage : _critical;
-
-        int overflow = Mathf.Max(chance - 100, 0);
-        chance = Mathf.Min(chance, 100);
 
         DamageType type = _type;
         if (Random.value < chance / 100f)
@@ -329,10 +325,7 @@ public class Tower : Entity
             damage = damage * critical / 100;
         }
 
-        bool isHit = _target.TakeDamage(damage, type);
-        if (_lifeUp && isHit && type == DamageType.Critical
-            && Random.value < overflow / 1000f)
-            GameManager.Instance?.LifeUp();
+        _target.TakeDamage(damage, type);
     }
     #endregion
 
@@ -362,31 +355,38 @@ public class Tower : Entity
 
     private void UpdateBuff()
     {
-        TowerStat.Stat4 stat = DataManager.Instance.GetBaseStat(data.Role, data.Grade);
+        TowerStat.Stat4 stat = DataManager.Instance.GetBaseStat(data.Role, data.Grade, rank);
 
         if (data.Target == AttackTarget.None)
             attackTarget = null;
 
-        int damage = stat.attackDamage * rank;
-        int speed = stat.attackSpeed * rank;
-        int chance = stat.criticalChance * rank;
-        int critical = stat.criticalDamage;
+        int damage = buff.CalcStat(TowerBuff.SubType.Damage, stat.attackDamage);
+        int speed = buff.CalcStat(TowerBuff.SubType.Speed, stat.attackSpeed);
+        int chance = buff.CalcStat(TowerBuff.SubType.Chance, stat.criticalChance);
+        int critical = buff.CalcStat(TowerBuff.SubType.Critical, stat.criticalDamage);
 
-        attackDamage = buff.CalcStat(TowerBuff.SubType.Damage, damage);
-        attackSpeed = buff.CalcStat(TowerBuff.SubType.Speed, speed);
-        chance = buff.CalcStat(TowerBuff.SubType.Chance, chance);
-        critical = buff.CalcStat(TowerBuff.SubType.Critical, critical);
+        int overChance = Mathf.Max(chance - 100, 0) / 10;
+        chance = Mathf.Min(chance, 100);
 
-        if (chance <= 0)
+        switch (data.Role)
         {
-            criticalChance = 0;
-            criticalDamage = 100;
+            case TowerRole.Dealer:
+                critical += overChance;
+                break;
+
+            case TowerRole.Debuff:
+                speed += overChance;
+                break;
+
+            case TowerRole.Summon:
+                damage += overChance;
+                break;
         }
-        else
-        {
-            criticalChance = chance;
-            criticalDamage = critical;
-        }
+
+        attackDamage = damage;
+        attackSpeed = speed;
+        criticalChance = chance <= 0 ? 0 : chance;
+        criticalDamage = chance <= 0 ? 100 : critical;
     }
 
     #region SET

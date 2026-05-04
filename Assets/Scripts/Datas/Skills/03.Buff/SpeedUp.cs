@@ -59,20 +59,15 @@ public class SpeedUp : TowerSkill
             targets.RemoveAt(i);
         }
 
-        for (int i = 0; i < current.Count; i++)
+        foreach (Tower target in currents)
         {
-            Tower target = current[i];
-            if (target.GetRole() == TowerRole.Buff) continue;
-
             TowerBuff buff = target.GetBuff();
 
             buff.ApplyStat(_tower, this, TowerBuff.SubType.Speed, factor, 0f, TowerBuff.ApplyType.Refresh);
             buff.ApplyStat(_tower, this, TowerBuff.SubType.Chance, factor, 0f, TowerBuff.ApplyType.Refresh);
 
-            if (targetSet.Contains(target)) continue;
-
-            targetSet.Add(target);
-            targets.Add(target);
+            if (targetSet.Add(target))
+                targets.Add(target);
         }
 
         if (timer <= 0f)

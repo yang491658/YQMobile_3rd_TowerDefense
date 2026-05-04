@@ -189,11 +189,7 @@ public class MonsterDebuff : MonoBehaviour
         => damageAmp.Update(_deltaTime);
 
     public int CalcDamage(int _damage)
-    {
-        if (!damageAmp.IsActive) return _damage;
-
-        return _damage * (100 + damageAmp.Value) / 100;
-    }
+        => damageAmp.IsActive ? _damage * (100 + damageAmp.Value) / 100 : _damage;
     #endregion
 
     #region 이동속도 제어

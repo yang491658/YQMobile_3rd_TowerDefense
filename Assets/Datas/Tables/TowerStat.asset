@@ -12,23 +12,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49cce6f4443e88740ac603129fe55b68, type: 3}
   m_Name: TowerStat
   m_EditorClassIdentifier: 
+  normal: 1
+  rare: 3
+  epic: 7
+  unique: 15
+  legend: 35
+  mythic: 100
   dealer:
     attackDamage: 10
     attackSpeed: 20
-    criticalChance: 5
+    criticalChance: 0
     criticalDamage: 150
   debuff:
     attackDamage: 5
     attackSpeed: 15
-    criticalChance: 5
+    criticalChance: 0
     criticalDamage: 150
   buff:
     attackDamage: 0
     attackSpeed: 0
     criticalChance: 0
-    criticalDamage: 100
+    criticalDamage: 150
   summon:
     attackDamage: 10
     attackSpeed: 5
-    criticalChance: 5
+    criticalChance: 0
     criticalDamage: 150

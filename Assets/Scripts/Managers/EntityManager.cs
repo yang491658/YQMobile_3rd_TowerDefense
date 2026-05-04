@@ -106,14 +106,9 @@ public class EntityManager : MonoBehaviour
     #region 필드
     private bool HasTower(Vector3Int _cell)
     {
-        for (int i = 0; i < towers.Count; i++)
-        {
-            Tower tower = towers[i];
-            if (tower == null) continue;
+        foreach (Vector3Int cell in towerDic.Values)
+            if (cell == _cell) return true;
 
-            if (towerDic.TryGetValue(tower, out Vector3Int c) && c == _cell)
-                return true;
-        }
         return false;
     }
 

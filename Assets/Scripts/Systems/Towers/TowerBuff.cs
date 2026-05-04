@@ -132,19 +132,11 @@ public class TowerBuff : MonoBehaviour
         switch (_sub)
         {
             case SubType.Damage:
-                _value = Mathf.RoundToInt(_value * (100f + bonus) / 100f);
-                break;
-
             case SubType.Speed:
                 _value = Mathf.RoundToInt(_value * (100f + bonus) / 100f);
-                _value = Mathf.Min(_value, 6000);
                 break;
 
             case SubType.Chance:
-                _value += bonus;
-                _value = Mathf.Min(_value, 1000);
-                break;
-
             case SubType.Critical:
                 _value += bonus;
                 break;

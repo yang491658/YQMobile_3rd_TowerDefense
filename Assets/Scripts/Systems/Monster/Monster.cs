@@ -170,7 +170,7 @@ public class Monster : Pooling
         target = _current;
         moveDirection = Vector3.zero;
     }
-    public float SetSpeed(float _speed) => moveSpeed = Mathf.Max(_speed, 0f);
+    public void SetSpeed(float _speed) => moveSpeed = Mathf.Max(_speed, 0f);
 
     public void SetHealth(int _health)
     {
