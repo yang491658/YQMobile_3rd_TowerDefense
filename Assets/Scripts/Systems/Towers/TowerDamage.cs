@@ -10,7 +10,7 @@ public class TowerDamage : ScriptableObject
     {
         public DamageType type;
         public Color color;
-        [Min(0f)] public int font;
+        [Min(0)] public int font;
 
         public DamageData(DamageType _type, Color _color, int _font = 50)
         {
