@@ -74,7 +74,7 @@ public class Tower : Entity
 
         float dt = Time.deltaTime;
 
-        UpdateBuff();
+        UpdateStat();
         if (FindTarget()) Attack(dt);
 
         for (int i = 0; i < skills.Count; i++)
@@ -242,6 +242,67 @@ public class Tower : Entity
     }
     #endregion
 
+    #region 스탯
+    private void UpdateStat()
+    {
+        int damage = 0;
+        int speed = 0;
+        int chance = 0;
+        int critical = 0;
+
+        ApplyBaseStat(ref damage, ref speed, ref chance, ref critical);
+        ApplyBuff(ref damage, ref speed, ref chance, ref critical);
+        ApplyOverChance(ref damage, ref speed, ref chance, ref critical);
+
+        attackDamage = damage;
+        attackSpeed = speed;
+        criticalChance = chance <= 0 ? 0 : chance;
+        criticalDamage = chance <= 0 ? 100 : critical;
+    }
+
+    private void ApplyBaseStat(ref int _damage, ref int _speed, ref int _chance, ref int _critical)
+    {
+        TowerStat.Stat4 stat = DataManager.Instance.GetBaseStat(data.Role, data.Grade, rank);
+
+        _damage = stat.attackDamage;
+        _speed = stat.attackSpeed;
+        _chance = stat.criticalChance;
+        _critical = stat.criticalDamage;
+
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnStat(this, ref _damage, ref _speed, ref _chance, ref _critical);
+    }
+
+    private void ApplyBuff(ref int _damage, ref int _speed, ref int _chance, ref int _critical)
+    {
+        _damage = buff.CalcStat(TowerBuff.SubType.Damage, _damage);
+        _speed = buff.CalcStat(TowerBuff.SubType.Speed, _speed);
+        _chance = buff.CalcStat(TowerBuff.SubType.Chance, _chance);
+        _critical = buff.CalcStat(TowerBuff.SubType.Critical, _critical);
+    }
+
+    private void ApplyOverChance(ref int _damage, ref int _speed, ref int _chance, ref int _critical)
+    {
+        int overChance = Mathf.Max(_chance - 100, 0) / 10;
+        _chance = Mathf.Min(_chance, 100);
+
+        switch (data.Role)
+        {
+            case TowerRole.Dealer:
+                _critical += overChance;
+                break;
+
+            case TowerRole.Debuff:
+                _speed += overChance;
+                break;
+
+            case TowerRole.Summon:
+                _damage += overChance;
+                break;
+        }
+    }
+    #endregion
+
     #region 전투
     private bool FindTarget()
     {
@@ -283,7 +344,7 @@ public class Tower : Entity
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnAttack(this, attackTarget, ref instead);
 
-        UpdateBuff();
+        UpdateStat();
 
         if (!instead)
             Shoot(attackTarget);
@@ -355,47 +416,6 @@ public class Tower : Entity
     }
     #endregion
 
-    private void UpdateBuff()
-    {
-        TowerStat.Stat4 stat = DataManager.Instance.GetBaseStat(data.Role, data.Grade, rank);
-
-        int damage = stat.attackDamage;
-        int speed = stat.attackSpeed;
-        int chance = stat.criticalChance;
-        int critical = stat.criticalDamage;
-
-        for (int i = 0; i < skills.Count; i++)
-            skills[i].OnStat(this, ref damage, ref speed, ref chance, ref critical);
-
-        damage = buff.CalcStat(TowerBuff.SubType.Damage, damage);
-        speed = buff.CalcStat(TowerBuff.SubType.Speed, speed);
-        chance = buff.CalcStat(TowerBuff.SubType.Chance, chance);
-        critical = buff.CalcStat(TowerBuff.SubType.Critical, critical);
-
-        int overChance = Mathf.Max(chance - 100, 0) / 10;
-        chance = Mathf.Min(chance, 100);
-
-        switch (data.Role)
-        {
-            case TowerRole.Dealer:
-                critical += overChance;
-                break;
-
-            case TowerRole.Debuff:
-                speed += overChance;
-                break;
-
-            case TowerRole.Summon:
-                damage += overChance;
-                break;
-        }
-
-        attackDamage = damage;
-        attackSpeed = speed;
-        criticalChance = chance <= 0 ? 0 : chance;
-        criticalDamage = chance <= 0 ? 100 : critical;
-    }
-
     #region SET
     private TowerData BasicData()
     {
@@ -449,7 +469,7 @@ public class Tower : Entity
     {
         rank = Mathf.Clamp(_rank, 1, MaxRank);
 
-        UpdateBuff();
+        UpdateStat();
         UpdateSymbol();
 
         valueDic.Clear(); int index = 0;
