@@ -14,7 +14,7 @@ public class Crack : TowerSkill
 #endif
 
     public override System.Predicate<Monster> GetFilter()
-        => _monster => !_monster.GetDebuff().HasDamageAmp();
+        => _monster => !_monster.GetDebuff().HasBonusDamage();
 
     public override void SetValues(Tower _tower)
     {
@@ -24,7 +24,7 @@ public class Crack : TowerSkill
 
     public override void OnAttack(Tower _tower, Monster _target, ref bool _instead)
     {
-        _target.GetDebuff().ActiveDamage();
+        _target.GetDebuff().ActiveBonus();
     }
 
     public override void OnHit(Tower _tower, Monster _target, ref bool _instead)
@@ -32,6 +32,6 @@ public class Crack : TowerSkill
         if (_target == null || _target.IsInvalid()) return;
 
         ViewEffect effect = EntityManager.Instance?.MakeEffect(_tower, _target, duration);
-        _target.GetDebuff().ApplyDamage(factor, duration, effect);
+        _target.GetDebuff().ApplyBonus(factor, duration, effect);
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -94,25 +95,35 @@ public class Monster : Pooling
     {
         if (IsDead) return false;
 
-        int damage = debuff.CalcDamage(_damage);
+        ApplyDamage(_damage, _type);
 
-        DamageType type = _type;
-        if (type != DamageType.Critical
-            && type != DamageType.Dot
-            && damage > _damage)
-            type = DamageType.Amp;
+        int bonus = debuff.CalcBonus(_damage);
+        if (bonus > 0)
+            StartCoroutine(DamageCoroutine(bonus, DamageType.Bonus));
 
+        return true;
+    }
+
+    private void ApplyDamage(int _damage, DamageType _type)
+    {
 #if TEST_Manager
-        TestManager.Instance?.AddDamage(damage);
+        TestManager.Instance?.AddDamage(_damage);
 
         if (!(TestManager.Instance?.Mode == TestMode.Solo && this is Boss))
 #endif
-            SetHealth(health - damage);
-        CreateDamage(damage, type);
+            SetHealth(health - _damage);
+        CreateDamage(_damage, _type);
 
         if (health <= 0) Die();
+    }
 
-        return true;
+    private IEnumerator DamageCoroutine(int _damage, DamageType _type)
+    {
+        yield return new WaitForSeconds(damageDuration / 8f);
+
+        if (IsExclude()) yield break;
+
+        ApplyDamage(_damage, _type);
     }
 
     private void CreateDamage(int _damage, DamageType _type = DamageType.Normal)

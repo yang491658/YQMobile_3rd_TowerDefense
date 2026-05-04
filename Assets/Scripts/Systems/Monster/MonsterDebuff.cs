@@ -99,7 +99,7 @@ public class MonsterDebuff : MonoBehaviour
     [Header("Debuff")]
     [SerializeField] private Debuff tickDamage;
     private float tickTimer;
-    [SerializeField] private Debuff damageAmp;
+    [SerializeField] private Debuff bonusDamage;
     [SerializeField] private Debuff speedControl;
     [SerializeField] private Debuff directionControl;
 
@@ -116,7 +116,7 @@ public class MonsterDebuff : MonoBehaviour
         bool boss = monster is Boss;
 
         tickDamage.SetBoss(boss);
-        damageAmp.SetBoss(boss);
+        bonusDamage.SetBoss(boss);
         speedControl.SetBoss(boss);
         directionControl.SetBoss(boss);
     }
@@ -129,7 +129,7 @@ public class MonsterDebuff : MonoBehaviour
         float dt = Time.deltaTime;
         UpdateDirection(dt);
         UpdateSpeed(dt);
-        UpdateDamage(dt);
+        UpdateBonus(dt);
         UpdateTick(dt);
 
         UpdateEffect(dt);
@@ -138,7 +138,7 @@ public class MonsterDebuff : MonoBehaviour
     public void Clear()
     {
         tickDamage.Reset();
-        damageAmp.Reset();
+        bonusDamage.Reset();
         speedControl.Reset();
         directionControl.Reset();
 
@@ -176,20 +176,20 @@ public class MonsterDebuff : MonoBehaviour
     }
     #endregion
 
-    #region 데미지 증폭
-    public void ActiveDamage() => damageAmp.Active();
+    #region 추가 데미지
+    public void ActiveBonus() => bonusDamage.Active();
 
-    public void ApplyDamage(int _factor, float _duration, ViewEffect _effect)
+    public void ApplyBonus(int _factor, float _duration, ViewEffect _effect)
     {
-        if (damageAmp.Apply(_factor, _duration, _effect))
-            AddEffect(damageAmp.Effect);
+        if (bonusDamage.Apply(_factor, _duration, _effect))
+            AddEffect(bonusDamage.Effect);
     }
 
-    private void UpdateDamage(float _deltaTime)
-        => damageAmp.Update(_deltaTime);
+    private void UpdateBonus(float _deltaTime)
+        => bonusDamage.Update(_deltaTime);
 
-    public int CalcDamage(int _damage)
-        => damageAmp.IsActive ? _damage * (100 + damageAmp.Value) / 100 : _damage;
+    public int CalcBonus(int _damage)
+        => bonusDamage.IsActive ? _damage * bonusDamage.Value / 100 : 0;
     #endregion
 
     #region 이동속도 제어
@@ -331,10 +331,10 @@ public class MonsterDebuff : MonoBehaviour
 
     #region GET
     public bool HasTickDamage() => tickDamage.IsActive;
-    public bool HasDamageAmp() => damageAmp.IsActive;
+    public bool HasBonusDamage() => bonusDamage.IsActive;
     public bool HasSpeedControl() => speedControl.IsActive;
     public bool HasDirectionControl() => directionControl.IsActive;
     public bool HasDebuff()
-        => tickDamage.IsActive || damageAmp.IsActive || speedControl.IsActive || directionControl.IsActive;
+        => tickDamage.IsActive || bonusDamage.IsActive || speedControl.IsActive || directionControl.IsActive;
     #endregion
 }

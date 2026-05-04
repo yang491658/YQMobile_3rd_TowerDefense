@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum DamageType { Normal, Critical, Dot, Amp, }
+public enum DamageType { Normal, Critical, Dot, Bonus, }
 
 [CreateAssetMenu(fileName = "TowerDamage", menuName = "Table/Tower/Damage", order = 54)]
 public class TowerDamage : ScriptableObject
@@ -22,14 +22,14 @@ public class TowerDamage : ScriptableObject
 
     [SerializeField] private DamageData normal = new(DamageType.Normal, 50f, Color.black);
     [SerializeField] private DamageData critical = new(DamageType.Critical, 65f, Color.red);
-    [SerializeField] private DamageData dot = new(DamageType.Dot, 45f, Color.green);
-    [SerializeField] private DamageData amp = new(DamageType.Amp, 55f, Color.magenta);
+    [SerializeField] private DamageData dot = new(DamageType.Dot, 35f, Color.green);
+    [SerializeField] private DamageData bonus = new(DamageType.Bonus, 45f, Color.magenta);
 
     public DamageData GetDamage(DamageType _type) => _type switch
     {
         DamageType.Critical => critical,
         DamageType.Dot => dot,
-        DamageType.Amp => amp,
+        DamageType.Bonus => bonus,
         _ => normal,
     };
 }
