@@ -43,7 +43,7 @@ public class Blind : TowerSkill
         }
     }
 
-    public override void OnHit(Tower _tower, Monster _target, ref bool _instead)
+    public override void OnHit(Tower _tower, Bullet _bullet, Monster _target, ref bool _instead)
     {
         if (_target == null || _target.IsInvalid()) return;
 

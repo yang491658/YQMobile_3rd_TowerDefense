@@ -20,7 +20,7 @@ public class Splash : TowerSkill
         range = _tower.GetValueInt(this, ValueType.Range);
     }
 
-    public override void OnHit(Tower _tower, Monster _target, ref bool _instead)
+    public override void OnHit(Tower _tower, Bullet _bullet, Monster _target, ref bool _instead)
     {
         Vector3 pos = _target.transform.position;
         List<Monster> monsters = EntityManager.Instance?.GetMonstersInRange(pos, range);
@@ -36,7 +36,7 @@ public class Splash : TowerSkill
         }
     }
 
-    public override void OnImpact(Tower _tower, Vector3 _pos)
+    public override void OnImpact(Tower _tower, Bullet _bullet, Vector3 _pos)
     {
         EntityManager.Instance?.MakeEffect(_tower, _pos, range * 2f);
 

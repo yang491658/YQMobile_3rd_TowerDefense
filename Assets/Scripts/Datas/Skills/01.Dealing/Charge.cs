@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Reload", menuName = "Skill/Dealing/Reload", order = 102)]
-public class Reload : TowerSkill
+[CreateAssetMenu(fileName = "Charge", menuName = "Skill/Dealing/Charge", order = 104)]
+public class Charge : TowerSkill
 {
     [Header("Value")]
     [SerializeField][Min(0)] private int count;
@@ -12,7 +12,7 @@ public class Reload : TowerSkill
     private bool ready;
 
 #if UNITY_EDITOR
-    public override void SetID() => ID = 102;
+    public override void SetID() => ID = 104;
     public override ValueType[] GetValues()
         => new[] { ValueType.Count, ValueType.Cooldown };
 #endif
@@ -55,12 +55,12 @@ public class Reload : TowerSkill
         }
     }
 
-    public override void OnHit(Tower _tower, Monster _target, ref bool _instead)
+    public override void OnHit(Tower _tower, Bullet _bullet, Monster _target, ref bool _instead)
     {
         ready = false;
     }
 
-    public override void OnImpact(Tower _tower, Vector3 _pos)
+    public override void OnImpact(Tower _tower, Bullet _bullet, Vector3 _pos)
     {
         ready = false;
     }

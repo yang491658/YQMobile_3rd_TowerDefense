@@ -168,3 +168,4 @@ MonoBehaviour:
   tower: {fileID: 0}
   target: {fileID: 0}
   moveSpeed: 10
+  moveDirection: {x: 0, y: 0}

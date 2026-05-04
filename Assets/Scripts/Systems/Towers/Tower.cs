@@ -347,16 +347,21 @@ public class Tower : Entity
         UpdateStat();
 
         if (!instead)
-            Shoot(attackTarget);
+        {
+            Bullet bullet = Shoot(attackTarget);
+            for (int i = 0; i < skills.Count; i++)
+                skills[i].OnBullet(this, bullet);
+        }
 
         if (!instead || data.Role == TowerRole.Summon)
             attackTimer = 60f / attackSpeed;
     }
 
-    public void Shoot(Monster _target)
+    public Bullet Shoot(Monster _target)
         => EntityManager.Instance?.MakeBullet(this, _target);
 
-    public void Hit(Monster _target, int _index, Vector3 _pos, bool _onHit = true)
+    public void Hit(Monster _target, int _index, Vector3 _pos, bool _onHit = true) => Hit(null, _target, _index, _pos, _onHit);
+    public void Hit(Bullet _bullet, Monster _target, int _index, Vector3 _pos, bool _onHit = true)
     {
         bool valid = _target != null && !_target.IsInvalid(_index);
         bool instead = false;
@@ -365,8 +370,8 @@ public class Tower : Entity
         {
             for (int i = 0; i < skills.Count; i++)
             {
-                if (valid) skills[i].OnHit(this, _target, ref instead);
-                else skills[i].OnImpact(this, _pos);
+                if (valid) skills[i].OnHit(this, _bullet, _target, ref instead);
+                else skills[i].OnImpact(this, _bullet, _pos);
             }
         }
 
