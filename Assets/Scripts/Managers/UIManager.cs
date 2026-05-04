@@ -212,8 +212,7 @@ public class UIManager : MonoBehaviour
             var assets = AssetDatabase.LoadAllAssetsAtPath(path);
             foreach (var obj in assets)
             {
-                var s = obj as Sprite;
-                if (s != null && s.name == _sprite)
+                if (obj is Sprite s && s.name == _sprite)
                 {
                     _list.Add(s);
                     return;
