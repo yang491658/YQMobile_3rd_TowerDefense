@@ -197,20 +197,32 @@ MonoBehaviour:
     duration: 0
     timer: 0
     immune: 0
-  damageAmp:
+    reserve: 0
+    boss: 0
+    effect: {fileID: 0}
+  bonusDamage:
     value: 0
     duration: 0
     timer: 0
     immune: 0
+    reserve: 0
+    boss: 0
+    effect: {fileID: 0}
   speedControl:
     value: 0
     duration: 0
     timer: 0
     immune: 0
+    reserve: 0
+    boss: 0
+    effect: {fileID: 0}
   directionControl:
     value: 0
     duration: 0
     timer: 0
     immune: 0
+    reserve: 0
+    boss: 0
+    effect: {fileID: 0}
   effects: []
   interval: 0.35

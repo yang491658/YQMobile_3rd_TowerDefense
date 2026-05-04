@@ -7,16 +7,15 @@ public class MonsterDebuff : MonoBehaviour
     [System.Serializable]
     private struct Debuff
     {
-        private int reserve;
-        [SerializeField] private int value;
-        [SerializeField] private float duration;
-        [SerializeField] private float timer;
-        private ViewEffect effect;
-        private bool boss;
-        [SerializeField] private float immune;
+        [Min(0)] public int value;
+        [Min(0f)] public float duration;
+        [Min(0f)] public float timer;
+        [Min(0f)] public float immune;
 
-        public int Value => value;
-        public ViewEffect Effect => effect;
+        [HideInInspector] public int reserve;
+        [HideInInspector] public bool boss;
+        [HideInInspector] public ViewEffect effect;
+
         public bool IsActive => reserve > 0 || timer > 0f;
 
         public void SetBoss(bool _boss) => boss = _boss;
@@ -158,7 +157,7 @@ public class MonsterDebuff : MonoBehaviour
         if (tickDamage.Apply(_damage, _duration, _effect))
         {
             tickTimer = 1f;
-            AddEffect(tickDamage.Effect);
+            AddEffect(tickDamage.effect);
         }
     }
 
@@ -170,7 +169,7 @@ public class MonsterDebuff : MonoBehaviour
         tickTimer -= _deltaTime;
         while (tickTimer <= 0f)
         {
-            monster.TakeDamage(tickDamage.Value, DamageType.Dot);
+            monster.TakeDamage(tickDamage.value, DamageType.DoT);
             tickTimer += 1f;
         }
     }
@@ -182,14 +181,14 @@ public class MonsterDebuff : MonoBehaviour
     public void ApplyBonus(int _factor, float _duration, ViewEffect _effect)
     {
         if (bonusDamage.Apply(_factor, _duration, _effect))
-            AddEffect(bonusDamage.Effect);
+            AddEffect(bonusDamage.effect);
     }
 
     private void UpdateBonus(float _deltaTime)
         => bonusDamage.Update(_deltaTime);
 
     public int CalcBonus(int _damage)
-        => bonusDamage.IsActive ? _damage * bonusDamage.Value / 100 : 0;
+        => bonusDamage.IsActive ? _damage * bonusDamage.value / 100 : 0;
     #endregion
 
     #region 이동속도 제어
@@ -201,18 +200,18 @@ public class MonsterDebuff : MonoBehaviour
             baseSpeed = monster.GetSpeed();
         else
         {
-            if (speedControl.Value == 100 && _factor != 100)
+            if (speedControl.value == 100 && _factor != 100)
             {
                 if (_effect != null) _effect.Despawn();
                 return;
             }
 
-            if (!(monster is Boss) && speedControl.Value != 100 && _factor == 100)
+            if (!(monster is Boss) && speedControl.value != 100 && _factor == 100)
                 speedControl.Reset();
         }
 
         if (speedControl.Apply(_factor, _duration, _effect))
-            AddEffect(speedControl.Effect);
+            AddEffect(speedControl.effect);
     }
 
     private void UpdateSpeed(float _deltaTime)
@@ -223,7 +222,7 @@ public class MonsterDebuff : MonoBehaviour
             return;
         }
 
-        monster.SetSpeed(baseSpeed * (1f - speedControl.Value / 100f));
+        monster.SetSpeed(baseSpeed * (1f - speedControl.value / 100f));
     }
     #endregion
 
@@ -236,7 +235,7 @@ public class MonsterDebuff : MonoBehaviour
             _dir = Random.Range(1, 5);
 
         if (directionControl.Apply(_dir, _duration, _effect))
-            AddEffect(directionControl.Effect);
+            AddEffect(directionControl.effect);
     }
 
     private void UpdateDirection(float _deltaTime)
@@ -248,7 +247,7 @@ public class MonsterDebuff : MonoBehaviour
 
         if (!directionControl.IsActive) return false;
 
-        Vector3Int offset = directionControl.Value switch
+        Vector3Int offset = directionControl.value switch
         {
             1 => Vector3Int.right,
             2 => Vector3Int.down,
