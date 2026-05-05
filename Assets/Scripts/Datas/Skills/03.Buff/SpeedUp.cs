@@ -75,7 +75,7 @@ public class SpeedUp : TowerSkill
         {
             timer = interval;
             for (int i = 0; i < targets.Count; i++)
-                EntityManager.Instance?.MakeEffect(_tower, targets[i]);
+                EntityManager.Instance?.MakeEffect(_tower, targets[i].transform.position, 1f);
         }
     }
 
