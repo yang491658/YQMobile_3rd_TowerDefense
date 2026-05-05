@@ -529,12 +529,12 @@ public class EntityManager : MonoBehaviour
         return bullet;
     }
 
-    public Summon MakeSummon(TowerSkill _skill, Tower _tower, Vector3 _pos, float _scale = 1f, float _rate = 1f)
+    public Summon MakeSummon(TowerSkill _skill, Tower _tower, Vector3 _pos, float _scale = 1f, float _speed = 0f)
     {
         Summon summon = SpawnPool<Summon>(summonBase, _pos, otherTrans);
         if (summon == null) return null;
 
-        summon.SetSummon(_skill, _tower, _scale, _rate);
+        summon.SetSummon(_skill, _tower, _scale, _speed);
         return summon;
     }
 

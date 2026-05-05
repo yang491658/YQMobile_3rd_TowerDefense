@@ -12,7 +12,6 @@ public class Summon : Pooling
 
     [Header("Move")]
     [SerializeField][Min(0f)] private float speed;
-    [SerializeField][Min(0f)] private float rate;
     [SerializeField] private Vector3[] path;
     [SerializeField][Min(0)] private int pathIndex;
     private bool loop = false;
@@ -75,7 +74,6 @@ public class Summon : Pooling
 
     private void UpdateMove(float _deltaTime)
     {
-        speed = tower.GetSpeed() * rate;
         if (speed <= 0f) return;
 
         Vector3 nextPos;
@@ -123,7 +121,7 @@ public class Summon : Pooling
     }
 
     #region SET
-    public void SetSummon(TowerSkill _skill, Tower _tower, float _scale = 1f, float _rate = 1f)
+    public void SetSummon(TowerSkill _skill, Tower _tower, float _scale = 1f, float _speed = 0f)
     {
         transform.localScale = _tower.transform.localScale * _scale;
         sr.sprite = _tower.GetIcon();
@@ -132,7 +130,8 @@ public class Summon : Pooling
         ID = _skill.ID;
         tower = _tower;
         tower.AddSummon(this);
-        rate = _rate;
+
+        speed = _speed;
     }
 
     public void SetOrbit(float _radius, float _angle)
@@ -203,7 +202,6 @@ public class Summon : Pooling
         targetPos = default;
 
         speed = 0f;
-        rate = 0f;
         path = null;
         pathIndex = 0;
         loop = false;

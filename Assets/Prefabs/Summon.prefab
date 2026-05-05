@@ -168,7 +168,6 @@ MonoBehaviour:
   tower: {fileID: 0}
   target: {fileID: 0}
   speed: 0
-  rate: 0
   path: []
   pathIndex: 0
   duration: 0

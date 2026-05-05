@@ -8,8 +8,6 @@ public class Zone : TowerSkill
     [SerializeField][Min(0f)] private float duration;
     [SerializeField][Min(0f)] private float cooldown;
 
-    private const float rotate = 360f;
-
 #if UNITY_EDITOR
     public override void SetID() => ID = 403;
     public override ValueType[] GetValues()
@@ -29,7 +27,7 @@ public class Zone : TowerSkill
         if (IsCooldown()) return;
 
         EntityManager.Instance?.MakeSummon(this, _tower, _target.transform.position, scale)
-            ?.SetZone(duration, rotate);
+            ?.SetZone(duration, _tower.GetDamage());
 
         StartCooldown(_tower, duration + cooldown);
     }

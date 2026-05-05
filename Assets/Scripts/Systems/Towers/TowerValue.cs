@@ -65,6 +65,7 @@ public enum ValueType
 
     [InspectorName("범위")] Range = 301,
     [InspectorName("크기")] Scale = 302,
+    [InspectorName("속도")] Speed = 303,
 
     [InspectorName("지속")] Duration = 401,
     [InspectorName("쿨다운")] Cooldown = 402,
