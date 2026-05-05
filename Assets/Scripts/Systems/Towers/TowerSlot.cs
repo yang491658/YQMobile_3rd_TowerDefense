@@ -39,7 +39,7 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         btn.interactable = state != SlotState.Complete && GameManager.Instance.EnoughGold();
     }
 
-    #region 슬롯 
+    #region 슬롯
     public void Init()
     {
         btn.onClick.RemoveListener(OnClickSlot);

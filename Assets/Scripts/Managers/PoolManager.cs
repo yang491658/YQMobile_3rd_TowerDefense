@@ -106,9 +106,7 @@ public class PoolManager : MonoBehaviour
                 obj.transform.SetParent(parent.TryGetValue(id, out var p) ? p : transform, false);
             }
 
-            int last = pending.Count - 1;
-            pending[i] = pending[last];
-            pending.RemoveAt(last);
+            pending.RemoveAt(i);
         }
     }
 

@@ -42,37 +42,21 @@ public class AutoBackground : MonoBehaviour
 
     private void Fit()
     {
-        if (sr == null || sr.sprite == null) return;
+        if (sr == null) return;
+
+        Sprite sp = sr.sprite;
+        if (sp == null) return;
 
         lastW = Screen.width;
         lastH = Screen.height;
         lastAspect = AutoCamera.Aspect;
         lastOrthoSize = AutoCamera.OrthoSize;
 
-        Rect worldRect = AutoCamera.WorldRect;
-        float worldW = worldRect.width;
-        float worldH = worldRect.height;
+        float camH = lastOrthoSize * 2f;
+        float camW = camH * lastAspect;
+        Vector2 size = sp.bounds.size;
+        float scale = Mathf.Max(camW / size.x, camH / size.y);
 
-        Sprite sp = sr.sprite;
-        float ppu = sp.pixelsPerUnit;
-        if (ppu <= 0f) return;
-
-        float spriteW = sp.rect.width / ppu;
-        float spriteH = sp.rect.height / ppu;
-        if (spriteW <= 0f || spriteH <= 0f) return;
-
-        Transform tr = transform;
-        Transform parent = tr.parent;
-        Vector3 parentLossy = parent != null ? parent.lossyScale : Vector3.one;
-        float parentScaleX = parentLossy.x == 0f ? 1f : parentLossy.x;
-        float parentScaleY = parentLossy.y == 0f ? 1f : parentLossy.y;
-
-        float localX = (worldW / spriteW) / parentScaleX;
-        float localY = (worldH / spriteH) / parentScaleY;
-        tr.localScale = new Vector3(localX, localY, (localX + localY) / 2f);
-
-        Bounds b = sr.bounds;
-        Vector2 center = worldRect.center;
-        tr.position += new Vector3(center.x - b.center.x, center.y - b.center.y, 0f);
+        transform.localScale = new Vector3(scale, scale, 1f);
     }
 }

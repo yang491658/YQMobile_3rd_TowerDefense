@@ -29,6 +29,7 @@ public class SpeedUp : TowerSkill
     {
         targets.Clear();
         targetSet.Clear();
+        currents.Clear();
         timer = 0f;
     }
 
@@ -101,5 +102,6 @@ public class SpeedUp : TowerSkill
 
         targets.Clear();
         targetSet.Clear();
+        currents.Clear();
     }
 }

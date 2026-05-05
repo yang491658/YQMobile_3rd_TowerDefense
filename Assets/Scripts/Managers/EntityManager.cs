@@ -281,7 +281,7 @@ public class EntityManager : MonoBehaviour
 
             if (prevCell == entryCell) color = entryColor;
             else if (prevCell == exitCell) color = exitColor;
-            else if (towerDic.ContainsValue(prevCell)) color = towerColor;
+            else if (HasTower(prevCell)) color = towerColor;
             else
             {
                 Vector3Int pathCell = entryCell;

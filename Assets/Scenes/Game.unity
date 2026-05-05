@@ -11680,7 +11680,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   phase: 0
   normalTime: 180
-  spawnRange: {x: 1, y: 1}
+  spawnRange: {x: 0.3, y: 3}
   spawnPeak: 30
   warningTime: 5
   warningInterval: 0.3
@@ -12658,7 +12658,7 @@ MonoBehaviour:
     slider: {fileID: 6970153951016945753}
     value: 1
     minValue: 1
-    maxValue: 100
+    maxValue: 20
     format: "\uBC30\uC18D \xD7 {0}"
   testCountNum: {fileID: 82935451405714779}
   averagePlayNum: {fileID: 274309895}
