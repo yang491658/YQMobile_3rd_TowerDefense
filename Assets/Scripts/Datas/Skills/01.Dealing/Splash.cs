@@ -32,7 +32,7 @@ public class Splash : TowerSkill
             Monster monster = monsters[i];
             if (monster == _target) continue;
 
-            monster.TakeDamage(damage);
+            monster.TakeDamage(damage, _direct: true);
         }
     }
 
@@ -42,6 +42,6 @@ public class Splash : TowerSkill
 
         List<Monster> monsters = EntityManager.Instance?.GetMonstersInRange(_pos, range);
         for (int i = 0; i < monsters.Count; i++)
-            monsters[i].TakeDamage(damage);
+            monsters[i].TakeDamage(damage, _direct: true);
     }
 }

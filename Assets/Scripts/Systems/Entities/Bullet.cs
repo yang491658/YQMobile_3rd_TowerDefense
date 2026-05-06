@@ -6,6 +6,9 @@ public class Bullet : Pooling
     [Header("Origin")]
     [SerializeField] private Tower tower;
 
+    [Header("Battle")]
+    [SerializeField][Min(0)] private int reserve;
+
     [Header("Move")]
     [SerializeField] private Monster target;
     private int targetIndex;
@@ -86,15 +89,21 @@ public class Bullet : Pooling
 
         tower = _tower;
         tower.AddBullet(this);
+        reserve = _tower.GetDamage();
 
         SetTarget(_target);
     }
 
     public void SetTarget(Monster _target)
     {
+        if (!IsHit && reserve > 0
+            && target != null && !target.IsInvalid(targetIndex))
+            target.ReserveDown(reserve);
+
         target = _target;
         if (target == null) return;
 
+        target.ReserveUp(reserve);
         targetIndex = target.Index;
         targetPos = target.transform.position;
         moveDirection = (target.transform.position - transform.position).normalized;
@@ -118,6 +127,10 @@ public class Bullet : Pooling
         if (tower != null)
             tower.RemoveBullet(this);
 
+        if (!IsHit && reserve > 0
+            && target != null && !target.IsInvalid(targetIndex))
+            target.ReserveDown(reserve);
+
         base.OnDespawnPool();
     }
 
@@ -126,6 +139,8 @@ public class Bullet : Pooling
         base.ResetPool();
 
         tower = null;
+        reserve = 0;
+
         target = null;
         targetIndex = 0;
         targetPos = default;

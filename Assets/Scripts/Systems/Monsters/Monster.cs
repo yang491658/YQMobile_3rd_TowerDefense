@@ -21,8 +21,10 @@ public class Monster : Pooling
     [SerializeField] private Vector3 moveDirection;
 
     [Header("Battle")]
+    [SerializeField][Min(0)] private int reserve = 0;
     [SerializeField][Min(0)] private int health;
     [SerializeField][Min(0)] protected int maxHealth;
+    [Space]
     [SerializeField][Min(0)] private int gold;
     [Space]
     [SerializeField] private MonsterDebuff debuff;
@@ -91,9 +93,11 @@ public class Monster : Pooling
     #endregion
 
     #region 전투
-    public bool TakeDamage(int _damage, DamageType _type = DamageType.Normal)
+    public bool TakeDamage(int _damage, DamageType _type = DamageType.Normal, bool _direct = false)
     {
         if (IsDead) return false;
+
+        if (!_direct) ReserveDown(_damage);
 
         ApplyDamage(_damage, _type);
 
@@ -121,7 +125,7 @@ public class Monster : Pooling
     {
         yield return new WaitForSeconds(damageDuration / 8f);
 
-        if (IsExclude()) yield break;
+        if (IsInvalid()) yield break;
 
         ApplyDamage(_damage, _type);
     }
@@ -143,6 +147,9 @@ public class Monster : Pooling
         text.SetMove(damageSpeed, dir);
         text.SetDuration(damageDuration);
     }
+
+    public void ReserveUp(int _damage) => reserve += _damage;
+    public void ReserveDown(int _damage) => reserve = Mathf.Max(reserve - _damage, 0);
 
     public void Die()
     {
@@ -197,8 +204,8 @@ public class Monster : Pooling
 
     public int GetHealth() => health;
     public int GetMaxHealth() => maxHealth;
-    public bool IsExclude() => IsDead || IsDespawn;
-    public bool IsInvalid(int _index = -1) => IsExclude() || (_index >= 0 && Index != _index);
+    public bool IsExclude() => health * 1.5f < reserve || IsDead || IsDespawn;
+    public bool IsInvalid(int _index = -1) => IsDead || IsDespawn || (_index >= 0 && Index != _index);
 
     public MonsterDebuff GetDebuff() => debuff;
     #endregion
@@ -238,6 +245,7 @@ public class Monster : Pooling
         moveSpeed = 1f;
         moveDirection = Vector3.zero;
 
+        reserve = 0;
         debuff.Clear();
 
         Stop();

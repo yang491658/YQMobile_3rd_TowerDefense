@@ -17,6 +17,7 @@ public class Summon : Pooling
     private bool loop = false;
 
     [Header("Battle")]
+    [SerializeField][Min(0)] private int reserve;
     private bool isHit = false;
     private bool onHit = false;
 
@@ -132,6 +133,7 @@ public class Summon : Pooling
         tower.AddSummon(this);
 
         speed = _speed;
+        reserve = _tower.GetDamage();
     }
 
     public void SetOrbit(float _radius, float _angle)
@@ -154,6 +156,7 @@ public class Summon : Pooling
     public void SetBounce(Monster _target, float _rotate = 0f)
     {
         target = _target;
+        target.ReserveUp(reserve);
         targetIndex = _target.Index;
         targetPos = _target.transform.position;
 
@@ -187,6 +190,10 @@ public class Summon : Pooling
         if (tower != null)
             tower.RemoveSummon(this);
 
+        if (!isHit && reserve > 0
+            && target != null && !target.IsInvalid(targetIndex))
+            target.ReserveDown(reserve);
+
         base.OnDespawnPool();
     }
 
@@ -206,6 +213,7 @@ public class Summon : Pooling
         pathIndex = 0;
         loop = false;
 
+        reserve = 0;
         isHit = false;
         onHit = false;
 
