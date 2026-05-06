@@ -183,6 +183,8 @@ public class Summon : Pooling
         base.OnSpawnPool();
 
         transform.rotation = Quaternion.identity;
+
+        ID = 0;
     }
 
     public override void OnDespawnPool()
@@ -200,8 +202,6 @@ public class Summon : Pooling
     public override void ResetPool()
     {
         base.ResetPool();
-
-        ID = 0;
 
         tower = null;
         target = null;

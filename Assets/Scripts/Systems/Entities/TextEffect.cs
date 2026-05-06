@@ -187,7 +187,6 @@ public class TextEffect : MonoBehaviour, IPoolable
         IsDespawn = false;
 
         cam = Camera.main;
-        colorTimer = 0f;
     }
 
     public void OnDespawnPool()

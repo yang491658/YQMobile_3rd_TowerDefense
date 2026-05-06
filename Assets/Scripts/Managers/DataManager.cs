@@ -35,8 +35,7 @@ public class DataManager : MonoBehaviour
         EditorUtility.SetDirty(this);
     }
 
-    private static TAsset[] CollectDatas<TAsset>
-        (string _filter, string[] _folders, System.Func<TAsset, int> _order) where TAsset : ScriptableObject
+    private static TAsset[] CollectDatas<TAsset>(string _filter, string[] _folders, System.Func<TAsset, int> _order) where TAsset : ScriptableObject
     {
         string[] guids = AssetDatabase.FindAssets(_filter, _folders);
         var list = new List<TAsset>(guids.Length);

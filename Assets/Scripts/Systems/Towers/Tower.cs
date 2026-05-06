@@ -72,10 +72,11 @@ public class Tower : Entity
 
         base.Update();
 
-        float dt = Time.deltaTime;
-
         UpdateStat();
-        if (FindTarget()) Attack(dt);
+
+        float dt = Time.deltaTime;
+        if ((attackTimer -= dt) <= 0f)
+            if (FindTarget()) Attack();
 
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnUpdate(this, attackTarget, dt);
@@ -308,6 +309,7 @@ public class Tower : Entity
     {
         if (!(data.Role == TowerRole.Debuff
             || attackTarget == null
+            || attackTarget.IsExclude()
             || attackTarget.IsInvalid(targetIndex)))
             return true;
 
@@ -335,11 +337,8 @@ public class Tower : Entity
         return attackTarget != null;
     }
 
-    private void Attack(float _deltaTime)
+    private void Attack()
     {
-        attackTimer -= _deltaTime;
-        if (attackTimer > 0f) return;
-
         bool instead = data.Role == TowerRole.Summon;
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnAttack(this, attackTarget, ref instead);

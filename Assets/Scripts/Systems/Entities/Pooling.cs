@@ -10,6 +10,7 @@ public abstract class Pooling : Entity, IPoolable
     public virtual void OnDespawnPool()
     {
         IsDespawn = true;
+
         ResetPool();
     }
 

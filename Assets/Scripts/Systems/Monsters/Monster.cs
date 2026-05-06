@@ -226,10 +226,8 @@ public class Monster : Pooling
         Index = order;
     }
 
-    public override void ResetPool()
+    public override void OnDespawnPool()
     {
-        base.ResetPool();
-
         Pooling[] poolings = GetComponentsInChildren<Pooling>(true);
         for (int i = 0; i < poolings.Length; i++)
         {
@@ -240,12 +238,23 @@ public class Monster : Pooling
             EntityManager.Instance?.DespawnPool(pooling);
         }
 
+        base.OnDespawnPool();
+    }
+
+    public override void ResetPool()
+    {
+        base.ResetPool();
+
         current = default;
         target = default;
         moveSpeed = 1f;
         moveDirection = Vector3.zero;
 
         reserve = 0;
+        health = 0;
+        maxHealth = 0;
+        gold = 0;
+
         debuff.Clear();
 
         Stop();

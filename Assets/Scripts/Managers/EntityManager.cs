@@ -548,22 +548,18 @@ public class EntityManager : MonoBehaviour
         return effect;
     }
 
-    public ViewEffect MakeEffect(Tower _tower, Entity _entity, float _duration = 0.7f)
+    public ViewEffect MakeEffect(Tower _tower, Monster _target, float _duration = 0.7f)
     {
-        if (_entity == null || !_entity.gameObject.activeInHierarchy) return null;
+        if (_target == null || !_target.gameObject.activeInHierarchy) return null;
 
-        float scale = 1f;
-        if (_entity is Tower) scale = 0.85f;
-        else if (_entity is Monster) scale = 0.7f;
-
-        Transform parent = _entity.transform;
+        Transform parent = _target.transform;
 
         ViewEffect effect = SpawnPool<ViewEffect>(viewBase, parent.position, parent);
         if (effect == null) return null;
 
-        effect.SetEffect(_tower, scale, _duration);
-        effect.GetSR().sortingLayerID = _entity.GetSR().sortingLayerID;
-        effect.GetSR().sortingOrder = _entity.GetSR().sortingOrder + 1;
+        effect.SetEffect(_tower, 0.7f, _duration);
+        effect.GetSR().sortingLayerID = _target.GetSR().sortingLayerID;
+        effect.GetSR().sortingOrder = _target.GetSR().sortingOrder + 1;
 
         return effect;
     }

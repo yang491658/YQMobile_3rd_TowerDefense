@@ -705,10 +705,10 @@ public class TestManager : MonoBehaviour
 
         testText.text =
             $"FPS : {frame / timer:0.0}\n" +
-            $"MS : {timer * 1000f / frame:0.0}\n\n" +
-            $"Tower : {EntityManager.Instance?.GetTowerCount()}\n" +
-            $"Monster : {EntityManager.Instance?.GetMonsterCount()}\n" +
-            $"Others : {PoolManager.Instance?.GetOtherCount()}";
+            $"MS : {timer * 1000f / frame:0.0}\n" +
+            $" / Tower : {EntityManager.Instance?.GetTowerCount()}\n" +
+            $" / Monster : {EntityManager.Instance?.GetMonsterCount()}\n" +
+            $" / Others : {PoolManager.Instance?.GetOtherCount()}";
 
         timer = 0f;
         frame = 0;

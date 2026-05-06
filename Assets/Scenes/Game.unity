@@ -3299,8 +3299,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -270, y: -140}
-  m_SizeDelta: {x: 280, y: 220}
+  m_AnchoredPosition: {x: -270, y: -135}
+  m_SizeDelta: {x: 270, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &228723977
 MonoBehaviour:
@@ -3322,7 +3322,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "FPS : 0 \nMS : 0\n\nTower : 0\nMonster : 0\nOhters : 0"
+  m_text: "FPS : 0 \nMS : 0\n / Tower : 0\n / Monster : 0\n / Ohters : 0"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8283177e01ffdb84594dec0572ce325c, type: 2}
   m_sharedMaterial: {fileID: 4134973234589648991, guid: 8283177e01ffdb84594dec0572ce325c, type: 2}
@@ -3349,7 +3349,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32.85
+  m_fontSize: 35.85
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
