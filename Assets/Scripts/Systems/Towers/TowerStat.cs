@@ -42,17 +42,18 @@ public class TowerStat : ScriptableObject
         switch (_role)
         {
             case TowerRole.Dealer:
-                stat.attackDamage *= gradeValue * _rank;
-                stat.attackSpeed *= gradeValue * _rank;
+                gradeValue = Mathf.FloorToInt(gradeValue / 2f + 0.5f);
+                stat.attackDamage *= _rank * gradeValue;
+                stat.attackSpeed *= _rank * gradeValue;
                 break;
 
             case TowerRole.Debuff:
                 stat.attackDamage *= _rank;
-                stat.attackSpeed *= gradeValue * _rank;
+                stat.attackSpeed *= _rank * gradeValue;
                 break;
 
             case TowerRole.Summon:
-                stat.attackDamage *= gradeValue * _rank;
+                stat.attackDamage *= _rank * gradeValue;
                 stat.attackSpeed *= _rank;
                 break;
 

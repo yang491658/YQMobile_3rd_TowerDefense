@@ -294,11 +294,11 @@ public class Tower : Entity
                 break;
 
             case TowerRole.Debuff:
-                _speed += overChance;
+                _speed = Mathf.RoundToInt(_speed * (100f + overChance) / 100f);
                 break;
 
             case TowerRole.Summon:
-                _damage += overChance;
+                _damage = Mathf.RoundToInt(_damage * (100f + overChance) / 100f);
                 break;
         }
     }
