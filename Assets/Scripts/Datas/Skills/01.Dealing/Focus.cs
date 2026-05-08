@@ -59,8 +59,11 @@ public class Focus : TowerSkill
     {
         if (IsCooldown())
         { _instead = true; return; }
+    }
 
-        if (hold > 0f) return;
+    public override void OnHit(Tower _tower, Bullet _bullet, Monster _target, ref bool _instead)
+    {
+        if (IsCooldown() || hold > 0f) return;
 
         stack = Mathf.Min(++stack, max);
 

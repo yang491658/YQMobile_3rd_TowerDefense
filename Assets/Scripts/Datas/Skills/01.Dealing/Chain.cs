@@ -31,7 +31,7 @@ public class Chain : TowerSkill
         EntityManager.Instance?.StartCoroutine(ChainCoroutine(_tower, _target.Index));
     }
 
-    public override void OnImpact(Tower _tower, Bullet _bullet, Vector3 _pos)
+    public override void OnMiss(Tower _tower, Bullet _bullet, Vector3 _pos)
     {
         EntityManager.Instance?.MakeEffect(_tower, _pos, 0.85f);
 

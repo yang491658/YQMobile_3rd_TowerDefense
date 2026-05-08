@@ -70,8 +70,19 @@ public class Bullet : Pooling
 
     private void Hit()
     {
+        if (target != null && !target.IsInvalid(targetIndex)
+            && !hits.Contains(targetIndex))
+            hits.Add(targetIndex);
+
         IsHit = true;
         tower.Hit(this, target, targetIndex, targetPos);
+
+        if (target == null)
+        {
+            IsHit = false;
+            return;
+        }
+
         Despawn();
     }
 

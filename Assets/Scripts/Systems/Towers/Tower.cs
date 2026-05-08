@@ -346,11 +346,7 @@ public class Tower : Entity
         UpdateStat();
 
         if (!instead)
-        {
-            Bullet bullet = Shoot(attackTarget);
-            for (int i = 0; i < skills.Count; i++)
-                skills[i].OnBullet(this, bullet);
-        }
+            Shoot(attackTarget);
 
         if (!instead || data.Role == TowerRole.Summon)
             attackTimer = 60f / attackSpeed;
@@ -370,7 +366,7 @@ public class Tower : Entity
             for (int i = 0; i < skills.Count; i++)
             {
                 if (valid) skills[i].OnHit(this, _bullet, _target, ref instead);
-                else skills[i].OnImpact(this, _bullet, _pos);
+                else skills[i].OnMiss(this, _bullet, _pos);
             }
         }
 

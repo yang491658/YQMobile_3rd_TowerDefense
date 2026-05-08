@@ -19,19 +19,21 @@ public class Pierce : TowerSkill
         min = _tower.GetValueInt(this, ValueType.Min);
     }
 
-    public override void OnBullet(Tower _tower, Bullet _bullet)
-    {
-        _bullet.SetTarget(null);
-    }
-
     public override void OnHit(Tower _tower, Bullet _bullet, Monster _target, ref bool _instead)
     {
+        int count = _bullet.GetHitCount();
+
+        if (count <= 1)
+        {
+            _bullet.SetTarget(null);
+            return;
+        }
+
         _instead = true;
 
-        int count = Mathf.Max(_bullet.GetHitCount() - 1, 0);
-        int rate = 100 - factor * count;
+        int rate = 100 - factor * (count - 1);
         int damage = Mathf.Max(_tower.GetDamage() * rate / 100, min);
 
-        _tower.HitDamage(_target, damage);
+        _tower.HitDamage(_target, damage, 0);
     }
 }

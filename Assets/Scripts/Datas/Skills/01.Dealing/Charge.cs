@@ -4,6 +4,7 @@ using UnityEngine;
 public class Charge : TowerSkill
 {
     [Header("Value")]
+    [SerializeField][Min(0)] private int factor;
     [SerializeField][Min(0)] private int count;
     [SerializeField][Min(0f)] private float cooldown;
 
@@ -14,11 +15,12 @@ public class Charge : TowerSkill
 #if UNITY_EDITOR
     public override void SetID() => ID = 104;
     public override ValueType[] GetValues()
-        => new[] { ValueType.Count, ValueType.Cooldown };
+        => new[] { ValueType.Factor, ValueType.Count, ValueType.Cooldown };
 #endif
 
     public override void SetValues(Tower _tower)
     {
+        factor = _tower.GetValueInt(this, ValueType.Factor);
         count = _tower.GetValueInt(this, ValueType.Count);
         cooldown = _tower.GetValue(this, ValueType.Cooldown);
     }
@@ -32,13 +34,10 @@ public class Charge : TowerSkill
 
     public override void OnStat(Tower _tower, ref int _damage, ref int _speed, ref int _chance, ref int _critical)
     {
-        int damage = _damage + _speed;
-        int critical = _chance + _critical;
-
-        _damage = damage;
+        _damage = _damage + _speed * factor / 100;
         _speed = speed;
-        _chance = !ready ? 0 : 100;
-        _critical = !ready ? 100 : critical;
+        _chance = !ready ? 0 : _chance;
+        _critical = !ready ? 100 : _critical;
     }
 
     public override void OnAttack(Tower _tower, Monster _target, ref bool _instead)
@@ -57,10 +56,23 @@ public class Charge : TowerSkill
 
     public override void OnHit(Tower _tower, Bullet _bullet, Monster _target, ref bool _instead)
     {
-        ready = false;
+        if (ready)
+        {
+            _instead = true;
+
+            int critical = _tower.GetCritical();
+
+            float c = Mathf.Min(_tower.GetChance() * count, 100f);
+            if (Random.value < c / 100f)
+                critical *= _tower.GetRank();
+
+            _tower.HitDamage(_target, _tower.GetDamage(), 100, critical);
+
+            ready = false;
+        }
     }
 
-    public override void OnImpact(Tower _tower, Bullet _bullet, Vector3 _pos)
+    public override void OnMiss(Tower _tower, Bullet _bullet, Vector3 _pos)
     {
         ready = false;
     }

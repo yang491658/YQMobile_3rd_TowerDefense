@@ -25,11 +25,9 @@ public abstract class TowerSkill : ScriptableObject
 
     public virtual void OnAttack(Tower _tower, Monster _target, ref bool _instead) { }
 
-    public virtual void OnBullet(Tower _tower, Bullet _bullet) { }
-
     public virtual void OnHit(Tower _tower, Bullet _bullet, Monster _target, ref bool _instead) { }
 
-    public virtual void OnImpact(Tower _tower, Bullet _bullet, Vector3 _pos) { }
+    public virtual void OnMiss(Tower _tower, Bullet _bullet, Vector3 _pos) { }
 
     public virtual void OnMerge(Tower _tower, Tower _target) { }
 
