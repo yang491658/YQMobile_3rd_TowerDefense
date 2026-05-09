@@ -11,7 +11,6 @@ public class TowerBuff : MonoBehaviour
     private sealed class Buff
     {
         [SerializeField] private Tower tower;
-        [SerializeField] private int skillID;
         [Space]
         [SerializeField] private BuffType type;
         [SerializeField] private SubType sub;
@@ -20,15 +19,15 @@ public class TowerBuff : MonoBehaviour
         [SerializeField] private float duration;
         [SerializeField] private float timer;
 
+        public int ID => tower.GetID();
         public BuffType Type => type;
         public SubType Sub => sub;
         public int Value => value;
         public bool IsActive => duration == 0f || timer > 0f;
 
-        public Buff(Tower _tower, TowerSkill _skill, BuffType _type, SubType _sub, int _value, float _duration)
+        public Buff(Tower _tower, BuffType _type, SubType _sub, int _value, float _duration)
         {
             tower = _tower;
-            skillID = _skill.ID;
             type = _type;
             sub = _sub;
             value = _value;
@@ -36,10 +35,9 @@ public class TowerBuff : MonoBehaviour
             timer = _duration;
         }
 
-        public bool IsSame(Tower _tower, TowerSkill _skill = null, BuffType? _type = null, SubType? _sub = null)
+        public bool IsSame(Tower _tower, BuffType? _type = null, SubType? _sub = null)
         {
-            if (tower != _tower) return false;
-            if (_skill != null && skillID != _skill.ID) return false;
+            if (_tower != tower) return false;
             if (_type != null && type != _type.Value) return false;
             if (_sub != null && sub != _sub.Value) return false;
 
@@ -76,30 +74,30 @@ public class TowerBuff : MonoBehaviour
     }
 
     #region 스탯형 버프
-    public void ApplyStat(Tower _tower, TowerSkill _skill, SubType _sub, int _value, float _duration, ApplyType _applyType)
+    public void ApplyStat(Tower _tower, SubType _sub, int _value, float _duration, ApplyType _applyType)
     {
         switch (_applyType)
         {
             case ApplyType.Add:
-                buffs.Add(new Buff(_tower, _skill, BuffType.Stat, _sub, _value, _duration));
+                buffs.Add(new Buff(_tower, BuffType.Stat, _sub, _value, _duration));
                 return;
 
             case ApplyType.Refresh:
                 for (int i = 0; i < buffs.Count; i++)
                 {
                     Buff buff = buffs[i];
-                    if (!buff.IsSame(_tower, _skill, BuffType.Stat, _sub)) continue;
+                    if (!buff.IsSame(_tower, BuffType.Stat, _sub)) continue;
 
                     buff.Refresh(_value, _duration);
                     return;
                 }
 
-                buffs.Add(new Buff(_tower, _skill, BuffType.Stat, _sub, _value, _duration));
+                buffs.Add(new Buff(_tower, BuffType.Stat, _sub, _value, _duration));
                 return;
 
             case ApplyType.Replace:
-                RemoveStat(_tower, _skill, _sub);
-                buffs.Add(new Buff(_tower, _skill, BuffType.Stat, _sub, _value, _duration));
+                RemoveStat(_tower, _sub);
+                buffs.Add(new Buff(_tower, BuffType.Stat, _sub, _value, _duration));
                 return;
         }
     }
@@ -145,15 +143,30 @@ public class TowerBuff : MonoBehaviour
         return _value;
     }
 
-    public void RemoveStat(Tower _tower, TowerSkill _skill, SubType? _sub = null)
+    public void RemoveStat(Tower _tower, SubType? _sub = null)
     {
         for (int i = buffs.Count - 1; i >= 0; i--)
         {
             Buff buff = buffs[i];
-            if (!buff.IsSame(_tower, _skill, BuffType.Stat, _sub)) continue;
+            if (!buff.IsSame(_tower, BuffType.Stat, _sub)) continue;
 
             buffs.RemoveAt(i);
         }
+    }
+    #endregion
+
+    #region GET
+    public bool HasBuff(int _id = 0)
+    {
+        for (int i = 0; i < buffs.Count; i++)
+        {
+            Buff buff = buffs[i];
+            if (!buff.IsActive) continue;
+            if (_id == 0) return true;
+            if (buff.ID == _id) return true;
+        }
+
+        return false;
     }
     #endregion
 }

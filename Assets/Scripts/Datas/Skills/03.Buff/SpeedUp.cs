@@ -11,9 +11,6 @@ public class SpeedUp : TowerSkill
     private readonly HashSet<Tower> targetSet = new();
     private readonly HashSet<Tower> currents = new();
 
-    private const float interval = 3f;
-    private float timer;
-
 #if UNITY_EDITOR
     public override void SetID() => ID = 302;
     public override ValueType[] GetValues()
@@ -30,12 +27,10 @@ public class SpeedUp : TowerSkill
         targets.Clear();
         targetSet.Clear();
         currents.Clear();
-        timer = 0f;
     }
 
     public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
     {
-        timer -= _deltaTime;
         List<Tower> current = EntityManager.Instance?.GetTowersInRange(_tower.transform.position, _square: true);
 
         currents.Clear();
@@ -53,8 +48,8 @@ public class SpeedUp : TowerSkill
             if (currents.Contains(target)) continue;
 
             TowerBuff buff = target.GetBuff();
-            buff.RemoveStat(_tower, this, TowerBuff.SubType.Speed);
-            buff.RemoveStat(_tower, this, TowerBuff.SubType.Chance);
+            buff.RemoveStat(_tower, TowerBuff.SubType.Speed);
+            buff.RemoveStat(_tower, TowerBuff.SubType.Chance);
 
             targetSet.Remove(target);
             targets.RemoveAt(i);
@@ -64,18 +59,11 @@ public class SpeedUp : TowerSkill
         {
             TowerBuff buff = target.GetBuff();
 
-            buff.ApplyStat(_tower, this, TowerBuff.SubType.Speed, factor, 0f, TowerBuff.ApplyType.Refresh);
-            buff.ApplyStat(_tower, this, TowerBuff.SubType.Chance, factor, 0f, TowerBuff.ApplyType.Refresh);
+            buff.ApplyStat(_tower, TowerBuff.SubType.Speed, factor, 0f, TowerBuff.ApplyType.Refresh);
+            buff.ApplyStat(_tower, TowerBuff.SubType.Chance, factor, 0f, TowerBuff.ApplyType.Refresh);
 
             if (targetSet.Add(target))
                 targets.Add(target);
-        }
-
-        if (timer <= 0f)
-        {
-            timer = interval;
-            for (int i = 0; i < targets.Count; i++)
-                EntityManager.Instance?.MakeEffect(_tower, targets[i].transform.position, 1f);
         }
     }
 
@@ -96,8 +84,8 @@ public class SpeedUp : TowerSkill
             Tower target = targets[i];
             TowerBuff buff = target.GetBuff();
 
-            buff.RemoveStat(_tower, this, TowerBuff.SubType.Speed);
-            buff.RemoveStat(_tower, this, TowerBuff.SubType.Chance);
+            buff.RemoveStat(_tower, TowerBuff.SubType.Speed);
+            buff.RemoveStat(_tower, TowerBuff.SubType.Chance);
         }
 
         targets.Clear();

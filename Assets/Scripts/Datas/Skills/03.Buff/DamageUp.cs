@@ -11,9 +11,6 @@ public class DamageUp : TowerSkill
     private readonly HashSet<Tower> targetSet = new();
     private readonly HashSet<Tower> currents = new();
 
-    private const float interval = 3f;
-    private float timer;
-
 #if UNITY_EDITOR
     public override void SetID() => ID = 301;
     public override ValueType[] GetValues()
@@ -30,12 +27,10 @@ public class DamageUp : TowerSkill
         targets.Clear();
         targetSet.Clear();
         currents.Clear();
-        timer = 0f;
     }
 
     public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
     {
-        timer -= _deltaTime;
         List<Tower> current = EntityManager.Instance?.GetTowersInRange(_tower.transform.position, _square: true);
 
         currents.Clear();
@@ -53,8 +48,8 @@ public class DamageUp : TowerSkill
             if (currents.Contains(target)) continue;
 
             TowerBuff buff = target.GetBuff();
-            buff.RemoveStat(_tower, this, TowerBuff.SubType.Damage);
-            buff.RemoveStat(_tower, this, TowerBuff.SubType.Critical);
+            buff.RemoveStat(_tower, TowerBuff.SubType.Damage);
+            buff.RemoveStat(_tower, TowerBuff.SubType.Critical);
 
             targetSet.Remove(target);
             targets.RemoveAt(i);
@@ -64,18 +59,11 @@ public class DamageUp : TowerSkill
         {
             TowerBuff buff = target.GetBuff();
 
-            buff.ApplyStat(_tower, this, TowerBuff.SubType.Damage, factor, 0f, TowerBuff.ApplyType.Refresh);
-            buff.ApplyStat(_tower, this, TowerBuff.SubType.Critical, factor, 0f, TowerBuff.ApplyType.Refresh);
+            buff.ApplyStat(_tower, TowerBuff.SubType.Damage, factor, 0f, TowerBuff.ApplyType.Refresh);
+            buff.ApplyStat(_tower, TowerBuff.SubType.Critical, factor, 0f, TowerBuff.ApplyType.Refresh);
 
             if (targetSet.Add(target))
                 targets.Add(target);
-        }
-
-        if (timer <= 0f)
-        {
-            timer = interval;
-            for (int i = 0; i < targets.Count; i++)
-                EntityManager.Instance?.MakeEffect(_tower, targets[i].transform.position, 1f);
         }
     }
 
@@ -96,8 +84,8 @@ public class DamageUp : TowerSkill
             Tower target = targets[i];
             TowerBuff buff = target.GetBuff();
 
-            buff.RemoveStat(_tower, this, TowerBuff.SubType.Damage);
-            buff.RemoveStat(_tower, this, TowerBuff.SubType.Critical);
+            buff.RemoveStat(_tower, TowerBuff.SubType.Damage);
+            buff.RemoveStat(_tower, TowerBuff.SubType.Critical);
         }
 
         targets.Clear();

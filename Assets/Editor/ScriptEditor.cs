@@ -152,6 +152,7 @@ public static class ScriptEditor
 #if TEST_Manager
             typeof(TestManager),
 #endif
+            typeof(TowerControl),
             typeof(TowerStore),
             typeof(TowerSlot),
             typeof(MonsterWave),
