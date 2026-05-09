@@ -17,9 +17,7 @@ public class DataManager : MonoBehaviour
 
     [Header("Tables")]
     [SerializeField] private TowerChance towerChance;
-    [SerializeField] private TowerColor towerColor;
-    [SerializeField] private TowerStat towerStat;
-    [SerializeField] private TowerDamage towerDamage;
+    [SerializeField] private TowerConfig towerConfig;
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -28,9 +26,7 @@ public class DataManager : MonoBehaviour
         bossDatas = CollectDatas<BossData>("t:BossData", new[] { "Assets/Datas/Monsters" }, _data => _data.ID);
 
         towerChance = LoadAsset<TowerChance>();
-        towerColor = LoadAsset<TowerColor>();
-        towerStat = LoadAsset<TowerStat>();
-        towerDamage = LoadAsset<TowerDamage>();
+        towerConfig = LoadAsset<TowerConfig>();
 
         EditorUtility.SetDirty(this);
     }
@@ -202,11 +198,11 @@ public class DataManager : MonoBehaviour
     public IReadOnlyList<TowerChance.GradeChance> GetGradeChance(int _level) => towerChance.GetGradeChance(_level);
     public TowerGrade GetRandomGrade(int _level) => towerChance.GetGrade(_level);
 
-    public Color GetGradeColor(TowerGrade _grade) => towerColor.GetColor(_grade);
+    public Color GetTowerColor(TowerGrade _grade) => towerConfig.GetColor(_grade);
 
-    public TowerStat.Stat4 GetBaseStat(TowerRole _role, TowerGrade _grade, int _rank = 1) => towerStat.GetStat(_role, _grade, _rank);
-    public int GetGradeStat(TowerGrade _grade) => towerStat.GetGradeStat(_grade);
+    public Stat4 GetTowerStat(TowerRole _role, TowerGrade _grade, int _rank = 1) => towerConfig.GetStat(_role, _grade, _rank);
+    public int GetGradeStat(TowerGrade _grade) => towerConfig.GetGradeStat(_grade);
 
-    public TowerDamage.DamageData GetTowerDamage(DamageType _type) => towerDamage.GetDamage(_type);
+    public DamageData GetTowerDamage(DamageType _type) => towerConfig.GetDamage(_type);
     #endregion
 }

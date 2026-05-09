@@ -10,19 +10,15 @@ public class TowerBuff : MonoBehaviour
     [System.Serializable]
     private sealed class Buff
     {
-        [SerializeField] private Tower tower;
+        public Tower tower;
+        public BuffType type;
+        public SubType sub;
         [Space]
-        [SerializeField] private BuffType type;
-        [SerializeField] private SubType sub;
-        [Space]
-        [SerializeField] private int value;
-        [SerializeField] private float duration;
-        [SerializeField] private float timer;
+        public int value;
+        public float duration;
+        public float timer;
 
         public int ID => tower.GetID();
-        public BuffType Type => type;
-        public SubType Sub => sub;
-        public int Value => value;
         public bool IsActive => duration == 0f || timer > 0f;
 
         public Buff(Tower _tower, BuffType _type, SubType _sub, int _value, float _duration)
@@ -108,7 +104,7 @@ public class TowerBuff : MonoBehaviour
 
         for (int i = buffs.Count - 1; i >= 0; i--)
         {
-            if (buffs[i].Type != BuffType.Stat) continue;
+            if (buffs[i].type != BuffType.Stat) continue;
             if (buffs[i].Update(_deltaTime)) continue;
 
             buffs.RemoveAt(i);
@@ -121,10 +117,10 @@ public class TowerBuff : MonoBehaviour
         for (int i = 0; i < buffs.Count; i++)
         {
             Buff buff = buffs[i];
-            if (buff.Type != BuffType.Stat) continue;
-            if (buff.Sub != _sub || !buff.IsActive) continue;
+            if (buff.type != BuffType.Stat) continue;
+            if (buff.sub != _sub || !buff.IsActive) continue;
 
-            bonus += buff.Value;
+            bonus += buff.value;
         }
 
         switch (_sub)

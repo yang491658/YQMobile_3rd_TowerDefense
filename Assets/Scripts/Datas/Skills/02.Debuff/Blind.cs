@@ -14,7 +14,6 @@ public class Blind : TowerSkill
         => ((long)(uint)_target.GetInstanceID() << 32) | (uint)_target.Index;
 
 #if UNITY_EDITOR
-    public override void SetID() => ID = 205;
     public override ValueType[] GetValues()
         => new[] { ValueType.Chance, ValueType.Duration };
 #endif

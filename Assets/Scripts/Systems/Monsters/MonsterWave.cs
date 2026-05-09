@@ -2,7 +2,7 @@ using UnityEngine;
 
 public enum Phase { None, Normal, Warning, Boss, Reward }
 
-public sealed class MonsterWave : MonoBehaviour
+public class MonsterWave : MonoBehaviour
 {
     public static MonsterWave Instance { private set; get; }
 
@@ -152,12 +152,11 @@ public sealed class MonsterWave : MonoBehaviour
         if (IsFinished) return;
 
         normalTimer -= _deltaTime;
-        if (normalTimer <= 0f)
-        {
-            phase = Phase.Warning;
-            warningTimer = warningTime;
-            warningTextTimer = 0f;
-        }
+        if (normalTimer > 0f) return;
+
+        phase = Phase.Warning;
+        warningTimer = warningTime;
+        warningTextTimer = 0f;
     }
     #endregion
 
@@ -167,17 +166,17 @@ public sealed class MonsterWave : MonoBehaviour
         warningTimer -= _deltaTime;
         warningTextTimer -= _deltaTime;
 
-        if (warningTimer > 0f && warningTextTimer <= 0f)
+        if (warningTimer > 0f)
         {
+            if (warningTextTimer > 0f) return;
+
             WarningText();
             warningTextTimer = warningInterval;
+            return;
         }
 
-        if (warningTimer <= 0f)
-        {
-            phase = Phase.Boss;
-            IsSpawned = false;
-        }
+        phase = Phase.Boss;
+        IsSpawned = false;
     }
 
     private void WarningText()
@@ -313,7 +312,7 @@ public sealed class MonsterWave : MonoBehaviour
         if (phaseTimer > 0f)
         {
             phaseTimer -= _deltaTime;
-            return;
+            if (phaseTimer > 0f) return;
         }
 
         float ratio = _deltaTime * rewardTimer;
@@ -337,13 +336,12 @@ public sealed class MonsterWave : MonoBehaviour
         }
 
         rewardTimer -= _deltaTime;
-        if (rewardTimer <= 0f && rewardExp <= 0 && rewardGold <= 0)
-        {
-            phase = Phase.Normal;
-            normalTimer = normalTime;
-            spawnDelay = spawnRange.y;
-            spawnTimer = 0f;
-        }
+        if (rewardTimer > 0f || rewardExp > 0 || rewardGold > 0) return;
+
+        phase = Phase.Normal;
+        normalTimer = normalTime;
+        spawnDelay = spawnRange.y;
+        spawnTimer = 0f;
     }
 
     private void RewardText()

@@ -684,7 +684,7 @@ public class UIManager : MonoBehaviour
             }
 
             chanceText[index].text = $"{weight}%";
-            chanceText[index].color = DataManager.Instance.GetGradeColor(grade);
+            chanceText[index].color = DataManager.Instance.GetTowerColor(grade);
 
             index++;
         }

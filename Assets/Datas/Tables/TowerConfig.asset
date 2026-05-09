@@ -9,9 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 49cce6f4443e88740ac603129fe55b68, type: 3}
-  m_Name: TowerStat
+  m_Script: {fileID: 11500000, guid: 09c8db666cc8db041a406b6a1d959ee2, type: 3}
+  m_Name: TowerConfig
   m_EditorClassIdentifier: 
+  normalColor: {r: 0, g: 0, b: 0, a: 1}
+  rareColor: {r: 1, g: 0, b: 1, a: 1}
+  epicColor: {r: 0, g: 0, b: 1, a: 1}
+  uniqueColor: {r: 0, g: 1, b: 0, a: 1}
+  legendColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  mythicColor: {r: 1, g: 0, b: 0, a: 1}
   normal: 1
   rare: 3
   epic: 7
@@ -38,3 +44,19 @@ MonoBehaviour:
     attackSpeed: 5
     criticalChance: 0
     criticalDamage: 150
+  normalDamage:
+    type: 0
+    color: {r: 0, g: 0, b: 0, a: 1}
+    font: 50
+  criticalDamage:
+    type: 1
+    color: {r: 1, g: 0, b: 0, a: 1}
+    font: 65
+  dotDamage:
+    type: 2
+    color: {r: 0, g: 1, b: 0, a: 1}
+    font: 35
+  bonusDamage:
+    type: 3
+    color: {r: 1, g: 0, b: 1, a: 1}
+    font: 45

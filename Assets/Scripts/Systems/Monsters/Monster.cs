@@ -134,7 +134,7 @@ public class Monster : Pooling
     {
         if (_damage <= 0) return;
 
-        TowerDamage.DamageData data = DataManager.Instance.GetTowerDamage(_type);
+        DamageData data = DataManager.Instance.GetTowerDamage(_type);
 
         Vector3 from = transform.position + Vector3.up * 0.5f;
         Vector3 to = new Vector3(0f, AutoCamera.WorldRect.yMax, 0f);

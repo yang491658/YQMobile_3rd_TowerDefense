@@ -8,7 +8,6 @@ public class Slow : TowerSkill
     [SerializeField][Min(0f)] private float duration;
 
 #if UNITY_EDITOR
-    public override void SetID() => ID = 202;
     public override ValueType[] GetValues()
         => new[] { ValueType.Factor, ValueType.Duration };
 #endif

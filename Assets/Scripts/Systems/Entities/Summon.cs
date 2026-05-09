@@ -40,7 +40,7 @@ public class Summon : Pooling
         {
             timer -= Time.deltaTime;
             if (timer <= 0f)
-                Despawn();
+            { Despawn(); return; }
         }
 
         transform.Rotate(0f, 0f, rotate * Time.deltaTime);

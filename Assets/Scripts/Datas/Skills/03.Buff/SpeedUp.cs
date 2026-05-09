@@ -12,7 +12,6 @@ public class SpeedUp : TowerSkill
     private readonly HashSet<Tower> currents = new();
 
 #if UNITY_EDITOR
-    public override void SetID() => ID = 302;
     public override ValueType[] GetValues()
         => new[] { ValueType.Factor };
 #endif

@@ -8,7 +8,6 @@ public class Pierce : TowerSkill
     [SerializeField][Min(0)] private int min;
 
 #if UNITY_EDITOR
-    public override void SetID() => ID = 102;
     public override ValueType[] GetValues()
         => new[] { ValueType.Factor, ValueType.Min };
 #endif

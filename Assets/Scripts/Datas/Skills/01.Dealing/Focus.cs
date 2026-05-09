@@ -13,7 +13,6 @@ public class Focus : TowerSkill
     private float hold;
 
 #if UNITY_EDITOR
-    public override void SetID() => ID = 105;
     public override ValueType[] GetValues()
         => new[] { ValueType.Factor, ValueType.Max, ValueType.Duration, ValueType.Cooldown };
 #endif
@@ -42,17 +41,13 @@ public class Focus : TowerSkill
     public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
     {
         if (IsCooldown()) return;
+        if (hold <= 0f) return;
 
-        if (hold > 0f)
-        {
-            hold -= _deltaTime;
+        hold -= _deltaTime;
+        if (hold > 0f) return;
 
-            if (hold <= 0f)
-            {
-                stack = 0;
-                StartCooldown(_tower, cooldown);
-            }
-        }
+        stack = 0;
+        StartCooldown(_tower, cooldown);
     }
 
     public override void OnAttack(Tower _tower, Monster _target, ref bool _instead)

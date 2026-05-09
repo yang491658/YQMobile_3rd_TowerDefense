@@ -8,8 +8,9 @@ public abstract class TowerSkill : ScriptableObject
     protected Coroutine cooldownRoutine;
 
 #if UNITY_EDITOR
-    private void OnValidate() => SetID();
-    public virtual void SetID() => ID = 0;
+    private void OnValidate()
+      => ID = ((CreateAssetMenuAttribute)System.Attribute.GetCustomAttribute(GetType(), typeof(CreateAssetMenuAttribute))).order;
+
     public virtual ValueType[] GetValues() => default;
 #endif
 
@@ -57,15 +58,14 @@ public abstract class TowerSkill : ScriptableObject
             timerUI.fillAmount = 1f;
         }
 
-        float time = 0f;
-        while (time < _cooldown)
+        float timer = _cooldown;
+        while (timer > 0f)
         {
             if (timerUI == null)
             { cooldownRoutine = null; yield break; }
 
-            time += Time.deltaTime;
-            float t = Mathf.Clamp01(time / _cooldown);
-            timerUI.fillAmount = 1f - t;
+            timer -= Time.deltaTime;
+            timerUI.fillAmount = Mathf.Clamp01(timer / _cooldown);
 
             yield return null;
         }

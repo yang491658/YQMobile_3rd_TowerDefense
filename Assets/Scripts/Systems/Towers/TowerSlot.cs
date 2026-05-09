@@ -146,7 +146,7 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     {
         data = _data;
 
-        outline.color = DataManager.Instance.GetGradeColor(_data.Grade);
+        outline.color = DataManager.Instance.GetTowerColor(_data.Grade);
         icon.sprite = _data.Icon;
         icon.color = _data.Color;
     }

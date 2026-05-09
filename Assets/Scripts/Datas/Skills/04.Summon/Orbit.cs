@@ -10,7 +10,6 @@ public class Orbit : TowerSkill
     private const float scale = 0.35f;
 
 #if UNITY_EDITOR
-    public override void SetID() => ID = 401;
     public override ValueType[] GetValues()
         => new[] { ValueType.Count, ValueType.Speed };
 #endif

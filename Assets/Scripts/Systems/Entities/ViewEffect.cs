@@ -7,13 +7,13 @@ public class ViewEffect : Pooling
 
     private IEnumerator EffectCoroutine(float _startAlpha, float _duration)
     {
-        float time = 0f;
+        float timer = _duration;
         Color color = sr.color;
 
-        while (time < _duration)
+        while (timer > 0f)
         {
-            time += Time.deltaTime;
-            float t = time / _duration;
+            timer -= Time.deltaTime;
+            float t = 1f - Mathf.Clamp01(timer / _duration);
             color.a = Mathf.Lerp(_startAlpha, 0f, t);
             sr.color = color;
             yield return null;

@@ -8675,9 +8675,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 45862eebabcb0c44fa0f90d339fc501d, type: 2}
   - {fileID: 11400000, guid: d3e85a2e421ba944e856fe007589dd08, type: 2}
   towerChance: {fileID: 11400000, guid: fa32553a70dee124aa6919c8820d9f57, type: 2}
-  towerColor: {fileID: 11400000, guid: cae0e69b465fe334fbc8bc3ac7fa48dc, type: 2}
-  towerStat: {fileID: 11400000, guid: 6fcd522abd58ae34e9e25a70f96dbfd9, type: 2}
-  towerDamage: {fileID: 11400000, guid: 6b97d4d538dd98446b49fe4757adf307, type: 2}
+  towerConfig: {fileID: 11400000, guid: 4e19fa1afac8564469f4922387f20442, type: 2}
 --- !u!4 &1065004637
 Transform:
   m_ObjectHideFlags: 0

@@ -38,10 +38,14 @@ public class TextEffect : MonoBehaviour, IPoolable
 
         float dt = Time.deltaTime;
 
-        if (duration > 0f && (timer -= dt) <= 0f)
+        if (duration > 0f)
         {
-            Despawn();
-            return;
+            timer -= dt;
+            if (timer <= 0f)
+            {
+                Despawn();
+                return;
+            }
         }
 
         UpdateColor(dt);
@@ -98,7 +102,7 @@ public class TextEffect : MonoBehaviour, IPoolable
         Vector2 current = rect.anchoredPosition;
         Vector2 target = moveTarget;
 
-        if (_deltaTime >= moveTime)
+        if (moveTime <= _deltaTime)
         {
             rect.anchoredPosition = target;
             moveTime = 0f;

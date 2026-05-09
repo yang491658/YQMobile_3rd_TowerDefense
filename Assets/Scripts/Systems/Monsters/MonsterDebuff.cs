@@ -5,7 +5,7 @@ using UnityEngine;
 public class MonsterDebuff : MonoBehaviour
 {
     [System.Serializable]
-    private struct Debuff
+    private sealed class Debuff
     {
         [Min(0)] public int value;
         [Min(0f)] public float duration;
@@ -96,11 +96,11 @@ public class MonsterDebuff : MonoBehaviour
     private float baseSpeed;
 
     [Header("Debuff")]
-    [SerializeField] private Debuff tickDamage;
+    [SerializeField] private Debuff tickDamage = new();
     private float tickTimer;
-    [SerializeField] private Debuff bonusDamage;
-    [SerializeField] private Debuff speedControl;
-    [SerializeField] private Debuff directionControl;
+    [SerializeField] private Debuff bonusDamage = new();
+    [SerializeField] private Debuff speedControl = new();
+    [SerializeField] private Debuff directionControl = new();
 
     [Header("Effect")]
     [SerializeField] private List<ViewEffect> effects = new();

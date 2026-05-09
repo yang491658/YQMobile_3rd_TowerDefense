@@ -13,7 +13,6 @@ public class Charge : TowerSkill
     private bool ready;
 
 #if UNITY_EDITOR
-    public override void SetID() => ID = 104;
     public override ValueType[] GetValues()
         => new[] { ValueType.Factor, ValueType.Count, ValueType.Cooldown };
 #endif
@@ -27,7 +26,7 @@ public class Charge : TowerSkill
 
     public override void OnGenerate(Tower _tower)
     {
-        speed = DataManager.Instance.GetBaseStat(_tower.GetRole(), TowerGrade.Normal).attackSpeed;
+        speed = DataManager.Instance.GetTowerStat(_tower.GetRole(), TowerGrade.Normal).attackSpeed;
         stack = 0;
         ready = false;
     }

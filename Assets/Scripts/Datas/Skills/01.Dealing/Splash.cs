@@ -9,7 +9,6 @@ public class Splash : TowerSkill
     [SerializeField][Min(0)] private int range;
 
 #if UNITY_EDITOR
-    public override void SetID() => ID = 101;
     public override ValueType[] GetValues()
         => new[] { ValueType.Damage, ValueType.Range };
 #endif

@@ -12,7 +12,6 @@ public class Chain : TowerSkill
     private const float interval = 0.1f;
 
 #if UNITY_EDITOR
-    public override void SetID() => ID = 103;
     public override ValueType[] GetValues()
         => new[] { ValueType.Damage, ValueType.Count };
 #endif

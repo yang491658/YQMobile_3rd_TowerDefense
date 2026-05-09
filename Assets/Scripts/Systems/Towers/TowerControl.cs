@@ -48,15 +48,15 @@ public class TowerControl : MonoBehaviour
     {
         if (buffs.Count == 0) return;
 
-        timer += Time.deltaTime;
-        if (timer < interval) return;
+        timer -= Time.deltaTime;
+        if (timer > 0f) return;
 
         if (index >= buffs.Count) index = 0;
 
         ShowBuff(buffs[index]);
 
         index = (index + 1) % buffs.Count;
-        timer = 0f;
+        timer = interval;
     }
 
     private void ShowBuff(int _id)

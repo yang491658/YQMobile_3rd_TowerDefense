@@ -348,13 +348,14 @@ public class EntityManager : MonoBehaviour
     private IEnumerator MapCoroutine(Vector3 _target, float _time)
     {
         Vector3 start = inGame.position;
-        float timer = 0f;
+        float timer = _time;
         IsMoving = true;
 
-        while (timer <= _time)
+        while (timer > 0f)
         {
-            timer += Time.deltaTime;
-            inGame.position = Vector3.Lerp(start, _target, Mathf.Clamp01(timer / _time));
+            timer -= Time.deltaTime;
+            float t = 1f - Mathf.Clamp01(timer / _time);
+            inGame.position = Vector3.Lerp(start, _target, t);
             yield return null;
         }
 

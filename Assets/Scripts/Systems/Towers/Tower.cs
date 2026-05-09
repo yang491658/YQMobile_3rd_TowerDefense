@@ -263,7 +263,7 @@ public class Tower : Entity
 
     private void ApplyBaseStat(ref int _damage, ref int _speed, ref int _chance, ref int _critical)
     {
-        TowerStat.Stat4 stat = DataManager.Instance.GetBaseStat(data.Role, data.Grade, rank);
+        Stat4 stat = DataManager.Instance.GetTowerStat(data.Role, data.Grade, rank);
 
         _damage = stat.attackDamage;
         _speed = stat.attackSpeed;
@@ -440,7 +440,7 @@ public class Tower : Entity
         data = _data != null ? _data : BasicData();
 
         gameObject.name = data.Name;
-        outlineSR.color = DataManager.Instance.GetGradeColor(data.Grade);
+        outlineSR.color = DataManager.Instance.GetTowerColor(data.Grade);
         symbolSR.color = data.Color;
 
         cell = EntityManager.Instance.GetCell(transform.position);

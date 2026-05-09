@@ -9,7 +9,6 @@ public class Zone : TowerSkill
     [SerializeField][Min(0f)] private float cooldown;
 
 #if UNITY_EDITOR
-    public override void SetID() => ID = 403;
     public override ValueType[] GetValues()
         => new[] { ValueType.Scale, ValueType.Duration, ValueType.Cooldown };
 #endif

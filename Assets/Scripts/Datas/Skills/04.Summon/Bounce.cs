@@ -13,7 +13,6 @@ public class Bounce : TowerSkill
     private const float interval = 0.15f;
 
 #if UNITY_EDITOR
-    public override void SetID() => ID = 402;
     public override ValueType[] GetValues()
         => new[] { ValueType.Count, ValueType.Speed };
 #endif

@@ -8,7 +8,6 @@ public class DoT : TowerSkill
     [SerializeField][Min(0f)] private float duration;
 
 #if UNITY_EDITOR
-    public override void SetID() => ID = 203;
     public override ValueType[] GetValues()
         => new[] { ValueType.Damage, ValueType.Duration };
 #endif

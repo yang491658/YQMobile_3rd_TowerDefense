@@ -8,7 +8,6 @@ public class Crack : TowerSkill
     [SerializeField][Min(0f)] private float duration;
 
 #if UNITY_EDITOR
-    public override void SetID() => ID = 204;
     public override ValueType[] GetValues()
         => new[] { ValueType.Factor, ValueType.Duration };
 #endif
