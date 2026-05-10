@@ -3299,8 +3299,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -270, y: -135}
-  m_SizeDelta: {x: 270, y: 200}
+  m_AnchoredPosition: {x: -270, y: -100}
+  m_SizeDelta: {x: 270, y: 135}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &228723977
 MonoBehaviour:
@@ -3322,7 +3322,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "FPS : 0 \nMS : 0\n / Tower : 0\n / Monster : 0\n / Ohters : 0"
+  m_text: 'Tower : 0
+
+    Monster : 0
+
+    Ohters : 0'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8283177e01ffdb84594dec0572ce325c, type: 2}
   m_sharedMaterial: {fileID: 4134973234589648991, guid: 8283177e01ffdb84594dec0572ce325c, type: 2}
@@ -3349,15 +3353,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 35.85
+  m_fontSize: 40.35
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 16
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
@@ -16108,7 +16112,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69c9c1a89a72f0042b7c74c25f7cea53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buffs: 
+  buffs: fd080000fe080000
   interval: 1.5
 --- !u!1 &1942526702
 GameObject:

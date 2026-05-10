@@ -60,8 +60,6 @@ public class TestManager : MonoBehaviour
 
     [Header("Test Text")]
     [SerializeField] private TextMeshProUGUI testText;
-    private float timer = 0.1f;
-    private int frame = 0;
 
     [Header("Test UI")]
     [SerializeField] private GameObject testUI;
@@ -698,20 +696,10 @@ public class TestManager : MonoBehaviour
 
     private void UpdateTestText()
     {
-        timer -= Time.unscaledDeltaTime;
-        frame++;
-
-        if (timer > 0f) return;
-
         testText.text =
-            $"FPS : {frame / 0.1f:0.0}\n" +
-            $"MS : {0.1f * 1000f / frame:0.0}\n" +
-            $" / Tower : {EntityManager.Instance?.GetTowerCount()}\n" +
-            $" / Monster : {EntityManager.Instance?.GetMonsterCount()}\n" +
-            $" / Others : {PoolManager.Instance?.GetOtherCount()}";
-
-        timer = 0.1f;
-        frame = 0;
+            $"Tower : {EntityManager.Instance?.GetTowerCount()}\n" +
+            $"Monster : {EntityManager.Instance?.GetMonsterCount()}\n" +
+            $"Others : {PoolManager.Instance?.GetOtherCount()}";
     }
 
     private void UpdateTestUI()
