@@ -7603,6 +7603,7 @@ MonoBehaviour:
   life: 0
   maxLife: 20
   lifeGold: 100
+  lifePause: 3
   exp: 0
   needExp: 100
   expScore: 1000

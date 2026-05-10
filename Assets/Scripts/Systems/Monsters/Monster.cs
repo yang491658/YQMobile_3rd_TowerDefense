@@ -56,6 +56,9 @@ public class Monster : Pooling
     #region 이동
     private void UpdateMove(float _deltaTime)
     {
+        if (MonsterWave.Instance.IsPause)
+        { Stop(); return; }
+
         Vector3Int currentCell = Vector3Int.RoundToInt(current);
         bool direction = debuff.CalcDirection(currentCell, out Vector3Int directionCell);
 

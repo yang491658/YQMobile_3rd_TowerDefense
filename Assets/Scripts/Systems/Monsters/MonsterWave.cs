@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public enum Phase { None, Normal, Warning, Boss, Reward }
@@ -120,7 +121,16 @@ public class MonsterWave : MonoBehaviour
         ResetWave();
         phase = Phase.Normal;
     }
+    
     public void PauseWave(bool _on) => IsPause = _on;
+    public void PauseWave(float _time) => StartCoroutine(PauseCoroutine(_time));
+    private IEnumerator PauseCoroutine(float _time)
+    {
+        PauseWave(true);
+        yield return new WaitForSeconds(_time);
+        PauseWave(false);
+    }
+
     public void StopWave()
     {
         ResetWave();

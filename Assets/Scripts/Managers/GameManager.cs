@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     [SerializeField][Min(0)] private int life = 0;
     [SerializeField][Min(0)] private int maxLife = 20;
     [SerializeField][Min(0)] private int lifeGold = 100;
+    [SerializeField][Min(0f)] private float lifePause = 3f;
     public event System.Action<int, int> OnChangeLife;
 
     [Header("Exp")]
@@ -205,6 +206,8 @@ public class GameManager : MonoBehaviour
         lifeGold *= 2;
         OnChangeLife?.Invoke(life, maxLife);
 
+        MonsterWave.Instance?.PauseWave(lifePause);
+
         return true;
     }
 
@@ -335,7 +338,8 @@ public class GameManager : MonoBehaviour
 
     public int GetLife() => life;
     public int GetMaxLife() => maxLife;
-    public bool CanBuyLife() => gold > 0 && life <= maxLife / 2;
+    public int GetLifePercent() => 100 * life / maxLife;
+    public bool CanBuyLife() => gold > 0;
 
     public int GetExp() => exp;
     public int GetNeedExp() => needExp;
