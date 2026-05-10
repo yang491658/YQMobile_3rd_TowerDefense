@@ -379,10 +379,10 @@ public class EntityManager : MonoBehaviour
             if (data == null) return null;
         }
 
-        if (_useGold && !GameManager.Instance.EnoughGold()) return null;
-
         Vector3 pos = SelectField(_pos);
         if (float.IsInfinity(pos.x)) return null;
+
+        if (_useGold && !GameManager.Instance.UseGold(data)) return null;
 
         Tower tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
             .GetComponent<Tower>();
@@ -393,8 +393,6 @@ public class EntityManager : MonoBehaviour
         towerDic[tower] = GetCell(pos);
 
         SetPath();
-
-        GameManager.Instance?.UseGold(_useGold);
 
         return tower;
     }

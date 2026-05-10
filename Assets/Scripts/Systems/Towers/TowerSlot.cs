@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -13,6 +14,7 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     [Space]
     [SerializeField] private Image outline;
     [SerializeField] private Image icon;
+    [SerializeField] private TextMeshProUGUI grade;
 
     [Header("Slot")]
     [SerializeField] private TowerData data;
@@ -31,12 +33,14 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
             outline = transform.Find("Outline")?.GetComponent<Image>();
         if (icon == null)
             icon = transform.Find("Icon")?.GetComponent<Image>();
+        if (grade == null)
+            grade = transform.Find("Grade")?.GetComponent<TextMeshProUGUI>();
     }
 #endif
 
     private void Update()
     {
-        btn.interactable = state != SlotState.Complete && GameManager.Instance.EnoughGold();
+        btn.interactable = state != SlotState.Complete && GameManager.Instance.EnoughGold(data);
     }
 
     #region 슬롯
@@ -87,6 +91,7 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         image.color = SetVisible(image.color, _on);
         outline.color = SetVisible(outline.color, _on);
         icon.color = SetVisible(icon.color, _on);
+        grade.color = SetVisible(grade.color, _on);
     }
 
     public void Complete()
@@ -97,6 +102,7 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         image.color = SetVisible(Color.gray, false);
         outline.color = SetVisible(Color.gray, false);
         icon.color = SetVisible(Color.gray, false);
+        grade.color = SetVisible(Color.gray, false);
     }
     #endregion
 
@@ -110,7 +116,7 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     public void OnBeginDrag(PointerEventData _eventData)
     {
         if (state == SlotState.Complete) return;
-        if (!GameManager.Instance.EnoughGold()) return;
+        if (!GameManager.Instance.EnoughGold(data)) return;
 
         SoundManager.Instance?.Button();
         TowerStore.Instance?.SelectSlot(this, true);
@@ -149,6 +155,8 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         outline.color = DataManager.Instance.GetTowerColor(_data.Grade);
         icon.sprite = _data.Icon;
         icon.color = _data.Color;
+        grade.text = $"×{DataManager.Instance.GetGradeStat(_data.Grade)}";
+        grade.color = Color.black;
     }
 
     private Color SetVisible(Color _color, bool _visible)
@@ -160,6 +168,7 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 
     #region GET
     public Vector3 GetPos() => rect.anchoredPosition;
+    public TowerData GetData() => data;
     public int GetID() => data.ID;
     public bool IsComplete => state == SlotState.Complete;
     #endregion

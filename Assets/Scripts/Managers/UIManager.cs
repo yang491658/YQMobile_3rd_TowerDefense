@@ -404,7 +404,7 @@ public class UIManager : MonoBehaviour
         OnOpenUI?.Invoke(_on);
 
         if (TowerStore.Instance.IsPlacing)
-            UpdateStore(1);
+            UpdateStore(1, TowerStore.Instance.GetSelectGold());
     }
 
     public void OpenConfirm(bool _on, string _text = null, System.Action _action = null, bool _pass = false)
@@ -452,7 +452,7 @@ public class UIManager : MonoBehaviour
         UpdateLife(GameManager.Instance.GetLife(), GameManager.Instance.GetMaxLife());
         UpdateExp(GameManager.Instance.GetExp(), GameManager.Instance.GetNeedExp());
         UpdateLevel(GameManager.Instance.GetLevel());
-        UpdateGold(GameManager.Instance.GetGold(), GameManager.Instance.GetNeedGold());
+        UpdateGold(GameManager.Instance.GetGold(), GameManager.Instance.GetRefGold());
         UpdateDrag(null);
 
         OpenUI(false);
@@ -604,7 +604,7 @@ public class UIManager : MonoBehaviour
         storeGold = _gold;
         storeImage.color = onStore != 0 ? Color.cyan : storeColor;
 
-        UpdateGold(GameManager.Instance.GetGold(), GameManager.Instance.GetNeedGold());
+        UpdateGold(GameManager.Instance.GetGold(), GameManager.Instance.GetRefGold());
     }
 
     private void UpdateLife(int _life, int _maxLife)
@@ -634,7 +634,7 @@ public class UIManager : MonoBehaviour
         UpdateChanceUI(_level);
     }
 
-    private void UpdateGold(int _gold, int _needGold)
+    private void UpdateGold(int _gold, int _refGold)
     {
         if (life.btn.gameObject.activeSelf)
             life.btn.interactable = GameManager.Instance.CanBuyLife();
@@ -642,23 +642,23 @@ public class UIManager : MonoBehaviour
         if (exp.btn.gameObject.activeSelf)
             exp.btn.interactable = GameManager.Instance.CanBuyExp();
 
-        string need = FormatNumber(_needGold);
+        string refText = FormatNumber(_refGold);
 
         if (onStore < 0)
         {
             int showGold = _gold + storeGold;
-            goldText.text = $"{FormatNumber(showGold)}(+{FormatNumber(storeGold)})/{need}";
+            goldText.text = $"{FormatNumber(showGold)}(+{FormatNumber(storeGold)})/{refText}";
             goldText.color = showGold >= 0 ? Color.blue : Color.red;
         }
         else if (onStore > 0)
         {
-            int showGold = _gold - _needGold;
-            goldText.text = $"{FormatNumber(showGold)}(-{need})/{need}";
+            int showGold = _gold - storeGold;
+            goldText.text = $"{FormatNumber(showGold)}(-{FormatNumber(storeGold)})/{refText}";
             goldText.color = Color.red;
         }
         else
         {
-            goldText.text = $"{FormatNumber(_gold)}/{need}";
+            goldText.text = $"{FormatNumber(_gold)}/{refText}";
             goldText.color = _gold >= 0 ? Color.white : Color.red;
         }
 

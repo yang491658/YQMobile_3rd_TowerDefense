@@ -300,12 +300,18 @@ public class TestManager : MonoBehaviour
 
     private bool TryPurchase(int _id)
     {
-        if (GameManager.Instance.EnoughGold())
+        if (EntityManager.Instance.HasEmptyField())
         {
-            if (EntityManager.Instance.HasEmptyField())
-                return TowerStore.Instance.AutoPurchase(_id);
-            else MergeRandom();
+            if (_id > 0)
+            {
+                TowerData data = DataManager.Instance?.SearchTower(_id);
+                if (!GameManager.Instance.EnoughGold(data)) return false;
+            }
+
+            return TowerStore.Instance.AutoPurchase(_id);
         }
+
+        MergeRandom();
         return false;
     }
 

@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Gold")]
     [SerializeField] private int gold = 100;
-    [SerializeField][Min(0)] private int needGold = 0;
+    [SerializeField][Min(0)] private int refGold = 0;
     public event System.Action<int, int> OnChangeGold;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -291,7 +291,7 @@ public class GameManager : MonoBehaviour
     public void GoldUp(int _gold = 1)
     {
         gold += _gold;
-        OnChangeGold?.Invoke(gold, needGold);
+        OnChangeGold?.Invoke(gold, refGold);
     }
 
     public void GoldDown(int _gold = 1, bool _force = false)
@@ -299,23 +299,25 @@ public class GameManager : MonoBehaviour
         if (!_force && gold < _gold) return;
 
         gold -= _gold;
-        OnChangeGold?.Invoke(gold, needGold);
+        OnChangeGold?.Invoke(gold, refGold);
     }
 
     public void ResetGold()
     {
         gold = 100;
-        needGold = 0;
-        OnChangeGold?.Invoke(gold, needGold);
+        refGold = 0;
+        OnChangeGold?.Invoke(gold, refGold);
     }
 
-    public void UseGold(bool _useGold)
+    public bool UseGold(TowerData _data)
     {
-        if (!_useGold || !EnoughGold()) return;
+        if (!EnoughGold(_data)) return false;
 
-        gold -= needGold;
-        needGold += 10;
-        OnChangeGold?.Invoke(gold, needGold);
+        gold -= GetNeedGold(_data);
+        refGold += 10;
+        OnChangeGold?.Invoke(gold, refGold);
+
+        return true;
     }
     #endregion
 
@@ -350,9 +352,13 @@ public class GameManager : MonoBehaviour
     public bool IsMaxLevel() => level >= maxLevel;
 
     public int GetGold() => gold;
-    public int GetNeedGold() => needGold;
+    public int GetRefGold() => refGold;
+    public int GetNeedGold(TowerData _data) => refGold * DataManager.Instance.GetGradeStat(_data.Grade);
     public int GetSellGold(Tower _tower)
-        => needGold * _tower.GetRank() * DataManager.Instance.GetGradeStat(_tower.GetGrade()) / 2;
-    public bool EnoughGold() => gold >= needGold;
+    {
+        float grade = Mathf.Pow(DataManager.Instance.GetGradeStat(_tower.GetGrade()), 0.8f);
+        return Mathf.FloorToInt(refGold * _tower.GetRank() * grade / 2f);
+    }
+    public bool EnoughGold(TowerData _data) => gold >= GetNeedGold(_data);
     #endregion
 }

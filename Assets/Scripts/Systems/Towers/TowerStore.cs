@@ -49,7 +49,7 @@ public class TowerStore : MonoBehaviour
         if (IsMoving)
             MoveSlot();
 
-        if (IsPlacing && !GameManager.Instance.EnoughGold())
+        if (IsPlacing && !GameManager.Instance.EnoughGold(select.GetData()))
             CancelSlot();
     }
 
@@ -181,9 +181,13 @@ public class TowerStore : MonoBehaviour
         IsMoving = !_on;
 
         EntityManager.Instance?.ShowPlaceField(_on);
-        UIManager.Instance?.UpdateStore(_on ? 1 : 0);
 
-        if (_on) return;
+        if (_on)
+        {
+            UIManager.Instance?.UpdateStore(1, GetSelectGold());
+            return;
+        }
+        else UIManager.Instance?.UpdateStore(0);
 
         for (int i = 0; i < slots.Length; i++)
         {
@@ -207,6 +211,7 @@ public class TowerStore : MonoBehaviour
 
             if (slot.IsComplete) continue;
             if (_id != 0 && slot.GetID() != _id) continue;
+            if (!GameManager.Instance.EnoughGold(slot.GetData())) continue;
 
             match++;
             if (Random.Range(0, match) == 0)
@@ -225,9 +230,11 @@ public class TowerStore : MonoBehaviour
         if (slot == null) return false;
 
         SelectSlot(slot);
-        PurchaseSlot(pos);
-
-        return true;
+        return PurchaseSlot(pos);
     }
+    #endregion
+
+    #region GET
+    public int GetSelectGold() => GameManager.Instance.GetNeedGold(select.GetData());
     #endregion
 }
