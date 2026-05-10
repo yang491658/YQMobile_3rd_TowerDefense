@@ -55,6 +55,8 @@ public class Charge : TowerSkill
 
     public override void OnHit(Tower _tower, Bullet _bullet, Monster _target, ref bool _instead)
     {
+        if (_tower == null) return;
+
         if (ready)
         {
             _instead = true;

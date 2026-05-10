@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Bullet : Pooling
@@ -14,8 +13,6 @@ public class Bullet : Pooling
     private int targetIndex;
     private Vector3 targetPos;
     [SerializeField][Min(0f)] private float moveSpeed = 10f;
-    [SerializeField] private Vector2 moveDirection;
-    private readonly List<int> hits = new();
 
     public bool IsHit { private set; get; } = false;
 
@@ -33,12 +30,6 @@ public class Bullet : Pooling
 
         float step = moveSpeed * Time.fixedDeltaTime;
 
-        if (target == null)
-        {
-            rb.MovePosition(rb.position + moveDirection * step);
-            return;
-        }
-
         Vector2 from = rb.position;
         Vector2 to = Vector2.MoveTowards(from, targetPos, step);
 
@@ -54,15 +45,6 @@ public class Bullet : Pooling
     {
         if (IsDespawn || IsHit) return;
 
-        if (target == null && _collision.TryGetComponent(out Monster _monster))
-        {
-            if (hits.Contains(_monster.Index)) return;
-
-            hits.Add(_monster.Index);
-            tower.Hit(this, _monster, _monster.Index, _monster.transform.position);
-            return;
-        }
-
         if (target != null && !target.IsInvalid(targetIndex)
             && target.gameObject == _collision.gameObject)
             Hit();
@@ -70,18 +52,8 @@ public class Bullet : Pooling
 
     private void Hit()
     {
-        if (target != null && !target.IsInvalid(targetIndex)
-            && !hits.Contains(targetIndex))
-            hits.Add(targetIndex);
-
         IsHit = true;
         tower.Hit(this, target, targetIndex, targetPos);
-
-        if (target == null)
-        {
-            IsHit = false;
-            return;
-        }
 
         Despawn();
     }
@@ -102,27 +74,11 @@ public class Bullet : Pooling
         tower.AddBullet(this);
         reserve = _tower.GetDamage();
 
-        SetTarget(_target);
-    }
-
-    public void SetTarget(Monster _target)
-    {
-        if (!IsHit && reserve > 0
-            && target != null && !target.IsInvalid(targetIndex))
-            target.ReserveDown(reserve);
-
         target = _target;
-        if (target == null) return;
-
-        target.ReserveUp(reserve);
         targetIndex = target.Index;
         targetPos = target.transform.position;
-        moveDirection = (target.transform.position - transform.position).normalized;
+        target.ReserveUp(reserve);
     }
-    #endregion
-
-    #region GET
-    public int GetHitCount() => hits.Count;
     #endregion
 
     #region 풀링
@@ -156,8 +112,6 @@ public class Bullet : Pooling
         targetIndex = 0;
         targetPos = default;
         moveSpeed = 10f;
-        moveDirection = default;
-        hits.Clear();
 
         Stop();
     }
