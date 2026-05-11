@@ -202,9 +202,9 @@ public class TestManager : MonoBehaviour
         #endregion
 
         #region UI 매니저
-        if (Input.GetKeyDown(KeyCode.Z)) UIManager.Instance?.OpenSetting(!UIManager.Instance.GetOnSetting());
-        if (Input.GetKeyDown(KeyCode.X)) UIManager.Instance?.OpenConfirm(!UIManager.Instance.GetOnConfirm());
-        if (Input.GetKeyDown(KeyCode.C)) UIManager.Instance?.OpenResult(!UIManager.Instance.GetOnResult());
+        if (Input.GetKeyDown(KeyCode.Z)) UIManager.Instance?.OpenSetting(!UIManager.Instance.OnSetting);
+        if (Input.GetKeyDown(KeyCode.X)) UIManager.Instance?.OpenConfirm(!UIManager.Instance.OnConfirm);
+        if (Input.GetKeyDown(KeyCode.C)) UIManager.Instance?.OpenResult(!UIManager.Instance.OnResult);
         #endregion
 
         #region 테스트 매니저
@@ -221,11 +221,11 @@ public class TestManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.UpArrow))
             ChangeGameSpeed(gameSpeed.value == gameSpeed.maxValue
-                ? GameManager.Instance.GetMaxSpeed()
+                ? GameManager.Instance.MaxSpeed
                 : gameSpeed.maxValue);
         if (Input.GetKeyDown(KeyCode.DownArrow))
             ChangeGameSpeed(gameSpeed.value == gameSpeed.minValue
-                ? GameManager.Instance.GetMaxSpeed()
+                ? GameManager.Instance.MaxSpeed
                 : gameSpeed.minValue);
         if (Input.GetKeyDown(KeyCode.LeftArrow))
             if (Mode != TestMode.Boss) ChangeRefTower(--refTower.value);
@@ -261,7 +261,7 @@ public class TestManager : MonoBehaviour
         AutoMerge();
         if (Mode == TestMode.None)
         {
-            if (GameManager.Instance.GetLifePercent() < 50)
+            if (GameManager.Instance?.LifePercent < 50)
                 if (GameManager.Instance.BuyLife()) return;
 
             if (!DataManager.Instance.IsUnlocked(refID))
@@ -271,7 +271,7 @@ public class TestManager : MonoBehaviour
                 return;
             }
 
-            int level = GameManager.Instance.GetLevel();
+            int level = GameManager.Instance.Level;
             int best = DataManager.Instance.GetBestLevel(refID);
 
             if (level < best)
@@ -325,9 +325,9 @@ public class TestManager : MonoBehaviour
         {
             Tower tower = towers[i];
             if (tower == null || tower.IsDragging) continue;
-            if (tower.GetID() == _id) continue;
+            if (tower.ID == _id) continue;
 
-            if (target == null || tower.GetRank() < target.GetRank())
+            if (target == null || tower.Rank < target.Rank)
                 target = tower;
         }
         if (target == null) return false;
@@ -390,7 +390,7 @@ public class TestManager : MonoBehaviour
 
         if (GameManager.Instance.IsGameOver)
         {
-            long value = GameManager.Instance.GetScore();
+            long value = GameManager.Instance.Score;
 
             if (Mode == TestMode.Boss)
             {
@@ -462,7 +462,7 @@ public class TestManager : MonoBehaviour
             {
                 Tower tower = towers[i];
                 if (tower == null || tower.IsDragging || tower.IsMax) continue;
-                if (tower.GetRank() != r) continue;
+                if (tower.Rank != r) continue;
 
                 matches.Add(tower);
             }
@@ -476,7 +476,7 @@ public class TestManager : MonoBehaviour
                 {
                     Tower b = matches[j];
                     if (b == null) continue;
-                    if (a.GetID() != b.GetID()) continue;
+                    if (a.ID != b.ID) continue;
 
                     if (b.Merge(a) != null) return;
                 }
@@ -495,7 +495,7 @@ public class TestManager : MonoBehaviour
             Tower tower = towers[i];
             if (tower == null || tower.IsDragging || tower.IsMax) continue;
 
-            rankSet.Add(tower.GetRank());
+            rankSet.Add(tower.Rank);
         }
 
         List<int> ranks = new(rankSet);
@@ -510,7 +510,7 @@ public class TestManager : MonoBehaviour
             {
                 Tower tower = towers[i];
                 if (tower == null || tower.IsDragging || tower.IsMax) continue;
-                if (tower.GetRank() != curRank) continue;
+                if (tower.Rank != curRank) continue;
 
                 matches.Add(tower);
             }
@@ -529,7 +529,7 @@ public class TestManager : MonoBehaviour
                 {
                     Tower b = matches[(start + n + m) % count];
                     if (b == null) continue;
-                    if (a.GetID() != b.GetID()) continue;
+                    if (a.ID != b.ID) continue;
 
                     if (a.Merge(b) != null) return;
                 }
@@ -551,8 +551,8 @@ public class TestManager : MonoBehaviour
             {
                 Tower newer = towers[newerIndex];
                 if (newer == null || newer.IsDragging || newer.IsMax) continue;
-                if (newer.GetID() != older.GetID()) continue;
-                if (newer.GetRank() != older.GetRank()) continue;
+                if (newer.ID != older.ID) continue;
+                if (newer.Rank != older.Rank) continue;
 
                 newer.Merge(older);
                 return;
@@ -582,8 +582,8 @@ public class TestManager : MonoBehaviour
             Tower tower = towers[i];
             if (tower == null || tower.IsDragging) continue;
 
-            int id = tower.GetID();
-            int rank = tower.GetRank();
+            int id = tower.ID;
+            int rank = tower.Rank;
 
             if (id == refID) target[rank]++;
             else if (id == 0) basics[rank].Add(tower);
@@ -632,7 +632,7 @@ public class TestManager : MonoBehaviour
     #region 테스트 UI
     private void OnEnable()
     {
-        gameSpeed.value = (int)GameManager.Instance?.GetSpeed();
+        gameSpeed.value = (int)GameManager.Instance?.Speed;
         InitSlider(gameSpeed, ChangeGameSpeed);
 
         refRank.minValue = 1;
@@ -706,7 +706,7 @@ public class TestManager : MonoBehaviour
         testText.text =
             $"Tower : {EntityManager.Instance?.GetTowerCount()}\n" +
             $"Monster : {EntityManager.Instance?.GetMonsterCount()}\n" +
-            $"Others : {PoolManager.Instance?.GetOtherCount()}";
+            $"Others : {PoolManager.Instance?.OtherCount}";
     }
 
     private void UpdateTestUI()

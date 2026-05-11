@@ -95,9 +95,9 @@ public class Summon : Pooling
             nextPos = path[pathIndex];
         }
 
-        Vector2 current = rb.position;
+        Vector2 current = RB.position;
         Vector2 move = Vector2.MoveTowards(current, nextPos, speed * _deltaTime);
-        rb.MovePosition(move);
+        RB.MovePosition(move);
 
         Vector2 delta = (Vector2)nextPos - move;
         if (delta.sqrMagnitude > 0.0001f) return;
@@ -125,15 +125,15 @@ public class Summon : Pooling
     public void SetSummon(TowerSkill _skill, Tower _tower, float _scale = 1f, float _speed = 0f)
     {
         transform.localScale = _tower.transform.localScale * _scale;
-        sr.sprite = _tower.GetIcon();
-        sr.color = _tower.GetColor();
+        SR.sprite = _tower.Icon;
+        SR.color = _tower.Color;
 
         ID = _skill.ID;
         tower = _tower;
         tower.AddSummon(this);
 
         speed = _speed;
-        reserve = _tower.GetDamage();
+        reserve = _tower.Damage;
     }
 
     public void SetOrbit(float _radius, float _angle)

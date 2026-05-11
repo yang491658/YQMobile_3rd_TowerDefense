@@ -23,7 +23,7 @@ public class Multi : TowerSkill
 
     public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
     {
-        if (IsCooldown()) return;
+        if (IsCooldown) return;
 
         StartCooldown(_tower, cooldown);
         EntityManager.Instance?.StartCoroutine(MultiCoroutine(_tower));

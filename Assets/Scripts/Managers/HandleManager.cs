@@ -7,9 +7,6 @@ public class HandleManager : MonoBehaviour
 {
     public static HandleManager Instance { private set; get; }
 
-    private Camera cam => Camera.main;
-    private LayerMask layer => LayerMask.GetMask("Tower");
-
     [Header("Tower")]
     [SerializeField] private Tower select;
     private Vector3 offset;
@@ -314,7 +311,7 @@ public class HandleManager : MonoBehaviour
         }
 
         Collider2D[] hits = Physics2D.OverlapPointAll(_end, layer);
-        Collider2D selfCol = select.GetCol();
+        Collider2D selfCol = select.Col;
         Tower target = null;
 
         for (int i = 0; i < hits.Length; i++)
@@ -411,5 +408,10 @@ public class HandleManager : MonoBehaviour
         }
     }
 #endif
+    #endregion
+
+    #region 프로퍼티
+    private Camera cam => Camera.main;
+    private LayerMask layer => LayerMask.GetMask("Tower");
     #endregion
 }

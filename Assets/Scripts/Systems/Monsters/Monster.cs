@@ -202,15 +202,18 @@ public class Monster : Pooling
     #endregion
 
     #region GET
-    public float GetSpeed() => moveSpeed;
-    public Vector3 GetDirection() => moveDirection;
-
-    public int GetHealth() => health;
-    public int GetMaxHealth() => maxHealth;
     public bool IsExclude() => health * 1.5f < reserve || IsDead || IsDespawn;
     public bool IsInvalid(int _index = -1) => IsDead || IsDespawn || (_index >= 0 && Index != _index);
+    #endregion
 
-    public MonsterDebuff GetDebuff() => debuff;
+    #region 프로퍼티
+    public float Speed => moveSpeed;
+    public Vector3 Direction => moveDirection;
+
+    public int Health => health;
+    public int MaxHealth => maxHealth;
+
+    public MonsterDebuff Debuff => debuff;
     #endregion
 
     #region 풀링
@@ -221,7 +224,7 @@ public class Monster : Pooling
         base.OnSpawnPool();
 
         int order = ++sorting * 10;
-        sr.sortingOrder = order;
+        SR.sortingOrder = order;
         if (canvas != null)
             canvas.sortingOrder = order;
 

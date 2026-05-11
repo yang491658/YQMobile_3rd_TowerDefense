@@ -111,7 +111,7 @@ public class MonsterDebuff : MonoBehaviour
     private void Awake()
     {
         monster = GetComponent<Monster>();
-        baseSpeed = monster.GetSpeed();
+        baseSpeed = monster.Speed;
         bool boss = monster is Boss;
 
         tickDamage.SetBoss(boss);
@@ -197,7 +197,7 @@ public class MonsterDebuff : MonoBehaviour
     public void ApplySpeed(int _factor, float _duration, ViewEffect _effect)
     {
         if (!speedControl.IsActive)
-            baseSpeed = monster.GetSpeed();
+            baseSpeed = monster.Speed;
         else
         {
             if (speedControl.value == 100 && _factor != 100)
@@ -328,12 +328,11 @@ public class MonsterDebuff : MonoBehaviour
     }
     #endregion
 
-    #region GET
-    public bool HasTickDamage() => tickDamage.IsActive;
-    public bool HasBonusDamage() => bonusDamage.IsActive;
-    public bool HasSpeedControl() => speedControl.IsActive;
-    public bool HasDirectionControl() => directionControl.IsActive;
-    public bool HasDebuff()
-        => tickDamage.IsActive || bonusDamage.IsActive || speedControl.IsActive || directionControl.IsActive;
+    #region 프로퍼티
+    public bool HasTickDamage => tickDamage.IsActive;
+    public bool HasBonusDamage => bonusDamage.IsActive;
+    public bool HasSpeedControl => speedControl.IsActive;
+    public bool HasDirectionControl => directionControl.IsActive;
+    public bool HasDebuff => tickDamage.IsActive || bonusDamage.IsActive || speedControl.IsActive || directionControl.IsActive;
     #endregion
 }

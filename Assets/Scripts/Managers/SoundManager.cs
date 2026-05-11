@@ -74,7 +74,7 @@ public class SoundManager : MonoBehaviour
     #region 배경음
     public void PlayBGM(AudioClip _clip)
     {
-        if (bgmSource == null || IsBGMMuted()) return;
+        if (bgmSource == null || IsBGMMuted) return;
 
         bgmSource.clip = _clip;
         bgmSource.Play();
@@ -96,7 +96,7 @@ public class SoundManager : MonoBehaviour
 
     public void ToggleBGM()
     {
-        if (!IsBGMMuted() && bgmVol > 0f)
+        if (!IsBGMMuted && bgmVol > 0f)
         {
             prevBgmVol = bgmVol;
             SetBGMVolume(0f);
@@ -108,7 +108,7 @@ public class SoundManager : MonoBehaviour
     #region 효과음
     public void PlaySFX(AudioClip _clip)
     {
-        if (sfxSource == null || IsSFXMuted()) return;
+        if (sfxSource == null || IsSFXMuted) return;
 
         sfxSource.PlayOneShot(_clip);
     }
@@ -158,7 +158,7 @@ public class SoundManager : MonoBehaviour
 
     public void ToggleSFX()
     {
-        if (!IsSFXMuted() && sfxVol > 0f)
+        if (!IsSFXMuted && sfxVol > 0f)
         {
             prevSfxVol = sfxVol;
             SetSFXVolume(0f);
@@ -235,11 +235,11 @@ public class SoundManager : MonoBehaviour
     }
     #endregion
 
-    #region GET
-    public float GetBGMVolume() => bgmVol;
-    public float GetSFXVolume() => sfxVol;
+    #region 프로퍼티
+    public float BGMVolume => bgmVol;
+    public float SFXVolume => sfxVol;
 
-    public bool IsBGMMuted() => bgmSource != null && bgmSource.mute;
-    public bool IsSFXMuted() => sfxSource != null && sfxSource.mute;
+    public bool IsBGMMuted => bgmSource != null && bgmSource.mute;
+    public bool IsSFXMuted => sfxSource != null && sfxSource.mute;
     #endregion
 }

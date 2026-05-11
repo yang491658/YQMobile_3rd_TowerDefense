@@ -303,9 +303,6 @@ public class PoolManager : MonoBehaviour
     }
 
 #if TEST_Manager
-    public int GetOtherCount()
-        => bulletPolicy.active + summonPolicy.active + effectPolicy.active;
-
     private void UpdateStatistics()
     {
         if (monsterPolicy != null) { monsterPolicy.active = 0; monsterPolicy.wait = 0; }
@@ -349,4 +346,10 @@ public class PoolManager : MonoBehaviour
     }
 #endif
     #endregion
+
+#if TEST_Manager
+    #region 프로퍼티
+    public int OtherCount => bulletPolicy.active + summonPolicy.active + effectPolicy.active;
+    #endregion
+#endif
 }

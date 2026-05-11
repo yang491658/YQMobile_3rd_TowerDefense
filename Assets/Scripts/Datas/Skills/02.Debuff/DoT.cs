@@ -13,7 +13,7 @@ public class DoT : TowerSkill
 #endif
 
     public override System.Predicate<Monster> GetFilter()
-        => _monster => !_monster.GetDebuff().HasTickDamage();
+        => _monster => !_monster.Debuff.HasTickDamage;
 
     public override void SetValues(Tower _tower)
     {
@@ -23,7 +23,7 @@ public class DoT : TowerSkill
 
     public override void OnAttack(Tower _tower, Monster _target, ref bool _instead)
     {
-        _target.GetDebuff().ActiveTick();
+        _target.Debuff.ActiveTick();
     }
 
     public override void OnHit(Tower _tower, Bullet _bullet, Monster _target, ref bool _instead)
@@ -31,6 +31,6 @@ public class DoT : TowerSkill
         if (_target == null || _target.IsInvalid()) return;
 
         ViewEffect effect = EntityManager.Instance?.MakeEffect(_tower, _target, duration);
-        _target.GetDebuff().ApplyTick(damage, duration, effect);
+        _target.Debuff.ApplyTick(damage, duration, effect);
     }
 }

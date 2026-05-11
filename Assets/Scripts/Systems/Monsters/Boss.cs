@@ -38,8 +38,8 @@ public class Boss : Monster
     }
     #endregion
 
-    #region GET
-    public BossData GetData() => data;
+    #region 프로퍼티
+    public BossData Data => data;
     #endregion
 
     #region 풀링

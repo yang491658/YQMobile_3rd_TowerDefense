@@ -8,19 +8,19 @@ public class ViewEffect : Pooling
     private IEnumerator EffectCoroutine(float _startAlpha, float _duration)
     {
         float timer = _duration;
-        Color color = sr.color;
+        Color color = SR.color;
 
         while (timer > 0f)
         {
             timer -= Time.deltaTime;
             float t = 1f - Mathf.Clamp01(timer / _duration);
             color.a = Mathf.Lerp(_startAlpha, 0f, t);
-            sr.color = color;
+            SR.color = color;
             yield return null;
         }
 
         color.a = 0f;
-        sr.color = color;
+        SR.color = color;
 
         routine = null;
         Despawn();
@@ -30,8 +30,8 @@ public class ViewEffect : Pooling
     public void SetEffect(Tower _tower, float _scale, float _duration)
     {
         transform.localScale = Vector3.one * _scale;
-        sr.color = _tower.GetColor();
-        sr.sprite = _tower.GetIcon();
+        SR.color = _tower.Color;
+        SR.sprite = _tower.Icon;
 
         if (routine != null)
         {
@@ -40,10 +40,10 @@ public class ViewEffect : Pooling
         }
 
         if (_duration > 0f)
-            routine = StartCoroutine(EffectCoroutine(sr.color.a, _duration));
+            routine = StartCoroutine(EffectCoroutine(SR.color.a, _duration));
     }
 
-    public void SetVisible(bool _visible) => sr.enabled = _visible;
+    public void SetVisible(bool _visible) => SR.enabled = _visible;
     #endregion
 
     #region 풀링
@@ -51,9 +51,9 @@ public class ViewEffect : Pooling
     {
         base.OnSpawnPool();
 
-        sr.enabled = true;
-        col.enabled = false;
-        rb.simulated = false;
+        SR.enabled = true;
+        Col.enabled = false;
+        RB.simulated = false;
     }
 
     public override void ResetPool()
@@ -61,10 +61,10 @@ public class ViewEffect : Pooling
         base.ResetPool();
 
         transform.localScale = Vector3.one;
-        sr.color = Color.white;
-        sr.sprite = null;
-        sr.sortingLayerID = SortingLayer.NameToID("Effect");
-        sr.sortingOrder = 0;
+        SR.color = Color.white;
+        SR.sprite = null;
+        SR.sortingLayerID = SortingLayer.NameToID("Effect");
+        SR.sortingOrder = 0;
 
         if (routine != null)
         {

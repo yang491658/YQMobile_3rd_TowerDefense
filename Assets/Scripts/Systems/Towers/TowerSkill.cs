@@ -36,7 +36,7 @@ public abstract class TowerSkill : ScriptableObject
 
     public virtual void OnSell(Tower _tower) { }
 
-    protected bool IsCooldown() => cooldownRoutine != null;
+    protected bool IsCooldown => cooldownRoutine != null;
 
     protected void StartCooldown(Tower _tower, float _cooldown)
     {
@@ -51,7 +51,7 @@ public abstract class TowerSkill : ScriptableObject
         if (_tower == null)
         { cooldownRoutine = null; yield break; }
 
-        Image timerUI = _tower.GetTimerUI();
+        Image timerUI = _tower.TimerUI;
         if (timerUI != null)
         {
             timerUI.gameObject.SetActive(true);

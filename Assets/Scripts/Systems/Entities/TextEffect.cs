@@ -184,7 +184,7 @@ public class TextEffect : MonoBehaviour, IPoolable
     #endregion
 
     #region 풀링
-    public bool IsDespawn { get; private set; } = true;
+    public bool IsDespawn { private set; get; } = true;
 
     public void OnSpawnPool()
     {

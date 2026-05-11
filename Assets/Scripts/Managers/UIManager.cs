@@ -266,23 +266,23 @@ public class UIManager : MonoBehaviour
     private void OnEnable()
     {
         GameManager.Instance.OnChangeSpeed += UpdateSpeed;
-        speedSlider.minValue = GameManager.Instance.GetMinSpeed();
-        speedSlider.maxValue = GameManager.Instance.GetMaxSpeed();
-        speedSlider.value = GameManager.Instance.GetSpeed();
+        speedSlider.minValue = GameManager.Instance.MinSpeed;
+        speedSlider.maxValue = GameManager.Instance.MaxSpeed;
+        speedSlider.value = GameManager.Instance.Speed;
         speedSlider.onValueChanged.AddListener(GameManager.Instance.SetSpeed);
 
         GameManager.Instance.OnChangeScore += UpdateScore;
         GameManager.Instance.OnChangeLife += UpdateLife;
-        life.slider.maxValue = GameManager.Instance.GetMaxLife();
-        life.slider.value = GameManager.Instance.GetLife();
+        life.slider.maxValue = GameManager.Instance.MaxLife;
+        life.slider.value = GameManager.Instance.Life;
         GameManager.Instance.OnChangeExp += UpdateExp;
         GameManager.Instance.OnChangeLevel += UpdateLevel;
         GameManager.Instance.OnChangeGold += UpdateGold;
 
         SoundManager.Instance.OnChangeVolume += UpdateVolume;
-        bgmSlider.value = SoundManager.Instance.GetBGMVolume();
+        bgmSlider.value = SoundManager.Instance.BGMVolume;
         bgmSlider.onValueChanged.AddListener(SoundManager.Instance.SetBGMVolume);
-        sfxSlider.value = SoundManager.Instance.GetSFXVolume();
+        sfxSlider.value = SoundManager.Instance.SFXVolume;
         sfxSlider.onValueChanged.AddListener(SoundManager.Instance.SetSFXVolume);
 
         OnOpenUI += GameManager.Instance.Pause;
@@ -404,7 +404,7 @@ public class UIManager : MonoBehaviour
         OnOpenUI?.Invoke(_on);
 
         if (TowerStore.Instance.IsPlacing)
-            UpdateStore(1, TowerStore.Instance.GetSelectGold());
+            UpdateStore(1, TowerStore.Instance.SelectGold);
     }
 
     public void OpenConfirm(bool _on, string _text = null, System.Action _action = null, bool _pass = false)
@@ -446,13 +446,13 @@ public class UIManager : MonoBehaviour
         ResetSlider(ref exp);
 
         UpdatePlayTime();
-        UpdateScore(GameManager.Instance.GetScore());
+        UpdateScore(GameManager.Instance.Score);
 
         UpdateStore(0);
-        UpdateLife(GameManager.Instance.GetLife(), GameManager.Instance.GetMaxLife());
-        UpdateExp(GameManager.Instance.GetExp(), GameManager.Instance.GetNeedExp());
-        UpdateLevel(GameManager.Instance.GetLevel());
-        UpdateGold(GameManager.Instance.GetGold(), GameManager.Instance.GetRefGold());
+        UpdateLife(GameManager.Instance.Life, GameManager.Instance.MaxLife);
+        UpdateExp(GameManager.Instance.Exp, GameManager.Instance.NeedExp);
+        UpdateLevel(GameManager.Instance.Level);
+        UpdateGold(GameManager.Instance.Gold, GameManager.Instance.RefGold);
         UpdateDrag(null);
 
         OpenUI(false);
@@ -604,15 +604,15 @@ public class UIManager : MonoBehaviour
         storeGold = _gold;
         storeImage.color = onStore != 0 ? Color.cyan : storeColor;
 
-        UpdateGold(GameManager.Instance.GetGold(), GameManager.Instance.GetRefGold());
+        UpdateGold(GameManager.Instance.Gold, GameManager.Instance.RefGold);
     }
 
     private void UpdateLife(int _life, int _maxLife)
-        => UpdateSlider(ref life, _life, _maxLife, GameManager.Instance.CanBuyLife());
+        => UpdateSlider(ref life, _life, _maxLife, GameManager.Instance.CanBuyLife);
 
     private void UpdateExp(int _exp, int _needExp)
     {
-        if (GameManager.Instance.IsMaxLevel())
+        if (GameManager.Instance.IsMaxLevel)
         {
             exp.slider.maxValue = 1;
             exp.slider.value = 1;
@@ -620,12 +620,12 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        UpdateSlider(ref exp, _exp, _needExp, GameManager.Instance.CanBuyExp());
+        UpdateSlider(ref exp, _exp, _needExp, GameManager.Instance.CanBuyExp);
     }
 
     private void UpdateLevel(int _level)
     {
-        bool isMax = GameManager.Instance.IsMaxLevel();
+        bool isMax = GameManager.Instance.IsMaxLevel;
 
         exp.text.gameObject.SetActive(!isMax);
         exp.btn.gameObject.SetActive(!isMax);
@@ -637,10 +637,10 @@ public class UIManager : MonoBehaviour
     private void UpdateGold(int _gold, int _refGold)
     {
         if (life.btn.gameObject.activeSelf)
-            life.btn.interactable = GameManager.Instance.CanBuyLife();
+            life.btn.interactable = GameManager.Instance.CanBuyLife;
 
         if (exp.btn.gameObject.activeSelf)
-            exp.btn.interactable = GameManager.Instance.CanBuyExp();
+            exp.btn.interactable = GameManager.Instance.CanBuyExp;
 
         string refText = FormatNumber(_refGold);
 
@@ -729,13 +729,13 @@ public class UIManager : MonoBehaviour
     private void UpdateSoundIcon()
     {
         if (bgmIcons.Count >= 2)
-            bgmIcon.sprite = SoundManager.Instance.IsBGMMuted() ? bgmIcons[1] : bgmIcons[0];
+            bgmIcon.sprite = SoundManager.Instance.IsBGMMuted ? bgmIcons[1] : bgmIcons[0];
 
         if (sfxIcons.Count >= 3)
         {
-            if (SoundManager.Instance.IsSFXMuted())
+            if (SoundManager.Instance.IsSFXMuted)
                 sfxIcon.sprite = sfxIcons[2];
-            else if (SoundManager.Instance?.GetSFXVolume() < 0.2f)
+            else if (SoundManager.Instance?.SFXVolume < 0.2f)
                 sfxIcon.sprite = sfxIcons[1];
             else
                 sfxIcon.sprite = sfxIcons[0];
@@ -783,12 +783,6 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region GET
-#if TEST_Manager
-    public bool GetOnSetting() => settingUI.activeSelf;
-    public bool GetOnConfirm() => confirmUI.activeSelf;
-    public bool GetOnResult() => resultUI.activeSelf;
-#endif
-
     public Rect GetMapAreaRect(float _z = 0f)
     {
         Rect rect = mapUI.rect;
@@ -835,4 +829,12 @@ public class UIManager : MonoBehaviour
         return origin - move;
     }
     #endregion
+
+#if TEST_Manager
+    #region 프로퍼티
+    public bool OnSetting => settingUI.activeSelf;
+    public bool OnConfirm => confirmUI.activeSelf;
+    public bool OnResult => resultUI.activeSelf;
+    #endregion
+#endif
 }

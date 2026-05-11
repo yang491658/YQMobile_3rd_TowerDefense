@@ -93,7 +93,7 @@ public class DataManager : MonoBehaviour
         if (_id == 0) return true;
         if (!towerDic.TryGetValue(_id, out var data)) return false;
 
-        IReadOnlyList<TowerChance.GradeChance> chances = GetGradeChance(GameManager.Instance.GetLevel());
+        IReadOnlyList<TowerChance.GradeChance> chances = GetGradeChance(GameManager.Instance.Level);
 
         for (int i = 0; i < chances.Count; i++)
         {
@@ -112,7 +112,7 @@ public class DataManager : MonoBehaviour
 
         int result = 0;
         float bestChance = 0f;
-        int maxLevel = GameManager.Instance.GetMaxLevel();
+        int maxLevel = GameManager.Instance.MaxLevel;
 
         for (int level = 1; level <= maxLevel; level++)
         {
@@ -173,7 +173,7 @@ public class DataManager : MonoBehaviour
 
     public TowerData GetRandomTower()
     {
-        int level = GameManager.Instance.GetLevel();
+        int level = GameManager.Instance.Level;
         TowerGrade grade = GetRandomGrade(level);
 
         TowerData result = null;

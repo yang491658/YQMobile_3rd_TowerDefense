@@ -8679,6 +8679,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 33f45f685c94d044dbff460e59fce319, type: 2}
   - {fileID: 11400000, guid: 45862eebabcb0c44fa0f90d339fc501d, type: 2}
   - {fileID: 11400000, guid: d3e85a2e421ba944e856fe007589dd08, type: 2}
+  - {fileID: 11400000, guid: 551a08ef32dd1c94b9fca51b2d8f83e2, type: 2}
+  - {fileID: 11400000, guid: 6c64711df0d9a2a43887ada0723a18f1, type: 2}
+  - {fileID: 11400000, guid: 213d775bf5ad65b4988a618a7f776c0b, type: 2}
+  - {fileID: 11400000, guid: 04e3bdfdd7f8a01418297439036a4653, type: 2}
+  - {fileID: 11400000, guid: 09c5b48d610faca4797715bc12c5d473, type: 2}
+  - {fileID: 11400000, guid: c4e4e1a6ec7a1a14a9d8f89694461364, type: 2}
+  - {fileID: 11400000, guid: 0bf925e40e3056241b9fe1dcdad4cca6, type: 2}
   towerChance: {fileID: 11400000, guid: fa32553a70dee124aa6919c8820d9f57, type: 2}
   towerConfig: {fileID: 11400000, guid: 4e19fa1afac8564469f4922387f20442, type: 2}
 --- !u!4 &1065004637
@@ -14302,14 +14309,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
+  m_fontSize: 31.5
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 16
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0

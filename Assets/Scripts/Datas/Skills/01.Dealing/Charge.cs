@@ -26,7 +26,7 @@ public class Charge : TowerSkill
 
     public override void OnGenerate(Tower _tower)
     {
-        speed = DataManager.Instance.GetTowerStat(_tower.GetRole(), TowerGrade.Normal).attackSpeed;
+        speed = DataManager.Instance.GetTowerStat(_tower.Role, TowerGrade.Normal).attackSpeed;
         stack = 0;
         ready = false;
     }
@@ -41,7 +41,7 @@ public class Charge : TowerSkill
 
     public override void OnAttack(Tower _tower, Monster _target, ref bool _instead)
     {
-        if (IsCooldown() || ready)
+        if (IsCooldown || ready)
         { _instead = true; return; }
 
         ready = ++stack >= count;
@@ -61,13 +61,13 @@ public class Charge : TowerSkill
         {
             _instead = true;
 
-            int critical = _tower.GetCritical();
+            int critical = _tower.Critical;
 
-            float c = Mathf.Min(_tower.GetChance() * count, 100f);
+            float c = Mathf.Min(_tower.Chance * count, 100f);
             if (Random.value < c / 100f)
-                critical *= _tower.GetRank();
+                critical *= _tower.Rank;
 
-            _tower.HitDamage(_target, _tower.GetDamage(), 100, critical);
+            _tower.HitDamage(_target, _tower.Damage, 100, critical);
 
             ready = false;
         }

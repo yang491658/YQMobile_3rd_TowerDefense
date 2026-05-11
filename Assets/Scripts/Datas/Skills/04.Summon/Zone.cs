@@ -23,10 +23,10 @@ public class Zone : TowerSkill
     public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
     {
         if (_target == null || _target.IsInvalid()) return;
-        if (IsCooldown()) return;
+        if (IsCooldown) return;
 
         EntityManager.Instance?.MakeSummon(this, _tower, _target.transform.position, scale)
-            ?.SetZone(duration, _tower.GetDamage());
+            ?.SetZone(duration, _tower.Damage);
 
         StartCooldown(_tower, duration + cooldown);
     }

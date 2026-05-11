@@ -198,7 +198,7 @@ public class GameManager : MonoBehaviour
 
     public bool BuyLife()
     {
-        if (!CanBuyLife()) return false;
+        if (!CanBuyLife) return false;
 
         GoldDown(gold + lifeGold, true);
 
@@ -237,7 +237,7 @@ public class GameManager : MonoBehaviour
 
     public bool BuyExp()
     {
-        if (!CanBuyExp()) return false;
+        if (!CanBuyExp) return false;
 
         int cost = needExp;
         ExpUp(cost / 10);
@@ -332,33 +332,36 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region GET
-    public float GetSpeed() => speed;
-    public float GetMinSpeed() => minSpeed;
-    public float GetMaxSpeed() => maxSpeed;
-
-    public int GetScore() => score;
-
-    public int GetLife() => life;
-    public int GetMaxLife() => maxLife;
-    public int GetLifePercent() => 100 * life / maxLife;
-    public bool CanBuyLife() => gold > 0;
-
-    public int GetExp() => exp;
-    public int GetNeedExp() => needExp;
-    public bool CanBuyExp() => gold >= needExp && level < maxLevel;
-
-    public int GetLevel() => level;
-    public int GetMaxLevel() => maxLevel;
-    public bool IsMaxLevel() => level >= maxLevel;
-
-    public int GetGold() => gold;
-    public int GetRefGold() => refGold;
     public int GetNeedGold(TowerData _data) => refGold * DataManager.Instance.GetGradeStat(_data.Grade);
     public int GetSellGold(Tower _tower)
     {
-        float grade = Mathf.Pow(DataManager.Instance.GetGradeStat(_tower.GetGrade()), 0.8f);
-        return Mathf.FloorToInt(refGold * _tower.GetRank() * grade / 2f);
+        float grade = Mathf.Pow(DataManager.Instance.GetGradeStat(_tower.Grade), 0.8f);
+        return Mathf.FloorToInt(refGold * _tower.Rank * grade / 2f);
     }
     public bool EnoughGold(TowerData _data) => gold >= GetNeedGold(_data);
+    #endregion
+
+    #region 프로퍼티
+    public float Speed => speed;
+    public float MinSpeed => minSpeed;
+    public float MaxSpeed => maxSpeed;
+
+    public int Score => score;
+
+    public int Life => life;
+    public int MaxLife => maxLife;
+    public int LifePercent => 100 * life / maxLife;
+    public bool CanBuyLife => gold > 0;
+
+    public int Exp => exp;
+    public int NeedExp => needExp;
+    public bool CanBuyExp => gold >= needExp && level < maxLevel;
+
+    public int Level => level;
+    public int MaxLevel => maxLevel;
+    public bool IsMaxLevel => level >= maxLevel;
+
+    public int Gold => gold;
+    public int RefGold => refGold;
     #endregion
 }

@@ -155,7 +155,7 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         outline.color = DataManager.Instance.GetTowerColor(_data.Grade);
         icon.sprite = _data.Icon;
         icon.color = _data.Color;
-        grade.text = $"×{DataManager.Instance.GetGradeStat(_data.Grade)}";
+        grade.text = $"×{DataManager.Instance?.GetGradeStat(_data.Grade)}";
         grade.color = Color.black;
     }
 
@@ -166,10 +166,11 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     }
     #endregion
 
-    #region GET
-    public Vector3 GetPos() => rect.anchoredPosition;
-    public TowerData GetData() => data;
-    public int GetID() => data.ID;
+    #region 프로퍼티
+    public Vector3 Pos => rect.anchoredPosition;
+    public TowerData Data => data;
+    public int ID => data.ID;
+
     public bool IsComplete => state == SlotState.Complete;
     #endregion
 }

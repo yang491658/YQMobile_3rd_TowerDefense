@@ -30,10 +30,10 @@ public class Bullet : Pooling
 
         float step = moveSpeed * Time.fixedDeltaTime;
 
-        Vector2 from = rb.position;
+        Vector2 from = RB.position;
         Vector2 to = Vector2.MoveTowards(from, targetPos, step);
 
-        rb.MovePosition(to);
+        RB.MovePosition(to);
 
         Vector2 delta = (Vector2)targetPos - to;
         if (delta.sqrMagnitude > 0.0001f) return;
@@ -67,12 +67,12 @@ public class Bullet : Pooling
     public void SetBullet(Tower _tower, Monster _target)
     {
         transform.localScale = _tower.transform.localScale * 0.3f;
-        sr.sprite = _tower.GetSymbol();
-        sr.color = _tower.GetColor();
+        SR.sprite = _tower.Symbol;
+        SR.color = _tower.Color;
 
         tower = _tower;
         tower.AddBullet(this);
-        reserve = _tower.GetDamage();
+        reserve = _tower.Damage;
 
         target = _target;
         targetIndex = target.Index;

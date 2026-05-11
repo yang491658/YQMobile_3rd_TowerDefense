@@ -36,7 +36,7 @@ public class SpeedUp : TowerSkill
         for (int i = 0; i < current.Count; i++)
         {
             Tower target = current[i];
-            if (target.GetRole() == TowerRole.Buff) continue;
+            if (target.Role == TowerRole.Buff) continue;
 
             currents.Add(target);
         }
@@ -46,7 +46,7 @@ public class SpeedUp : TowerSkill
             Tower target = targets[i];
             if (currents.Contains(target)) continue;
 
-            TowerBuff buff = target.GetBuff();
+            TowerBuff buff = target.Buff;
             buff.RemoveStat(_tower, TowerBuff.SubType.Speed);
             buff.RemoveStat(_tower, TowerBuff.SubType.Chance);
 
@@ -56,7 +56,7 @@ public class SpeedUp : TowerSkill
 
         foreach (Tower target in currents)
         {
-            TowerBuff buff = target.GetBuff();
+            TowerBuff buff = target.Buff;
 
             buff.ApplyStat(_tower, TowerBuff.SubType.Speed, factor, 0f, TowerBuff.ApplyType.Refresh);
             buff.ApplyStat(_tower, TowerBuff.SubType.Chance, factor, 0f, TowerBuff.ApplyType.Refresh);
@@ -81,7 +81,7 @@ public class SpeedUp : TowerSkill
         for (int i = targets.Count - 1; i >= 0; i--)
         {
             Tower target = targets[i];
-            TowerBuff buff = target.GetBuff();
+            TowerBuff buff = target.Buff;
 
             buff.RemoveStat(_tower, TowerBuff.SubType.Speed);
             buff.RemoveStat(_tower, TowerBuff.SubType.Chance);

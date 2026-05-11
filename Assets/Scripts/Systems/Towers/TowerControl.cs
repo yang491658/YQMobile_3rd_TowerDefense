@@ -66,12 +66,12 @@ public class TowerControl : MonoBehaviour
         for (int i = 0; i < towers.Count; i++)
         {
             Tower buffTower = towers[i];
-            if (buffTower.GetID() != _id) continue;
+            if (buffTower.ID != _id) continue;
 
             for (int j = 0; j < towers.Count; j++)
             {
                 Tower target = towers[j];
-                if (!target.GetBuff().HasBuff(_id)) continue;
+                if (!target.Buff.HasBuff(_id)) continue;
 
                 EntityManager.Instance?.MakeEffect(buffTower, target.transform.position, 1f);
             }

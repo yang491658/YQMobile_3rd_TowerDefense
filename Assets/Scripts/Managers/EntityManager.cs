@@ -399,14 +399,14 @@ public class EntityManager : MonoBehaviour
 
     public bool CanMerge(Tower _select, Tower _target)
         => _select != null && _target != null && _select != _target &&
-        _select.GetID() == _target.GetID() &&
-        _select.GetRank() == _target.GetRank() &&
+        _select.ID == _target.ID &&
+        _select.Rank == _target.Rank &&
         !_select.IsMax && !_target.IsMax;
 
     public Tower MergeTower(Tower _select, Tower _target)
     {
-        int id = _target.GetID();
-        int rank = _target.GetRank();
+        int id = _target.ID;
+        int rank = _target.Rank;
         Vector3 pos = _target.transform.position;
 
         DespawnTower(_select);
@@ -459,7 +459,7 @@ public class EntityManager : MonoBehaviour
         Monster monster = SpawnPool<Monster>(monsterBase, pos, monsterTrans);
         if (monster == null) return null;
 
-        monster.SetMonster(GameManager.Instance.GetScore() / 50);
+        monster.SetMonster(GameManager.Instance.Score / 50);
         monster.SetMove(mapFieldTilemap.WorldToCell(pos));
         monster.transform.localScale = map.localScale;
         monsters.Add(monster);
@@ -557,8 +557,8 @@ public class EntityManager : MonoBehaviour
         if (effect == null) return null;
 
         effect.SetEffect(_tower, 0.7f, _duration);
-        effect.GetSR().sortingLayerID = _target.GetSR().sortingLayerID;
-        effect.GetSR().sortingOrder = _target.GetSR().sortingOrder + 1;
+        effect.SR.sortingLayerID = _target.SR.sortingLayerID;
+        effect.SR.sortingOrder = _target.SR.sortingOrder + 1;
 
         return effect;
     }
@@ -1078,7 +1078,7 @@ public class EntityManager : MonoBehaviour
             Tower t = towers[i];
             if (t == null) continue;
 
-            if (t.GetID() == _id) count++;
+            if (t.ID == _id) count++;
         }
         return count;
     }
@@ -1146,10 +1146,10 @@ public class EntityManager : MonoBehaviour
         => GetByDistance(GetMonsters(_filter), _pos, false, _distance);
 
     public Monster GetMonsterHighHealth(System.Predicate<Monster> _filter = null)
-        => GetByStat(GetMonsters(_filter), _monster => _monster.GetHealth(), true);
+        => GetByStat(GetMonsters(_filter), _monster => _monster.Health, true);
 
     public Monster GetMonsterLowHealth(System.Predicate<Monster> _filter = null)
-        => GetByStat(GetMonsters(_filter), _monster => _monster.GetHealth(), false);
+        => GetByStat(GetMonsters(_filter), _monster => _monster.Health, false);
 
     public List<Monster> GetMonstersInRange(Vector3 _center, int _range, int _count = 0, bool _square = false)
         => GetInRange(monsters, _center, _range, _count, _square);

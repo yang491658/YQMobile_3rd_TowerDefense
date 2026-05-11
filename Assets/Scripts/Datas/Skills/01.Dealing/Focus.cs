@@ -33,14 +33,14 @@ public class Focus : TowerSkill
 
     public override void OnStat(Tower _tower, ref int _damage, ref int _speed, ref int _chance, ref int _critical)
     {
-        if (IsCooldown()) return;
+        if (IsCooldown) return;
 
         _speed = Mathf.RoundToInt(_speed * (100f + factor * stack) / 100f);
     }
 
     public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
     {
-        if (IsCooldown()) return;
+        if (IsCooldown) return;
         if (hold <= 0f) return;
 
         hold -= _deltaTime;
@@ -52,14 +52,14 @@ public class Focus : TowerSkill
 
     public override void OnAttack(Tower _tower, Monster _target, ref bool _instead)
     {
-        if (IsCooldown())
+        if (IsCooldown)
         { _instead = true; return; }
     }
 
     public override void OnHit(Tower _tower, Bullet _bullet, Monster _target, ref bool _instead)
     {
         if (_tower == null) return;
-        if (IsCooldown() || hold > 0f) return;
+        if (IsCooldown || hold > 0f) return;
 
         stack = Mathf.Min(++stack, max);
 

@@ -18,7 +18,7 @@ public class TowerBuff : MonoBehaviour
         public float duration;
         public float timer;
 
-        public int ID => tower.GetID();
+        public int ID => tower.ID;
         public bool IsActive => duration == 0f || timer > 0f;
 
         public Buff(Tower _tower, BuffType _type, SubType _sub, int _value, float _duration)

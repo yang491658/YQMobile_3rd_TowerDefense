@@ -19,7 +19,7 @@ public class Blind : TowerSkill
 #endif
 
     public override System.Predicate<Monster> GetFilter()
-        => _monster => !_monster.GetDebuff().HasDirectionControl();
+        => _monster => !_monster.Debuff.HasDirectionControl;
 
     public override void SetValues(Tower _tower)
     {
@@ -38,7 +38,7 @@ public class Blind : TowerSkill
         if (Random.value < c / 100f)
         {
             if (targets.Add(GetTargetKey(_target)))
-                _target.GetDebuff().ActiveDirection();
+                _target.Debuff.ActiveDirection();
         }
     }
 
@@ -49,7 +49,7 @@ public class Blind : TowerSkill
         if (targets.Remove(GetTargetKey(_target)))
         {
             ViewEffect effect = EntityManager.Instance?.MakeEffect(_tower, _target, duration);
-            _target.GetDebuff().ApplyDirection(0, duration, effect);
+            _target.Debuff.ApplyDirection(0, duration, effect);
         }
     }
 }

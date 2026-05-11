@@ -23,9 +23,9 @@ public class Entity : MonoBehaviour
     public void Stop() => rb.linearVelocity = Vector2.zero;
     #endregion
 
-    #region GET
-    public SpriteRenderer GetSR() => sr;
-    public Collider2D GetCol() => col;
-    public Rigidbody2D GetRb() => rb;
+    #region 프로퍼티
+    public SpriteRenderer SR => sr;
+    public Collider2D Col => col;
+    public Rigidbody2D RB => rb;
     #endregion
 }

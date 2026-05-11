@@ -121,7 +121,7 @@ public class MonsterWave : MonoBehaviour
         ResetWave();
         phase = Phase.Normal;
     }
-    
+
     public void PauseWave(bool _on) => IsPause = _on;
     public void PauseWave(float _time) => StartCoroutine(PauseCoroutine(_time));
     private IEnumerator PauseCoroutine(float _time)
@@ -263,7 +263,7 @@ public class MonsterWave : MonoBehaviour
 
             IsSpawned = true;
 
-            BossData data = boss.GetData();
+            BossData data = boss.Data;
             rewardExp = data.Exp;
             rewardGold = data.Gold;
             return;
@@ -416,8 +416,8 @@ public class MonsterWave : MonoBehaviour
             case Phase.Boss:
                 if (boss != null)
                 {
-                    _value = boss.GetHealth();
-                    _maxValue = boss.GetMaxHealth();
+                    _value = boss.Health;
+                    _maxValue = boss.MaxHealth;
                 }
                 else
                 {

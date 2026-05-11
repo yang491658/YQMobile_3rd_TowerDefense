@@ -202,7 +202,7 @@ public class Tower : Entity
         {
             SpriteRenderer r = renderers[i];
 
-            if (r == sr)
+            if (r == SR)
                 r.sortingOrder = baseOrder;
             else if (r == outlineSR)
                 r.sortingOrder = baseOrder + 1;
@@ -516,21 +516,6 @@ public class Tower : Entity
     #endregion
 
     #region GET
-    public TowerData GetData() => data;
-    public Sprite GetIcon() => data.Icon;
-    public int GetID() => data.ID;
-    public Sprite GetSymbol() => data.Symbol;
-    public Color GetColor() => data.Color;
-    public TowerRole GetRole() => data.Role;
-    public TowerGrade GetGrade() => data.Grade;
-
-    public int GetRank() => rank;
-    public Monster GetTarget() => attackTarget;
-    public int GetDamage() => attackDamage;
-    public int GetSpeed() => attackSpeed;
-    public int GetChance() => criticalChance;
-    public int GetCritical() => criticalDamage;
-
     public float GetValue(TowerSkill _skill, ValueType _type)
     {
         if (!valueDic.TryGetValue(_skill, out var dic)) return 0f;
@@ -539,8 +524,6 @@ public class Tower : Entity
     public int GetValueInt(TowerSkill _skill, ValueType _type)
         => Mathf.FloorToInt(GetValue(_skill, _type) + 0.5f);
 
-    public Image GetTimerUI() => timerUI;
-    public TowerBuff GetBuff() => buff;
     public int GetSummonCount(TowerSkill _skill = null)
     {
         if (_skill == null)
@@ -558,5 +541,25 @@ public class Tower : Entity
 
         return count;
     }
+    #endregion
+
+    #region 프로퍼티
+    public TowerData Data => data;
+    public Sprite Icon => data.Icon;
+    public int ID => data.ID;
+    public Sprite Symbol => data.Symbol;
+    public Color Color => data.Color;
+    public TowerRole Role => data.Role;
+    public TowerGrade Grade => data.Grade;
+
+    public int Rank => rank;
+    public Monster Target => attackTarget;
+    public int Damage => attackDamage;
+    public int Speed => attackSpeed;
+    public int Chance => criticalChance;
+    public int Critical => criticalDamage;
+
+    public Image TimerUI => timerUI;
+    public TowerBuff Buff => buff;
     #endregion
 }
