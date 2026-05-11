@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Gold")]
     [SerializeField] private int gold = 100;
-    [SerializeField][Min(0)] private int refGold = 0;
+    [SerializeField][Min(0)] private int needGold = 0;
     public event System.Action<int, int> OnChangeGold;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -291,7 +291,7 @@ public class GameManager : MonoBehaviour
     public void GoldUp(int _gold = 1)
     {
         gold += _gold;
-        OnChangeGold?.Invoke(gold, refGold);
+        OnChangeGold?.Invoke(gold, needGold);
     }
 
     public void GoldDown(int _gold = 1, bool _force = false)
@@ -299,23 +299,23 @@ public class GameManager : MonoBehaviour
         if (!_force && gold < _gold) return;
 
         gold -= _gold;
-        OnChangeGold?.Invoke(gold, refGold);
+        OnChangeGold?.Invoke(gold, needGold);
     }
 
     public void ResetGold()
     {
         gold = 100;
-        refGold = 0;
-        OnChangeGold?.Invoke(gold, refGold);
+        needGold = 0;
+        OnChangeGold?.Invoke(gold, needGold);
     }
 
-    public bool UseGold(TowerData _data)
+    public bool UseGold()
     {
-        if (!EnoughGold(_data)) return false;
+        if (!EnoughGold()) return false;
 
-        gold -= GetNeedGold(_data);
-        refGold += 10;
-        OnChangeGold?.Invoke(gold, refGold);
+        gold -= needGold;
+        needGold += 10;
+        OnChangeGold?.Invoke(gold, needGold);
 
         return true;
     }
@@ -332,13 +332,12 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region GET
-    public int GetNeedGold(TowerData _data) => refGold * DataManager.Instance.GetGradeStat(_data.Grade);
     public int GetSellGold(Tower _tower)
     {
-        float grade = Mathf.Pow(DataManager.Instance.GetGradeStat(_tower.Grade), 0.8f);
-        return Mathf.FloorToInt(refGold * _tower.Rank * grade / 2f);
+        float rate = 0.8f / Mathf.Sqrt(DataManager.Instance.GetGradeStat(_tower.Grade));
+        return Mathf.FloorToInt(needGold * _tower.Rank * rate);
     }
-    public bool EnoughGold(TowerData _data) => gold >= GetNeedGold(_data);
+    public bool EnoughGold() => gold >= needGold;
     #endregion
 
     #region 프로퍼티
@@ -362,6 +361,6 @@ public class GameManager : MonoBehaviour
     public bool IsMaxLevel => level >= maxLevel;
 
     public int Gold => gold;
-    public int RefGold => refGold;
+    public int NeedGold => needGold;
     #endregion
 }

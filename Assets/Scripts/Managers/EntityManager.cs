@@ -382,7 +382,7 @@ public class EntityManager : MonoBehaviour
         Vector3 pos = SelectField(_pos);
         if (float.IsInfinity(pos.x)) return null;
 
-        if (_useGold && !GameManager.Instance.UseGold(data)) return null;
+        if (_useGold && !GameManager.Instance.UseGold()) return null;
 
         Tower tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
             .GetComponent<Tower>();
