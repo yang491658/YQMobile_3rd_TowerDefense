@@ -104,7 +104,7 @@ public class EntityManager : MonoBehaviour
     }
 
     #region 필드
-    private bool HasTower(Vector3Int _cell)
+    private bool IsTowerCell(Vector3Int _cell)
     {
         foreach (Vector3Int cell in towerDic.Values)
             if (cell == _cell) return true;
@@ -112,7 +112,7 @@ public class EntityManager : MonoBehaviour
         return false;
     }
 
-    private bool HasMonster(Vector3Int _cell)
+    private bool IsMonsterCell(Vector3Int _cell)
     {
         for (int i = 0; i < monsters.Count; i++)
         {
@@ -187,8 +187,8 @@ public class EntityManager : MonoBehaviour
     {
         if (!mapFieldTilemap.HasTile(_cell)) return false;
         if (_cell == entryCell || _cell == exitCell) return false;
-        if (HasTower(_cell)) return false;
-        if (HasMonster(_cell)) return false;
+        if (IsTowerCell(_cell)) return false;
+        if (IsMonsterCell(_cell)) return false;
 
         return CanReachExit(_cell);
     }
@@ -196,7 +196,7 @@ public class EntityManager : MonoBehaviour
     public bool CanMoveCell(Vector3Int _cell)
     {
         if (!mapFieldTilemap.HasTile(_cell)) return false;
-        if (HasTower(_cell)) return false;
+        if (IsTowerCell(_cell)) return false;
 
         return true;
     }
@@ -210,7 +210,7 @@ public class EntityManager : MonoBehaviour
         for (int i = 0; i < fieldCells.Count; i++)
         {
             Vector3Int cell = fieldCells[i];
-            bool canUse = _forTower ? CanPlaceTower(cell) : !HasTower(cell);
+            bool canUse = _forTower ? CanPlaceTower(cell) : !IsTowerCell(cell);
             if (!canUse) continue;
 
             count++;
@@ -237,7 +237,7 @@ public class EntityManager : MonoBehaviour
                 mapFieldTilemap.HasTile(cell) &&
                 cell != entryCell &&
                 cell != exitCell &&
-                !HasTower(cell);
+                !IsTowerCell(cell);
 
             if (!canUse)
                 return Vector3.positiveInfinity;
@@ -281,7 +281,7 @@ public class EntityManager : MonoBehaviour
 
             if (prevCell == entryCell) color = entryColor;
             else if (prevCell == exitCell) color = exitColor;
-            else if (HasTower(prevCell)) color = towerColor;
+            else if (IsTowerCell(prevCell)) color = towerColor;
             else
             {
                 Vector3Int pathCell = entryCell;
@@ -1173,5 +1173,10 @@ public class EntityManager : MonoBehaviour
 
         return int.MaxValue;
     }
+    #endregion
+
+    #region 프로퍼티
+    public bool HasTower => towers.Count > 0;
+    public bool HasMonster => monsters.Count > 0;
     #endregion
 }

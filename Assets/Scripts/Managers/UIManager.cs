@@ -261,6 +261,12 @@ public class UIManager : MonoBehaviour
 
         UpdatePlayTime();
         UpdateWave();
+
+        if (life.btn.gameObject.activeSelf)
+            life.btn.interactable = GameManager.Instance.CanBuyLife;
+
+        if (exp.btn.gameObject.activeSelf)
+            exp.btn.interactable = GameManager.Instance.CanBuyExp;
     }
 
     private void OnEnable()
@@ -636,12 +642,6 @@ public class UIManager : MonoBehaviour
 
     private void UpdateGold(int _gold, int _needGold)
     {
-        if (life.btn.gameObject.activeSelf)
-            life.btn.interactable = GameManager.Instance.CanBuyLife;
-
-        if (exp.btn.gameObject.activeSelf)
-            exp.btn.interactable = GameManager.Instance.CanBuyExp;
-
         string need = FormatNumber(_needGold);
 
         if (onStore < 0)

@@ -13,7 +13,6 @@ public class MonsterWave : MonoBehaviour
     private bool onText = false;
 
     public bool IsPause { private set; get; } = false;
-    public bool IsRunning => phase != Phase.None;
 
     [Header("Normal")]
     [SerializeField][Min(0.1f)] private float normalTime = 180f;
@@ -184,6 +183,8 @@ public class MonsterWave : MonoBehaviour
             warningTextTimer = warningInterval;
             return;
         }
+
+        if (EntityManager.Instance.HasMonster) return;
 
         phase = Phase.Boss;
         IsSpawned = false;
@@ -443,5 +444,10 @@ public class MonsterWave : MonoBehaviour
                 break;
         }
     }
+    #endregion
+
+    #region 프로퍼티
+    public bool IsRunning => phase != Phase.None;
+    public bool CanPause => phase == Phase.Normal || phase == Phase.Warning;
     #endregion
 }
