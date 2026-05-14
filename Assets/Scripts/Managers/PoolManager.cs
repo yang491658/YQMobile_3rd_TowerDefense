@@ -288,7 +288,7 @@ public class PoolManager : MonoBehaviour
         if (_prefab.TryGetComponent(out ViewEffect _)) return effectPolicy;
         if (_prefab.TryGetComponent(out TextEffect _)) return effectPolicy;
 
-        return default;
+        return null;
     }
 
     private Transform GetParent(GameObject _obj)

@@ -9,7 +9,8 @@ public abstract class TowerSkill : ScriptableObject
 
 #if UNITY_EDITOR
     private void OnValidate()
-      => ID = ((CreateAssetMenuAttribute)System.Attribute.GetCustomAttribute(GetType(), typeof(CreateAssetMenuAttribute))).order;
+        => ID = ((CreateAssetMenuAttribute)System.Attribute.GetCustomAttribute(
+            GetType(), typeof(CreateAssetMenuAttribute))).order;
 
     public virtual ValueType[] GetValues() => default;
 #endif

@@ -129,8 +129,6 @@ public class TestManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        testUI.SetActive(false);
     }
 
     private void Start()
@@ -802,6 +800,7 @@ public class TestManager : MonoBehaviour
     {
         OnClickReset();
         GameManager.Instance?.Replay();
+        testUI.SetActive(false);
     }
     #endregion
 }

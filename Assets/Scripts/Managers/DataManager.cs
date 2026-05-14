@@ -53,13 +53,10 @@ public class DataManager : MonoBehaviour
     {
         string typeName = typeof(T).Name;
         string[] guids = AssetDatabase.FindAssets($"t:{typeName}", new[] { "Assets/Datas" });
-        if (guids.Length > 0)
-        {
-            string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-            return AssetDatabase.LoadAssetAtPath<T>(path);
-        }
+        if (guids.Length == 0) return null;
 
-        return null;
+        string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+        return AssetDatabase.LoadAssetAtPath<T>(path);
     }
 #endif
 
