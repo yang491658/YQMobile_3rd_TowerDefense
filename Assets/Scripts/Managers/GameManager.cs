@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -27,9 +26,8 @@ public class GameManager : MonoBehaviour
     [Header("Life")]
     [SerializeField][Min(0)] private int life = 0;
     [SerializeField][Min(0)] private int maxLife = 20;
-    [SerializeField][Min(0)] private int lifeGold = 10;
-    private int lifeCount = 0;
-    private Coroutine lifeRoutine;
+    [SerializeField][Min(0f)] private float lifeCooldown = 3f;
+    private float lifeTimer = 0f;
     public event System.Action<int, int> OnChangeLife;
 
     [Header("Exp")]
@@ -72,6 +70,11 @@ public class GameManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    private void Update()
+    {
+        lifeTimer -= Time.deltaTime;
     }
 
     private void OnEnable()
@@ -191,54 +194,21 @@ public class GameManager : MonoBehaviour
     public void LifeDown(int _life = 1)
     {
         if (IsGameOver) return;
+        if (lifeTimer > 0f) return;
 
         life = Mathf.Max(life - _life, 0);
+        lifeTimer = lifeCooldown;
         OnChangeLife?.Invoke(life, maxLife);
 
         if (life <= 0) GameOver();
-    }
-
-    public bool BuyLife()
-    {
-        if (!CanBuyLife) return false;
-
-        MonsterWave.Instance?.PauseWave(true);
-        GoldDown(gold + needGold * ++lifeCount, true);
-
-        maxLife += 5;
-        life = maxLife;
-        lifeRoutine = StartCoroutine(LifePauseCoroutine());
-        OnChangeLife?.Invoke(life, maxLife);
-
-        return true;
-    }
-
-    private IEnumerator LifePauseCoroutine()
-    {
-        while (CanPauseLife)
-        {
-            yield return new WaitForSeconds(1f);
-
-            int drain = Mathf.Max(needGold / 100, lifeGold);
-            GoldDown(drain * lifeCount, true);
-        }
-
-        MonsterWave.Instance?.PauseWave(false);
-        lifeRoutine = null;
     }
 
     public void ResetLife()
     {
         maxLife = 20;
         life = maxLife;
-        lifeCount = 0;
+        lifeTimer = 0f;
         OnChangeLife?.Invoke(life, maxLife);
-
-        if (lifeRoutine != null)
-        {
-            StopCoroutine(lifeRoutine);
-            lifeRoutine = null;
-        }
     }
     #endregion
 
@@ -312,12 +282,6 @@ public class GameManager : MonoBehaviour
     #region 골드
     public void GoldUp(int _gold = 1)
     {
-        if (lifeRoutine != null)
-        {
-            OnChangeGold?.Invoke(gold, needGold);
-            return;
-        }
-
         gold += _gold;
         OnChangeGold?.Invoke(gold, needGold);
     }
@@ -362,8 +326,6 @@ public class GameManager : MonoBehaviour
     #region GET
     public int GetSellGold(Tower _tower)
     {
-        if (lifeRoutine != null) return 0;
-
         float rate = 0.8f / Mathf.Sqrt(DataManager.Instance.GetGradeStat(_tower.Grade));
         return Mathf.FloorToInt(needGold * _tower.Rank * rate);
     }
@@ -379,11 +341,7 @@ public class GameManager : MonoBehaviour
 
     public int Life => life;
     public int MaxLife => maxLife;
-    public int LifePercent => 100 * life / maxLife;
-    public bool CanBuyLife => gold > 0 && CanPauseLife;
-    public bool CanPauseLife => EntityManager.Instance.HasTower
-        && EntityManager.Instance.HasMonster
-        && MonsterWave.Instance.CanPause;
+    public float LifeCooldown => lifeCooldown;
 
     public int Exp => exp;
     public int NeedExp => 100 * level * (level + 1) / 2;

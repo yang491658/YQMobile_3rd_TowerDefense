@@ -259,9 +259,6 @@ public class TestManager : MonoBehaviour
         AutoMerge();
         if (Mode == TestMode.None)
         {
-            if (GameManager.Instance?.LifePercent < 50)
-                if (GameManager.Instance.BuyLife()) return;
-
             if (!DataManager.Instance.IsUnlocked(refID))
             {
                 if (GameManager.Instance.BuyExp()) return;

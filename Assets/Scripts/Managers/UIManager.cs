@@ -136,8 +136,6 @@ public class UIManager : MonoBehaviour
             life.slider = GameObject.Find("InGameUI/Player/Life/LifeSlider")?.GetComponent<Slider>();
         if (life.text == null)
             life.text = GameObject.Find("InGameUI/Player/Life/LifeSlider/LifeText")?.GetComponent<TextMeshProUGUI>();
-        if (life.btn == null)
-            life.btn = GameObject.Find("InGameUI/Player/Life/LifeBtn")?.GetComponent<Button>();
 
         if (exp.slider == null)
             exp.slider = GameObject.Find("InGameUI/Player/Exp/ExpSlider")?.GetComponent<Slider>();
@@ -261,9 +259,6 @@ public class UIManager : MonoBehaviour
 
         UpdatePlayTime();
         UpdateWave();
-
-        if (life.btn.gameObject.activeSelf)
-            life.btn.interactable = GameManager.Instance.CanBuyLife;
 
         if (exp.btn.gameObject.activeSelf)
             exp.btn.interactable = GameManager.Instance.CanBuyExp;
@@ -557,9 +552,10 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private IEnumerator FlashCoroutine(SliderUI _ui)
+    private IEnumerator FlashCoroutine(SliderUI _ui, Color? _color = null, float _duration = 0.3f)
     {
-        _ui.fill.color = Color.white;
+        Color color = _color.HasValue ? _color.Value : Color.white;
+        _ui.fill.color = color;
         _ui.text.color = Color.black;
 
         yield return new WaitForSecondsRealtime(0.05f);
@@ -567,10 +563,10 @@ public class UIManager : MonoBehaviour
         float start = Time.realtimeSinceStartup;
         while (true)
         {
-            float t = (Time.realtimeSinceStartup - start) / 0.3f;
+            float t = (Time.realtimeSinceStartup - start) / _duration;
             if (t >= 1f) break;
 
-            _ui.fill.color = Color.Lerp(Color.white, _ui.color, t);
+            _ui.fill.color = Color.Lerp(color, _ui.color, t);
             _ui.text.color = Color.Lerp(Color.black, Color.white, t);
             yield return null;
         }
@@ -579,18 +575,20 @@ public class UIManager : MonoBehaviour
         _ui.text.color = Color.white;
     }
 
-    private void UpdateSlider(ref SliderUI _ui, int _value, int _maxValue, bool _interactable)
+    private void UpdateSlider(ref SliderUI _ui, int _value, int _maxValue, bool _btn, bool _flash = true)
     {
         _ui.slider.maxValue = _maxValue;
         _ui.slider.value = Mathf.Min(_value, _maxValue);
         _ui.text.text = $"{FormatNumber(_value)} / {FormatNumber(_maxValue)}";
-        _ui.btn.interactable = _interactable;
+        if (_ui.btn != null) _ui.btn.interactable = _btn;
 
         if (_ui.prev == int.MinValue)
         { _ui.prev = _value; return; }
 
         if (_value == _ui.prev) return;
         _ui.prev = _value;
+
+        if (!_flash) return;
 
         if (_ui.routine != null)
             StopCoroutine(_ui.routine);
@@ -614,7 +612,17 @@ public class UIManager : MonoBehaviour
     }
 
     private void UpdateLife(int _life, int _maxLife)
-        => UpdateSlider(ref life, _life, _maxLife, GameManager.Instance.CanBuyLife);
+    {
+        int prev = life.prev;
+
+        UpdateSlider(ref life, _life, _maxLife, false, prev != int.MinValue && _life > prev);
+
+        if (prev == int.MinValue || _life >= prev) return;
+
+        if (life.routine != null)
+            StopCoroutine(life.routine);
+        life.routine = StartCoroutine(FlashCoroutine(life, Color.black, GameManager.Instance.LifeCooldown));
+    }
 
     private void UpdateExp(int _exp, int _needExp)
     {
@@ -745,7 +753,6 @@ public class UIManager : MonoBehaviour
 
     #region 버튼
     public void OnClickSetting() => OpenSetting(true);
-    public void OnClickLife() => GameManager.Instance?.BuyLife();
     public void OnClickExp() => GameManager.Instance?.BuyExp();
 
     public void OnClickClose() => OpenUI(false);

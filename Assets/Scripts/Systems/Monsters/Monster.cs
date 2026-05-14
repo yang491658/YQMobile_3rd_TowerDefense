@@ -173,6 +173,7 @@ public class Monster : Pooling
     protected virtual void OnGoal()
     {
         GameManager.Instance?.LifeDown();
+        GameManager.Instance?.GoldDown(gold, true);
         EntityManager.Instance?.DespawnMonster(this);
     }
     #endregion
