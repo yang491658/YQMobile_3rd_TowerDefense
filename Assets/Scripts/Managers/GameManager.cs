@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Exp")]
     [SerializeField][Min(0)] private int exp = 0;
-    [SerializeField][Min(0)] private int needExp = 100;
+    [SerializeField][Min(0)] private int needExp = 0;
     [SerializeField][Min(0)] private int expScore = 1000;
     public event System.Action<int, int> OnChangeExp;
 
@@ -248,7 +248,7 @@ public class GameManager : MonoBehaviour
         if (level >= maxLevel) return;
 
         exp += _exp;
-        while (level < maxLevel && exp >= needExp)
+        while (CanLevelUp && level < maxLevel && exp >= needExp)
         {
             exp -= needExp;
             LevelUp();
@@ -277,7 +277,7 @@ public class GameManager : MonoBehaviour
         level = Mathf.Min(level + _level, maxLevel);
         OnChangeLevel?.Invoke(level);
 
-        needExp = 100 * level * (level + 1) / 2;
+        needExp = NeedExp;
         OnChangeExp?.Invoke(exp, needExp);
 
         LevelText();
@@ -304,7 +304,7 @@ public class GameManager : MonoBehaviour
         OnChangeLevel?.Invoke(level);
 
         exp = 0;
-        needExp = 100;
+        needExp = NeedExp;
         OnChangeExp?.Invoke(exp, needExp);
     }
     #endregion
@@ -386,8 +386,9 @@ public class GameManager : MonoBehaviour
         && MonsterWave.Instance.CanPause;
 
     public int Exp => exp;
-    public int NeedExp => needExp;
-    public bool CanBuyExp => gold >= needExp && level < maxLevel;
+    public int NeedExp => 100 * level * (level + 1) / 2;
+    public bool CanBuyExp => gold >= needExp && exp < needExp && level < maxLevel;
+    private bool CanLevelUp => MonsterWave.Instance?.Order > level;
 
     public int Level => level;
     public int MaxLevel => maxLevel;

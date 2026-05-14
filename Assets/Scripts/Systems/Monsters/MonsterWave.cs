@@ -449,5 +449,6 @@ public class MonsterWave : MonoBehaviour
     #region 프로퍼티
     public bool IsRunning => phase != Phase.None;
     public bool CanPause => phase == Phase.Normal || phase == Phase.Warning;
+    public int Order => bossOrder;
     #endregion
 }

@@ -7604,7 +7604,7 @@ MonoBehaviour:
   maxLife: 20
   lifeGold: 10
   exp: 0
-  needExp: 100
+  needExp: 0
   expScore: 1000
   level: 1
   maxLevel: 10
