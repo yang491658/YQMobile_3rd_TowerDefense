@@ -96,6 +96,8 @@ public class PoolManager : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (pending.Count == 0) return;
+
         for (int i = pending.Count - 1; i >= 0; i--)
         {
             GameObject obj = pending[i];

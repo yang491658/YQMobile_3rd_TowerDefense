@@ -473,8 +473,10 @@ public class UIManager : MonoBehaviour
 
     private void UpdateSpeed(float _speed)
     {
-        if (!Mathf.Approximately(speedSlider.value, _speed))
-            speedSlider.value = _speed;
+        float value = Mathf.Clamp(_speed, speedSlider.minValue, speedSlider.maxValue);
+
+        if (!Mathf.Approximately(speedSlider.value, value))
+            speedSlider.SetValueWithoutNotify(value);
     }
 
     private void UpdatePlayTime()
@@ -508,7 +510,7 @@ public class UIManager : MonoBehaviour
         }
 #endif
 
-        if (!MonsterWave.Instance.IsRunning || MonsterWave.Instance.IsFinished)
+        if (!MonsterWave.Instance.IsRunning || MonsterWave.Instance.BossFinished)
         {
             waveUI.SetActive(false);
             bossUI.SetActive(false);
@@ -721,12 +723,12 @@ public class UIManager : MonoBehaviour
         {
             case SoundType.BGM:
                 if (!Mathf.Approximately(bgmSlider.value, _volume))
-                    bgmSlider.value = _volume;
+                    bgmSlider.SetValueWithoutNotify(_volume);
                 break;
 
             case SoundType.SFX:
                 if (!Mathf.Approximately(sfxSlider.value, _volume))
-                    sfxSlider.value = _volume;
+                    sfxSlider.SetValueWithoutNotify(_volume);
                 break;
 
             default: return;

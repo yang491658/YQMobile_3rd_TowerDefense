@@ -179,11 +179,13 @@ public class Monster : Pooling
     #endregion
 
     #region SET
-    public void SetMonster(int _set)
+    public void SetMonster()
     {
-        maxHealth = Mathf.Max(50 * _set, 50);
+        int score = GameManager.Instance.Score / 50;
+
+        maxHealth = 50 * Mathf.Max(score, 1);
         SetHealth(maxHealth);
-        gold = Mathf.Max(10 * _set, 10);
+        gold = 10 * Mathf.Max(score, 1);
     }
 
     public void SetMove(Vector3Int _current)
@@ -231,6 +233,8 @@ public class Monster : Pooling
 
         IsDead = false;
         Index = order;
+
+        SetMonster();
     }
 
     public override void OnDespawnPool()

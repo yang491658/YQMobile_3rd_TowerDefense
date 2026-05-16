@@ -249,8 +249,9 @@ public class HandleManager : MonoBehaviour
 
     private void OnDouble(Vector3 _pos)
     {
-        if (TowerStore.Instance.IsPlacing)
-            OnSingle(_pos);
+        if (!TowerStore.Instance.IsPlacing) return;
+
+        OnSingle(_pos);
     }
 
     private void OnDragBegin(Vector3 _pos)
@@ -319,8 +320,7 @@ public class HandleManager : MonoBehaviour
             Collider2D otherCol = hits[i];
             if (selfCol == otherCol) continue;
 
-            Tower other = otherCol.GetComponent<Tower>();
-            if (other != null)
+            if (otherCol.TryGetComponent(out Tower other))
             { target = other; break; }
         }
 

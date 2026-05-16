@@ -24,7 +24,7 @@ public class MonsterWave : MonoBehaviour
     private float spawnDecrease;
 
     [Header("Warning")]
-    [SerializeField][Min(0.1f)] private float warningTime = 5f;
+    [SerializeField][Min(0.1f)] private float warningTime = 3f;
     private float warningTimer;
     [SerializeField][Min(0.1f)] private float warningInterval = 0.3f;
     private float warningTextTimer;
@@ -36,7 +36,6 @@ public class MonsterWave : MonoBehaviour
     private bool onBoss = false;
 
     public bool IsSpawned { private set; get; } = false;
-    public bool IsFinished { private set; get; } = false;
 
     [Header("Reward")]
     [SerializeField][Min(0.1f)] private float rewardDelay = 1.5f;
@@ -108,7 +107,6 @@ public class MonsterWave : MonoBehaviour
         boss = null;
         onBoss = false;
         IsSpawned = false;
-        IsFinished = false;
 
         rewardTimer = 0f;
         rewardExp = 0;
@@ -158,7 +156,7 @@ public class MonsterWave : MonoBehaviour
         if (TestManager.Instance?.Mode == TestMode.Wave) return;
 #endif
 
-        if (IsFinished) return;
+        if (BossFinished) return;
 
         normalTimer -= _deltaTime;
         if (normalTimer > 0f) return;
@@ -183,8 +181,6 @@ public class MonsterWave : MonoBehaviour
             warningTextTimer = warningInterval;
             return;
         }
-
-        if (EntityManager.Instance.HasMonster) return;
 
         phase = Phase.Boss;
         IsSpawned = false;
@@ -264,9 +260,8 @@ public class MonsterWave : MonoBehaviour
 
             IsSpawned = true;
 
-            BossData data = boss.Data;
-            rewardExp = data.Exp;
-            rewardGold = data.Gold;
+            rewardExp = order * 100;
+            rewardGold = order * 100;
             return;
         }
 
@@ -283,8 +278,8 @@ public class MonsterWave : MonoBehaviour
             phase = Phase.Reward;
             onText = false;
             boss = null;
+            bossOrder++;
             IsSpawned = false;
-            IsFinished = DataManager.Instance?.GetBossID(++bossOrder) == 0;
             rewardTimer = rewardTime;
         }
     }
@@ -448,7 +443,7 @@ public class MonsterWave : MonoBehaviour
 
     #region 프로퍼티
     public bool IsRunning => phase != Phase.None;
-    public bool CanPause => phase == Phase.Normal || phase == Phase.Warning;
-    public int Order => bossOrder;
+    public int BossOrder => bossOrder;
+    public bool BossFinished => DataManager.Instance?.GetBossID(bossOrder) == 0;
     #endregion
 }

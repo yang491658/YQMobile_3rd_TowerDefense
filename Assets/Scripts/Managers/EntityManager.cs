@@ -250,7 +250,16 @@ public class EntityManager : MonoBehaviour
         return result;
     }
 
-    public bool HasEmptyField() => PickRandom(out _, true);
+    public bool HasEmptyField()
+    {
+        for (int i = 0; i < fieldCells.Count; i++)
+        {
+            if (CanPlaceTower(fieldCells[i]))
+                return true;
+        }
+
+        return false;
+    }
 
     public void ShowPlaceField(bool _on, Vector3? _pos = null)
     {
@@ -459,7 +468,6 @@ public class EntityManager : MonoBehaviour
         Monster monster = SpawnPool<Monster>(monsterBase, pos, monsterTrans);
         if (monster == null) return null;
 
-        monster.SetMonster(GameManager.Instance.Score / 50);
         monster.SetMove(mapFieldTilemap.WorldToCell(pos));
         monster.transform.localScale = map.localScale;
         monsters.Add(monster);
@@ -976,8 +984,7 @@ public class EntityManager : MonoBehaviour
         int maxDistance = _distance > 0 ? _distance : int.MaxValue;
 
         T result = null;
-        bool found = false;
-        int bestDistance = 0;
+        int bestDistance = _near ? int.MaxValue : int.MinValue;
 
         for (int i = 0; i < _list.Count; i++)
         {
@@ -990,16 +997,14 @@ public class EntityManager : MonoBehaviour
                 Mathf.Abs(entityCell.y - centerCell.y);
 
             if (distance > maxDistance) continue;
+            if (_near && distance >= bestDistance) continue;
+            if (!_near && distance <= bestDistance) continue;
 
-            if (!found || (_near ? distance < bestDistance : distance > bestDistance))
-            {
-                found = true;
-                bestDistance = distance;
-                result = entity;
-            }
+            bestDistance = distance;
+            result = entity;
         }
 
-        return found ? result : null;
+        return result;
     }
 
     private List<T> GetInRange<T>(List<T> _list, Vector3 _center, int _range, int _count = 0, bool _square = false)
@@ -1173,10 +1178,5 @@ public class EntityManager : MonoBehaviour
 
         return int.MaxValue;
     }
-    #endregion
-
-    #region 프로퍼티
-    public bool HasTower => towers.Count > 0;
-    public bool HasMonster => monsters.Count > 0;
     #endregion
 }

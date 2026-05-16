@@ -23,6 +23,7 @@ public class Multi : TowerSkill
 
     public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
     {
+        if (_target == null || _target.IsInvalid()) return;
         if (IsCooldown) return;
 
         StartCooldown(_tower, cooldown);
@@ -31,8 +32,9 @@ public class Multi : TowerSkill
 
     private IEnumerator MultiCoroutine(Tower _tower)
     {
-        int hit = 0;
+        EntityManager.Instance?.MakeEffect(_tower, _tower.transform.position, 1.2f);
 
+        int hit = 0;
         while (hit < count)
         {
             if (_tower == null) yield break;

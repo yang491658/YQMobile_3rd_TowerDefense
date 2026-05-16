@@ -17,10 +17,6 @@ public class BossData : ScriptableObject
     [Header("Stat")]
     [Min(0)] public int MaxHealth;
 
-    [Header("Reward")]
-    [Min(0)] public int Exp;
-    [Min(0)] public int Gold;
-
 #if UNITY_EDITOR
     private void OnValidate()
     {
@@ -108,11 +104,7 @@ public class BossData : ScriptableObject
     private void AutoValue()
     {
         if (Name == "Temp")
-        {
             MaxHealth = ID * 1000;
-            Exp = ID * 100;
-            Gold = ID * 100;
-        }
     }
 #endif
 }

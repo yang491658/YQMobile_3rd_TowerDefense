@@ -346,7 +346,7 @@ public class GameManager : MonoBehaviour
     public int Exp => exp;
     public int NeedExp => 100 * level * (level + 1) / 2;
     public bool CanBuyExp => gold >= needExp && exp < needExp && level < maxLevel;
-    private bool CanLevelUp => MonsterWave.Instance?.Order > level;
+    private bool CanLevelUp => MonsterWave.Instance?.BossOrder > level;
 
     public int Level => level;
     public int MaxLevel => maxLevel;

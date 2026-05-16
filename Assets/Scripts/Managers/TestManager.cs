@@ -218,11 +218,11 @@ public class TestManager : MonoBehaviour
             else AutoPlay();
         }
         if (Input.GetKeyDown(KeyCode.UpArrow))
-            ChangeGameSpeed(gameSpeed.value == gameSpeed.maxValue
+            ChangeGameSpeed(Mathf.Approximately(GameManager.Instance.Speed, gameSpeed.maxValue)
                 ? GameManager.Instance.MaxSpeed
                 : gameSpeed.maxValue);
         if (Input.GetKeyDown(KeyCode.DownArrow))
-            ChangeGameSpeed(gameSpeed.value == gameSpeed.minValue
+            ChangeGameSpeed(Mathf.Approximately(GameManager.Instance.Speed, gameSpeed.minValue)
                 ? GameManager.Instance.MaxSpeed
                 : gameSpeed.minValue);
         if (Input.GetKeyDown(KeyCode.LeftArrow))
@@ -661,7 +661,14 @@ public class TestManager : MonoBehaviour
 
     private void ApplySlider(ref SliderConfig _config, float _value, System.Action<int> _afterAction = null)
     {
-        _config.value = ChangeSlider(_value, _config);
+        int value = ChangeSlider(_value, _config);
+        if (_config.value == value)
+        {
+            UpdateSliderUI(_config);
+            return;
+        }
+
+        _config.value = value;
         UpdateSliderUI(_config);
         _afterAction?.Invoke(_config.value);
     }

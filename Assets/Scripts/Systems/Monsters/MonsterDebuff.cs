@@ -333,6 +333,5 @@ public class MonsterDebuff : MonoBehaviour
     public bool HasBonusDamage => bonusDamage.IsActive;
     public bool HasSpeedControl => speedControl.IsActive;
     public bool HasDirectionControl => directionControl.IsActive;
-    public bool HasDebuff => tickDamage.IsActive || bonusDamage.IsActive || speedControl.IsActive || directionControl.IsActive;
     #endregion
 }

@@ -11690,7 +11690,7 @@ MonoBehaviour:
   normalTime: 180
   spawnRange: {x: 0.3, y: 3}
   spawnPeak: 30
-  warningTime: 5
+  warningTime: 3
   warningInterval: 0.3
   bossDelay: 1
   bossOrder: 1
