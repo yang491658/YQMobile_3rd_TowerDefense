@@ -124,18 +124,18 @@ public class Tower : Entity
         float offset = _standard * interval;
 
         Vector2[] grid =
-            {
-            Vector2.zero ,
-            new Vector2(    -offset ,   -offset ) ,
-            new Vector2(         0f ,   -offset ) ,
-            new Vector2(    +offset ,   -offset ) ,
-            new Vector2(    -offset ,        0f ) ,
-            new Vector2(         0f ,        0f ) ,
-            new Vector2(    +offset ,        0f ) ,
-            new Vector2(    -offset ,   +offset ) ,
-            new Vector2(         0f ,   +offset ) ,
-            new Vector2(    +offset ,   +offset ) ,
-        };
+        {
+        Vector2.zero,
+        new Vector2(-offset, -offset),
+        new Vector2(0f, -offset),
+        new Vector2(+offset, -offset),
+        new Vector2(-offset, 0f),
+        new Vector2(0f, 0f),
+        new Vector2(+offset, 0f),
+        new Vector2(-offset, +offset),
+        new Vector2(0f, +offset),
+        new Vector2(+offset, +offset),
+    };
 
         switch (_rank)
         {
@@ -251,7 +251,7 @@ public class Tower : Entity
         int chance = 0;
         int critical = 0;
 
-        ApplyBaseStat(ref damage, ref speed, ref chance, ref critical);
+        ApplyStat(ref damage, ref speed, ref chance, ref critical);
         ApplyBuff(ref damage, ref speed, ref chance, ref critical);
         ApplyOverChance(ref damage, ref speed, ref chance, ref critical);
 
@@ -261,7 +261,7 @@ public class Tower : Entity
         criticalDamage = chance <= 0 ? 100 : critical;
     }
 
-    private void ApplyBaseStat(ref int _damage, ref int _speed, ref int _chance, ref int _critical)
+    private void ApplyStat(ref int _damage, ref int _speed, ref int _chance, ref int _critical)
     {
         Stat4 stat = DataManager.Instance.GetTowerStat(data.Role, data.Grade, rank);
 

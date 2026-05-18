@@ -768,7 +768,7 @@ public class TestManager : MonoBehaviour
         int seconds = totalSeconds % 60;
 
         testCountNum.text = count.ToString();
-        averagePlayNum.text = minutes.ToString("00") + ":" + seconds.ToString("00");
+        averagePlayNum.text = $"{minutes:00}:{seconds:00}";
         averageValueName.text = Mode switch
         {
             TestMode.Solo => "누적 데미지",
