@@ -184,7 +184,7 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    #region 생명력
+    #region 생명
     public void LifeUp(int _life = 1)
     {
         life = Mathf.Min(life + _life, maxLife);
@@ -346,7 +346,7 @@ public class GameManager : MonoBehaviour
     public int Exp => exp;
     public int NeedExp => 100 * level * (level + 1) / 2;
     public bool CanBuyExp => gold >= needExp && exp < needExp && level < maxLevel;
-    private bool CanLevelUp => MonsterWave.Instance?.BossOrder > level;
+    public bool CanLevelUp => MonsterWave.Instance?.BossOrder > level;
 
     public int Level => level;
     public int MaxLevel => maxLevel;

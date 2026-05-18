@@ -194,9 +194,7 @@ public class TowerStore : MonoBehaviour
     #endregion
 
     #region 자동 구매
-    public bool HasSlot(int _id) => AutoSlot(_id) != null;
-
-    private TowerSlot AutoSlot(int _id = 0)
+    public TowerSlot AutoSlot(int _id = 0)
     {
         TowerSlot result = null;
 
@@ -216,12 +214,12 @@ public class TowerStore : MonoBehaviour
         return result;
     }
 
-    public bool AutoPurchase(int _id = 0)
+    public bool AutoPurchase(int _id = 0, TowerSlot _slot = null)
     {
         Vector3 pos = EntityManager.Instance.SelectField();
         if (float.IsInfinity(pos.x)) return false;
 
-        TowerSlot slot = AutoSlot(_id);
+        TowerSlot slot = _slot != null ? _slot : AutoSlot(_id);
         if (slot == null) return false;
 
         SelectSlot(slot);

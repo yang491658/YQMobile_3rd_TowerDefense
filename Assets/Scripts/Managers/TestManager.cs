@@ -261,7 +261,7 @@ public class TestManager : MonoBehaviour
         {
             if (!DataManager.Instance.IsUnlocked(refID))
             {
-                if (GameManager.Instance.BuyExp()) return;
+                if (GameManager.Instance.CanLevelUp && GameManager.Instance.BuyExp()) return;
                 if (TryPurchase(0)) return;
                 return;
             }
@@ -271,19 +271,22 @@ public class TestManager : MonoBehaviour
 
             if (level < best)
             {
-                if (TowerStore.Instance.HasSlot(refID))
-                    TryPurchase(refID);
-                else GameManager.Instance?.BuyExp();
+                TowerSlot slot = TowerStore.Instance.AutoSlot(refID);
+                if (slot != null)
+                    TryPurchase(refID, slot);
+                else if (GameManager.Instance.CanLevelUp)
+                    GameManager.Instance?.BuyExp();
 
                 return;
             }
 
-            if (TowerStore.Instance.HasSlot(refID))
+            TowerSlot target = TowerStore.Instance.AutoSlot(refID);
+            if (target != null)
             {
                 if (EntityManager.Instance.HasEmptyField())
-                    TryPurchase(refID);
-                else if (TrySell(refID))
-                    TryPurchase(refID);
+                    TryPurchase(refID, target);
+                else if (TrySell(refID, target))
+                    TryPurchase(refID, target);
                 else
                     MergeRandom();
 
@@ -293,34 +296,39 @@ public class TestManager : MonoBehaviour
         else TestPlay();
     }
 
-    private bool TryPurchase(int _id)
+    private bool TryPurchase(int _id, TowerSlot _slot = null)
     {
         if (GameManager.Instance.EnoughGold())
         {
             if (EntityManager.Instance.HasEmptyField())
-                return TowerStore.Instance.AutoPurchase(_id);
+                return TowerStore.Instance.AutoPurchase(_id, _slot);
             else MergeRandom();
         }
 
         return false;
     }
 
-    private bool TrySell(int _id)
+    private bool TrySell(int _id, TowerSlot _slot = null)
     {
-        List<Tower> towers = EntityManager.Instance?.GetTowers();
-        if (towers == null || towers.Count == 0) return false;
+        if (_slot == null) return false;
+
+        List<Tower> towers = EntityManager.Instance.GetTowers();
+        if (towers.Count == 0) return false;
 
         Tower target = null;
         for (int i = 0; i < towers.Count; i++)
         {
             Tower tower = towers[i];
             if (tower == null || tower.IsDragging) continue;
-            if (tower.ID == _id) continue;
+            if (_id != 0 && tower.ID == _id) continue;
 
-            if (target == null || tower.Rank < target.Rank)
+            if (target == null
+                || tower.Grade < target.Grade
+                || tower.Grade == target.Grade && tower.Rank < target.Rank)
                 target = tower;
         }
         if (target == null) return false;
+        if (target.Grade >= _slot.Grade) return false;
 
         target.Sell();
 
@@ -802,9 +810,10 @@ public class TestManager : MonoBehaviour
     }
     public void OnClickReplay()
     {
-        OnClickReset();
-        GameManager.Instance?.Replay();
         testUI.SetActive(false);
+        OnClickReset();
+        ChangeGameSpeed(gameSpeed.maxValue);
+        GameManager.Instance?.Replay();
     }
     #endregion
 }

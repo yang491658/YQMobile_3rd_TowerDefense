@@ -161,6 +161,7 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     #region 프로퍼티
     public Vector3 Pos => rect.anchoredPosition;
     public int ID => data.ID;
+    public TowerGrade Grade => data.Grade;
 
     public bool IsComplete => state == SlotState.Complete;
     #endregion
