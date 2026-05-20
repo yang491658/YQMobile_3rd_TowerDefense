@@ -8,7 +8,6 @@ public class DamageUp : TowerSkill
     [SerializeField][Min(0)] private int factor;
 
     private readonly List<Tower> targets = new();
-    private readonly HashSet<Tower> targetSet = new();
     private readonly HashSet<Tower> currents = new();
 
 #if UNITY_EDITOR
@@ -24,7 +23,6 @@ public class DamageUp : TowerSkill
     public override void OnGenerate(Tower _tower)
     {
         targets.Clear();
-        targetSet.Clear();
         currents.Clear();
     }
 
@@ -36,7 +34,7 @@ public class DamageUp : TowerSkill
         for (int i = 0; i < current.Count; i++)
         {
             Tower target = current[i];
-            if (target.Role == TowerRole.Buff) continue;
+            if (target.Damage <= 0) continue;
 
             currents.Add(target);
         }
@@ -50,7 +48,6 @@ public class DamageUp : TowerSkill
             buff.RemoveStat(_tower, TowerBuff.SubType.Damage);
             buff.RemoveStat(_tower, TowerBuff.SubType.Critical);
 
-            targetSet.Remove(target);
             targets.RemoveAt(i);
         }
 
@@ -61,7 +58,7 @@ public class DamageUp : TowerSkill
             buff.ApplyStat(_tower, TowerBuff.SubType.Damage, factor, 0f, TowerBuff.ApplyType.Refresh);
             buff.ApplyStat(_tower, TowerBuff.SubType.Critical, factor, 0f, TowerBuff.ApplyType.Refresh);
 
-            if (targetSet.Add(target))
+            if (!targets.Contains(target))
                 targets.Add(target);
         }
     }
@@ -72,6 +69,11 @@ public class DamageUp : TowerSkill
     }
 
     public override void OnSell(Tower _tower)
+    {
+        ClearBuff(_tower);
+    }
+
+    public override void OnDespawn(Tower _tower)
     {
         ClearBuff(_tower);
     }
@@ -88,7 +90,6 @@ public class DamageUp : TowerSkill
         }
 
         targets.Clear();
-        targetSet.Clear();
         currents.Clear();
     }
 }

@@ -249,8 +249,6 @@ public class HandleManager : MonoBehaviour
 
     private void OnDouble(Vector3 _pos)
     {
-        if (!TowerStore.Instance.IsPlacing) return;
-
         OnSingle(_pos);
     }
 

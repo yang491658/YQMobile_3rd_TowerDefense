@@ -19,7 +19,6 @@ public class Summon : Pooling
     [Header("Battle")]
     [SerializeField][Min(0)] private int reserve;
     private bool isHit = false;
-    private bool onHit = false;
 
     [Header("Life")]
     [SerializeField][Min(0f)] private float duration;
@@ -66,10 +65,10 @@ public class Summon : Pooling
                 if (!target.IsInvalid(targetIndex) && target == _monster)
                 {
                     isHit = true;
-                    tower.Hit(target, targetIndex, targetPos, onHit);
+                    tower.Hit(target, targetIndex, targetPos, false);
                 }
             }
-            else tower.Hit(_monster, _monster.Index, _monster.transform.position, onHit);
+            else tower.Hit(_monster, _monster.Index, _monster.transform.position, false);
         }
     }
 
@@ -104,8 +103,8 @@ public class Summon : Pooling
 
         if (hasTarget)
         {
-            if (!isHit && onHit && !target.IsInvalid(targetIndex))
-                tower.Hit(target, targetIndex, targetPos, true);
+            if (!isHit && !target.IsInvalid(targetIndex))
+                tower.Hit(target, targetIndex, targetPos, false);
 
             isHit = true;
 
@@ -165,7 +164,6 @@ public class Summon : Pooling
         loop = false;
 
         isHit = false;
-        onHit = true;
 
         rotate = _rotate;
     }
@@ -215,7 +213,6 @@ public class Summon : Pooling
 
         reserve = 0;
         isHit = false;
-        onHit = false;
 
         duration = 0f;
         timer = 0f;

@@ -618,7 +618,7 @@ public class TestManager : MonoBehaviour
                 {
                     int last = list.Count - 1; Tower remove = list[last]; list.RemoveAt(last);
 
-                    EntityManager.Instance?.DespawnTower(remove);
+                    remove.Despawn();
                 }
             }
         }

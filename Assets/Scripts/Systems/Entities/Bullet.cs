@@ -81,6 +81,11 @@ public class Bullet : Pooling
     }
     #endregion
 
+    #region 프로퍼티
+    public Monster Target => target;
+    public int Index => targetIndex;
+    #endregion
+
     #region 풀링
     public override void OnSpawnPool()
     {

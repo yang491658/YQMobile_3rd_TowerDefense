@@ -9,9 +9,8 @@ public class Blind : TowerSkill
     [SerializeField][Min(0f)] private float duration;
 
     private readonly HashSet<long> targets = new();
-
-    private static long GetTargetKey(Monster _target)
-        => ((long)(uint)_target.GetInstanceID() << 32) | (uint)_target.Index;
+    private static long GetTargetKey(Monster _target, int _index)
+        => ((long)(uint)_target.GetInstanceID() << 32) | (uint)_index;
 
 #if UNITY_EDITOR
     public override ValueType[] GetValues()
@@ -37,7 +36,7 @@ public class Blind : TowerSkill
         float c = Mathf.Min(chance, 100f);
         if (Random.value < c / 100f)
         {
-            if (targets.Add(GetTargetKey(_target)))
+            if (targets.Add(GetTargetKey(_target, _target.Index)))
                 _target.Debuff.ActiveDirection();
         }
     }
@@ -46,10 +45,15 @@ public class Blind : TowerSkill
     {
         if (_target == null || _target.IsInvalid()) return;
 
-        if (targets.Remove(GetTargetKey(_target)))
+        if (targets.Remove(GetTargetKey(_target, _target.Index)))
         {
             ViewEffect effect = EntityManager.Instance?.MakeEffect(_tower, _target, duration);
             _target.Debuff.ApplyDirection(0, duration, effect);
         }
+    }
+
+    public override void OnMiss(Tower _tower, Bullet _bullet, Vector3 _pos)
+    {
+        targets.Remove(GetTargetKey(_bullet.Target, _bullet.Index));
     }
 }

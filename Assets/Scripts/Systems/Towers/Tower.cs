@@ -75,11 +75,13 @@ public class Tower : Entity
         UpdateStat();
 
         float dt = Time.deltaTime;
-        if ((attackTimer -= dt) <= 0f)
-            if (FindTarget()) Attack();
 
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnUpdate(this, attackTarget, dt);
+
+        attackTimer -= dt;
+        if (attackTimer <= 0f)
+            if (FindTarget()) Attack();
     }
 
     #region 심볼
@@ -229,6 +231,7 @@ public class Tower : Entity
         if (IsMax) return;
 
         SetRank(rank + _amount);
+        UpdateStat();
 
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnRankUp(this, _amount);
@@ -240,6 +243,16 @@ public class Tower : Entity
             skills[i].OnSell(this);
 
         EntityManager.Instance?.SellTower(this);
+    }
+
+    public void Despawn()
+    {
+        ClearSummon();
+
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnDespawn(this);
+
+        EntityManager.Instance?.DespawnTower(this);
     }
     #endregion
 
@@ -343,13 +356,10 @@ public class Tower : Entity
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnAttack(this, attackTarget, ref instead);
 
-        UpdateStat();
+        if (instead) return;
 
-        if (!instead)
-            Shoot(attackTarget);
-
-        if (!instead || data.Role == TowerRole.Summon)
-            attackTimer = 60f / attackSpeed;
+        Shoot(attackTarget);
+        attackTimer = 60f / attackSpeed;
     }
 
     public Bullet Shoot(Monster _target)
@@ -463,13 +473,14 @@ public class Tower : Entity
 
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnGenerate(this);
+
+        UpdateStat();
     }
 
     public void SetRank(int _rank)
     {
         rank = Mathf.Clamp(_rank, 1, MaxRank);
 
-        UpdateStat();
         UpdateSymbol();
 
         valueDic.Clear(); int index = 0;

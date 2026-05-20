@@ -418,8 +418,8 @@ public class EntityManager : MonoBehaviour
         int rank = _target.Rank;
         Vector3 pos = _target.transform.position;
 
-        DespawnTower(_select);
-        DespawnTower(_target);
+        _select.Despawn();
+        _target.Despawn();
 
         return SpawnTower(id, rank + 1, pos, false);
     }
@@ -430,14 +430,12 @@ public class EntityManager : MonoBehaviour
         UIManager.Instance?.UpdateStore(0);
         UIManager.Instance?.UpdateDrag(null);
 
-        DespawnTower(_tower);
+        _tower.Despawn();
         SetPath();
     }
 
     public void DespawnTower(Tower _tower)
     {
-        _tower.ClearSummon();
-
         towers.Remove(_tower);
         towerDic.Remove(_tower);
         Destroy(_tower.gameObject);

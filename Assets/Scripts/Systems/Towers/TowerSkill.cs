@@ -37,6 +37,8 @@ public abstract class TowerSkill : ScriptableObject
 
     public virtual void OnSell(Tower _tower) { }
 
+    public virtual void OnDespawn(Tower _tower) { }
+
     protected bool IsCooldown => cooldownRoutine != null;
 
     protected void StartCooldown(Tower _tower, float _cooldown)
