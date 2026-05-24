@@ -10,24 +10,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: abf7c14b1ff5e1746b8923d9ca7ebcef, type: 3}
-  m_Name: Tower2206_Blue
+  m_Name: Tower208_Purple
   m_EditorClassIdentifier: 
-  Icon: {fileID: 21300000, guid: 8a32cb7c0c293294a98ca718f4b76028, type: 3}
-  ID: 2206
-  Name: Blue
+  Icon: {fileID: 21300000, guid: f04742dd80ceda94b98ca51a1dd4a12b, type: 3}
+  ID: 208
+  Name: Purple
   Symbol: {fileID: 21300000, guid: d5368b4bf7fca394dbb5d84089d73b73, type: 3}
-  Color: {r: 0, g: 0, b: 1, a: 1}
-  Grade: 2
+  Color: {r: 0.47058824, g: 0, b: 1, a: 1}
   Role: 2
-  Target: 0
+  Target: 6
   Skills:
-  - skill: {fileID: 11400000, guid: 3f7935f9bc45ed34f9801989f8f6412e, type: 2}
+  - grade: 2
+    skill: {fileID: 11400000, guid: 04e2aa554c2407741aa2e72b6e7392ec, type: 2}
     values:
-    - valueType: 202
-      baseValue: 10
+    - valueType: 101
+      baseValue: 5
       rankType: 3
       rankBonus: 1
     - valueType: 401
-      baseValue: 1
-      rankType: 3
-      rankBonus: 1
+      baseValue: 2
+      rankType: 1
+      rankBonus: 0
+  - grade: 3
+    skill: {fileID: 0}
+    values: []
+  - grade: 4
+    skill: {fileID: 0}
+    values: []

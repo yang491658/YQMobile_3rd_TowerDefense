@@ -72,10 +72,10 @@ public class TestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI averageValueNum;
     [SerializeField] private TextMeshProUGUI value10Num;
     [Space]
-    [SerializeField] private SliderConfig refRank = new(3, 0, 0, "기준 랭크 : {0}");
     [SerializeField] private SliderConfig refTower = new(0, 0, 0, "기준 타워 : {0}");
+    [SerializeField] private SliderConfig refGrade = new(0, 0, 0, "기준 등급: {0}");
+    [SerializeField] private SliderConfig refRank = new(3, 0, 0, "기준 랭크 : {0}");
     [SerializeField] private SliderConfig refBoss = new(0, 0, 0, "기준 보스 : {0}");
-    public int RefBoss => refBoss.value;
     private bool bossInit = false;
     private int needTower = 1;
 
@@ -105,14 +105,21 @@ public class TestManager : MonoBehaviour
         if (value10Num == null)
             value10Num = GameObject.Find("TestUI/Value10/TestNum")?.GetComponent<TextMeshProUGUI>();
 
-        if (refRank.TMP == null)
-            refRank.TMP = GameObject.Find("TestUI/RefRank/TestName")?.GetComponent<TextMeshProUGUI>();
-        if (refRank.slider == null)
-            refRank.slider = GameObject.Find("TestUI/RefRank/TestSlider")?.GetComponent<Slider>();
         if (refTower.TMP == null)
             refTower.TMP = GameObject.Find("TestUI/RefTower/TestName")?.GetComponent<TextMeshProUGUI>();
         if (refTower.slider == null)
             refTower.slider = GameObject.Find("TestUI/RefTower/TestSlider")?.GetComponent<Slider>();
+
+        if (refGrade.TMP == null)
+            refGrade.TMP = GameObject.Find("TestUI/RefGrade/TestName")?.GetComponent<TextMeshProUGUI>();
+        if (refGrade.slider == null)
+            refGrade.slider = GameObject.Find("TestUI/RefGrade/TestSlider")?.GetComponent<Slider>();
+
+        if (refRank.TMP == null)
+            refRank.TMP = GameObject.Find("TestUI/RefRank/TestName")?.GetComponent<TextMeshProUGUI>();
+        if (refRank.slider == null)
+            refRank.slider = GameObject.Find("TestUI/RefRank/TestSlider")?.GetComponent<Slider>();
+
         if (refBoss.TMP == null)
             refBoss.TMP = GameObject.Find("TestUI/RefBoss/TestName")?.GetComponent<TextMeshProUGUI>();
         if (refBoss.slider == null)
@@ -186,12 +193,11 @@ public class TestManager : MonoBehaviour
 
         if (Input.GetKey(KeyCode.T))
         {
-            int refID = DataManager.Instance.GetTowerID(refTower.value);
             Vector3 pos = Input.mousePosition;
             pos.z = -Camera.main.transform.position.z;
             pos = Camera.main.ScreenToWorldPoint(pos);
 
-            EntityManager.Instance?.SpawnTower(refID, refRank.value, pos, _useGold: false);
+            EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, pos, _useGold: false);
         }
         if (Input.GetKeyDown(KeyCode.E))
             EntityManager.Instance?.ToggleSpawn(MonsterWave.Instance.IsPause);
@@ -252,41 +258,39 @@ public class TestManager : MonoBehaviour
 
     private void AutoPlay()
     {
-        int refID = DataManager.Instance.GetTowerID(refTower.value);
-
         playTime += Time.deltaTime;
 
         AutoMerge();
         if (Mode == TestMode.None)
         {
-            if (!DataManager.Instance.IsUnlocked(refID))
+            if (!DataManager.Instance.IsUnlocked(RefGrade))
             {
                 if (GameManager.Instance.CanLevelUp && GameManager.Instance.BuyExp()) return;
-                if (TryPurchase(0)) return;
+                if (TryPurchase(0, 0)) return;
                 return;
             }
 
             int level = GameManager.Instance.Level;
-            int best = DataManager.Instance.GetBestLevel(refID);
+            int best = DataManager.Instance.GetBestLevel(RefGrade);
 
             if (level < best)
             {
-                TowerSlot slot = TowerStore.Instance.AutoSlot(refID);
+                TowerSlot slot = TowerStore.Instance?.AutoSlot(RefID, RefGrade);
                 if (slot != null)
-                    TryPurchase(refID, slot);
+                    TryPurchase(RefID, RefGrade, slot);
                 else if (GameManager.Instance.CanLevelUp)
                     GameManager.Instance?.BuyExp();
 
                 return;
             }
 
-            TowerSlot target = TowerStore.Instance.AutoSlot(refID);
+            TowerSlot target = TowerStore.Instance?.AutoSlot(RefID, RefGrade);
             if (target != null)
             {
                 if (EntityManager.Instance.HasEmptyField())
-                    TryPurchase(refID, target);
-                else if (TrySell(refID, target))
-                    TryPurchase(refID, target);
+                    TryPurchase(RefID, RefGrade, target);
+                else if (TrySell(RefID, RefGrade, target))
+                    TryPurchase(RefID, RefGrade, target);
                 else
                     MergeRandom();
 
@@ -296,19 +300,19 @@ public class TestManager : MonoBehaviour
         else TestPlay();
     }
 
-    private bool TryPurchase(int _id, TowerSlot _slot = null)
+    private bool TryPurchase(int _id, TowerGrade _grade, TowerSlot _slot = null)
     {
         if (GameManager.Instance.EnoughGold())
         {
             if (EntityManager.Instance.HasEmptyField())
-                return TowerStore.Instance.AutoPurchase(_id, _slot);
+                return TowerStore.Instance.AutoPurchase(_id, _grade, _slot);
             else MergeRandom();
         }
 
         return false;
     }
 
-    private bool TrySell(int _id, TowerSlot _slot = null)
+    private bool TrySell(int _id, TowerGrade _grade, TowerSlot _slot = null)
     {
         if (_slot == null) return false;
 
@@ -320,7 +324,8 @@ public class TestManager : MonoBehaviour
         {
             Tower tower = towers[i];
             if (tower == null || tower.IsDragging) continue;
-            if (_id != 0 && tower.ID == _id) continue;
+            if (_id != 0 && tower.ID == _id
+                && (_grade == 0 || tower.Grade == _grade)) continue;
 
             if (target == null
                 || tower.Grade < target.Grade
@@ -337,14 +342,12 @@ public class TestManager : MonoBehaviour
 
     private void TestPlay()
     {
-        int refID = DataManager.Instance.GetTowerID(refTower.value);
-
         switch (Mode)
         {
             case TestMode.Wave:
                 Vector3? posWave = EntityManager.Instance?.GetLShapePos();
                 if (posWave.HasValue)
-                    EntityManager.Instance?.SpawnTower(refID, refRank.value, posWave.Value, _useGold: false);
+                    EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, posWave.Value, _useGold: false);
                 SyncBasic();
                 break;
 
@@ -352,7 +355,7 @@ public class TestManager : MonoBehaviour
                 MonsterWave.Instance?.StopWave();
                 Vector3? posSolo = EntityManager.Instance?.GetLShapePos();
                 if (posSolo.HasValue)
-                    EntityManager.Instance?.SpawnTower(refID, refRank.value, posSolo.Value, _useGold: false);
+                    EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, posSolo.Value, _useGold: false);
                 if (EntityManager.Instance?.GetMonsterCount() == 0)
                     EntityManager.Instance?.SpawnBoss();
                 SyncBasic();
@@ -362,7 +365,7 @@ public class TestManager : MonoBehaviour
                 if (!bossInit)
                 {
                     for (int i = 0; i < needTower; i++)
-                        EntityManager.Instance?.SpawnTower(0, 1, _useGold: false);
+                        EntityManager.Instance?.SpawnTower(RefID, RefGrade, 1, _useGold: false);
                     bossInit = true;
                 }
                 break;
@@ -370,13 +373,13 @@ public class TestManager : MonoBehaviour
             case TestMode.Snake:
                 Vector3? posSnake = EntityManager.Instance?.GetSnakePos();
                 if (posSnake.HasValue)
-                    EntityManager.Instance?.SpawnTower(refID, _pos: posSnake.Value);
+                    EntityManager.Instance?.SpawnTower(RefID, RefGrade, _pos: posSnake.Value);
                 else MergeByOrder();
                 break;
 
             case TestMode.Full:
                 if (EntityManager.Instance.HasEmptyField())
-                    EntityManager.Instance?.SpawnTower(refID);
+                    EntityManager.Instance?.SpawnTower(RefID, RefGrade);
                 else MergeRandom();
                 break;
         }
@@ -475,6 +478,7 @@ public class TestManager : MonoBehaviour
                     Tower b = matches[j];
                     if (b == null) continue;
                     if (a.ID != b.ID) continue;
+                    if (a.Grade != b.Grade) continue;
 
                     if (b.Merge(a) != null) return;
                 }
@@ -528,6 +532,7 @@ public class TestManager : MonoBehaviour
                     Tower b = matches[(start + n + m) % count];
                     if (b == null) continue;
                     if (a.ID != b.ID) continue;
+                    if (a.Grade != b.Grade) continue;
 
                     if (a.Merge(b) != null) return;
                 }
@@ -550,6 +555,7 @@ public class TestManager : MonoBehaviour
                 Tower newer = towers[newerIndex];
                 if (newer == null || newer.IsDragging || newer.IsMax) continue;
                 if (newer.ID != older.ID) continue;
+                if (newer.Grade != older.Grade) continue;
                 if (newer.Rank != older.Rank) continue;
 
                 newer.Merge(older);
@@ -562,8 +568,7 @@ public class TestManager : MonoBehaviour
     {
         if (refTower.value == 0) return;
 
-        int refID = DataManager.Instance.GetTowerID(refTower.value);
-        TowerData refData = DataManager.Instance?.SearchTower(refID);
+        TowerData refData = DataManager.Instance?.SearchTower(RefID);
         if (refData.Role != TowerRole.Buff && refData.Role != TowerRole.Debuff) return;
 
         List<Tower> towers = EntityManager.Instance?.GetTowers();
@@ -583,8 +588,10 @@ public class TestManager : MonoBehaviour
             int id = tower.ID;
             int rank = tower.Rank;
 
-            if (id == refID) target[rank]++;
-            else if (id == 0) basics[rank].Add(tower);
+            if (id == RefID && (refGrade.value == 0 || tower.Grade == RefGrade))
+                target[rank]++;
+            else if (id == 999 && tower.Grade == TowerGrade.Temp)
+                basics[rank].Add(tower);
         }
 
         for (int rank = 1; rank <= maxRank; rank++)
@@ -597,7 +604,7 @@ public class TestManager : MonoBehaviour
                 Vector3? pos = EntityManager.Instance?.GetLShapePos();
                 if (!pos.HasValue) break;
 
-                Tower spawned = EntityManager.Instance?.SpawnTower(0, rank, pos.Value, _useGold: false);
+                Tower spawned = EntityManager.Instance?.SpawnTower(999, TowerGrade.Temp, rank, pos.Value, _useGold: false);
                 if (spawned == null) break;
 
                 list.Add(spawned);
@@ -627,17 +634,22 @@ public class TestManager : MonoBehaviour
     public void AddDamage(int _damage) => runDamage += _damage;
     #endregion
 
-    #region 테스트 UI
     private void OnEnable()
     {
         gameSpeed.value = (int)GameManager.Instance?.Speed;
         InitSlider(gameSpeed, ChangeGameSpeed);
 
+        refTower.maxValue = DataManager.Instance.GetTowerDatas().Length;
+        InitSlider(refTower, ChangeRefTower);
+
+        refGrade.minValue = 0;
+        refGrade.maxValue = (int)TowerGrade.Mythic;
+        InitSlider(refGrade, ChangeRefGrade);
+
         refRank.minValue = 1;
         refRank.maxValue = Tower.MaxRank;
         InitSlider(refRank, ChangeRefRank);
-        refTower.maxValue = DataManager.Instance.GetTowerDatas().Length;
-        InitSlider(refTower, ChangeRefTower);
+
         refBoss.maxValue = DataManager.Instance.GetBossDatas().Length;
         InitSlider(refBoss, ChangeRefBoss);
     }
@@ -646,11 +658,13 @@ public class TestManager : MonoBehaviour
     {
         gameSpeed.slider.onValueChanged.RemoveListener(ChangeGameSpeed);
 
-        refRank.slider.onValueChanged.RemoveListener(ChangeRefRank);
         refTower.slider.onValueChanged.RemoveListener(ChangeRefTower);
+        refGrade.slider.onValueChanged.RemoveListener(ChangeRefGrade);
+        refRank.slider.onValueChanged.RemoveListener(ChangeRefRank);
         refBoss.slider.onValueChanged.RemoveListener(ChangeRefBoss);
     }
 
+    #region 테스트 UI_기본
     private void InitSlider(SliderConfig _config, UnityEngine.Events.UnityAction<float> _action)
     {
         if (_config.slider == null) return;
@@ -691,28 +705,6 @@ public class TestManager : MonoBehaviour
 
     private void ChangeGameSpeed(float _value)
         => ApplySlider(ref gameSpeed, _value, _v => GameManager.Instance?.SetSpeed(_v, true));
-
-    private void ChangeRefRank(float _value) => ApplySlider(ref refRank, _value);
-    private void ChangeRefTower(float _value) => ApplySlider(ref refTower, _value, _v =>
-    {
-        if (Mode == TestMode.None) return;
-        OnClickReset();
-        GameManager.Instance?.Replay();
-    });
-    private void ChangeRefBoss(float _value) => ApplySlider(ref refBoss, _value, _v =>
-    {
-        if (_v == 0) { ToggleMode(TestMode.None); return; }
-        OnClickReset();
-        GameManager.Instance?.Replay();
-    });
-
-    private void UpdateTestText()
-    {
-        testText.text =
-            $"Tower : {EntityManager.Instance?.GetTowerCount()}\n" +
-            $"Monster : {EntityManager.Instance?.GetMonsterCount()}\n" +
-            $"Others : {PoolManager.Instance?.OtherCount}";
-    }
 
     private void UpdateTestUI()
     {
@@ -781,11 +773,86 @@ public class TestManager : MonoBehaviour
         value10Num.text = $"{topAvg:#,0} / {bottomAvg:#,0}";
 
         UpdateSliderUI(gameSpeed);
-        UpdateSliderUI(refRank);
         UpdateSliderUI(refTower);
+        UpdateSliderUI(refGrade);
+        UpdateSliderUI(refRank);
         UpdateSliderUI(refBoss);
+
+        refTower.TMP.text = string.Format(refTower.format, TowerText());
+        refGrade.TMP.text = string.Format(refGrade.format, GradeText());
+    }
+    #endregion
+
+    #region 테스트 UI_추가
+    private void ChangeRefTower(float _value)
+    {
+        ApplySlider(ref refTower, _value, _v =>
+        {
+            if (Mode == TestMode.None) return;
+            OnClickReset();
+            GameManager.Instance?.Replay();
+        });
+
+        refTower.TMP.text = string.Format(refTower.format, TowerText());
+        refGrade.TMP.text = string.Format(refGrade.format, GradeText());
     }
 
+    private void ChangeRefGrade(float _value)
+    {
+        ApplySlider(ref refGrade, _value, _v =>
+        {
+            if (Mode == TestMode.None) return;
+            OnClickReset();
+            GameManager.Instance?.Replay();
+        });
+
+        refGrade.TMP.text = string.Format(refGrade.format, GradeText());
+    }
+
+    private void ChangeRefRank(float _value) => ApplySlider(ref refRank, _value);
+
+    private void ChangeRefBoss(float _value) => ApplySlider(ref refBoss, _value, _v =>
+    {
+        if (Mode == TestMode.None) return;
+        if (_v == 0) { ToggleMode(TestMode.None); return; }
+        OnClickReset();
+        GameManager.Instance?.Replay();
+    });
+
+    private void UpdateTestText()
+    {
+        testText.text =
+            $"Tower : {EntityManager.Instance?.GetTowerCount()}\n" +
+            $"Monster : {EntityManager.Instance?.GetMonsterCount()}\n" +
+            $"Others : {PoolManager.Instance?.OtherCount}";
+    }
+
+    private string TowerText()
+    {
+        if (refTower.value != 0) return RefID.ToString();
+
+        return Mode == TestMode.None ? "랜덤" : "기본";
+    }
+
+    private string GradeText()
+    {
+        if (refGrade.value == 0) return "전체";
+
+        return RefGrade switch
+        {
+            TowerGrade.Normal => "일반",
+            TowerGrade.Rare => "희귀",
+            TowerGrade.Epic => "서사",
+            TowerGrade.Unique => "유일",
+            TowerGrade.Legend => "전설",
+            TowerGrade.Mythic => "신화",
+            TowerGrade.Temp => "임시",
+            _ => ((int)RefGrade).ToString()
+        };
+    }
+    #endregion
+
+    #region 테스트 UI_클릭
     public void OnClickTest()
     {
         testUI.SetActive(!testUI.activeSelf);
@@ -815,6 +882,31 @@ public class TestManager : MonoBehaviour
         ChangeGameSpeed(gameSpeed.maxValue);
         GameManager.Instance?.Replay();
     }
+    #endregion
+
+    #region 프로퍼티
+    private int RefID => refTower.value != 0
+        ? DataManager.Instance.GetTowerID(refTower.value)
+        : Mode == TestMode.None ? 0 : 999;
+
+    private TowerGrade RefGrade
+    {
+        get
+        {
+            TowerGrade grade = (TowerGrade)refGrade.value;
+            if (refTower.value == 0) return grade;
+
+            TowerData data = DataManager.Instance?.SearchTower(RefID);
+
+            if (grade == 0) return data.MinGrade;
+            if (grade < data.MinGrade) return data.MinGrade;
+            if (grade > data.MaxGrade) return data.MaxGrade;
+
+            return grade;
+        }
+    }
+
+    public BossData RefBoss => DataManager.Instance?.SearchBoss(refBoss.value);
     #endregion
 }
 #endif

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(TowerBuff))]
 public class Tower : Entity
 {
-    [Header("Data + Base")]
+    [Header("Data")]
     [SerializeField] private TowerData data;
     [SerializeField] private Transform outline;
     private SpriteRenderer outlineSR;
@@ -22,7 +22,8 @@ public class Tower : Entity
 
     public bool IsDragging { private set; get; } = false;
 
-    [Header("Rank")]
+    [Header("Type")]
+    [SerializeField] private TowerGrade grade;
     [SerializeField][Min(0)] private int rank;
     public const int MaxRank = 7;
 
@@ -102,14 +103,14 @@ public class Tower : Entity
             if (!IsMax)
             {
                 symbol.localScale = Vector3.one * maxSize;
-                symbolSR.sprite = data.Icon;
+                symbolSR.sprite = Icon;
                 IsMax = true;
             }
             return;
         }
 
         symbol.localScale = Vector3.one * baseSize;
-        symbolSR.sprite = data.Symbol;
+        symbolSR.sprite = Symbol;
         IsMax = false;
 
         Vector2[] positions = SymbolPos(rank, symbol.localScale.x);
@@ -127,17 +128,17 @@ public class Tower : Entity
 
         Vector2[] grid =
         {
-        Vector2.zero,
-        new Vector2(-offset, -offset),
-        new Vector2(0f, -offset),
-        new Vector2(+offset, -offset),
-        new Vector2(-offset, 0f),
-        new Vector2(0f, 0f),
-        new Vector2(+offset, 0f),
-        new Vector2(-offset, +offset),
-        new Vector2(0f, +offset),
-        new Vector2(+offset, +offset),
-    };
+            Vector2.zero,
+            new Vector2(-offset, -offset),
+            new Vector2(0f, -offset),
+            new Vector2(+offset, -offset),
+            new Vector2(-offset, 0f),
+            new Vector2(0f, 0f),
+            new Vector2(+offset, 0f),
+            new Vector2(-offset, +offset),
+            new Vector2(0f, +offset),
+            new Vector2(+offset, +offset),
+        };
 
         switch (_rank)
         {
@@ -276,7 +277,7 @@ public class Tower : Entity
 
     private void ApplyStat(ref int _damage, ref int _speed, ref int _chance, ref int _critical)
     {
-        Stat4 stat = DataManager.Instance.GetTowerStat(data.Role, data.Grade, rank);
+        Stat4 stat = DataManager.Instance.GetTowerStat(Role, Grade, rank);
 
         _damage = stat.attackDamage;
         _speed = stat.attackSpeed;
@@ -300,7 +301,7 @@ public class Tower : Entity
         int overChance = Mathf.Max(_chance - 100, 0) / 10;
         _chance = Mathf.Min(_chance, 100);
 
-        switch (data.Role)
+        switch (Role)
         {
             case TowerRole.Dealer:
                 _critical += overChance;
@@ -320,7 +321,7 @@ public class Tower : Entity
     #region 전투
     private bool FindTarget()
     {
-        if (!(data.Role == TowerRole.Debuff
+        if (!(Role == TowerRole.Debuff
             || attackTarget == null
             || attackTarget.IsExclude()
             || attackTarget.IsInvalid(targetIndex)))
@@ -352,7 +353,7 @@ public class Tower : Entity
 
     private void Attack()
     {
-        bool instead = data.Role == TowerRole.Summon;
+        bool instead = Role == TowerRole.Summon;
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnAttack(this, attackTarget, ref instead);
 
@@ -427,31 +428,14 @@ public class Tower : Entity
     #endregion
 
     #region SET
-    private TowerData BasicData()
+    public void SetTower(TowerData _data, TowerGrade _grade, int _rank = 1)
     {
-        TowerData basic = ScriptableObject.CreateInstance<TowerData>();
+        data = _data;
+        grade = _grade;
 
-        basic.ID = 0;
-        basic.Name = "Basic";
-        basic.Icon = symbolSR.sprite;
-        basic.Symbol = symbolSR.sprite;
-        basic.Color = Color.black;
-
-        basic.Grade = TowerGrade.Normal;
-        basic.Role = TowerRole.Dealer;
-        basic.Target = AttackTarget.First;
-        basic.Skills = new();
-
-        return basic;
-    }
-
-    public void SetTower(TowerData _data, int _rank = 1)
-    {
-        data = _data != null ? _data : BasicData();
-
-        gameObject.name = data.Name;
-        outlineSR.color = DataManager.Instance.GetTowerColor(data.Grade);
-        symbolSR.color = data.Color;
+        gameObject.name = Name;
+        outlineSR.color = DataManager.Instance.GetTowerColor(grade);
+        symbolSR.color = Color;
 
         cell = EntityManager.Instance.GetCell(transform.position);
 
@@ -462,6 +446,7 @@ public class Tower : Entity
         for (int i = 0; i < data.Skills.Count; i++)
         {
             SkillConfig config = data.Skills[i];
+            if (config.grade != grade) continue;
             if (config.skill == null) continue;
 
             TowerSkill skill = Instantiate(config.skill);
@@ -487,6 +472,7 @@ public class Tower : Entity
         for (int i = 0; i < data.Skills.Count && index < skills.Count; i++)
         {
             SkillConfig config = data.Skills[i];
+            if (config.grade != grade) continue;
             if (config.skill == null) continue;
 
             if (config.values != null)
@@ -558,11 +544,12 @@ public class Tower : Entity
     public TowerData Data => data;
     public Sprite Icon => data.Icon;
     public int ID => data.ID;
+    public string Name => data.Name;
     public Sprite Symbol => data.Symbol;
     public Color Color => data.Color;
     public TowerRole Role => data.Role;
-    public TowerGrade Grade => data.Grade;
 
+    public TowerGrade Grade => grade;
     public int Rank => rank;
     public Monster Target => attackTarget;
     public int Damage => attackDamage;

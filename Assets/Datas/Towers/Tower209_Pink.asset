@@ -10,24 +10,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: abf7c14b1ff5e1746b8923d9ca7ebcef, type: 3}
-  m_Name: Tower2210_Black
+  m_Name: Tower209_Pink
   m_EditorClassIdentifier: 
-  Icon: {fileID: 21300000, guid: 437ac426ef4d12f418fdc265610861fb, type: 3}
-  ID: 2210
-  Name: Black
+  Icon: {fileID: 21300000, guid: 9bc6d89e4227d0a47ae886c8626a14d4, type: 3}
+  ID: 209
+  Name: Pink
   Symbol: {fileID: 21300000, guid: d5368b4bf7fca394dbb5d84089d73b73, type: 3}
-  Color: {r: 0, g: 0, b: 0, a: 1}
-  Grade: 2
+  Color: {r: 1, g: 0, b: 1, a: 1}
   Role: 2
-  Target: 0
+  Target: 4
   Skills:
-  - skill: {fileID: 11400000, guid: ed1eb96c129f2c945843497e3a0fbee6, type: 2}
+  - grade: 2
+    skill: {fileID: 11400000, guid: 940e95316d2c5304fbf3f37963bff4b4, type: 2}
     values:
-    - valueType: 202
-      baseValue: 5
+    - valueType: 201
+      baseValue: 10
       rankType: 3
       rankBonus: 1
     - valueType: 401
-      baseValue: 0.5
-      rankType: 3
+      baseValue: 2
+      rankType: 1
       rankBonus: 1
+  - grade: 3
+    skill: {fileID: 0}
+    values: []
+  - grade: 4
+    skill: {fileID: 0}
+    values: []

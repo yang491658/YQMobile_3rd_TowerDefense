@@ -9,7 +9,7 @@ public enum TowerGrade
     [InspectorName("전설")] Legend = 5,
     [InspectorName("신화")] Mythic = 6,
 
-    [InspectorName("임시")] Temp = 9,
+    [InspectorName("임시")] Temp = 999,
 }
 
 public enum TowerRole
@@ -76,9 +76,9 @@ public enum ValueType
 
 public enum RankType
 {
-    [InspectorName("미적용")] None,
-    [InspectorName("더하기")] Add,
-    [InspectorName("빼기")] Subtract,
-    [InspectorName("곱하기")] Multiply,
-    [InspectorName("나누기")] Divide,
+    [InspectorName("＝")] None,
+    [InspectorName("＋")] Add,
+    [InspectorName("－")] Subtract,
+    [InspectorName("×")] Multiply,
+    [InspectorName("÷")] Divide,
 }

@@ -214,7 +214,7 @@ public class MonsterWave : MonoBehaviour
 #if TEST_Manager
         if (TestManager.Instance?.Mode == TestMode.Boss)
         {
-            order = TestManager.Instance.RefBoss;
+            order = TestManager.Instance.RefBoss.ID;
             if (!onBoss)
             {
                 Vector3 offset = UIManager.Instance.GetPlayerOffset();
@@ -376,10 +376,10 @@ public class MonsterWave : MonoBehaviour
     {
 #if TEST_Manager
         if (TestManager.Instance?.Mode == TestMode.Boss)
-            return DataManager.Instance?.SearchBossByOrder(TestManager.Instance.RefBoss);
+            return TestManager.Instance?.RefBoss;
 #endif
 
-        return DataManager.Instance?.SearchBossByOrder(bossOrder);
+        return DataManager.Instance?.SearchBoss(bossOrder);
     }
 
     public void GetPhaseValue(out Phase _phase, out float _value, out float _maxValue, out Color _color)
@@ -444,6 +444,6 @@ public class MonsterWave : MonoBehaviour
     #region 프로퍼티
     public bool IsRunning => phase != Phase.None;
     public int BossOrder => bossOrder;
-    public bool BossFinished => DataManager.Instance?.GetBossID(bossOrder) == 0;
+    public bool BossFinished => DataManager.Instance?.SearchBoss(bossOrder) == null;
     #endregion
 }

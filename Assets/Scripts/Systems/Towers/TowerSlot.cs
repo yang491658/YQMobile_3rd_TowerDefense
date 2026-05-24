@@ -16,6 +16,7 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 
     [Header("Slot")]
     [SerializeField] private TowerData data;
+    [SerializeField] private TowerGrade grade;
     [SerializeField] private SlotState state;
 
 #if UNITY_EDITOR
@@ -52,13 +53,13 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 
     public void Reroll()
     {
-        data = DataManager.Instance?.GetRandomTower();
+        data = DataManager.Instance?.GetRandomTower(out grade);
         Ready();
     }
 
     public bool Purchase(Vector3 _pos)
     {
-        if (EntityManager.Instance?.SpawnTower(data.ID, 1, _pos) == null)
+        if (EntityManager.Instance?.SpawnTower(data.ID, grade, 1, _pos) == null)
             return false;
 
         Complete();
@@ -146,7 +147,7 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     {
         data = _data;
 
-        outline.color = DataManager.Instance.GetTowerColor(_data.Grade);
+        outline.color = DataManager.Instance.GetTowerColor(grade);
         icon.sprite = _data.Icon;
         icon.color = _data.Color;
     }
@@ -160,9 +161,9 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 
     #region 프로퍼티
     public Vector3 Pos => rect.anchoredPosition;
-    public int ID => data.ID;
-    public TowerGrade Grade => data.Grade;
 
+    public int ID => data.ID;
+    public TowerGrade Grade => grade;
     public bool IsComplete => state == SlotState.Complete;
     #endregion
 }

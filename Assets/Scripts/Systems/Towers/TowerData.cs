@@ -9,6 +9,7 @@ using UnityEditor;
 [System.Serializable]
 public struct SkillConfig
 {
+    public TowerGrade grade;
     public TowerSkill skill;
     public List<SkillValue> values;
 }
@@ -16,7 +17,7 @@ public struct SkillConfig
 [CreateAssetMenu(fileName = "TowerData", menuName = "Data/Tower", order = 1)]
 public class TowerData : ScriptableObject
 {
-    [Header("Base")]
+    [Header("Data")]
     public Sprite Icon;
     public int ID;
     public string Name;
@@ -24,10 +25,7 @@ public class TowerData : ScriptableObject
     public Color Color = Color.black;
 
     [Header("Type")]
-    public TowerGrade Grade = TowerGrade.Temp;
     public TowerRole Role = TowerRole.Dealer;
-
-    [Header("Stat")]
     public AttackTarget Target = AttackTarget.First;
     public List<SkillConfig> Skills = new();
 
@@ -37,6 +35,7 @@ public class TowerData : ScriptableObject
         AutoIcon();
         AutoName();
         AutoSymbol();
+        AutoSkill();
         AutoValue();
 
         EditorUtility.SetDirty(this);
@@ -100,14 +99,14 @@ public class TowerData : ScriptableObject
             if (split.Length > 0)
                 int.TryParse(split[0], out number);
 
-            ID = (int)Grade * 1000 + (int)Role * 100 + number % 100;
+            ID = (int)Role * 100 + number % 100;
             Name = split.Length > 1 ? split[1] : Icon.name;
         }
         else
         {
             Role = TowerRole.Dealer;
-            ID = 9000 + (int)Grade;
-            Name = Grade.ToString();
+            ID = 999;
+            Name = TowerGrade.Temp.ToString();
         }
     }
 
@@ -124,6 +123,50 @@ public class TowerData : ScriptableObject
         }
     }
 
+    private void AutoSkill()
+    {
+        if (Skills == null)
+            Skills = new();
+
+        if (ID == 999)
+            return;
+
+        TowerGrade start = TowerGrade.Normal;
+        TowerGrade end = TowerGrade.Legend;
+
+        if (Role == TowerRole.Debuff || Role == TowerRole.Buff)
+        {
+            start = TowerGrade.Rare;
+            end = TowerGrade.Unique;
+        }
+        else if (Role == TowerRole.Summon)
+        {
+            start = TowerGrade.Epic;
+            end = TowerGrade.Unique;
+        }
+
+        for (int i = (int)start; i <= (int)end; i++)
+        {
+            TowerGrade grade = (TowerGrade)i;
+            bool exists = false;
+
+            for (int j = 0; j < Skills.Count; j++)
+            {
+                if (Skills[j].grade != grade) continue;
+
+                exists = true;
+                break;
+            }
+
+            if (exists) continue;
+
+            SkillConfig config = new();
+            config.grade = grade;
+            config.values = new();
+            Skills.Add(config);
+        }
+    }
+
     private void AutoValue()
     {
         if (Skills == null)
@@ -133,11 +176,17 @@ public class TowerData : ScriptableObject
         {
             SkillConfig config = Skills[i];
 
+            if (config.values == null)
+                config.values = new();
+
             if (config.skill == null)
             {
-                if (config.values == null)
-                    config.values = new();
+                Skills[i] = config;
+                continue;
+            }
 
+            if (config.skill.ID / 100 != (int)Role)
+            {
                 Skills[i] = config;
                 continue;
             }
@@ -195,4 +244,27 @@ public class TowerData : ScriptableObject
             _value.rankBonus = 1f;
     }
 #endif
+
+    #region GET
+    public bool HasGrade(TowerGrade _grade)
+    {
+        if (Skills.Count <= 0)
+            return _grade == TowerGrade.Temp;
+
+        for (int i = 0; i < Skills.Count; i++)
+        {
+            SkillConfig config = Skills[i];
+            if (config.grade == _grade)
+                return true;
+        }
+
+        return false;
+    }
+    #endregion
+
+    #region 프로퍼티
+    public TowerGrade RandomGrade => Skills.Count > 0 ? Skills[Random.Range(0, Skills.Count)].grade : TowerGrade.Temp;
+    public TowerGrade MinGrade => Skills.Count > 0 ? Skills[0].grade : TowerGrade.Temp;
+    public TowerGrade MaxGrade => Skills.Count > 0 ? Skills[Skills.Count - 1].grade : TowerGrade.Temp;
+    #endregion
 }

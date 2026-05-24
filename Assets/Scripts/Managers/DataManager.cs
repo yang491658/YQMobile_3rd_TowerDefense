@@ -79,33 +79,28 @@ public class DataManager : MonoBehaviour
 
     public BossData SearchBoss(int _id)
         => bossDic.TryGetValue(_id, out var _data) ? _data : null;
-
-    public BossData SearchBossByOrder(int _order)
-        => (_order > 0 && _order <= bossDatas.Length) ? bossDatas[_order - 1] : null;
     #endregion
 
     #region 상점 시스템
-    public bool IsUnlocked(int _id)
+    public bool IsUnlocked(TowerGrade _grade)
     {
-        if (_id == 0) return true;
-        if (!towerDic.TryGetValue(_id, out var data)) return false;
+        if (_grade == 0) return true;
 
         IReadOnlyList<TowerChance.GradeChance> chances = GetGradeChance(GameManager.Instance.Level);
 
         for (int i = 0; i < chances.Count; i++)
         {
             TowerChance.GradeChance chance = chances[i];
-            if (chance.grade == data.Grade)
+            if (chance.grade == _grade)
                 return chance.weight > 0;
         }
 
         return false;
     }
 
-    public int GetBestLevel(int _id)
+    public int GetBestLevel(TowerGrade _grade)
     {
-        if (_id == 0) return 1;
-        if (!towerDic.TryGetValue(_id, out var data)) return 0;
+        if (_grade == 0) return 0;
 
         int result = 0;
         float bestChance = 0f;
@@ -122,7 +117,7 @@ public class DataManager : MonoBehaviour
                 TowerChance.GradeChance chance = chances[i];
 
                 if (chance.weight > 0) total += chance.weight;
-                if (chance.grade == data.Grade) weight = chance.weight;
+                if (chance.grade == _grade) weight = chance.weight;
             }
 
             float value = total > 0 ? (float)weight / total : 0f;
@@ -154,24 +149,26 @@ public class DataManager : MonoBehaviour
     public TowerData[] GetTowerDatas() => towerDatas;
     public TowerData[] GetTowerDatas(TowerGrade _grade)
     {
+        if (_grade == 0) return towerDatas;
+
         List<TowerData> result = new(towerDatas.Length);
 
         for (int i = 0; i < towerDatas.Length; i++)
         {
             TowerData data = towerDatas[i];
-            if (data != null && data.Grade == _grade)
+            if (data != null && data.HasGrade(_grade))
                 result.Add(data);
         }
 
         return result.ToArray();
     }
-    public int GetTowerID(int _order)
-        => (_order > 0 && _order <= towerDatas.Length) ? towerDatas[_order - 1].ID : 0;
 
-    public TowerData GetRandomTower()
+    public int GetTowerID(int _order) => (_order > 0 && _order <= towerDatas.Length) ? towerDatas[_order - 1].ID : 0;
+
+    public TowerData GetRandomTower(out TowerGrade _grade)
     {
         int level = GameManager.Instance.Level;
-        TowerGrade grade = GetRandomGrade(level);
+        _grade = GetRandomGrade(level);
 
         TowerData result = null;
         int count = 0;
@@ -179,7 +176,7 @@ public class DataManager : MonoBehaviour
         for (int i = 0; i < towerDatas.Length; i++)
         {
             TowerData data = towerDatas[i];
-            if (data == null || data.Grade != grade) continue;
+            if (data == null || !data.HasGrade(_grade)) continue;
 
             if (Random.Range(0, ++count) == 0)
                 result = data;
@@ -189,8 +186,6 @@ public class DataManager : MonoBehaviour
     }
 
     public BossData[] GetBossDatas() => bossDatas;
-    public int GetBossID(int _order)
-        => (_order > 0 && _order <= bossDatas.Length) ? bossDatas[_order - 1].ID : 0;
 
     public IReadOnlyList<TowerChance.GradeChance> GetGradeChance(int _level) => towerChance.GetGradeChance(_level);
     public TowerGrade GetRandomGrade(int _level) => towerChance.GetGrade(_level);

@@ -194,12 +194,7 @@ public class EntityManager : MonoBehaviour
     }
 
     public bool CanMoveCell(Vector3Int _cell)
-    {
-        if (!mapFieldTilemap.HasTile(_cell)) return false;
-        if (IsTowerCell(_cell)) return false;
-
-        return true;
-    }
+        => mapFieldTilemap.HasTile(_cell) && !IsTowerCell(_cell);
 
     private bool PickRandom(out Vector3Int _cell, bool _forTower = true)
     {
@@ -375,18 +370,26 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region 타워
-    public Tower SpawnTower(int _id = 0, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
+    public Tower SpawnTower(int _id, TowerGrade _grade, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
     {
         TowerData data = null;
 
-#if TEST_Manager
-        if (!(TestManager.Instance?.Mode != TestMode.None && _id == 0))
-#endif
+        if (_id > 0)
         {
-            int id = _id > 0 ? _id : DataManager.Instance.GetRandomTower().ID;
-            data = DataManager.Instance?.SearchTower(id);
+            data = DataManager.Instance?.SearchTower(_id);
             if (data == null) return null;
+
+            if (_grade == 0) _grade = data.RandomGrade;
+            if (_id != 999 && !data.HasGrade(_grade)) return null;
         }
+        else if (_grade > 0)
+        {
+            TowerData[] datas = DataManager.Instance?.GetTowerDatas(_grade);
+            data = datas[Random.Range(0, datas.Length)];
+        }
+        else data = DataManager.Instance?.GetRandomTower(out _grade);
+
+        if (data == null) return null;
 
         Vector3 pos = SelectField(_pos);
         if (float.IsInfinity(pos.x)) return null;
@@ -396,7 +399,7 @@ public class EntityManager : MonoBehaviour
         Tower tower = Instantiate(towerBase, pos, Quaternion.identity, towerTrans)
             .GetComponent<Tower>();
 
-        tower.SetTower(data, _rank);
+        tower.SetTower(data, _grade, _rank);
         tower.transform.localScale = map.localScale;
         towers.Add(tower);
         towerDic[tower] = GetCell(pos);
@@ -409,19 +412,21 @@ public class EntityManager : MonoBehaviour
     public bool CanMerge(Tower _select, Tower _target)
         => _select != null && _target != null && _select != _target &&
         _select.ID == _target.ID &&
+        _select.Grade == _target.Grade &&
         _select.Rank == _target.Rank &&
         !_select.IsMax && !_target.IsMax;
 
     public Tower MergeTower(Tower _select, Tower _target)
     {
         int id = _target.ID;
+        TowerGrade grade = _target.Grade;
         int rank = _target.Rank;
         Vector3 pos = _target.transform.position;
 
         _select.Despawn();
         _target.Despawn();
 
-        return SpawnTower(id, rank + 1, pos, false);
+        return SpawnTower(id, grade, rank + 1, pos, false);
     }
 
     public void SellTower(Tower _tower)
@@ -473,12 +478,9 @@ public class EntityManager : MonoBehaviour
         return monster;
     }
 
-    public Boss SpawnBoss(int _order)
+    public Boss SpawnBoss(int _id)
     {
-        int id = DataManager.Instance.GetBossID(_order);
-        if (id == 0) return null;
-
-        BossData data = DataManager.Instance?.SearchBoss(id);
+        BossData data = DataManager.Instance?.SearchBoss(_id);
         if (data == null) return null;
 
         Vector3 pos = mapFieldTilemap.GetCellCenterWorld(entryCell);
@@ -1078,10 +1080,10 @@ public class EntityManager : MonoBehaviour
         int count = 0;
         for (int i = 0; i < towers.Count; i++)
         {
-            Tower t = towers[i];
-            if (t == null) continue;
+            Tower tower = towers[i];
+            if (tower == null) continue;
 
-            if (t.ID == _id) count++;
+            if (tower.ID == _id) count++;
         }
         return count;
     }

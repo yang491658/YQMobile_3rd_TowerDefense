@@ -10,20 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: abf7c14b1ff5e1746b8923d9ca7ebcef, type: 3}
-  m_Name: Tower2301_Brown
+  m_Name: Tower301_Brown
   m_EditorClassIdentifier: 
   Icon: {fileID: 21300000, guid: 7ae567450797c1b499f9155f27916f49, type: 3}
-  ID: 2301
+  ID: 301
   Name: Brown
   Symbol: {fileID: 21300000, guid: a9ccae04d9e9672489755cd55673508a, type: 3}
   Color: {r: 0.7058824, g: 0.23529412, b: 0, a: 1}
-  Grade: 2
   Role: 3
   Target: 7
   Skills:
-  - skill: {fileID: 11400000, guid: 12f33d2895d3707439df3afdc19d0f7f, type: 2}
+  - grade: 2
+    skill: {fileID: 11400000, guid: 12f33d2895d3707439df3afdc19d0f7f, type: 2}
     values:
     - valueType: 201
       baseValue: 10
       rankType: 3
       rankBonus: 1
+  - grade: 3
+    skill: {fileID: 0}
+    values: []
+  - grade: 4
+    skill: {fileID: 0}
+    values: []
