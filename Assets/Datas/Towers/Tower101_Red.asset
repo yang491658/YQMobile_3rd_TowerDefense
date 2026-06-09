@@ -27,10 +27,6 @@ MonoBehaviour:
       baseValue: 5
       rankType: 3
       rankBonus: 1
-    - valueType: 301
-      baseValue: 1
-      rankType: 0
-      rankBonus: 0
   - grade: 2
     skill: {fileID: 0}
     values: []

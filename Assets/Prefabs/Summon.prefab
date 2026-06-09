@@ -166,10 +166,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tower: {fileID: 0}
-  target: {fileID: 0}
   speed: 0
-  path: []
-  pathIndex: 0
+  type: 0
+  radius: 0
+  angle: 0
+  target: {fileID: 0}
   reserve: 0
   duration: 0
-  rotate: 0

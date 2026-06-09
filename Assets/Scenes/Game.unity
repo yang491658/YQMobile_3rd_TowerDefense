@@ -9093,7 +9093,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8c11b998fd6539148a0fd4b4f9e113b8, type: 2}
   - {fileID: 11400000, guid: b3c7f4e2f1400de4f9f7d0b2a65f06f1, type: 2}
   - {fileID: 11400000, guid: e806bf6b3ad12d24fb087a360063c412, type: 2}
-  - {fileID: 11400000, guid: d0765e96a4ac5254a96e6a97b04a98d6, type: 2}
+  - {fileID: 11400000, guid: 52cc5361baa349045872bde058a10cd1, type: 2}
   bossDatas:
   - {fileID: 11400000, guid: 33f45f685c94d044dbff460e59fce319, type: 2}
   - {fileID: 11400000, guid: 45862eebabcb0c44fa0f90d339fc501d, type: 2}
@@ -13107,7 +13107,7 @@ MonoBehaviour:
     value: 0
     minValue: 0
     maxValue: 0
-    format: "\uAE30\uC900 \uB4F1\uAE09: {0}"
+    format: "\uAE30\uC900 \uB4F1\uAE09 : {0}"
   refRank:
     TMP: {fileID: 168061003}
     slider: {fileID: 948936902}

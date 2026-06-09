@@ -32,7 +32,7 @@ public struct DamageData
     }
 }
 
-public enum DamageType { Normal, Critical, DoT, Bonus, }
+public enum DamageType { Normal, Critical, DoT }
 
 [CreateAssetMenu(fileName = "TowerConfig", menuName = "Table/Tower/Config", order = 52)]
 public class TowerConfig : ScriptableObject
@@ -62,7 +62,6 @@ public class TowerConfig : ScriptableObject
     [SerializeField] private DamageData normalDamage = new(DamageType.Normal, Color.black, 50);
     [SerializeField] private DamageData criticalDamage = new(DamageType.Critical, Color.red, 65);
     [SerializeField] private DamageData dotDamage = new(DamageType.DoT, Color.green, 35);
-    [SerializeField] private DamageData bonusDamage = new(DamageType.Bonus, Color.magenta, 45);
 
     #region 타워 색상
     public Color GetColor(TowerGrade _grade)
@@ -145,7 +144,6 @@ public class TowerConfig : ScriptableObject
         {
             DamageType.Critical => criticalDamage,
             DamageType.DoT => dotDamage,
-            DamageType.Bonus => bonusDamage,
             _ => normalDamage,
         };
     #endregion

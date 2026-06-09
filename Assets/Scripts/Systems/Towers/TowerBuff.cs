@@ -75,8 +75,7 @@ public class TowerBuff : MonoBehaviour
         switch (_applyType)
         {
             case ApplyType.Add:
-                buffs.Add(new Buff(_tower, BuffType.Stat, _sub, _value, _duration));
-                return;
+                break;
 
             case ApplyType.Refresh:
                 for (int i = 0; i < buffs.Count; i++)
@@ -87,15 +86,16 @@ public class TowerBuff : MonoBehaviour
                     buff.Refresh(_value, _duration);
                     return;
                 }
-
-                buffs.Add(new Buff(_tower, BuffType.Stat, _sub, _value, _duration));
-                return;
+                break;
 
             case ApplyType.Replace:
                 RemoveStat(_tower, _sub);
-                buffs.Add(new Buff(_tower, BuffType.Stat, _sub, _value, _duration));
-                return;
+                break;
+
+            default: return;
         }
+
+        buffs.Add(new Buff(_tower, BuffType.Stat, _sub, _value, _duration));
     }
 
     private void UpdateStat(float _deltaTime)
@@ -104,8 +104,9 @@ public class TowerBuff : MonoBehaviour
 
         for (int i = buffs.Count - 1; i >= 0; i--)
         {
-            if (buffs[i].type != BuffType.Stat) continue;
-            if (buffs[i].Update(_deltaTime)) continue;
+            Buff buff = buffs[i];
+            if (buff.type != BuffType.Stat) continue;
+            if (buff.Update(_deltaTime)) continue;
 
             buffs.RemoveAt(i);
         }

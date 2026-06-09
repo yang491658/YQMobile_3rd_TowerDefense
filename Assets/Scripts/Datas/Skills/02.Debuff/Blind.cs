@@ -8,6 +8,7 @@ public class Blind : TowerSkill
     [SerializeField][Min(0)] private int chance;
     [SerializeField][Min(0f)] private float duration;
 
+    [Header("Others")]
     private readonly HashSet<long> targets = new();
     private static long GetTargetKey(Monster _target, int _index)
         => ((long)(uint)_target.GetInstanceID() << 32) | (uint)_index;

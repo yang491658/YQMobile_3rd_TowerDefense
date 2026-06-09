@@ -43,7 +43,8 @@ public class MonsterDebuff : MonoBehaviour
         {
             reserve = Mathf.Max(reserve - 1, 0);
 
-            if (!CanApply(_value, _duration))
+            float d = Mathf.Max(_duration, 1f);
+            if (!CanApply(_value, d))
             {
                 if (_effect != null) _effect.Despawn();
                 return false;
@@ -52,8 +53,8 @@ public class MonsterDebuff : MonoBehaviour
             value = _value;
             if (!boss || timer <= 0f)
             {
-                duration = _duration;
-                timer = _duration;
+                duration = d;
+                timer = d;
             }
             if (effect != null) effect.Despawn();
             effect = _effect;
@@ -98,7 +99,7 @@ public class MonsterDebuff : MonoBehaviour
     [Header("Debuff")]
     [SerializeField] private Debuff tickDamage = new();
     private float tickTimer;
-    [SerializeField] private Debuff bonusDamage = new();
+    [SerializeField] private Debuff damageAmp = new();
     [SerializeField] private Debuff speedControl = new();
     [SerializeField] private Debuff directionControl = new();
 
@@ -115,7 +116,7 @@ public class MonsterDebuff : MonoBehaviour
         bool boss = monster is Boss;
 
         tickDamage.SetBoss(boss);
-        bonusDamage.SetBoss(boss);
+        damageAmp.SetBoss(boss);
         speedControl.SetBoss(boss);
         directionControl.SetBoss(boss);
     }
@@ -128,7 +129,7 @@ public class MonsterDebuff : MonoBehaviour
         float dt = Time.deltaTime;
         UpdateDirection(dt);
         UpdateSpeed(dt);
-        UpdateBonus(dt);
+        UpdateAmplified(dt);
         UpdateTick(dt);
 
         UpdateEffect(dt);
@@ -137,7 +138,7 @@ public class MonsterDebuff : MonoBehaviour
     public void Clear()
     {
         tickDamage.Reset();
-        bonusDamage.Reset();
+        damageAmp.Reset();
         speedControl.Reset();
         directionControl.Reset();
 
@@ -156,7 +157,7 @@ public class MonsterDebuff : MonoBehaviour
     {
         if (tickDamage.Apply(_damage, _duration, _effect))
         {
-            tickTimer = 1f;
+            tickTimer = 0.5f;
             AddEffect(tickDamage.effect);
         }
     }
@@ -175,20 +176,20 @@ public class MonsterDebuff : MonoBehaviour
     }
     #endregion
 
-    #region 추가 데미지
-    public void ActiveBonus() => bonusDamage.Active();
+    #region 데미지 증폭
+    public void ActiveAmplified() => damageAmp.Active();
 
-    public void ApplyBonus(int _factor, float _duration, ViewEffect _effect)
+    public void ApplyAmplified(int _factor, float _duration, ViewEffect _effect)
     {
-        if (bonusDamage.Apply(_factor, _duration, _effect))
-            AddEffect(bonusDamage.effect);
+        if (damageAmp.Apply(_factor, _duration, _effect))
+            AddEffect(damageAmp.effect);
     }
 
-    private void UpdateBonus(float _deltaTime)
-        => bonusDamage.Update(_deltaTime);
+    private void UpdateAmplified(float _deltaTime)
+        => damageAmp.Update(_deltaTime);
 
-    public int CalcBonus(int _damage)
-        => bonusDamage.IsActive ? _damage * bonusDamage.value / 100 : 0;
+    public int CalcAmplified(int _damage)
+        => damageAmp.IsActive ? _damage * (100 + damageAmp.value) / 100 : _damage;
     #endregion
 
     #region 이동속도 제어
@@ -231,9 +232,6 @@ public class MonsterDebuff : MonoBehaviour
 
     public void ApplyDirection(int _dir, float _duration, ViewEffect _effect)
     {
-        if (_dir == 0)
-            _dir = Random.Range(1, 5);
-
         if (directionControl.Apply(_dir, _duration, _effect))
             AddEffect(directionControl.effect);
     }
@@ -243,25 +241,44 @@ public class MonsterDebuff : MonoBehaviour
 
     public bool CalcDirection(Vector3Int _current, out Vector3Int _next)
     {
-        _next = default;
+        _next = _current;
 
-        if (!directionControl.IsActive) return false;
+        if (directionControl.timer <= 0f) return false;
 
-        Vector3Int offset = directionControl.value switch
+        int value = directionControl.value;
+        if (value < 0)
         {
-            1 => Vector3Int.right,
-            2 => Vector3Int.down,
-            3 => Vector3Int.left,
-            4 => Vector3Int.up,
-            _ => default,
-        };
+            if (EntityManager.Instance.GetPrevCell(_current, out Vector3Int prev))
+                _next = prev;
 
-        if (offset == default) return false;
+            return true;
+        }
 
-        Vector3Int next = _current + offset;
-        if (!EntityManager.Instance.CanMoveCell(next)) return false;
+        Vector3Int[] offsets = { Vector3Int.right, Vector3Int.down, Vector3Int.left, Vector3Int.up, };
 
-        _next = next;
+        if (value == 0)
+        {
+            int count = 0;
+            for (int i = 0; i < offsets.Length; i++)
+            {
+                Vector3Int next = _current + offsets[i];
+                if (EntityManager.Instance.CanMoveCell(next))
+                {
+                    offsets[count] = offsets[i];
+                    count++;
+                }
+            }
+
+            if (count > 0)
+                _next = _current + offsets[Random.Range(0, count)];
+
+            return true;
+        }
+
+        Vector3Int target = _current + offsets[value - 1];
+        if (EntityManager.Instance.CanMoveCell(target))
+            _next = target;
+
         return true;
     }
     #endregion
@@ -330,7 +347,7 @@ public class MonsterDebuff : MonoBehaviour
 
     #region 프로퍼티
     public bool HasTickDamage => tickDamage.IsActive;
-    public bool HasBonusDamage => bonusDamage.IsActive;
+    public bool HasDamageAmp => damageAmp.IsActive;
     public bool HasSpeedControl => speedControl.IsActive;
     public bool HasDirectionControl => directionControl.IsActive;
     #endregion

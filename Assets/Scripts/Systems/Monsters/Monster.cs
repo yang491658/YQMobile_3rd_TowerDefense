@@ -1,4 +1,3 @@
-using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -60,28 +59,34 @@ public class Monster : Pooling
         { Stop(); return; }
 
         Vector3Int currentCell = Vector3Int.RoundToInt(current);
-        bool direction = debuff.CalcDirection(currentCell, out Vector3Int directionCell);
+        Vector3Int targetCell = Vector3Int.RoundToInt(target);
 
-        if (!direction)
+        if (targetCell == currentCell)
         {
-            if (!EntityManager.Instance.GetNextCell(currentCell, out Vector3Int nextCell))
-            { OnGoal(); return; }
+            bool direction = debuff.CalcDirection(currentCell, out Vector3Int directionCell);
 
-            target = nextCell;
+            if (!direction)
+            {
+                if (EntityManager.Instance.GetNextCell(currentCell, out Vector3Int nextCell))
+                    target = nextCell;
+                else
+                    target = currentCell;
+            }
+            else
+                target = directionCell;
         }
-        else
-            target = directionCell;
 
         Vector3 targetPos = EntityManager.Instance.GetCellPos(Vector3Int.RoundToInt(target));
         Vector3 delta = targetPos - transform.position;
 
-        float arrive = Mathf.Max(moveSpeed * _deltaTime, 0.1f);
+        float arrive = Mathf.Max(moveSpeed * _deltaTime, 0.01f);
         if (delta.sqrMagnitude <= arrive * arrive)
         {
             transform.position = targetPos;
+            current = Vector3Int.RoundToInt(target);
 
-            if (!direction)
-                current = Vector3Int.RoundToInt(target);
+            if (!EntityManager.Instance.GetNextCell(Vector3Int.RoundToInt(current), out _))
+            { OnGoal(); return; }
 
             target = current;
             moveDirection = Vector3.zero;
@@ -102,35 +107,19 @@ public class Monster : Pooling
 
         if (!_direct) ReserveDown(_damage);
 
-        ApplyDamage(_damage, _type);
+        int damage = debuff.CalcAmplified(_damage);
 
-        int bonus = debuff.CalcBonus(_damage);
-        if (bonus > 0)
-            StartCoroutine(DamageCoroutine(bonus, DamageType.Bonus));
-
-        return true;
-    }
-
-    private void ApplyDamage(int _damage, DamageType _type)
-    {
 #if TEST_Manager
-        TestManager.Instance?.AddDamage(_damage);
+        TestManager.Instance?.AddDamage(damage);
 
         if (!(TestManager.Instance?.Mode == TestMode.Solo && this is Boss))
 #endif
-            SetHealth(health - _damage);
-        CreateDamage(_damage, _type);
+            SetHealth(health - damage);
+        CreateDamage(damage, _type);
 
         if (health <= 0) Die();
-    }
 
-    private IEnumerator DamageCoroutine(int _damage, DamageType _type)
-    {
-        yield return new WaitForSeconds(damageDuration / 8f);
-
-        if (IsInvalid()) yield break;
-
-        ApplyDamage(_damage, _type);
+        return true;
     }
 
     private void CreateDamage(int _damage, DamageType _type = DamageType.Normal)

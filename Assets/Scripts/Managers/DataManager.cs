@@ -134,14 +134,14 @@ public class DataManager : MonoBehaviour
     private void SetDictionary()
     {
         towerDic.Clear();
-        foreach (var d in towerDatas)
-            if (d != null)
-                towerDic.TryAdd(d.ID, d);
+        foreach (TowerData data in towerDatas)
+            if (data != null)
+                towerDic.TryAdd(data.ID, data);
 
         bossDic.Clear();
-        foreach (var d in bossDatas)
-            if (d != null)
-                bossDic.TryAdd(d.ID, d);
+        foreach (BossData data in bossDatas)
+            if (data != null)
+                bossDic.TryAdd(data.ID, data);
     }
     #endregion
 

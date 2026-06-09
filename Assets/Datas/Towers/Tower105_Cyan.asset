@@ -23,22 +23,14 @@ MonoBehaviour:
   - grade: 1
     skill: {fileID: 11400000, guid: 77ecb34805ae0ca4f802dac9e39d5e78, type: 2}
     values:
-    - valueType: 201
-      baseValue: 20
-      rankType: 0
-      rankBonus: 0
-    - valueType: 501
+    - valueType: 104
       baseValue: 5
       rankType: 3
       rankBonus: 1
-    - valueType: 401
-      baseValue: 2
+    - valueType: 501
+      baseValue: 150
       rankType: 1
-      rankBonus: 1
-    - valueType: 402
-      baseValue: 1
-      rankType: 0
-      rankBonus: 0
+      rankBonus: 50
   - grade: 2
     skill: {fileID: 0}
     values: []

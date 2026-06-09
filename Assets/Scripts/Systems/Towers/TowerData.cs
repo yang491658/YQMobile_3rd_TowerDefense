@@ -112,6 +112,8 @@ public class TowerData : ScriptableObject
 
     private void AutoSymbol()
     {
+        Symbol = null;
+
         Sprite[] sprites = Resources.LoadAll<Sprite>("Images/Symbols");
         for (int i = 0; i < sprites.Length; i++)
         {
@@ -160,11 +162,15 @@ public class TowerData : ScriptableObject
 
             if (exists) continue;
 
-            SkillConfig config = new();
-            config.grade = grade;
-            config.values = new();
+            SkillConfig config = new()
+            {
+                grade = grade,
+                values = new()
+            };
             Skills.Add(config);
         }
+
+        Skills.Sort((_a, _b) => _a.grade.CompareTo(_b.grade));
     }
 
     private void AutoValue()
@@ -181,12 +187,14 @@ public class TowerData : ScriptableObject
 
             if (config.skill == null)
             {
+                config.values.Clear();
                 Skills[i] = config;
                 continue;
             }
 
             if (config.skill.ID / 100 != (int)Role)
             {
+                config.values.Clear();
                 Skills[i] = config;
                 continue;
             }

@@ -36,9 +36,8 @@ public class Bullet : Pooling
         RB.MovePosition(to);
 
         Vector2 delta = (Vector2)targetPos - to;
-        if (delta.sqrMagnitude > 0.0001f) return;
-
-        Hit();
+        if (delta.sqrMagnitude <= 0.0001f)
+            Hit();
     }
 
     private void OnTriggerEnter2D(Collider2D _collision)

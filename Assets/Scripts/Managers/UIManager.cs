@@ -366,25 +366,34 @@ public class UIManager : MonoBehaviour
 
     public string FormatNumber(int _number, bool _full = false)
     {
-        if (_number < 10000)
-            return _full ? _number.ToString("0000") : _number.ToString();
+        long number = _number;
+        bool negative = number < 0L;
+        if (negative) number = -number;
 
-        float value = _number;
+        if (number < 10000L)
+        {
+            string text = _full ? number.ToString("0000") : number.ToString();
+            return negative ? $"-{text}" : text;
+        }
+
+        double value = number;
         int unitIndex = -1;
 
-        while (value >= 1000f && unitIndex < units.Length - 1)
+        while (value >= 1000d && unitIndex < units.Length - 1)
         {
-            value /= 1000f;
+            value /= 1000d;
             unitIndex++;
         }
 
-        if (value >= 100f)
-            return Mathf.RoundToInt(value).ToString() + units[unitIndex];
+        string result;
+        if (value >= 100d)
+            result = Mathf.RoundToInt((float)value).ToString() + units[unitIndex];
+        else if (value >= 10d)
+            result = value.ToString("0.0") + units[unitIndex];
+        else
+            result = value.ToString("0.00") + units[unitIndex];
 
-        if (value >= 10f)
-            return value.ToString("0.0") + units[unitIndex];
-
-        return value.ToString("0.00") + units[unitIndex];
+        return negative ? "-" + result : result;
     }
     #endregion
 
@@ -485,8 +494,7 @@ public class UIManager : MonoBehaviour
         if (total == playTimeSec) return;
         playTimeSec = total;
 
-        string s = (total / 60).ToString("00") + ":" + (total % 60).ToString("00");
-        playTimeText.text = s;
+        playTimeText.text = $"{total / 60:00}:{total % 60:00}";
     }
 
     private void UpdateScore(int _score)

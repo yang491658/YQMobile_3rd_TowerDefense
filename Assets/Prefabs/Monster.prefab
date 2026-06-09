@@ -201,7 +201,7 @@ MonoBehaviour:
     reserve: 0
     boss: 0
     effect: {fileID: 0}
-  bonusDamage:
+  damageAmp:
     value: 0
     duration: 0
     timer: 0

@@ -6,17 +6,18 @@ public class Splash : TowerSkill
 {
     [Header("Value")]
     [SerializeField][Min(0)] private int damage;
-    [SerializeField][Min(0)] private int range;
+
+    [Header("Const")]
+    private const int range = 1;
 
 #if UNITY_EDITOR
     public override ValueType[] GetValues()
-        => new[] { ValueType.Damage, ValueType.Range };
+        => new[] { ValueType.Damage };
 #endif
 
     public override void SetValues(Tower _tower)
     {
         damage = _tower.GetValueInt(this, ValueType.Damage);
-        range = _tower.GetValueInt(this, ValueType.Range);
     }
 
     public override void OnHit(Tower _tower, Bullet _bullet, Monster _target, ref bool _instead)

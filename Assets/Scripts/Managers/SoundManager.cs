@@ -121,7 +121,7 @@ public class SoundManager : MonoBehaviour
 
     public AudioSource PlaySFXLoop(AudioClip _clip, Transform _owner)
     {
-        var src = _owner.gameObject.AddComponent<AudioSource>();
+        AudioSource src = _owner.gameObject.AddComponent<AudioSource>();
         src.clip = _clip;
         src.loop = true;
         src.playOnAwake = false;
@@ -129,6 +129,7 @@ public class SoundManager : MonoBehaviour
         src.mute = (sfxVol <= 0f);
         src.spatialBlend = 0f;
         src.Play();
+
         sfxLoops.Add(src);
         return src;
     }
@@ -143,10 +144,11 @@ public class SoundManager : MonoBehaviour
     {
         sfxLoops.RemoveWhere(_src => _src == null);
 
-        if (_on)
-            foreach (var src in sfxLoops) src.Pause();
-        else
-            foreach (var src in sfxLoops) src.UnPause();
+        foreach (var src in sfxLoops)
+        {
+            if (_on) src.Pause();
+            else src.UnPause();
+        }
     }
 
     public void StopSFXLoop(AudioSource _src)
@@ -225,13 +227,13 @@ public class SoundManager : MonoBehaviour
     {
         bgmDict.Clear();
         if (soundClips.bgmClips != null)
-            foreach (var c in soundClips.bgmClips)
-                if (c != null) bgmDict.TryAdd(c.name, c);
+            foreach (AudioClip clip in soundClips.bgmClips)
+                if (clip != null) bgmDict.TryAdd(clip.name, clip);
 
         sfxDict.Clear();
         if (soundClips.sfxClips != null)
-            foreach (var c in soundClips.sfxClips)
-                if (c != null) sfxDict.TryAdd(c.name, c);
+            foreach (AudioClip clip in soundClips.sfxClips)
+                if (clip != null) sfxDict.TryAdd(clip.name, clip);
     }
     #endregion
 

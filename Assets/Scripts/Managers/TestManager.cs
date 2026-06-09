@@ -73,7 +73,7 @@ public class TestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI value10Num;
     [Space]
     [SerializeField] private SliderConfig refTower = new(0, 0, 0, "기준 타워 : {0}");
-    [SerializeField] private SliderConfig refGrade = new(0, 0, 0, "기준 등급: {0}");
+    [SerializeField] private SliderConfig refGrade = new(0, 0, 0, "기준 등급 : {0}");
     [SerializeField] private SliderConfig refRank = new(3, 0, 0, "기준 랭크 : {0}");
     [SerializeField] private SliderConfig refBoss = new(0, 0, 0, "기준 보스 : {0}");
     private bool bossInit = false;
@@ -232,11 +232,11 @@ public class TestManager : MonoBehaviour
                 ? GameManager.Instance.MaxSpeed
                 : gameSpeed.minValue);
         if (Input.GetKeyDown(KeyCode.LeftArrow))
-            if (Mode != TestMode.Boss) ChangeRefTower(--refTower.value);
-            else ChangeRefBoss(--refBoss.value);
+            if (Mode != TestMode.Boss) ChangeRefTower(refTower.value - 1);
+            else ChangeRefBoss(refBoss.value - 1);
         if (Input.GetKeyDown(KeyCode.RightArrow))
-            if (Mode != TestMode.Boss) ChangeRefTower(++refTower.value);
-            else ChangeRefBoss(++refBoss.value);
+            if (Mode != TestMode.Boss) ChangeRefTower(refTower.value + 1);
+            else ChangeRefBoss(refBoss.value + 1);
 
         if (Input.GetKeyDown(KeyCode.J)) ToggleMode(TestMode.Wave);
         if (Input.GetKeyDown(KeyCode.K)) ToggleMode(TestMode.Solo);
@@ -252,8 +252,15 @@ public class TestManager : MonoBehaviour
     public void SetAuto(bool _on = true)
     {
         IsAuto = _on;
+        if (_on) return;
 
-        if (!_on) Mode = TestMode.None;
+        Mode = TestMode.None;
+
+        if (autoRoutine != null)
+        {
+            StopCoroutine(autoRoutine);
+            autoRoutine = null;
+        }
     }
 
     private void AutoPlay()
@@ -700,7 +707,7 @@ public class TestManager : MonoBehaviour
         _config.TMP.text = string.IsNullOrEmpty(_config.format)
             ? _config.value.ToString()
             : string.Format(_config.format, _config.value);
-        _config.slider.value = _config.value;
+        _config.slider.SetValueWithoutNotify(_config.value);
     }
 
     private void ChangeGameSpeed(float _value)
@@ -836,9 +843,16 @@ public class TestManager : MonoBehaviour
 
     private string GradeText()
     {
-        if (refGrade.value == 0) return "전체";
+        TowerGrade grade;
+        if (refGrade.value == 0 && refTower.value == 0)
+        {
+            if (Mode == TestMode.None) return "전체";
 
-        return RefGrade switch
+            grade = TowerGrade.Temp;
+        }
+        else grade = RefGrade;
+
+        return grade switch
         {
             TowerGrade.Normal => "일반",
             TowerGrade.Rare => "희귀",
@@ -847,7 +861,7 @@ public class TestManager : MonoBehaviour
             TowerGrade.Legend => "전설",
             TowerGrade.Mythic => "신화",
             TowerGrade.Temp => "임시",
-            _ => ((int)RefGrade).ToString()
+            _ => ((int)grade).ToString()
         };
     }
     #endregion

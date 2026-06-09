@@ -50,6 +50,7 @@ public class EntityManager : MonoBehaviour
 
     private static readonly Vector3Int[] moveDirs = { Vector3Int.up, Vector3Int.right, Vector3Int.down, Vector3Int.left };
     private readonly Dictionary<Vector3Int, Vector3Int> pathDic = new();
+    private readonly Dictionary<Vector3Int, Vector3Int> reverseDic = new();
     private readonly Dictionary<Tower, Vector3Int> towerDic = new();
 
     public bool IsMoving { private set; get; } = false;
@@ -87,8 +88,6 @@ public class EntityManager : MonoBehaviour
 
     private void Start()
     {
-        SetEntity();
-
         PoolManager.Instance?.Init(monsterBase);
         PoolManager.Instance?.Init(bossBase);
         PoolManager.Instance?.Init(bulletBase);
@@ -536,7 +535,7 @@ public class EntityManager : MonoBehaviour
         return bullet;
     }
 
-    public Summon MakeSummon(TowerSkill _skill, Tower _tower, Vector3 _pos, float _scale = 1f, float _speed = 0f)
+    public Summon MakeSummon(TowerSkill _skill, Tower _tower, Vector3 _pos, float _scale, float _speed)
     {
         Summon summon = SpawnPool<Summon>(summonBase, _pos, otherTrans);
         if (summon == null) return null;
@@ -616,6 +615,7 @@ public class EntityManager : MonoBehaviour
 
         TowerStore.Instance?.ResetStore();
         MonsterWave.Instance?.StopWave();
+
         SetEntity();
         ToggleSpawn(true);
     }
@@ -722,6 +722,7 @@ public class EntityManager : MonoBehaviour
     private void SetPath()
     {
         pathDic.Clear();
+        reverseDic.Clear();
 
         if (!mapFieldTilemap.HasTile(entryCell)) return;
         if (!mapFieldTilemap.HasTile(exitCell)) return;
@@ -775,6 +776,8 @@ public class EntityManager : MonoBehaviour
         {
             if (!nextExitDic.TryGetValue(pathCell, out Vector3Int nextCell))
                 break;
+
+            reverseDic[nextCell] = pathCell;
 
             pathSet.Add(nextCell);
             if (nextCell == exitCell) break;
@@ -862,6 +865,9 @@ public class EntityManager : MonoBehaviour
     #region GET_기타
     public bool GetNextCell(Vector3Int _cell, out Vector3Int _next)
         => pathDic.TryGetValue(_cell, out _next);
+
+    public bool GetPrevCell(Vector3Int _cell, out Vector3Int _prev)
+        => reverseDic.TryGetValue(_cell, out _prev);
 
     public Vector3Int GetCell(Vector3 _pos)
         => mapFieldTilemap.WorldToCell(_pos);
@@ -1050,18 +1056,16 @@ public class EntityManager : MonoBehaviour
     {
         if (_list.Count == 0) return null;
 
-        bool hasBest = false;
-        float bestValue = 0f;
-        T bestEntity = null;
+        T bestEntity = _list[0];
+        float bestValue = _selector(bestEntity);
 
-        for (int i = 0; i < _list.Count; i++)
+        for (int i = 1; i < _list.Count; i++)
         {
             T entity = _list[i];
             float value = _selector(entity);
 
-            if (!hasBest || (_high ? value > bestValue : value < bestValue))
+            if (_high ? value > bestValue : value < bestValue)
             {
-                hasBest = true;
                 bestValue = value;
                 bestEntity = entity;
             }

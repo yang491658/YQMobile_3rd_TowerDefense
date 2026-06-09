@@ -7,6 +7,10 @@ public class SpeedUp : TowerSkill
     [Header("Value")]
     [SerializeField][Min(0)] private int factor;
 
+    [Header("Const")]
+    private const int range = 1;
+
+    [Header("Others")]
     private readonly List<Tower> targets = new();
     private readonly HashSet<Tower> currents = new();
 
@@ -28,7 +32,7 @@ public class SpeedUp : TowerSkill
 
     public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
     {
-        List<Tower> current = EntityManager.Instance?.GetTowersInRange(_tower.transform.position, _square: true);
+        List<Tower> current = EntityManager.Instance?.GetTowersInRange(_tower.transform.position, range, _square: true);
 
         currents.Clear();
         for (int i = 0; i < current.Count; i++)
@@ -46,7 +50,6 @@ public class SpeedUp : TowerSkill
 
             TowerBuff buff = target.Buff;
             buff.RemoveStat(_tower, TowerBuff.SubType.Speed);
-            buff.RemoveStat(_tower, TowerBuff.SubType.Chance);
 
             targets.RemoveAt(i);
         }
@@ -56,7 +59,6 @@ public class SpeedUp : TowerSkill
             TowerBuff buff = target.Buff;
 
             buff.ApplyStat(_tower, TowerBuff.SubType.Speed, factor, 0f, TowerBuff.ApplyType.Refresh);
-            buff.ApplyStat(_tower, TowerBuff.SubType.Chance, factor, 0f, TowerBuff.ApplyType.Refresh);
 
             if (!targets.Contains(target))
                 targets.Add(target);
@@ -86,7 +88,6 @@ public class SpeedUp : TowerSkill
             TowerBuff buff = target.Buff;
 
             buff.RemoveStat(_tower, TowerBuff.SubType.Speed);
-            buff.RemoveStat(_tower, TowerBuff.SubType.Chance);
         }
 
         targets.Clear();

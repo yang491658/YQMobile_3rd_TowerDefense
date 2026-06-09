@@ -59,6 +59,8 @@ public enum ValueType
 {
     [InspectorName("데미지")] Damage = 101,
     [InspectorName("개수/횟수")] Count = 102,
+    [InspectorName("수치/양")] Amount = 103,
+    [InspectorName("변화량")] Delta = 104,
 
     [InspectorName("계수")] Factor = 201,
     [InspectorName("확률")] Chance = 202,

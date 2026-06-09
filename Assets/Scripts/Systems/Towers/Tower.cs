@@ -248,7 +248,7 @@ public class Tower : Entity
 
     public void Despawn()
     {
-        ClearSummon();
+        ClearSummon(SummonType.Orbit);
 
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnDespawn(this);
@@ -258,7 +258,7 @@ public class Tower : Entity
     #endregion
 
     #region 스탯
-    private void UpdateStat()
+    public void UpdateStat()
     {
         int damage = 0;
         int speed = 0;
@@ -321,10 +321,10 @@ public class Tower : Entity
     #region 전투
     private bool FindTarget()
     {
-        if (!(Role == TowerRole.Debuff
-            || attackTarget == null
-            || attackTarget.IsExclude()
-            || attackTarget.IsInvalid(targetIndex)))
+        if (Role != TowerRole.Debuff
+            && attackTarget != null
+            && !attackTarget.IsExclude()
+            && !attackTarget.IsInvalid(targetIndex))
             return true;
 
         System.Predicate<Monster> filter = null;
@@ -353,7 +353,9 @@ public class Tower : Entity
 
     private void Attack()
     {
-        bool instead = Role == TowerRole.Summon;
+        if (Role == TowerRole.Summon) return;
+
+        bool instead = false;
         for (int i = 0; i < skills.Count; i++)
             skills[i].OnAttack(this, attackTarget, ref instead);
 
@@ -424,6 +426,17 @@ public class Tower : Entity
 
         if (_skill == null)
             summons.Clear();
+    }
+    public void ClearSummon(SummonType _type)
+    {
+        for (int i = summons.Count - 1; i >= 0; i--)
+        {
+            Summon summon = summons[i];
+            if (summon == null) continue;
+            if (summon.Type != _type) continue;
+
+            summon.Despawn();
+        }
     }
     #endregion
 

@@ -4,69 +4,54 @@ using UnityEngine;
 public class Focus : TowerSkill
 {
     [Header("Value")]
-    [SerializeField][Min(0)] private int factor;
+    [SerializeField][Min(0)] private int delta;
     [SerializeField][Min(0)] private int max;
-    [SerializeField][Min(0f)] private float duration;
-    [SerializeField][Min(0f)] private float cooldown;
 
+    [Header("Others")]
+    private int index;
     private int stack;
-    private float hold;
 
 #if UNITY_EDITOR
     public override ValueType[] GetValues()
-        => new[] { ValueType.Factor, ValueType.Max, ValueType.Duration, ValueType.Cooldown };
+        => new[] { ValueType.Delta, ValueType.Max };
 #endif
 
     public override void SetValues(Tower _tower)
     {
-        factor = _tower.GetValueInt(this, ValueType.Factor);
+        delta = _tower.GetValueInt(this, ValueType.Delta);
         max = _tower.GetValueInt(this, ValueType.Max);
-        duration = _tower.GetValue(this, ValueType.Duration);
-        cooldown = _tower.GetValue(this, ValueType.Cooldown);
     }
 
     public override void OnGenerate(Tower _tower)
     {
+        index = -1;
         stack = 0;
-        hold = 0f;
     }
 
     public override void OnStat(Tower _tower, ref int _damage, ref int _speed, ref int _chance, ref int _critical)
     {
-        if (IsCooldown) return;
+        int limit = Mathf.RoundToInt(_speed * max / 100f);
 
-        _speed = Mathf.RoundToInt(_speed * (100f + factor * stack) / 100f);
-    }
-
-    public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
-    {
-        if (IsCooldown) return;
-        if (hold <= 0f) return;
-
-        hold -= _deltaTime;
-        if (hold > 0f) return;
-
-        stack = 0;
-        StartCooldown(_tower, cooldown);
+        _speed += Mathf.Min(delta * stack, limit);
     }
 
     public override void OnAttack(Tower _tower, Monster _target, ref bool _instead)
     {
-        if (IsCooldown)
-        { _instead = true; return; }
+        if (_target == null || _target.IsInvalid()) return;
+
+        if (_target.Index != index)
+        {
+            index = _target.Index;
+            stack = 0;
+        }
+
+        stack++;
+        _tower.UpdateStat();
     }
 
-    public override void OnHit(Tower _tower, Bullet _bullet, Monster _target, ref bool _instead)
+    public override void OnMiss(Tower _tower, Bullet _bullet, Vector3 _pos)
     {
-        if (_tower == null) return;
-        if (IsCooldown || hold > 0f) return;
-
-        stack = Mathf.Min(++stack, max);
-
-        if (stack == max)
-        {
-            hold = duration;
-            EntityManager.Instance?.MakeEffect(_tower, _tower.transform.position, 1.2f);
-        }
+        stack = 0;
+        _tower.UpdateStat();
     }
 }

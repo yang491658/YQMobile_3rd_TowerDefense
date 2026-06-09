@@ -1,55 +1,48 @@
 using UnityEngine;
 
+public enum SummonType { None, Orbit = 401, Bounce = 402, Zone = 403 }
+
 public class Summon : Pooling
 {
     public int ID { private set; get; }
 
-    [Header("Origin")]
+    [Header("Base")]
     [SerializeField] private Tower tower;
+    private Vector3 towerPos;
+    [SerializeField][Min(0f)] private float speed;
+    [SerializeField] private SummonType type;
+
+    [Header("Orbit")]
+    [SerializeField][Min(0f)] private float radius;
+    [SerializeField][Min(0f)] private float angle;
+
+    [Header("Bounce")]
     [SerializeField] private Monster target;
     private int targetIndex;
     private Vector3 targetPos;
-
-    [Header("Move")]
-    [SerializeField][Min(0f)] private float speed;
-    [SerializeField] private Vector3[] path;
-    [SerializeField][Min(0)] private int pathIndex;
-    private bool loop = false;
-
-    [Header("Battle")]
     [SerializeField][Min(0)] private int reserve;
-    private bool isHit = false;
 
-    [Header("Life")]
+    public bool IsHit { private set; get; } = false;
+
+    [Header("Zone")]
     [SerializeField][Min(0f)] private float duration;
     private float timer;
-    [SerializeField][Min(0f)] private float rotate;
 
     protected override void Update()
     {
         base.Update();
 
-        if (tower == null)
-        { Despawn(); return; }
-
-        if (target != null && !target.IsInvalid(targetIndex))
-            targetPos = target.transform.position;
-
-        if (duration > 0f)
-        {
-            timer -= Time.deltaTime;
-            if (timer <= 0f)
-            { Despawn(); return; }
-        }
-
-        transform.Rotate(0f, 0f, rotate * Time.deltaTime);
-    }
-
-    private void FixedUpdate()
-    {
         if (IsDespawn) return;
 
-        UpdateMove(Time.fixedDeltaTime);
+        if (tower == null && type == SummonType.Orbit)
+        { Despawn(); return; }
+
+        switch (type)
+        {
+            case SummonType.Orbit: MoveOrbit(); break;
+            case SummonType.Bounce: MoveBounce(); break;
+            case SummonType.Zone: MoveZone(); break;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D _collision)
@@ -58,70 +51,77 @@ public class Summon : Pooling
 
         if (_collision.TryGetComponent(out Monster _monster))
         {
-            if (isHit) return;
-
-            if (target != null)
+            switch (type)
             {
-                if (!target.IsInvalid(targetIndex) && target == _monster)
-                {
-                    isHit = true;
-                    tower.Hit(target, targetIndex, targetPos, false);
-                }
+                case SummonType.Orbit:
+                case SummonType.Zone:
+                    tower.Hit(_monster, _monster.Index, _monster.transform.position, false);
+                    break;
+
+                case SummonType.Bounce:
+                    if (IsHit) return;
+                    if (target != null && !target.IsInvalid(targetIndex) && target == _monster)
+                    {
+                        IsHit = true;
+                        tower.Hit(target, targetIndex, targetPos, false);
+                    }
+                    break;
             }
-            else tower.Hit(_monster, _monster.Index, _monster.transform.position, false);
         }
     }
 
-    private void UpdateMove(float _deltaTime)
+    #region 스킬
+    private void MoveOrbit()
     {
-        if (speed <= 0f) return;
+        angle += speed * Time.deltaTime;
 
-        Vector3 nextPos;
-        bool hasTarget = target != null;
+        Vector3 pos = tower.transform.position;
+        float rad = angle * Mathf.Deg2Rad;
 
-        if (hasTarget)
-            nextPos = targetPos;
+        pos.x += Mathf.Cos(rad) * radius;
+        pos.y += Mathf.Sin(rad) * radius;
+
+        transform.position = pos;
+    }
+
+    private void MoveBounce()
+    {
+        transform.Rotate(Vector3.forward * speed * 180f * Time.deltaTime);
+
+        if (!IsHit)
+        {
+            if (target != null && !target.IsInvalid(targetIndex))
+                targetPos = target.transform.position;
+
+            transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
+
+            if ((transform.position - targetPos).sqrMagnitude <= 0.0001f)
+                IsHit = true;
+        }
         else
         {
-            if (path == null || path.Length == 0) return;
+            if (tower != null)
+                towerPos = tower.transform.position;
 
-            if (pathIndex >= path.Length)
-            {
-                if (loop) pathIndex = 0;
-                else { Despawn(); return; }
-            }
+            transform.position = Vector3.MoveTowards(transform.position, towerPos, speed * Time.deltaTime);
 
-            nextPos = path[pathIndex];
+            if ((transform.position - towerPos).sqrMagnitude <= 0.0001f)
+                Despawn();
         }
-
-        Vector2 current = RB.position;
-        Vector2 move = Vector2.MoveTowards(current, nextPos, speed * _deltaTime);
-        RB.MovePosition(move);
-
-        Vector2 delta = (Vector2)nextPos - move;
-        if (delta.sqrMagnitude > 0.0001f) return;
-
-        if (hasTarget)
-        {
-            if (!isHit && !target.IsInvalid(targetIndex))
-                tower.Hit(target, targetIndex, targetPos, false);
-
-            isHit = true;
-
-            target = null;
-            targetIndex = 0;
-            targetPos = default;
-            return;
-        }
-
-        if (++pathIndex < path.Length) return;
-
-        if (loop) pathIndex = 0;
-        else Despawn();
     }
 
+    private void MoveZone()
+    {
+        transform.Rotate(Vector3.forward * speed * Time.deltaTime);
+
+        timer -= Time.deltaTime;
+        if (timer <= 0f)
+            Despawn();
+    }
+    #endregion
+
     #region SET
-    public void SetSummon(TowerSkill _skill, Tower _tower, float _scale = 1f, float _speed = 0f)
+    public void SetSummon(TowerSkill _skill, Tower _tower, float _scale, float _speed)
     {
         transform.localScale = _tower.transform.localScale * _scale;
         SR.sprite = _tower.Icon;
@@ -129,50 +129,41 @@ public class Summon : Pooling
 
         ID = _skill.ID;
         tower = _tower;
+        towerPos = _tower.transform.position;
         tower.AddSummon(this);
-
         speed = _speed;
-        reserve = _tower.Damage;
     }
 
     public void SetOrbit(float _radius, float _angle)
     {
-        const int count = 36;
-
-        path = new Vector3[count];
-        Vector3 center = tower.transform.position;
-
-        for (int i = 0; i < count; i++)
-        {
-            float angle = (_angle + 360f / count * i) * Mathf.Deg2Rad;
-            path[i] = center + new Vector3(Mathf.Cos(angle), Mathf.Sin(angle)) * _radius;
-        }
-
-        transform.position = path[0];
-        pathIndex = 1;
-        loop = true;
+        type = SummonType.Orbit;
+        radius = _radius;
+        angle = _angle;
     }
-    public void SetBounce(Monster _target, float _rotate = 0f)
+
+    public void SetBounce(Monster _target)
     {
+        type = SummonType.Bounce;
         target = _target;
-        target.ReserveUp(reserve);
         targetIndex = _target.Index;
         targetPos = _target.transform.position;
 
-        path = new[] { tower.transform.position };
-        pathIndex = 0;
-        loop = false;
+        reserve = tower.Damage;
+        target.ReserveUp(reserve);
 
-        isHit = false;
-
-        rotate = _rotate;
+        IsHit = false;
     }
-    public void SetZone(float _duration, float _rotate)
+
+    public void SetZone(float _duration)
     {
+        type = SummonType.Zone;
         duration = _duration;
         timer = _duration;
-        rotate = _rotate;
     }
+    #endregion
+
+    #region 프로퍼티
+    public SummonType Type => type;
     #endregion
 
     #region 풀링
@@ -183,6 +174,7 @@ public class Summon : Pooling
         transform.rotation = Quaternion.identity;
 
         ID = 0;
+        IsHit = false;
     }
 
     public override void OnDespawnPool()
@@ -190,7 +182,7 @@ public class Summon : Pooling
         if (tower != null)
             tower.RemoveSummon(this);
 
-        if (!isHit && reserve > 0
+        if (type == SummonType.Bounce && !IsHit
             && target != null && !target.IsInvalid(targetIndex))
             target.ReserveDown(reserve);
 
@@ -202,21 +194,20 @@ public class Summon : Pooling
         base.ResetPool();
 
         tower = null;
+        towerPos = default;
+        speed = 0f;
+        type = SummonType.None;
+
+        radius = 0f;
+        angle = 0f;
+
         target = null;
         targetIndex = 0;
         targetPos = default;
-
-        speed = 0f;
-        path = null;
-        pathIndex = 0;
-        loop = false;
-
         reserve = 0;
-        isHit = false;
 
         duration = 0f;
         timer = 0f;
-        rotate = 0f;
 
         Stop();
     }

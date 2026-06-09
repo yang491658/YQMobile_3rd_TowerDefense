@@ -7,6 +7,7 @@ public class Orbit : TowerSkill
     [SerializeField][Min(0)] private int count;
     [SerializeField][Min(0f)] private float speed;
 
+    [Header("Others")]
     private const float scale = 0.35f;
 
 #if UNITY_EDITOR
@@ -39,5 +40,10 @@ public class Orbit : TowerSkill
             EntityManager.Instance?.MakeSummon(this, _tower, pos, scale, speed)
                 ?.SetOrbit(radius, angle);
         }
+    }
+
+    public override void OnRankUp(Tower _tower, int _amount = 1)
+    {
+        _tower.ClearSummon(this);
     }
 }
