@@ -39,7 +39,7 @@ public struct SliderConfig
     }
 }
 
-public enum TestMode { None, Wave, Solo, Boss, Snake, Full, }
+public enum TestMode { None, Wave, Solo, Boss }
 
 public class TestManager : MonoBehaviour
 {
@@ -241,8 +241,6 @@ public class TestManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.J)) ToggleMode(TestMode.Wave);
         if (Input.GetKeyDown(KeyCode.K)) ToggleMode(TestMode.Solo);
         if (Input.GetKeyDown(KeyCode.L)) ToggleMode(TestMode.Boss);
-        if (Input.GetKeyDown(KeyCode.Semicolon)) ToggleMode(TestMode.Snake);
-        if (Input.GetKeyDown(KeyCode.Quote)) ToggleMode(TestMode.Full);
 
         UpdateTestText();
         #endregion
@@ -349,20 +347,20 @@ public class TestManager : MonoBehaviour
 
     private void TestPlay()
     {
+        int testCount = 5;
+
         switch (Mode)
         {
             case TestMode.Wave:
-                Vector3? posWave = EntityManager.Instance?.GetLShapePos();
-                if (posWave.HasValue)
-                    EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, posWave.Value, _useGold: false);
+                if (EntityManager.Instance?.GetTowerCount(RefID) < testCount)
+                    EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, _useGold: false);
                 SyncBasic();
                 break;
 
             case TestMode.Solo:
                 MonsterWave.Instance?.StopWave();
-                Vector3? posSolo = EntityManager.Instance?.GetLShapePos();
-                if (posSolo.HasValue)
-                    EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, posSolo.Value, _useGold: false);
+                if (EntityManager.Instance?.GetTowerCount(RefID) < testCount)
+                    EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, _useGold: false);
                 if (EntityManager.Instance?.GetMonsterCount() == 0)
                     EntityManager.Instance?.SpawnBoss();
                 SyncBasic();
@@ -375,19 +373,6 @@ public class TestManager : MonoBehaviour
                         EntityManager.Instance?.SpawnTower(RefID, RefGrade, 1, _useGold: false);
                     bossInit = true;
                 }
-                break;
-
-            case TestMode.Snake:
-                Vector3? posSnake = EntityManager.Instance?.GetSnakePos();
-                if (posSnake.HasValue)
-                    EntityManager.Instance?.SpawnTower(RefID, RefGrade, _pos: posSnake.Value);
-                else MergeByOrder();
-                break;
-
-            case TestMode.Full:
-                if (EntityManager.Instance.HasEmptyField())
-                    EntityManager.Instance?.SpawnTower(RefID, RefGrade);
-                else MergeRandom();
                 break;
         }
     }
@@ -547,30 +532,6 @@ public class TestManager : MonoBehaviour
         }
     }
 
-    private void MergeByOrder()
-    {
-        List<Tower> towers = EntityManager.Instance?.GetTowers();
-        if (towers == null || towers.Count < 2) return;
-
-        for (int olderIndex = 0; olderIndex < towers.Count - 1; olderIndex++)
-        {
-            Tower older = towers[olderIndex];
-            if (older == null || older.IsDragging || older.IsMax) continue;
-
-            for (int newerIndex = towers.Count - 1; newerIndex > olderIndex; newerIndex--)
-            {
-                Tower newer = towers[newerIndex];
-                if (newer == null || newer.IsDragging || newer.IsMax) continue;
-                if (newer.ID != older.ID) continue;
-                if (newer.Grade != older.Grade) continue;
-                if (newer.Rank != older.Rank) continue;
-
-                newer.Merge(older);
-                return;
-            }
-        }
-    }
-
     private void SyncBasic()
     {
         if (refTower.value == 0) return;
@@ -608,10 +569,7 @@ public class TestManager : MonoBehaviour
 
             while (list.Count < need)
             {
-                Vector3? pos = EntityManager.Instance?.GetLShapePos();
-                if (!pos.HasValue) break;
-
-                Tower spawned = EntityManager.Instance?.SpawnTower(999, TowerGrade.Temp, rank, pos.Value, _useGold: false);
+                Tower spawned = EntityManager.Instance?.SpawnTower(999, TowerGrade.Temp, rank, _useGold: false);
                 if (spawned == null) break;
 
                 list.Add(spawned);

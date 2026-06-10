@@ -217,9 +217,6 @@ public class MonsterWave : MonoBehaviour
             order = TestManager.Instance.RefBoss.ID;
             if (!onBoss)
             {
-                Vector3 offset = UIManager.Instance.GetPlayerOffset();
-                EntityManager.Instance?.MoveMap(offset, 0f);
-
                 phaseTimer = 0f;
                 onText = true;
                 onBoss = true;
@@ -230,9 +227,6 @@ public class MonsterWave : MonoBehaviour
 
         if (!onBoss)
         {
-            Vector3 offset = UIManager.Instance.GetPlayerOffset();
-            EntityManager.Instance?.MoveMap(offset, bossDelay);
-
             phaseTimer = bossDelay;
             onText = false;
             onBoss = true;
@@ -306,7 +300,6 @@ public class MonsterWave : MonoBehaviour
     {
         if (!onText)
         {
-            EntityManager.Instance?.MoveMap(Vector3.zero, rewardDelay);
             RewardText();
 
             phaseTimer = rewardDelay;

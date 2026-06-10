@@ -17,11 +17,6 @@ public class TowerStore : MonoBehaviour
 
     public bool IsMoving { private set; get; }
 
-    [Header("Place")]
-    [SerializeField] private TowerSlot select;
-
-    public bool IsPlacing { private set; get; }
-
 #if UNITY_EDITOR
     private void OnValidate()
     {
@@ -48,18 +43,12 @@ public class TowerStore : MonoBehaviour
     {
         if (IsMoving)
             MoveSlot();
-
-        if (IsPlacing && !GameManager.Instance.EnoughGold())
-            CancelSlot();
     }
 
     #region 상점
     public void ResetStore()
     {
         IsMoving = false;
-
-        select = null;
-        IsPlacing = false;
 
         for (int i = 0; i < slots.Length; i++)
             Destroy(slots[i].gameObject);
@@ -130,67 +119,6 @@ public class TowerStore : MonoBehaviour
             slot.Move(pos);
         }
     }
-
-    public void SelectSlot(TowerSlot _slot, bool _force = false)
-    {
-        if (select == _slot && !_force)
-        {
-            select = null;
-            PlaceMode(false);
-            return;
-        }
-
-        select = _slot;
-
-        for (int i = 0; i < slots.Length; i++)
-            slots[i].Select(slots[i] == _slot);
-
-        PlaceMode(true);
-    }
-
-    public bool PurchaseSlot(Vector3 _pos)
-    {
-        if (select == null) return false;
-
-        if (!select.Purchase(_pos))
-        {
-            select = null;
-            PlaceMode(false);
-            return false;
-        }
-
-        select = null;
-        PlaceMode(false);
-
-        return true;
-    }
-
-    public void CancelSlot()
-    {
-        if (select == null) return;
-
-        select = null;
-        PlaceMode(false);
-    }
-    #endregion
-
-    #region 배치모드
-    public void PlaceMode(bool _on)
-    {
-        IsPlacing = _on;
-        IsMoving = !_on;
-
-        EntityManager.Instance?.ShowPlaceField(_on);
-        UIManager.Instance?.UpdateStore(_on ? 1 : 0);
-
-        if (_on) return;
-
-        for (int i = 0; i < slots.Length; i++)
-        {
-            if (!slots[i].IsComplete)
-                slots[i].Ready();
-        }
-    }
     #endregion
 
     #region 자동 구매
@@ -217,14 +145,14 @@ public class TowerStore : MonoBehaviour
 
     public bool AutoPurchase(int _id, TowerGrade _grade, TowerSlot _slot = null)
     {
-        Vector3 pos = EntityManager.Instance.SelectField();
-        if (float.IsInfinity(pos.x)) return false;
-
         TowerSlot slot = _slot != null ? _slot : AutoSlot(_id, _grade);
         if (slot == null) return false;
 
-        SelectSlot(slot);
-        return PurchaseSlot(pos);
+        if (EntityManager.Instance?.SpawnTower(slot.ID, slot.Grade) == null)
+            return false;
+
+        slot.Complete();
+        return true;
     }
     #endregion
 }

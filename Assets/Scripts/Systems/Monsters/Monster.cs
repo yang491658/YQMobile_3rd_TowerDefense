@@ -14,10 +14,12 @@ public class Monster : Pooling
     [SerializeField][Min(0f)] private float damageDuration = 1.5f;
 
     [Header("Move")]
-    [SerializeField] private Vector3 current;
-    [SerializeField] private Vector3 target;
-    [SerializeField][Min(0f)] private float moveSpeed = 1f;
+    [SerializeField] private Transform[] paths;
+    [SerializeField][Min(0)] private int pathIndex;
+    [SerializeField][Min(0f)] private float moveSpeed = 3f;
     [SerializeField] private Vector3 moveDirection;
+
+    public bool IsForward { private set; get; } = true;
 
     [Header("Battle")]
     [SerializeField][Min(0)] private int reserve = 0;
@@ -58,41 +60,50 @@ public class Monster : Pooling
         if (MonsterWave.Instance.IsPause)
         { Stop(); return; }
 
-        Vector3Int currentCell = Vector3Int.RoundToInt(current);
-        Vector3Int targetCell = Vector3Int.RoundToInt(target);
+        if (IsForward)
+            MoveForward(_deltaTime);
+        else
+            MoveBackward(_deltaTime);
+    }
 
-        if (targetCell == currentCell)
-        {
-            bool direction = debuff.CalcDirection(currentCell, out Vector3Int directionCell);
+    private void MoveForward(float _deltaTime)
+    {
+        if (pathIndex >= paths.Length)
+        { OnGoal(); return; }
 
-            if (!direction)
-            {
-                if (EntityManager.Instance.GetNextCell(currentCell, out Vector3Int nextCell))
-                    target = nextCell;
-                else
-                    target = currentCell;
-            }
-            else
-                target = directionCell;
-        }
-
-        Vector3 targetPos = EntityManager.Instance.GetCellPos(Vector3Int.RoundToInt(target));
-        Vector3 delta = targetPos - transform.position;
+        Vector3 delta = paths[pathIndex].position - transform.position;
 
         float arrive = Mathf.Max(moveSpeed * _deltaTime, 0.01f);
         if (delta.sqrMagnitude <= arrive * arrive)
         {
-            transform.position = targetPos;
-            current = Vector3Int.RoundToInt(target);
+            transform.position = paths[pathIndex].position;
 
-            if (!EntityManager.Instance.GetNextCell(Vector3Int.RoundToInt(current), out _))
-            { OnGoal(); return; }
+            if (++pathIndex >= paths.Length)
+            { Stop(); return; }
 
-            target = current;
-            moveDirection = Vector3.zero;
+            delta = paths[pathIndex].position - transform.position;
+        }
 
-            Stop();
-            return;
+        moveDirection = delta.normalized;
+        Move(moveSpeed, moveDirection);
+    }
+
+    private void MoveBackward(float _deltaTime)
+    {
+        if (pathIndex <= 0)
+        { Stop(); return; }
+
+        Vector3 delta = paths[pathIndex - 1].position - transform.position;
+
+        float arrive = Mathf.Max(moveSpeed * _deltaTime, 0.01f);
+        if (delta.sqrMagnitude <= arrive * arrive)
+        {
+            transform.position = paths[pathIndex - 1].position;
+
+            if (--pathIndex <= 0)
+            { Stop(); return; }
+
+            delta = paths[pathIndex - 1].position - transform.position;
         }
 
         moveDirection = delta.normalized;
@@ -177,13 +188,13 @@ public class Monster : Pooling
         gold = 10 * Mathf.Max(score, 1);
     }
 
-    public void SetMove(Vector3Int _current)
+    public void SetPath(Transform[] _paths)
     {
-        current = _current;
-        target = _current;
-        moveDirection = Vector3.zero;
+        paths = _paths;
+        pathIndex = 0;
     }
     public void SetSpeed(float _speed) => moveSpeed = Mathf.Max(_speed, 0f);
+    public void SetForward(bool _on) => IsForward = _on;
 
     public void SetHealth(int _health)
     {
@@ -201,6 +212,18 @@ public class Monster : Pooling
     #region 프로퍼티
     public float Speed => moveSpeed;
     public Vector3 Direction => moveDirection;
+    public float PathProgress
+    {
+        get
+        {
+            int index = pathIndex;
+            if (index >= paths.Length) return -paths.Length * 10000f;
+
+            Vector3 target = paths[index].position;
+            float dist = (target - transform.position).sqrMagnitude;
+            return -index * 10000f + dist;
+        }
+    }
 
     public int Health => health;
     public int MaxHealth => maxHealth;
@@ -220,6 +243,7 @@ public class Monster : Pooling
         if (canvas != null)
             canvas.sortingOrder = order;
 
+        IsForward = true;
         IsDead = false;
         Index = order;
 
@@ -245,9 +269,9 @@ public class Monster : Pooling
     {
         base.ResetPool();
 
-        current = default;
-        target = default;
-        moveSpeed = 1f;
+        paths = null;
+        pathIndex = 0;
+        moveSpeed = 3f;
         moveDirection = Vector3.zero;
 
         reserve = 0;

@@ -1,11 +1,8 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class TowerSlot : MonoBehaviour
 {
-    private enum SlotState { Ready, Select, Complete }
-
     [Header("UI")]
     [SerializeField] private RectTransform rect;
     [SerializeField] private Image image;
@@ -17,7 +14,8 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     [Header("Slot")]
     [SerializeField] private TowerData data;
     [SerializeField] private TowerGrade grade;
-    [SerializeField] private SlotState state;
+
+    public bool IsComplete { private set; get; } = false;
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -37,7 +35,7 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 
     private void Update()
     {
-        btn.interactable = state != SlotState.Complete && GameManager.Instance.EnoughGold();
+        btn.interactable = !IsComplete && GameManager.Instance.EnoughGold();
     }
 
     #region 슬롯
@@ -56,21 +54,12 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         data = DataManager.Instance?.GetRandomTower(out grade);
         Ready();
     }
-
-    public bool Purchase(Vector3 _pos)
-    {
-        if (EntityManager.Instance?.SpawnTower(data.ID, grade, 1, _pos) == null)
-            return false;
-
-        Complete();
-        return true;
-    }
     #endregion
 
     #region 상태 및 UI
     public void Ready()
     {
-        state = SlotState.Ready;
+        IsComplete = false;
 
         rect.localScale = Vector3.one;
         image.color = Color.white;
@@ -78,21 +67,9 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         SetSlot(data);
     }
 
-    public void Select(bool _on)
-    {
-        if (state == SlotState.Complete) return;
-
-        state = _on ? SlotState.Select : SlotState.Ready;
-
-        rect.localScale = _on ? Vector3.one * 1.2f : Vector3.one;
-        image.color = SetVisible(image.color, _on);
-        outline.color = SetVisible(outline.color, _on);
-        icon.color = SetVisible(icon.color, _on);
-    }
-
     public void Complete()
     {
-        state = SlotState.Complete;
+        IsComplete = true;
 
         rect.localScale = Vector3.one;
         image.color = SetVisible(Color.gray, false);
@@ -101,46 +78,12 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     }
     #endregion
 
-    #region 클릭 및 드래그
     private void OnClickSlot()
     {
         SoundManager.Instance?.Button();
-        TowerStore.Instance?.SelectSlot(this);
+        if (EntityManager.Instance?.SpawnTower(data.ID, grade) != null)
+            Complete();
     }
-
-    public void OnBeginDrag(PointerEventData _eventData)
-    {
-        if (state == SlotState.Complete) return;
-        if (!GameManager.Instance.EnoughGold()) return;
-
-        SoundManager.Instance?.Button();
-        TowerStore.Instance?.SelectSlot(this, true);
-
-        Vector3 pos = HandleManager.Instance.ScreenToWorld(_eventData.position);
-        EntityManager.Instance?.ShowPlaceField(true, pos);
-    }
-
-    public void OnDrag(PointerEventData _eventData)
-    {
-        if (!TowerStore.Instance.IsPlacing) return;
-
-        Vector3 pos = HandleManager.Instance.ScreenToWorld(_eventData.position);
-        EntityManager.Instance?.ShowPlaceField(true, pos);
-    }
-
-    public void OnEndDrag(PointerEventData _eventData)
-    {
-        if (!TowerStore.Instance.IsPlacing) return;
-
-        Vector3 pos = HandleManager.Instance.ScreenToWorld(_eventData.position);
-        Rect mapRect = UIManager.Instance.GetMapAreaRect(pos.z);
-
-        if (mapRect.Contains(new Vector2(pos.x, pos.y)))
-            TowerStore.Instance?.PurchaseSlot(pos);
-        else
-            TowerStore.Instance?.CancelSlot();
-    }
-    #endregion
 
     #region SET
     private void SetSlot(TowerData _data)
@@ -164,6 +107,5 @@ public class TowerSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 
     public int ID => data.ID;
     public TowerGrade Grade => grade;
-    public bool IsComplete => state == SlotState.Complete;
     #endregion
 }

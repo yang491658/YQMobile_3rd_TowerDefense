@@ -33,17 +33,15 @@ public class UIManager : MonoBehaviour
     private int playTimeSec = -1;
     [SerializeField] private TextMeshProUGUI scoreNum;
 
-    [Header("InGame UI / Wave + Boss")]
+    [Header("InGame UI / Wave")]
     [SerializeField] private GameObject waveUI;
     [SerializeField] private SliderUI wave;
-    [SerializeField] private GameObject bossUI;
-    [SerializeField] private Image bossImage;
 
-    [Header("InGame UI / Player + Tower")]
+    [Header("InGame UI / Player")]
     [SerializeField] private RectTransform mapUI;
     [SerializeField] private RectTransform playerUI;
     private float playerHeight = 0f;
-    private int onStore = 0;
+    private bool onStore = false;
     private int storeGold = 0;
     private Image storeImage;
     private Color storeColor;
@@ -54,8 +52,6 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI goldText;
     [SerializeField] private GameObject goldImage;
     [SerializeField] private GameObject loanImage;
-    [Space]
-    [SerializeField] private GameObject towerUI;
     [SerializeField] private TextMeshProUGUI[] chanceText;
 
     [Header("InGame UI / Drag")]
@@ -122,11 +118,6 @@ public class UIManager : MonoBehaviour
         if (wave.text == null)
             wave.text = GameObject.Find("InGameUI/Wave/WaveText")?.GetComponent<TextMeshProUGUI>();
 
-        if (bossUI == null)
-            bossUI = GameObject.Find("InGameUI/Boss");
-        if (bossImage == null)
-            bossImage = GameObject.Find("InGameUI/Boss/BossImage")?.GetComponent<Image>();
-
         if (mapUI == null)
             mapUI = GameObject.Find("InGameUI/Map")?.GetComponent<RectTransform>();
         if (playerUI == null)
@@ -152,9 +143,6 @@ public class UIManager : MonoBehaviour
             goldImage = GameObject.Find("InGameUI/Player/Level+Gold/GoldImage");
         if (loanImage == null)
             loanImage = GameObject.Find("InGameUI/Player/Level+Gold/LoanImage");
-
-        if (towerUI == null)
-            towerUI = GameObject.Find("InGameUI/Player/Tower");
         if (chanceText == null || chanceText.Length == 0)
             chanceText = GameObject.Find("InGameUI/Player/Tower/Chance").GetComponentsInChildren<TextMeshProUGUI>();
 
@@ -412,9 +400,6 @@ public class UIManager : MonoBehaviour
         inGameUI.SetActive(!_on);
         settingUI.SetActive(_on);
         OnOpenUI?.Invoke(_on);
-
-        if (TowerStore.Instance.IsPlacing)
-            UpdateStore(1);
     }
 
     public void OpenConfirm(bool _on, string _text = null, System.Action _action = null, bool _pass = false)
@@ -458,7 +443,7 @@ public class UIManager : MonoBehaviour
         UpdatePlayTime();
         UpdateScore(GameManager.Instance.Score);
 
-        UpdateStore(0);
+        UpdateStore(false);
         UpdateLife(GameManager.Instance.Life, GameManager.Instance.MaxLife);
         UpdateExp(GameManager.Instance.Exp, GameManager.Instance.NeedExp);
         UpdateLevel(GameManager.Instance.Level);
@@ -512,8 +497,6 @@ public class UIManager : MonoBehaviour
             || TestManager.Instance?.Mode == TestMode.Solo)
         {
             waveUI.SetActive(false);
-            bossUI.SetActive(false);
-            towerUI.SetActive(false);
             return;
         }
 #endif
@@ -521,8 +504,6 @@ public class UIManager : MonoBehaviour
         if (!MonsterWave.Instance.IsRunning || MonsterWave.Instance.BossFinished)
         {
             waveUI.SetActive(false);
-            bossUI.SetActive(false);
-            towerUI.SetActive(true);
             return;
         }
         waveUI.SetActive(true);
@@ -538,26 +519,16 @@ public class UIManager : MonoBehaviour
                 wave.image.gameObject.SetActive(true);
                 wave.image.sprite = MonsterWave.Instance?.GetBoss().Image;
                 wave.text.gameObject.SetActive(false);
-                bossUI.SetActive(false);
-                towerUI.SetActive(true);
                 break;
             case Phase.Boss:
                 wave.image.gameObject.SetActive(false);
                 wave.text.gameObject.SetActive(MonsterWave.Instance.IsSpawned);
                 if (MonsterWave.Instance.IsSpawned)
-                {
                     wave.text.text = $"{FormatNumber((int)value)} / {FormatNumber((int)maxValue)}";
-                    bossUI.SetActive(true);
-                    bossImage.sprite = MonsterWave.Instance?.GetBoss().Image;
-                }
-                else bossUI.SetActive(false);
-                towerUI.SetActive(false);
                 break;
             default:
                 wave.image.gameObject.SetActive(false);
                 wave.text.gameObject.SetActive(false);
-                bossUI.SetActive(false);
-                towerUI.SetActive(true);
                 break;
         }
     }
@@ -612,11 +583,11 @@ public class UIManager : MonoBehaviour
         return RectTransformUtility.RectangleContainsScreenPoint(playerUI, pos);
     }
 
-    public void UpdateStore(int _store, int _gold = 0)
+    public void UpdateStore(bool _on, int _gold = 0)
     {
-        onStore = Mathf.Clamp(_store, -1, 1);
+        onStore = _on;
         storeGold = _gold;
-        storeImage.color = onStore != 0 ? Color.cyan : storeColor;
+        storeImage.color = onStore ? Color.cyan : storeColor;
 
         UpdateGold(GameManager.Instance.Gold, GameManager.Instance.NeedGold);
     }
@@ -655,24 +626,18 @@ public class UIManager : MonoBehaviour
         exp.btn.gameObject.SetActive(!isMax);
         levelText.text = isMax ? "Lv.MAX" : $"Lv.{_level}";
 
-        UpdateChanceUI(_level);
+        UpdateChance(_level);
     }
 
     private void UpdateGold(int _gold, int _needGold)
     {
         string need = FormatNumber(_needGold);
 
-        if (onStore < 0)
+        if (onStore)
         {
             int showGold = _gold + storeGold;
             goldText.text = $"{FormatNumber(showGold)}(+{FormatNumber(storeGold)})/{need}";
             goldText.color = showGold >= 0 ? Color.blue : Color.red;
-        }
-        else if (onStore > 0)
-        {
-            int showGold = _gold - _needGold;
-            goldText.text = $"{FormatNumber(showGold)}(-{FormatNumber(_needGold)})/{need}";
-            goldText.color = Color.red;
         }
         else
         {
@@ -684,7 +649,7 @@ public class UIManager : MonoBehaviour
         loanImage.SetActive(_gold < 0);
     }
 
-    private void UpdateChanceUI(int _level)
+    private void UpdateChance(int _level)
     {
         var rows = DataManager.Instance?.GetGradeChance(_level);
 
@@ -713,6 +678,7 @@ public class UIManager : MonoBehaviour
         if (_tower == null)
         {
             drag.gameObject.SetActive(false);
+            drag.localScale = Vector3.one;
             return;
         }
 
@@ -722,6 +688,8 @@ public class UIManager : MonoBehaviour
             drag.gameObject.SetActive(true);
         }
 
+        Vector3 scale = _tower.transform.lossyScale;
+        drag.localScale = new Vector3(scale.x, scale.y, 1f);
         drag.position = RectTransformUtility.WorldToScreenPoint(Camera.main, _worldPos);
     }
 

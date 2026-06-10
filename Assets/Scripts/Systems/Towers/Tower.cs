@@ -14,7 +14,7 @@ public class Tower : Entity
     [SerializeField] private Transform symbol;
     private SpriteRenderer symbolSR;
     [SerializeField] private float interval = 1.25f;
-    [SerializeField] private float baseSize = 0.18f;
+    [SerializeField] private float baseSize = 0.15f;
     [SerializeField] private float maxSize = 0.65f;
 
     [Header("Control")]
@@ -69,8 +69,6 @@ public class Tower : Entity
 
     protected override void Update()
     {
-        if (EntityManager.Instance.IsMoving) return;
-
         base.Update();
 
         UpdateStat();

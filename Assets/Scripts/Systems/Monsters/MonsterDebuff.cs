@@ -238,49 +238,6 @@ public class MonsterDebuff : MonoBehaviour
 
     private void UpdateDirection(float _deltaTime)
         => directionControl.Update(_deltaTime);
-
-    public bool CalcDirection(Vector3Int _current, out Vector3Int _next)
-    {
-        _next = _current;
-
-        if (directionControl.timer <= 0f) return false;
-
-        int value = directionControl.value;
-        if (value < 0)
-        {
-            if (EntityManager.Instance.GetPrevCell(_current, out Vector3Int prev))
-                _next = prev;
-
-            return true;
-        }
-
-        Vector3Int[] offsets = { Vector3Int.right, Vector3Int.down, Vector3Int.left, Vector3Int.up, };
-
-        if (value == 0)
-        {
-            int count = 0;
-            for (int i = 0; i < offsets.Length; i++)
-            {
-                Vector3Int next = _current + offsets[i];
-                if (EntityManager.Instance.CanMoveCell(next))
-                {
-                    offsets[count] = offsets[i];
-                    count++;
-                }
-            }
-
-            if (count > 0)
-                _next = _current + offsets[Random.Range(0, count)];
-
-            return true;
-        }
-
-        Vector3Int target = _current + offsets[value - 1];
-        if (EntityManager.Instance.CanMoveCell(target))
-            _next = target;
-
-        return true;
-    }
     #endregion
 
     #region 이펙트 관리

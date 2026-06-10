@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 968071403554459107}
   - component: {fileID: 6468100552802196400}
-  - component: {fileID: 5097317302990778872}
+  - component: {fileID: 6035151075804538182}
   - component: {fileID: 4146417558866710935}
   - component: {fileID: 6017865858304229194}
   - component: {fileID: 1411693724332733731}
@@ -32,7 +32,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 9033726707795719250}
   m_Father: {fileID: 0}
@@ -81,7 +81,7 @@ SpriteRenderer:
   m_SortingLayerID: -1215436905
   m_SortingLayer: 2
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 76361313f9c70054abf93304889ea31c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 81523292c4870424eaea749624106aed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -92,8 +92,8 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!58 &5097317302990778872
-CircleCollider2D:
+--- !u!61 &6035151075804538182
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -127,7 +127,17 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
 --- !u!50 &4146417558866710935
 Rigidbody2D:
   serializedVersion: 5
@@ -171,9 +181,9 @@ MonoBehaviour:
   healthText: {fileID: 3766315220739497655}
   damageSpeed: 150
   damageDuration: 1.5
-  current: {x: 0, y: 0, z: 0}
-  target: {x: 0, y: 0, z: 0}
-  moveSpeed: 1
+  paths: []
+  pathIndex: 0
+  moveSpeed: 3
   moveDirection: {x: 0, y: 0, z: 0}
   reserve: 0
   health: 0

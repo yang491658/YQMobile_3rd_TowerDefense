@@ -111,7 +111,7 @@ public class HandleManager : MonoBehaviour
         Vector3 worldPos = ScreenToWorld(_pos);
         Collider2D hit = Physics2D.OverlapPoint(worldPos, layer);
 
-        if (CanSelect(hit) || TowerStore.Instance.IsPlacing)
+        if (CanSelect(hit))
         {
             canDrag = true;
             isDragging = false;
@@ -140,7 +140,7 @@ public class HandleManager : MonoBehaviour
         Vector3 worldPos = ScreenToWorld(_pos);
         float distanceSqr = (worldPos - dragStart).sqrMagnitude;
 
-        if (!isDragging && (distanceSqr >= drag * drag || TowerStore.Instance.IsPlacing))
+        if (!isDragging && distanceSqr >= drag * drag)
         {
             isDragging = true;
             OnDragBegin(dragStart);
@@ -176,7 +176,7 @@ public class HandleManager : MonoBehaviour
             }
         }
 
-        if (Time.unscaledTime - clickTimer <= doubleClick || TowerStore.Instance.IsPlacing)
+        if (Time.unscaledTime - clickTimer <= doubleClick)
         {
             isDoubleClick = false;
             clickTimer = 0;
@@ -231,35 +231,26 @@ public class HandleManager : MonoBehaviour
 
         ResetDrag();
 
-        UIManager.Instance?.UpdateStore(0);
+        UIManager.Instance?.UpdateStore(false);
         UIManager.Instance?.UpdateDrag(null);
     }
 
     private void OnSingle(Vector3 _pos)
     {
-        if (!TowerStore.Instance.IsPlacing) return;
-
-        Rect mapRect = UIManager.Instance.GetMapAreaRect(_pos.z);
-
-        if (mapRect.Contains(new Vector2(_pos.x, _pos.y)))
-            TowerStore.Instance?.PurchaseSlot(_pos);
-        else
-            TowerStore.Instance?.CancelSlot();
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
+        AddClick(_pos, Color.cyan);
+#endif
     }
 
     private void OnDouble(Vector3 _pos)
     {
-        OnSingle(_pos);
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
+        AddClick(_pos, Color.blue);
+#endif
     }
 
     private void OnDragBegin(Vector3 _pos)
     {
-        if (TowerStore.Instance.IsPlacing)
-        {
-            EntityManager.Instance?.ShowPlaceField(true, _pos);
-            return;
-        }
-
         Collider2D hit = Physics2D.OverlapPoint(_pos, layer);
 
         if (hit == null)
@@ -275,12 +266,6 @@ public class HandleManager : MonoBehaviour
 
     private void OnDragMove(Vector3 _start, Vector3 _current)
     {
-        if (TowerStore.Instance.IsPlacing)
-        {
-            EntityManager.Instance?.ShowPlaceField(true, _current);
-            return;
-        }
-
         if (select == null) return;
 
         select.transform.position = _current + offset;
@@ -288,18 +273,12 @@ public class HandleManager : MonoBehaviour
         bool isStore = UIManager.Instance.IsStore(_current);
         int storeGold = GameManager.Instance.GetSellGold(select);
 
-        UIManager.Instance?.UpdateStore(isStore ? -1 : 0, storeGold);
+        UIManager.Instance?.UpdateStore(isStore, storeGold);
         UIManager.Instance?.UpdateDrag(select, select.transform.position);
     }
 
     private void OnDragEnd(Vector3 _start, Vector3 _end)
     {
-        if (TowerStore.Instance.IsPlacing)
-        {
-            OnSingle(_end);
-            return;
-        }
-
         if (select == null) return;
 
         if (UIManager.Instance.IsStore(_end))
@@ -327,7 +306,7 @@ public class HandleManager : MonoBehaviour
 
         select = null;
 
-        UIManager.Instance?.UpdateStore(0);
+        UIManager.Instance?.UpdateStore(false);
         UIManager.Instance?.UpdateDrag(null);
     }
 
