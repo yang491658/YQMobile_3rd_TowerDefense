@@ -338,8 +338,8 @@ public class Tower : Entity
             AttackTarget.Random => EntityManager.Instance?.GetMonsterRandom(filter),
             AttackTarget.First => EntityManager.Instance?.GetMonsterFirst(filter),
             AttackTarget.Last => EntityManager.Instance?.GetMonsterLast(filter),
-            AttackTarget.Near => EntityManager.Instance?.GetMonsterNearest(transform.position, 0, filter),
-            AttackTarget.Far => EntityManager.Instance?.GetMonsterFarthest(transform.position, 0, filter),
+            AttackTarget.Near => EntityManager.Instance?.GetMonsterNearest(transform.position, filter),
+            AttackTarget.Far => EntityManager.Instance?.GetMonsterFarthest(transform.position, filter),
             AttackTarget.Strong => EntityManager.Instance?.GetMonsterHighHealth(filter),
             AttackTarget.Weak => EntityManager.Instance?.GetMonsterLowHealth(filter),
             _ => attackTarget

@@ -13,7 +13,7 @@ public class Slow : TowerSkill
 #endif
 
     public override System.Predicate<Monster> GetFilter()
-        => _monster => !_monster.Debuff.HasSpeedControl;
+        => _monster => !_monster.Debuff.HasMoveControl;
 
     public override void SetValues(Tower _tower)
     {
@@ -23,15 +23,15 @@ public class Slow : TowerSkill
 
     public override void OnAttack(Tower _tower, Monster _target, ref bool _instead)
     {
-        _target.Debuff.ActiveSpeed();
+        _target.Debuff.ActiveMove();
     }
 
     public override void OnHit(Tower _tower, Bullet _bullet, Monster _target, ref bool _instead)
     {
         if (_target == null || _target.IsInvalid()) return;
 
-        int value = Mathf.Min(factor, 90);
+        int value = Mathf.Clamp(factor, 1, 99);
         ViewEffect effect = EntityManager.Instance?.MakeEffect(_tower, _target, duration);
-        _target.Debuff.ApplySpeed(value, duration, effect);
+        _target.Debuff.ApplyMove(value, duration, effect);
     }
 }

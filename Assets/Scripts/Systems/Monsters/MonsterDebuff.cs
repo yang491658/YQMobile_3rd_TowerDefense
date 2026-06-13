@@ -36,15 +36,18 @@ public class MonsterDebuff : MonoBehaviour
             }
 
             if (timer <= 0f) return true;
+            if (_value <= 0) return _duration > timer;
             return _value * _duration > value * timer;
         }
 
-        public bool Apply(int _value, float _duration, ViewEffect _effect)
+        public bool CanApply(float _duration) => CanApply(value, _duration);
+
+        public bool Apply(int _value, float _duration, ViewEffect _effect, bool _force = false)
         {
             reserve = Mathf.Max(reserve - 1, 0);
 
             float d = Mathf.Max(_duration, 1f);
-            if (!CanApply(_value, d))
+            if (!_force && !CanApply(_value, d))
             {
                 if (_effect != null) _effect.Despawn();
                 return false;
@@ -100,8 +103,7 @@ public class MonsterDebuff : MonoBehaviour
     [SerializeField] private Debuff tickDamage = new();
     private float tickTimer;
     [SerializeField] private Debuff damageAmp = new();
-    [SerializeField] private Debuff speedControl = new();
-    [SerializeField] private Debuff directionControl = new();
+    [SerializeField] private Debuff moveControl = new();
 
     [Header("Effect")]
     [SerializeField] private List<ViewEffect> effects = new();
@@ -117,8 +119,7 @@ public class MonsterDebuff : MonoBehaviour
 
         tickDamage.SetBoss(boss);
         damageAmp.SetBoss(boss);
-        speedControl.SetBoss(boss);
-        directionControl.SetBoss(boss);
+        moveControl.SetBoss(boss);
     }
 
     private void Update()
@@ -127,8 +128,7 @@ public class MonsterDebuff : MonoBehaviour
             return;
 
         float dt = Time.deltaTime;
-        UpdateDirection(dt);
-        UpdateSpeed(dt);
+        UpdateMove(dt);
         UpdateAmplified(dt);
         UpdateTick(dt);
 
@@ -139,11 +139,11 @@ public class MonsterDebuff : MonoBehaviour
     {
         tickDamage.Reset();
         damageAmp.Reset();
-        speedControl.Reset();
-        directionControl.Reset();
+        moveControl.Reset();
 
         tickTimer = 0f;
         monster.SetSpeed(baseSpeed);
+        monster.SetForward(true);
 
         effects.Clear();
         index = 0;
@@ -192,52 +192,55 @@ public class MonsterDebuff : MonoBehaviour
         => damageAmp.IsActive ? _damage * (100 + damageAmp.value) / 100 : _damage;
     #endregion
 
-    #region 이동속도 제어
-    public void ActiveSpeed() => speedControl.Active();
+    #region 이동 제어
+    public void ActiveMove() => moveControl.Active();
 
-    public void ApplySpeed(int _factor, float _duration, ViewEffect _effect)
+    public bool CanApplyMove(int _factor, float _duration)
     {
-        if (!speedControl.IsActive)
-            baseSpeed = monster.Speed;
-        else
-        {
-            if (speedControl.value == 100 && _factor != 100)
-            {
-                if (_effect != null) _effect.Despawn();
-                return;
-            }
+        if (_factor <= 0)
+            return moveControl.value <= 0 ? moveControl.CanApply(_duration) : true;
+        else if (_factor >= 100)
+            return moveControl.value > 0 ? moveControl.CanApply(100, _duration) : false;
 
-            if (!(monster is Boss) && speedControl.value != 100 && _factor == 100)
-                speedControl.Reset();
-        }
-
-        if (speedControl.Apply(_factor, _duration, _effect))
-            AddEffect(speedControl.effect);
+        return moveControl.value > 0 && moveControl.value < 100 && moveControl.CanApply(_factor, _duration);
     }
 
-    private void UpdateSpeed(float _deltaTime)
+    public void ApplyMove(int _factor, float _duration, ViewEffect _effect)
     {
-        if (!speedControl.Update(_deltaTime))
+        if (!CanApplyMove(_factor, _duration))
         {
-            monster.SetSpeed(baseSpeed);
+            if (_effect != null) _effect.Despawn();
             return;
         }
 
-        monster.SetSpeed(baseSpeed * (1f - speedControl.value / 100f));
+        if (moveControl.Apply(_factor, _duration, _effect, true))
+            AddEffect(moveControl.effect);
     }
-    #endregion
 
-    #region 이동방향 제어
-    public void ActiveDirection() => directionControl.Active();
-
-    public void ApplyDirection(int _dir, float _duration, ViewEffect _effect)
+    private void UpdateMove(float _deltaTime)
     {
-        if (directionControl.Apply(_dir, _duration, _effect))
-            AddEffect(directionControl.effect);
-    }
+        if (!moveControl.Update(_deltaTime))
+        {
+            monster.SetSpeed(baseSpeed);
+            monster.SetForward(true);
+            return;
+        }
 
-    private void UpdateDirection(float _deltaTime)
-        => directionControl.Update(_deltaTime);
+        if (moveControl.value <= 0)
+        {
+            monster.SetSpeed(baseSpeed);
+            monster.SetForward(false);
+        }
+        else if (moveControl.value >= 100)
+        {
+            monster.Stop();
+        }
+        else
+        {
+            monster.SetSpeed(baseSpeed * (100 - moveControl.value) / 100f);
+            monster.SetForward(true);
+        }
+    }
     #endregion
 
     #region 이펙트 관리
@@ -305,7 +308,6 @@ public class MonsterDebuff : MonoBehaviour
     #region 프로퍼티
     public bool HasTickDamage => tickDamage.IsActive;
     public bool HasDamageAmp => damageAmp.IsActive;
-    public bool HasSpeedControl => speedControl.IsActive;
-    public bool HasDirectionControl => directionControl.IsActive;
+    public bool HasMoveControl => moveControl.IsActive;
     #endregion
 }

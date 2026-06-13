@@ -219,15 +219,7 @@ MonoBehaviour:
     reserve: 0
     boss: 0
     effect: {fileID: 0}
-  speedControl:
-    value: 0
-    duration: 0
-    timer: 0
-    immune: 0
-    reserve: 0
-    boss: 0
-    effect: {fileID: 0}
-  directionControl:
+  moveControl:
     value: 0
     duration: 0
     timer: 0

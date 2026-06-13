@@ -19,7 +19,7 @@ public class Stun : TowerSkill
 #endif
 
     public override System.Predicate<Monster> GetFilter()
-        => _monster => !_monster.Debuff.HasSpeedControl;
+        => _monster => !_monster.Debuff.HasMoveControl;
 
     public override void SetValues(Tower _tower)
     {
@@ -38,7 +38,7 @@ public class Stun : TowerSkill
         if (Random.value < c / 100f)
         {
             if (targets.Add(GetTargetKey(_target, _target.Index)))
-                _target.Debuff.ActiveSpeed();
+                _target.Debuff.ActiveMove();
         }
     }
 
@@ -49,7 +49,7 @@ public class Stun : TowerSkill
         if (targets.Remove(GetTargetKey(_target, _target.Index)))
         {
             ViewEffect effect = EntityManager.Instance?.MakeEffect(_tower, _target, duration);
-            _target.Debuff.ApplySpeed(100, duration, effect);
+            _target.Debuff.ApplyMove(100, duration, effect);
         }
     }
 

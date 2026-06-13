@@ -28,7 +28,7 @@ MonoBehaviour:
       rankType: 3
       rankBonus: 1
     - valueType: 303
-      baseValue: 10
+      baseValue: 30
       rankType: 3
       rankBonus: 1
   - grade: 4

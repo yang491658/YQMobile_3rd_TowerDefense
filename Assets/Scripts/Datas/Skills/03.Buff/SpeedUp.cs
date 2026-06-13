@@ -8,7 +8,7 @@ public class SpeedUp : TowerSkill
     [SerializeField][Min(0)] private int factor;
 
     [Header("Const")]
-    private const int range = 1;
+    private const int count = 5;
 
     [Header("Others")]
     private readonly List<Tower> targets = new();
@@ -32,15 +32,17 @@ public class SpeedUp : TowerSkill
 
     public override void OnUpdate(Tower _tower, Monster _target, float _deltaTime)
     {
-        List<Tower> current = EntityManager.Instance?.GetTowersInRange(_tower.transform.position, range, _square: true);
+        List<Tower> current = EntityManager.Instance?.GetTowersInRange(_tower.transform.position, 0f);
 
         currents.Clear();
         for (int i = 0; i < current.Count; i++)
         {
             Tower target = current[i];
+            if (target == _tower) continue;
             if (target.Damage <= 0) continue;
 
             currents.Add(target);
+            if (currents.Count >= count) break;
         }
 
         for (int i = targets.Count - 1; i >= 0; i--)

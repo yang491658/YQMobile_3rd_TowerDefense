@@ -8,7 +8,7 @@ public class Orbit : TowerSkill
     [SerializeField][Min(0f)] private float speed;
 
     [Header("Others")]
-    private const float scale = 0.35f;
+    private const float scale = 0.5f;
 
 #if UNITY_EDITOR
     public override ValueType[] GetValues()

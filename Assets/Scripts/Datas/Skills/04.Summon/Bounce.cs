@@ -12,7 +12,7 @@ public class Bounce : TowerSkill
 
     [Header("Others")]
     private Coroutine routine;
-    private const float scale = 0.5f;
+    private const float scale = 0.35f;
     private const float interval = 0.15f;
 
 #if UNITY_EDITOR

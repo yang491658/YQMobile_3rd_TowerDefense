@@ -8,7 +8,7 @@ public class Splash : TowerSkill
     [SerializeField][Min(0)] private int damage;
 
     [Header("Const")]
-    private const int range = 1;
+    private const float range = 1f;
 
 #if UNITY_EDITOR
     public override ValueType[] GetValues()
