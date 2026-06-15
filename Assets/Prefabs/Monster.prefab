@@ -177,6 +177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bfe741ecaa73104ca284f97feb783ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scale: 0.7
   canvas: {fileID: 1692177131567420101}
   healthText: {fileID: 3766315220739497655}
   damageSpeed: 150

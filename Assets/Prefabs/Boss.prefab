@@ -166,20 +166,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63d30178a8c10f2479c2d6e876b97554, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scale: 1
   canvas: {fileID: 0}
   healthText: {fileID: 0}
   damageSpeed: 150
   damageDuration: 1.5
   paths: []
   pathIndex: 0
-  moveSpeed: 3
+  moveSpeed: 1
   moveDirection: {x: 0, y: 0, z: 0}
   reserve: 0
   health: 0
   maxHealth: 0
   gold: 0
   debuff: {fileID: 7060836011662514846}
-  data: {fileID: 0}
+  reward: 0
 --- !u!114 &7060836011662514846
 MonoBehaviour:
   m_ObjectHideFlags: 0

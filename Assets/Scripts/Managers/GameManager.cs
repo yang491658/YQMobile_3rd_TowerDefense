@@ -149,6 +149,8 @@ public class GameManager : MonoBehaviour
         if (IsGameOver) return;
         IsGameOver = true;
 
+        StopAllCoroutines();
+
         Pause(true);
         SoundManager.Instance?.GameOver();
         UIManager.Instance?.OpenResult(true);
@@ -346,7 +348,7 @@ public class GameManager : MonoBehaviour
     public int Exp => exp;
     public int NeedExp => 100 * level * (level + 1) / 2;
     public bool CanBuyExp => gold >= needExp && exp < needExp && level < maxLevel;
-    public bool CanLevelUp => MonsterWave.Instance?.BossOrder > level;
+    public bool CanLevelUp => MonsterWave.Instance?.BossCount >= level;
 
     public int Level => level;
     public int MaxLevel => maxLevel;

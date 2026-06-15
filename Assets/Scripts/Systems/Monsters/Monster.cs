@@ -7,6 +7,7 @@ public class Monster : Pooling
     private static int sorting = 0;
 
     [Header("UI")]
+    [SerializeField][Min(0f)] protected float scale = 0.7f;
     [SerializeField] private Canvas canvas;
     [SerializeField] private TextMeshProUGUI healthText;
     [Space]
@@ -16,7 +17,7 @@ public class Monster : Pooling
     [Header("Move")]
     [SerializeField] private Transform[] paths;
     [SerializeField][Min(0)] private int pathIndex;
-    [SerializeField][Min(0f)] private float moveSpeed = 3f;
+    [SerializeField][Min(0f)] protected float moveSpeed = 3f;
     [SerializeField] private Vector3 moveDirection;
 
     public bool IsForward { private set; get; } = true;
@@ -33,7 +34,7 @@ public class Monster : Pooling
     public bool IsDead { private set; get; } = false;
 
 #if UNITY_EDITOR
-    private void OnValidate()
+    protected virtual void OnValidate()
     {
         if (canvas == null)
             canvas = GetComponentInChildren<Canvas>();
@@ -120,12 +121,7 @@ public class Monster : Pooling
 
         int damage = debuff.CalcAmplified(_damage);
 
-#if TEST_Manager
-        TestManager.Instance?.AddDamage(damage);
-
-        if (!(TestManager.Instance?.Mode == TestMode.Solo && this is Boss))
-#endif
-            SetHealth(health - damage);
+        SetHealth(health - damage);
         CreateDamage(damage, _type);
 
         if (health <= 0) Die();
@@ -210,6 +206,7 @@ public class Monster : Pooling
     #endregion
 
     #region 프로퍼티
+    public float Scale => scale;
     public float Speed => moveSpeed;
     public Vector3 Direction => moveDirection;
     public float PathProgress
@@ -237,6 +234,8 @@ public class Monster : Pooling
     public override void OnSpawnPool()
     {
         base.OnSpawnPool();
+
+        transform.localScale = Vector3.one * scale;
 
         int order = ++sorting * 10;
         SR.sortingOrder = order;

@@ -39,7 +39,7 @@ public struct SliderConfig
     }
 }
 
-public enum TestMode { None, Wave, Solo, Boss }
+public enum TestMode { None, Wave, Solo }
 
 public class TestManager : MonoBehaviour
 {
@@ -75,9 +75,6 @@ public class TestManager : MonoBehaviour
     [SerializeField] private SliderConfig refTower = new(0, 0, 0, "기준 타워 : {0}");
     [SerializeField] private SliderConfig refGrade = new(0, 0, 0, "기준 등급 : {0}");
     [SerializeField] private SliderConfig refRank = new(3, 0, 0, "기준 랭크 : {0}");
-    [SerializeField] private SliderConfig refBoss = new(0, 0, 0, "기준 보스 : {0}");
-    private bool bossInit = false;
-    private int needTower = 1;
 
     public TestMode Mode { private set; get; } = TestMode.None;
 
@@ -119,11 +116,6 @@ public class TestManager : MonoBehaviour
             refRank.TMP = GameObject.Find("TestUI/RefRank/TestName")?.GetComponent<TextMeshProUGUI>();
         if (refRank.slider == null)
             refRank.slider = GameObject.Find("TestUI/RefRank/TestSlider")?.GetComponent<Slider>();
-
-        if (refBoss.TMP == null)
-            refBoss.TMP = GameObject.Find("TestUI/RefBoss/TestName")?.GetComponent<TextMeshProUGUI>();
-        if (refBoss.slider == null)
-            refBoss.slider = GameObject.Find("TestUI/RefBoss/TestSlider")?.GetComponent<Slider>();
     }
 #endif
 
@@ -231,16 +223,11 @@ public class TestManager : MonoBehaviour
             ChangeGameSpeed(Mathf.Approximately(GameManager.Instance.Speed, gameSpeed.minValue)
                 ? GameManager.Instance.MaxSpeed
                 : gameSpeed.minValue);
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-            if (Mode != TestMode.Boss) ChangeRefTower(refTower.value - 1);
-            else ChangeRefBoss(refBoss.value - 1);
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-            if (Mode != TestMode.Boss) ChangeRefTower(refTower.value + 1);
-            else ChangeRefBoss(refBoss.value + 1);
+        if (Input.GetKeyDown(KeyCode.LeftArrow)) ChangeRefTower(refTower.value - 1);
+        if (Input.GetKeyDown(KeyCode.RightArrow)) ChangeRefTower(refTower.value + 1);
 
         if (Input.GetKeyDown(KeyCode.J)) ToggleMode(TestMode.Wave);
         if (Input.GetKeyDown(KeyCode.K)) ToggleMode(TestMode.Solo);
-        if (Input.GetKeyDown(KeyCode.L)) ToggleMode(TestMode.Boss);
 
         UpdateTestText();
         #endregion
@@ -352,27 +339,18 @@ public class TestManager : MonoBehaviour
         switch (Mode)
         {
             case TestMode.Wave:
-                if (EntityManager.Instance?.GetTowerCount(RefID) < testCount)
-                    EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, _useGold: false);
-                SyncBasic();
+                //if (EntityManager.Instance?.GetTowerCount(RefID) < testCount)
+                //    EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, _useGold: false);
+                //SyncBasic();
                 break;
 
             case TestMode.Solo:
-                MonsterWave.Instance?.StopWave();
-                if (EntityManager.Instance?.GetTowerCount(RefID) < testCount)
-                    EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, _useGold: false);
-                if (EntityManager.Instance?.GetMonsterCount() == 0)
-                    EntityManager.Instance?.SpawnBoss();
-                SyncBasic();
-                break;
-
-            case TestMode.Boss:
-                if (!bossInit)
-                {
-                    for (int i = 0; i < needTower; i++)
-                        EntityManager.Instance?.SpawnTower(RefID, RefGrade, 1, _useGold: false);
-                    bossInit = true;
-                }
+                //MonsterWave.Instance?.StopWave();
+                //if (EntityManager.Instance?.GetTowerCount(RefID) < testCount)
+                //    EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, _useGold: false);
+                //if (EntityManager.Instance?.GetMonsterCount() == 0)
+                //    EntityManager.Instance?.SpawnBoss();
+                //SyncBasic();
                 break;
         }
     }
@@ -385,33 +363,13 @@ public class TestManager : MonoBehaviour
         {
             long value = GameManager.Instance.Score;
 
-            if (Mode == TestMode.Boss)
-            {
-                if (EntityManager.Instance?.GetMonsterCount() > 0)
-                {
-                    playTime = 0f;
-                    runDamage = 0;
-                    needTower++;
-                }
-                else
-                {
-                    testResults.Add(new TestResult(needTower, playTime));
-                    playTime = 0f;
-                    runDamage = 0;
-                    needTower = Mathf.Max(needTower - 1, 1);
-                }
-                bossInit = false;
-            }
-            else
-            {
-                if (Mode == TestMode.Solo)
-                    value = runDamage;
+            if (Mode == TestMode.Solo)
+                value = runDamage;
 
-                testResults.Add(new TestResult(value, playTime));
+            testResults.Add(new TestResult(value, playTime));
 
-                playTime = 0f;
-                runDamage = 0;
-            }
+            playTime = 0f;
+            runDamage = 0;
 
             GameManager.Instance?.Replay();
             UpdateTestUI();
@@ -421,19 +379,6 @@ public class TestManager : MonoBehaviour
 
     private void ToggleMode(TestMode _mode)
     {
-        if (Mode != _mode)
-            switch (_mode)
-            {
-                case TestMode.Wave:
-                case TestMode.Solo:
-                    ChangeRefBoss(0);
-                    break;
-                case TestMode.Boss:
-                    ChangeRefTower(0);
-                    if (refBoss.value == 0) ChangeRefBoss(1);
-                    break;
-            }
-
         Mode = Mode == _mode ? TestMode.None : _mode;
         OnClickReset();
         GameManager.Instance?.Replay();
@@ -614,9 +559,6 @@ public class TestManager : MonoBehaviour
         refRank.minValue = 1;
         refRank.maxValue = Tower.MaxRank;
         InitSlider(refRank, ChangeRefRank);
-
-        refBoss.maxValue = DataManager.Instance.GetBossDatas().Length;
-        InitSlider(refBoss, ChangeRefBoss);
     }
 
     private void OnDisable()
@@ -626,7 +568,6 @@ public class TestManager : MonoBehaviour
         refTower.slider.onValueChanged.RemoveListener(ChangeRefTower);
         refGrade.slider.onValueChanged.RemoveListener(ChangeRefGrade);
         refRank.slider.onValueChanged.RemoveListener(ChangeRefRank);
-        refBoss.slider.onValueChanged.RemoveListener(ChangeRefBoss);
     }
 
     #region 테스트 UI_기본
@@ -729,19 +670,15 @@ public class TestManager : MonoBehaviour
         averageValueName.text = Mode switch
         {
             TestMode.Solo => "누적 데미지",
-            TestMode.Boss => "필요 타워 수",
             _ => "평균점수"
         };
-        averageValueNum.text = Mode == TestMode.Boss
-            ? $"{averageValue:#,0}"
-            : $"{averageValue:#,0} ({cvValue:0.#}%)";
+        averageValueNum.text = $"{averageValue:#,0} ({cvValue:0.#}%)";
         value10Num.text = $"{topAvg:#,0} / {bottomAvg:#,0}";
 
         UpdateSliderUI(gameSpeed);
         UpdateSliderUI(refTower);
         UpdateSliderUI(refGrade);
         UpdateSliderUI(refRank);
-        UpdateSliderUI(refBoss);
 
         refTower.TMP.text = string.Format(refTower.format, TowerText());
         refGrade.TMP.text = string.Format(refGrade.format, GradeText());
@@ -775,14 +712,6 @@ public class TestManager : MonoBehaviour
     }
 
     private void ChangeRefRank(float _value) => ApplySlider(ref refRank, _value);
-
-    private void ChangeRefBoss(float _value) => ApplySlider(ref refBoss, _value, _v =>
-    {
-        if (Mode == TestMode.None) return;
-        if (_v == 0) { ToggleMode(TestMode.None); return; }
-        OnClickReset();
-        GameManager.Instance?.Replay();
-    });
 
     private void UpdateTestText()
     {
@@ -842,9 +771,6 @@ public class TestManager : MonoBehaviour
             autoRoutine = null;
         }
 
-        needTower = 1;
-        bossInit = false;
-
         UpdateTestUI();
     }
     public void OnClickReplay()
@@ -877,8 +803,6 @@ public class TestManager : MonoBehaviour
             return grade;
         }
     }
-
-    public BossData RefBoss => DataManager.Instance?.SearchBoss(refBoss.value);
     #endregion
 }
 #endif

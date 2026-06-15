@@ -1,55 +1,75 @@
+using System.Collections;
 using UnityEngine;
 
 public class Boss : Monster
 {
-    [Header("Boss / Data")]
-    [SerializeField] private BossData data;
+    [Header("Reward")]
+    [SerializeField][Min(0)] private int reward;
+    private Coroutine rewardRoutine;
+
+#if UNITY_EDITOR
+    protected override void OnValidate()
+    {
+        base.OnValidate();
+
+        scale = 1f;
+        moveSpeed = 1f;
+    }
+#endif
 
     #region 전투
     protected override void OnDeath()
     {
+        GameManager.Instance?.ScoreUp();
+
+        if (rewardRoutine != null)
+            GameManager.Instance?.StopCoroutine(rewardRoutine);
+        rewardRoutine = GameManager.Instance?.StartCoroutine(RewardCoroutine(reward));
     }
 
     protected override void OnGoal()
     {
         GameManager.Instance?.GameOver();
     }
-    #endregion
 
-    #region SET
-    public void SetBoss(BossData _data)
+    private IEnumerator RewardCoroutine(int _reward)
     {
-        StopAllCoroutines();
-
-#if TEST_Manager
-        if (TestManager.Instance?.Mode == TestMode.Solo)
+        while (_reward-- > 0)
         {
-            SetSpeed(1f);
-            maxHealth = int.MaxValue;
-            SetHealth(maxHealth);
-            return;
+            GameManager.Instance?.ExpUp();
+            GameManager.Instance?.GoldUp();
+
+            yield return null;
         }
-#endif
-
-        data = _data;
-
-        maxHealth = data.MaxHealth;
-        SetHealth(maxHealth);
+        rewardRoutine = null;
     }
     #endregion
 
-    #region 프로퍼티
-    public BossData Data => data;
+    #region SET
+    public void SetBoss()
+    {
+        int score = GameManager.Instance.Score / 50;
+        int wave = MonsterWave.Instance.WaveCount;
+
+        maxHealth = 100 * Mathf.Max(score, 1) * Mathf.Max(wave, 1);
+        SetHealth(maxHealth);
+        reward = 100 * MonsterWave.Instance.BossCount;
+    }
     #endregion
 
     #region 풀링
+    public override void OnSpawnPool()
+    {
+        base.OnSpawnPool();
+
+        SetBoss();
+    }
+
     public override void ResetPool()
     {
         base.ResetPool();
 
-        StopAllCoroutines();
-
-        data = null;
+        moveSpeed = 1f;
     }
     #endregion
 }

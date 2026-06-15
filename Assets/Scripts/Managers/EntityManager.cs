@@ -220,31 +220,12 @@ public class EntityManager : MonoBehaviour
         if (monster == null) return null;
 
         monster.SetPath(monsterPath);
-        monster.transform.localScale = map.localScale;
+        monster.transform.localScale = Vector3.Scale(monster.transform.localScale, map.localScale);
         monsters.Add(monster);
 
         return monster;
     }
 
-    public Boss SpawnBoss(int _id)
-    {
-        BossData data = DataManager.Instance?.SearchBoss(_id);
-        if (data == null) return null;
-
-        Vector3 pos = monsterPath[0].position;
-
-        Boss boss = SpawnPool<Boss>(bossBase, pos, monsterTrans);
-        if (boss == null) return null;
-
-        boss.SetPath(monsterPath);
-        boss.SetBoss(data);
-        boss.transform.localScale = map.localScale;
-        monsters.Add(boss);
-
-        return boss;
-    }
-
-#if TEST_Manager
     public Boss SpawnBoss()
     {
         Vector3 pos = monsterPath[0].position;
@@ -253,13 +234,11 @@ public class EntityManager : MonoBehaviour
         if (boss == null) return null;
 
         boss.SetPath(monsterPath);
-        boss.SetBoss(null);
-        boss.transform.localScale = map.localScale;
+        boss.transform.localScale = Vector3.Scale(boss.transform.localScale, map.localScale);
         monsters.Add(boss);
 
         return boss;
     }
-#endif
 
     public void DespawnMonster(Monster _monster)
     {

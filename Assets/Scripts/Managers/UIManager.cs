@@ -67,7 +67,6 @@ public class UIManager : MonoBehaviour
         [HideInInspector] public Color color;
         [HideInInspector] public int prev;
 
-        public Image image;
         public TextMeshProUGUI text;
         public Button btn;
 
@@ -113,8 +112,6 @@ public class UIManager : MonoBehaviour
             waveUI = GameObject.Find("InGameUI/Wave");
         if (wave.slider == null)
             wave.slider = GameObject.Find("InGameUI/Wave/WaveSlider")?.GetComponent<Slider>();
-        if (wave.image == null)
-            wave.image = GameObject.Find("InGameUI/Wave/WaveSlider/Fill Area/Fill/WaveImage").GetComponent<Image>();
         if (wave.text == null)
             wave.text = GameObject.Find("InGameUI/Wave/WaveText")?.GetComponent<TextMeshProUGUI>();
 
@@ -492,45 +489,21 @@ public class UIManager : MonoBehaviour
 
     private void UpdateWave()
     {
-#if TEST_Manager
-        if (TestManager.Instance?.Mode == TestMode.Wave
-            || TestManager.Instance?.Mode == TestMode.Solo)
-        {
-            waveUI.SetActive(false);
-            return;
-        }
-#endif
-
-        if (!MonsterWave.Instance.IsRunning || MonsterWave.Instance.BossFinished)
+        if (!MonsterWave.Instance.IsRunning)
         {
             waveUI.SetActive(false);
             return;
         }
         waveUI.SetActive(true);
 
-        MonsterWave.Instance.GetPhaseValue(out Phase phase, out float value, out float maxValue, out Color color);
+        MonsterWave.Instance.GetPhaseValue(out Color color, out float value, out float maxValue, out string text);
+        wave.fill.color = color;
         wave.slider.value = value;
         wave.slider.maxValue = maxValue;
-        wave.fill.color = color;
 
-        switch (phase)
-        {
-            case Phase.Normal:
-                wave.image.gameObject.SetActive(true);
-                wave.image.sprite = MonsterWave.Instance?.GetBoss().Image;
-                wave.text.gameObject.SetActive(false);
-                break;
-            case Phase.Boss:
-                wave.image.gameObject.SetActive(false);
-                wave.text.gameObject.SetActive(MonsterWave.Instance.IsSpawned);
-                if (MonsterWave.Instance.IsSpawned)
-                    wave.text.text = $"{FormatNumber((int)value)} / {FormatNumber((int)maxValue)}";
-                break;
-            default:
-                wave.image.gameObject.SetActive(false);
-                wave.text.gameObject.SetActive(false);
-                break;
-        }
+        bool onText = !string.IsNullOrEmpty(text);
+        wave.text.gameObject.SetActive(onText);
+        if (onText) wave.text.text = text;
     }
 
     private IEnumerator FlashCoroutine(SliderUI _ui, Color? _color = null, float _duration = 0.3f)

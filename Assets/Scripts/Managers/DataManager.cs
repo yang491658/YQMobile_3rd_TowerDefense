@@ -12,8 +12,6 @@ public class DataManager : MonoBehaviour
     [Header("Data")]
     [SerializeField] private TowerData[] towerDatas;
     private readonly Dictionary<int, TowerData> towerDic = new();
-    [SerializeField] private BossData[] bossDatas;
-    private readonly Dictionary<int, BossData> bossDic = new();
 
     [Header("Tables")]
     [SerializeField] private TowerChance towerChance;
@@ -23,8 +21,6 @@ public class DataManager : MonoBehaviour
     private void OnValidate()
     {
         towerDatas = CollectDatas<TowerData>("t:TowerData", new[] { "Assets/Datas/Towers" }, _data => _data.ID);
-        bossDatas = CollectDatas<BossData>("t:BossData", new[] { "Assets/Datas/Monsters" }, _data => _data.ID);
-
         towerChance = LoadAsset<TowerChance>();
         towerConfig = LoadAsset<TowerConfig>();
 
@@ -76,9 +72,6 @@ public class DataManager : MonoBehaviour
     #region 검색
     public TowerData SearchTower(int _id)
         => towerDic.TryGetValue(_id, out var _data) ? _data : null;
-
-    public BossData SearchBoss(int _id)
-        => bossDic.TryGetValue(_id, out var _data) ? _data : null;
     #endregion
 
     #region 상점 시스템
@@ -137,11 +130,6 @@ public class DataManager : MonoBehaviour
         foreach (TowerData data in towerDatas)
             if (data != null)
                 towerDic.TryAdd(data.ID, data);
-
-        bossDic.Clear();
-        foreach (BossData data in bossDatas)
-            if (data != null)
-                bossDic.TryAdd(data.ID, data);
     }
     #endregion
 
@@ -184,8 +172,6 @@ public class DataManager : MonoBehaviour
 
         return result;
     }
-
-    public BossData[] GetBossDatas() => bossDatas;
 
     public IReadOnlyList<TowerChance.GradeChance> GetGradeChance(int _level) => towerChance.GetGradeChance(_level);
     public TowerGrade GetRandomGrade(int _level) => towerChance.GetGrade(_level);

@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public enum Phase { None, Normal, Warning, Boss, Reward }
+public enum Phase { None, Normal, Boss, Waiting, Warning }
 
 public class MonsterWave : MonoBehaviour
 {
@@ -9,8 +9,7 @@ public class MonsterWave : MonoBehaviour
 
     [Header("Wave")]
     [SerializeField] private Phase phase;
-    private float phaseTimer;
-    private bool onText = false;
+    [SerializeField][Min(0)] private int waveCount = 1;
 
     public bool IsPause { private set; get; } = false;
 
@@ -23,26 +22,19 @@ public class MonsterWave : MonoBehaviour
     [SerializeField][Min(0f)] private float spawnPeak = 30f;
     private float spawnDecrease;
 
-    [Header("Warning")]
-    [SerializeField][Min(0.1f)] private float warningTime = 3f;
-    private float warningTimer;
-    [SerializeField][Min(0.1f)] private float warningInterval = 0.3f;
-    private float warningTextTimer;
-
     [Header("Boss")]
-    [SerializeField][Min(0.1f)] private float bossDelay = 1f;
-    [SerializeField][Min(1)] private int bossOrder = 1;
+    [SerializeField][Min(1)] private int bossInterval = 5;
+    [SerializeField][Min(0)] private int bossCount;
+    [Space]
     [SerializeField] private Boss boss;
-    private bool onBoss = false;
 
     public bool IsSpawned { private set; get; } = false;
 
-    [Header("Reward")]
-    [SerializeField][Min(0.1f)] private float rewardDelay = 1.5f;
-    [SerializeField][Min(0.1f)] private float rewardTime = 3f;
-    private float rewardTimer;
-    [SerializeField][Min(0)] private int rewardExp;
-    [SerializeField][Min(0)] private int rewardGold;
+    [Header("Waiting / Warning")]
+    [SerializeField][Min(0.1f)] private float waitingTime = 10f;
+    private float waitingTimer;
+    [SerializeField][Min(0.1f)] private float warningInterval = 0.3f;
+    private float warningTextTimer;
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -73,26 +65,20 @@ public class MonsterWave : MonoBehaviour
         if (GameManager.Instance.IsGameOver) return;
         if (IsPause) return;
 
-#if TEST_Manager
-        if (TestManager.Instance?.Mode == TestMode.Boss)
-            phase = Phase.Boss;
-#endif
-
         float dt = Time.deltaTime;
         switch (phase)
         {
             case Phase.Normal: NormalPhase(dt); break;
-            case Phase.Warning: WarningPhase(dt); break;
             case Phase.Boss: BossPhase(dt); break;
-            case Phase.Reward: RewardPhase(dt); break;
+            case Phase.Waiting: WaitingPhase(dt); break;
+            case Phase.Warning: WarningPhase(dt); break;
         }
     }
 
     #region 웨이브 진행
     public void ResetWave()
     {
-        phaseTimer = 0f;
-        onText = false;
+        waveCount = 1;
         IsPause = false;
 
         normalTimer = normalTime;
@@ -100,17 +86,12 @@ public class MonsterWave : MonoBehaviour
         spawnTimer = 0f;
         spawnDecrease = (normalTime - spawnPeak) / (spawnRange.y - spawnRange.x);
 
-        warningTimer = 0f;
-        warningTextTimer = 0f;
-
-        bossOrder = 1;
+        bossCount = 0;
         boss = null;
-        onBoss = false;
         IsSpawned = false;
 
-        rewardTimer = 0f;
-        rewardExp = 0;
-        rewardGold = 0;
+        waitingTimer = 0f;
+        warningTextTimer = 0f;
     }
 
     public void StartWave()
@@ -135,13 +116,9 @@ public class MonsterWave : MonoBehaviour
     }
     #endregion
 
-    #region 노말 페이즈
+    #region 노말/보스 페이즈
     private void NormalPhase(float _deltaTime)
     {
-#if TEST_Manager
-        if (TestManager.Instance?.Mode == TestMode.Solo) return;
-#endif
-
         spawnTimer -= _deltaTime;
         if (spawnTimer <= 0f)
         {
@@ -152,28 +129,62 @@ public class MonsterWave : MonoBehaviour
         if (spawnDelay > spawnRange.x)
             spawnDelay = Mathf.Max(spawnDelay - _deltaTime / spawnDecrease, spawnRange.x);
 
-#if TEST_Manager
-        if (TestManager.Instance?.Mode == TestMode.Wave) return;
-#endif
-
-        if (BossFinished) return;
-
         normalTimer -= _deltaTime;
         if (normalTimer > 0f) return;
 
-        phase = Phase.Warning;
-        warningTimer = warningTime;
+        if ((waveCount + 1) % bossInterval != 0)
+            phase = Phase.Waiting;
+        else
+            phase = Phase.Warning;
+
+        waitingTimer = waitingTime;
         warningTextTimer = 0f;
+    }
+
+    private void BossPhase(float _deltaTime)
+    {
+        if (!IsSpawned)
+        {
+            bossCount++;
+            boss = EntityManager.Instance?.SpawnBoss();
+            IsSpawned = true;
+            return;
+        }
+
+        if (EntityManager.Instance?.GetMonsterCount() == 0)
+        {
+            ClearText();
+
+            phase = Phase.Waiting;
+            boss = null;
+            IsSpawned = false;
+            waitingTimer = waitingTime;
+        }
     }
     #endregion
 
-    #region 경고 페이즈
+    #region 대기/경고 페이즈
+    private void WaitingPhase(float _deltaTime)
+    {
+        waitingTimer -= _deltaTime;
+        if (waitingTimer > 0f) return;
+
+        if (++waveCount % bossInterval != 0)
+        {
+            phase = Phase.Normal;
+            normalTimer = normalTime;
+            spawnDelay = spawnRange.y;
+            spawnTimer = 0f;
+        }
+        else phase = Phase.Boss;
+    }
+
     private void WarningPhase(float _deltaTime)
     {
-        warningTimer -= _deltaTime;
+        waitingTimer -= _deltaTime;
         warningTextTimer -= _deltaTime;
 
-        if (warningTimer > 0f)
+        if (waitingTimer > 0f)
         {
             if (warningTextTimer > 0f) return;
 
@@ -182,8 +193,8 @@ public class MonsterWave : MonoBehaviour
             return;
         }
 
+        waveCount++;
         phase = Phase.Boss;
-        IsSpawned = false;
     }
 
     private void WarningText()
@@ -202,148 +213,10 @@ public class MonsterWave : MonoBehaviour
         effect.SetText("경고", scale, Color.yellow, 0.1f);
         effect.SetColor(Color.black);
         effect.SetMove(speed, Vector3.left);
-        effect.SetDuration(warningTimer);
-    }
-    #endregion
-
-    #region 보스 페이즈
-    private void BossPhase(float _deltaTime)
-    {
-        int order = bossOrder;
-
-#if TEST_Manager
-        if (TestManager.Instance?.Mode == TestMode.Boss)
-        {
-            order = TestManager.Instance.RefBoss.ID;
-            if (!onBoss)
-            {
-                phaseTimer = 0f;
-                onText = true;
-                onBoss = true;
-                return;
-            }
-        }
-#endif
-
-        if (!onBoss)
-        {
-            phaseTimer = bossDelay;
-            onText = false;
-            onBoss = true;
-            return;
-        }
-
-        if (!onText)
-        {
-            phaseTimer -= _deltaTime;
-            if (phaseTimer > 0f) return;
-
-            BossText();
-            phaseTimer = bossDelay;
-            onText = true;
-            return;
-        }
-
-        if (!IsSpawned)
-        {
-            phaseTimer -= _deltaTime;
-            if (phaseTimer > 0f) return;
-
-            boss = EntityManager.Instance?.SpawnBoss(order);
-            if (boss == null) return;
-
-            IsSpawned = true;
-
-            rewardExp = order * 100;
-            rewardGold = order * 100;
-            return;
-        }
-
-        if (boss.IsDead)
-        {
-#if TEST_Manager
-            if (TestManager.Instance?.Mode == TestMode.Boss)
-            {
-                GameManager.Instance?.GameOver();
-                return;
-            }
-#endif
-
-            phase = Phase.Reward;
-            onText = false;
-            boss = null;
-            bossOrder++;
-            IsSpawned = false;
-            rewardTimer = rewardTime;
-        }
+        effect.SetDuration(waitingTimer);
     }
 
-    private void BossText()
-    {
-        Rect worldRect = AutoCamera.WorldRect;
-        Rect mapRect = UIManager.Instance.GetMapAreaRect();
-        Vector3 pos = new Vector3(0f, worldRect.yMax, 0f);
-        Vector3 target = new Vector3(0f, mapRect.yMax * 0.85f, 0f);
-
-        TextEffect effect = EntityManager.Instance?.MakeText(pos);
-        if (effect == null) return;
-
-        effect.SetText("보스 등장", 250f, Color.red, 0.05f);
-        effect.SetColor(Color.black);
-        effect.SetMove(target, bossDelay / 2f);
-        effect.SetDuration(bossDelay);
-    }
-    #endregion
-
-    #region 보상 페이즈
-    private void RewardPhase(float _deltaTime)
-    {
-        if (!onText)
-        {
-            RewardText();
-
-            phaseTimer = rewardDelay;
-            onText = true;
-            onBoss = false;
-            return;
-        }
-
-        if (phaseTimer > 0f)
-        {
-            phaseTimer -= _deltaTime;
-            if (phaseTimer > 0f) return;
-        }
-
-        float ratio = _deltaTime * rewardTimer;
-
-        if (rewardExp > 0)
-        {
-            int delta = Mathf.FloorToInt(rewardExp * ratio);
-            delta = Mathf.Clamp(delta, 1, rewardExp);
-
-            GameManager.Instance?.ExpUp(delta);
-            rewardExp -= delta;
-        }
-
-        if (rewardGold > 0)
-        {
-            int delta = Mathf.FloorToInt(rewardGold * ratio);
-            delta = Mathf.Clamp(delta, 1, rewardGold);
-
-            GameManager.Instance?.GoldUp(delta);
-            rewardGold -= delta;
-        }
-
-        rewardTimer -= _deltaTime;
-        if (rewardTimer > 0f || rewardExp > 0 || rewardGold > 0) return;
-
-        phase = Phase.Normal;
-        normalTimer = normalTime;
-        spawnDelay = spawnRange.y;
-        spawnTimer = 0f;
-    }
-
-    private void RewardText()
+    private void ClearText()
     {
         Rect mapRect = UIManager.Instance.GetMapAreaRect();
         Vector3 pos = new Vector3(0f, mapRect.center.y, 0f);
@@ -354,8 +227,8 @@ public class MonsterWave : MonoBehaviour
 
         effect.SetText("클리어", 250f, Color.green, 0.3f);
         effect.SetColor(Color.white);
-        effect.SetMove(target, rewardDelay * 0.8f);
-        effect.SetDuration(rewardDelay);
+        effect.SetMove(target, waitingTime * 0.8f);
+        effect.SetDuration(waitingTime / 3f);
     }
     #endregion
 
@@ -365,70 +238,56 @@ public class MonsterWave : MonoBehaviour
     #endregion
 
     #region GET
-    public BossData GetBoss()
+    public void GetPhaseValue(out Color _color, out float _value, out float _maxValue, out string _text)
     {
-#if TEST_Manager
-        if (TestManager.Instance?.Mode == TestMode.Boss)
-            return TestManager.Instance?.RefBoss;
-#endif
-
-        return DataManager.Instance?.SearchBoss(bossOrder);
-    }
-
-    public void GetPhaseValue(out Phase _phase, out float _value, out float _maxValue, out Color _color)
-    {
-        _phase = phase;
+        _color = Color.clear;
         _value = 0f;
         _maxValue = 1f;
-        _color = Color.clear;
+        _text = string.Empty;
 
         switch (phase)
         {
             case Phase.Normal:
+                _color = Color.green;
                 if (normalTime > 0f)
                 {
                     _value = normalTimer;
                     _maxValue = normalTime;
                 }
-                _color = Color.green;
-                break;
-
-            case Phase.Warning:
-                if (warningTime > 0f)
-                {
-                    _value = warningTime - warningTimer;
-                    _maxValue = warningTime;
-                }
-                _color = Color.yellow;
+                _text = (waveCount + 1) % bossInterval != 0
+                    ? $"웨이브 {waveCount}"
+                    : $"웨이브 {waveCount} | 곧 보스 등장";
                 break;
 
             case Phase.Boss:
+                _color = Color.red;
                 if (boss != null)
                 {
                     _value = boss.Health;
                     _maxValue = boss.MaxHealth;
-                }
-                else
-                {
-                    _maxValue = bossDelay * 2f;
 
-                    if (!onBoss)
-                        _value = 0f;
-                    else if (!onText)
-                        _value = bossDelay - phaseTimer;
-                    else
-                        _value = bossDelay + (bossDelay - phaseTimer);
+                    if (!boss.IsInvalid())
+                        _text = $"{UIManager.Instance?.FormatNumber(boss.Health)} / {UIManager.Instance?.FormatNumber(boss.MaxHealth)}";
                 }
-                _color = Color.red;
                 break;
 
-            case Phase.Reward:
-                if (rewardTime > 0f)
-                {
-                    _value = rewardTime - rewardTimer;
-                    _maxValue = rewardTime;
-                }
+            case Phase.Waiting:
                 _color = Color.magenta;
+                if (waitingTimer > 0f)
+                {
+                    _value = waitingTime - waitingTimer;
+                    _maxValue = waitingTime;
+                }
+                _text = "웨이브 대기 중...";
+                break;
+
+            case Phase.Warning:
+                _color = Color.yellow;
+                if (waitingTimer > 0f)
+                {
+                    _value = waitingTime - waitingTimer;
+                    _maxValue = waitingTime;
+                }
                 break;
         }
     }
@@ -436,7 +295,7 @@ public class MonsterWave : MonoBehaviour
 
     #region 프로퍼티
     public bool IsRunning => phase != Phase.None;
-    public int BossOrder => bossOrder;
-    public bool BossFinished => DataManager.Instance?.SearchBoss(bossOrder) == null;
+    public int WaveCount => waveCount;
+    public int BossCount => bossCount;
     #endregion
 }
