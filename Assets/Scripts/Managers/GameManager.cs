@@ -220,7 +220,7 @@ public class GameManager : MonoBehaviour
         if (level >= maxLevel) return;
 
         exp += _exp;
-        while (CanLevelUp && level < maxLevel && exp >= needExp)
+        while (level < maxLevel && exp >= needExp)
         {
             exp -= needExp;
             LevelUp();
@@ -348,7 +348,6 @@ public class GameManager : MonoBehaviour
     public int Exp => exp;
     public int NeedExp => 100 * level * (level + 1) / 2;
     public bool CanBuyExp => gold >= needExp && exp < needExp && level < maxLevel;
-    public bool CanLevelUp => MonsterWave.Instance?.BossCount >= level;
 
     public int Level => level;
     public int MaxLevel => maxLevel;

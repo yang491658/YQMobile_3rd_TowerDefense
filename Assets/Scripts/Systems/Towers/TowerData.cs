@@ -131,7 +131,7 @@ public class TowerData : ScriptableObject
             Skills = new();
 
         if (ID == 999)
-            return;
+        { Skills = new(); return; }
 
         TowerGrade start = TowerGrade.Normal;
         TowerGrade end = TowerGrade.Legend;
@@ -145,6 +145,14 @@ public class TowerData : ScriptableObject
         {
             start = TowerGrade.Epic;
             end = TowerGrade.Unique;
+        }
+
+        HashSet<TowerGrade> grades = new();
+        for (int i = 0; i < Skills.Count; i++)
+        {
+            TowerGrade grade = Skills[i].grade;
+            if (grade < start || grade > end || !grades.Add(grade))
+                Skills.RemoveAt(i--);
         }
 
         for (int i = (int)start; i <= (int)end; i++)
@@ -186,13 +194,6 @@ public class TowerData : ScriptableObject
                 config.values = new();
 
             if (config.skill == null)
-            {
-                config.values.Clear();
-                Skills[i] = config;
-                continue;
-            }
-
-            if (config.skill.ID / 100 != (int)Role)
             {
                 config.values.Clear();
                 Skills[i] = config;

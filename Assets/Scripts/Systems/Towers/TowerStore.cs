@@ -121,6 +121,7 @@ public class TowerStore : MonoBehaviour
     }
     #endregion
 
+#if TEST_Manager
     #region 자동 구매
     public TowerSlot AutoSlot(int _id, TowerGrade _grade)
     {
@@ -155,4 +156,5 @@ public class TowerStore : MonoBehaviour
         return true;
     }
     #endregion
+#endif
 }

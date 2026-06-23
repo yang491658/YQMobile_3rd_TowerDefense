@@ -11380,7 +11380,6 @@ MonoBehaviour:
   spawnRange: {x: 0.3, y: 3}
   spawnPeak: 30
   bossInterval: 5
-  bossCount: 0
   boss: {fileID: 0}
   waitingTime: 10
   warningInterval: 0.3

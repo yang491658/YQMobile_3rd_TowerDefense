@@ -24,7 +24,6 @@ public class MonsterWave : MonoBehaviour
 
     [Header("Boss")]
     [SerializeField][Min(1)] private int bossInterval = 5;
-    [SerializeField][Min(0)] private int bossCount;
     [Space]
     [SerializeField] private Boss boss;
 
@@ -86,7 +85,6 @@ public class MonsterWave : MonoBehaviour
         spawnTimer = 0f;
         spawnDecrease = (normalTime - spawnPeak) / (spawnRange.y - spawnRange.x);
 
-        bossCount = 0;
         boss = null;
         IsSpawned = false;
 
@@ -145,7 +143,6 @@ public class MonsterWave : MonoBehaviour
     {
         if (!IsSpawned)
         {
-            bossCount++;
             boss = EntityManager.Instance?.SpawnBoss();
             IsSpawned = true;
             return;
@@ -296,6 +293,5 @@ public class MonsterWave : MonoBehaviour
     #region 프로퍼티
     public bool IsRunning => phase != Phase.None;
     public int WaveCount => waveCount;
-    public int BossCount => bossCount;
     #endregion
 }

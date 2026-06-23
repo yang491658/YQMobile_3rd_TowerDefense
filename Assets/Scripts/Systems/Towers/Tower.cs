@@ -79,8 +79,8 @@ public class Tower : Entity
             skills[i].OnUpdate(this, attackTarget, dt);
 
         attackTimer -= dt;
-        if (attackTimer <= 0f)
-            if (FindTarget()) Attack();
+        if (attackTimer <= 0f && FindTarget())
+            Attack();
     }
 
     #region 심볼
@@ -374,11 +374,12 @@ public class Tower : Entity
 
         if (_onHit)
         {
-            for (int i = 0; i < skills.Count; i++)
-            {
-                if (valid) skills[i].OnHit(this, _bullet, _target, ref instead);
-                else skills[i].OnMiss(this, _bullet, _pos);
-            }
+            if (valid)
+                for (int i = 0; i < skills.Count; i++)
+                    skills[i].OnHit(this, _bullet, _target, ref instead);
+            else
+                for (int i = 0; i < skills.Count; i++)
+                    skills[i].OnMiss(this, _bullet, _pos);
         }
 
         if (!valid || instead) return;

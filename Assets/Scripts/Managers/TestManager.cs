@@ -257,7 +257,7 @@ public class TestManager : MonoBehaviour
         {
             if (!DataManager.Instance.IsUnlocked(RefGrade))
             {
-                if (GameManager.Instance.CanLevelUp && GameManager.Instance.BuyExp()) return;
+                if (GameManager.Instance.BuyExp()) return;
                 if (TryPurchase(0, 0)) return;
                 return;
             }
@@ -270,7 +270,7 @@ public class TestManager : MonoBehaviour
                 TowerSlot slot = TowerStore.Instance?.AutoSlot(RefID, RefGrade);
                 if (slot != null)
                     TryPurchase(RefID, RefGrade, slot);
-                else if (GameManager.Instance.CanLevelUp)
+                else
                     GameManager.Instance?.BuyExp();
 
                 return;
@@ -308,7 +308,7 @@ public class TestManager : MonoBehaviour
     {
         if (_slot == null) return false;
 
-        List<Tower> towers = EntityManager.Instance.GetTowers();
+        List<Tower> towers = EntityManager.Instance?.GetTowers();
         if (towers.Count == 0) return false;
 
         Tower target = null;

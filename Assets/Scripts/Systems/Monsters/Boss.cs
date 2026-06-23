@@ -20,7 +20,7 @@ public class Boss : Monster
     #region 전투
     protected override void OnDeath()
     {
-        GameManager.Instance?.ScoreUp();
+        base.OnDeath();
 
         if (rewardRoutine != null)
             GameManager.Instance?.StopCoroutine(rewardRoutine);
@@ -48,12 +48,13 @@ public class Boss : Monster
     #region SET
     public void SetBoss()
     {
-        int score = GameManager.Instance.Score / 50;
-        int wave = MonsterWave.Instance.WaveCount;
+        int score = Mathf.Max(GameManager.Instance.Score / 50, 1);
+        int wave = Mathf.Max(MonsterWave.Instance.WaveCount, 1);
 
-        maxHealth = 100 * Mathf.Max(score, 1) * Mathf.Max(wave, 1);
+        maxHealth = 100 * score * wave;
+        reward = 20 * wave;
+
         SetHealth(maxHealth);
-        reward = 100 * MonsterWave.Instance.BossCount;
     }
     #endregion
 

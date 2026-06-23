@@ -91,7 +91,7 @@ public class Monster : Pooling
 
     private void MoveBackward(float _deltaTime)
     {
-        if (pathIndex <= 0)
+        if (pathIndex <= 1)
         { Stop(); return; }
 
         Vector3 delta = paths[pathIndex - 1].position - transform.position;
@@ -101,7 +101,7 @@ public class Monster : Pooling
         {
             transform.position = paths[pathIndex - 1].position;
 
-            if (--pathIndex <= 0)
+            if (--pathIndex <= 1)
             { Stop(); return; }
 
             delta = paths[pathIndex - 1].position - transform.position;
@@ -110,6 +110,23 @@ public class Monster : Pooling
         moveDirection = delta.normalized;
         Move(moveSpeed, moveDirection);
     }
+    #endregion
+
+    #region 타겟
+    public bool IsExclude()
+    {
+        Bounds bounds = SR.bounds;
+        Rect rect = AutoCamera.WorldRect;
+
+        bool onScreen = bounds.max.x >= rect.xMin
+            && bounds.min.x <= rect.xMax
+            && bounds.max.y >= rect.yMin
+            && bounds.min.y <= rect.yMax;
+
+        return pathIndex <= 1 || health * 1.5f < reserve || IsDead || IsDespawn || !onScreen;
+    }
+
+    public bool IsInvalid(int _index = -1) => IsDead || IsDespawn || (_index >= 0 && Index != _index);
     #endregion
 
     #region 전투
@@ -169,7 +186,7 @@ public class Monster : Pooling
     protected virtual void OnGoal()
     {
         GameManager.Instance?.LifeDown();
-        GameManager.Instance?.GoldDown(gold, true);
+        GameManager.Instance?.GoldDown(gold / 10, true);
         EntityManager.Instance?.DespawnMonster(this);
     }
     #endregion
@@ -177,11 +194,12 @@ public class Monster : Pooling
     #region SET
     public void SetMonster()
     {
-        int score = GameManager.Instance.Score / 50;
+        int score = Mathf.Max(GameManager.Instance.Score / 50, 1);
 
-        maxHealth = 50 * Mathf.Max(score, 1);
+        maxHealth = 50 * score;
+        gold = 10 * score;
+
         SetHealth(maxHealth);
-        gold = 10 * Mathf.Max(score, 1);
     }
 
     public void SetPath(Transform[] _paths)
@@ -198,11 +216,6 @@ public class Monster : Pooling
         if (healthText != null)
             healthText.text = UIManager.Instance?.FormatNumber(health);
     }
-    #endregion
-
-    #region GET
-    public bool IsExclude() => health * 1.5f < reserve || IsDead || IsDespawn;
-    public bool IsInvalid(int _index = -1) => IsDead || IsDespawn || (_index >= 0 && Index != _index);
     #endregion
 
     #region 프로퍼티

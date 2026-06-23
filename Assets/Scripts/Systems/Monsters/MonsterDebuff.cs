@@ -197,6 +197,9 @@ public class MonsterDebuff : MonoBehaviour
 
     public bool CanApplyMove(int _factor, float _duration)
     {
+        if (moveControl.timer <= 0f)
+            return moveControl.CanApply(_factor, _duration);
+
         if (_factor <= 0)
             return moveControl.value <= 0 ? moveControl.CanApply(_duration) : true;
         else if (_factor >= 100)
