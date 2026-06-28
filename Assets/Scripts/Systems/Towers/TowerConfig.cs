@@ -34,7 +34,7 @@ public struct DamageData
 
 public enum DamageType { Normal, Critical, DoT }
 
-[CreateAssetMenu(fileName = "TowerConfig", menuName = "Table/Tower/Config", order = 52)]
+[CreateAssetMenu(fileName = "TowerConfig", menuName = "Table/Tower/Config", order = 51)]
 public class TowerConfig : ScriptableObject
 {
     [Header("Tower Color")]

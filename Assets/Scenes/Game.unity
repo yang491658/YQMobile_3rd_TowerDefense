@@ -5559,6 +5559,67 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 597384626}
   m_CullTransparentMesh: 1
+--- !u!1 &612691443
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 612691444}
+  - component: {fileID: 612691445}
+  m_Layer: 0
+  m_Name: TowerChance
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &612691444
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 612691443}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2061510342}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &612691445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 612691443}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a21995deb605cd4985ef786b8f332ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  normal:
+    grade: 1
+    level: {x: 0, y: 0}
+  rare:
+    grade: 2
+    level: {x: 2, y: 5}
+  epic:
+    grade: 3
+    level: {x: 4, y: 9}
+  unique:
+    grade: 4
+    level: {x: 8, y: 17}
+  legend:
+    grade: 5
+    level: {x: 16, y: 0}
+  currents: 
+  chances: []
 --- !u!1 &624159764
 GameObject:
   m_ObjectHideFlags: 0
@@ -8327,7 +8388,7 @@ MonoBehaviour:
   needExp: 0
   expScore: 1000
   level: 1
-  maxLevel: 10
+  maxLevel: 20
   gold: 100
   needGold: 0
 --- !u!4 &892690366
@@ -9498,7 +9559,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b3c7f4e2f1400de4f9f7d0b2a65f06f1, type: 2}
   - {fileID: 11400000, guid: e806bf6b3ad12d24fb087a360063c412, type: 2}
   - {fileID: 11400000, guid: 52cc5361baa349045872bde058a10cd1, type: 2}
-  towerChance: {fileID: 11400000, guid: fa32553a70dee124aa6919c8820d9f57, type: 2}
   towerConfig: {fileID: 11400000, guid: 4e19fa1afac8564469f4922387f20442, type: 2}
 --- !u!4 &1065004637
 Transform:
@@ -16241,6 +16301,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 612691444}
   - {fileID: 1941476962}
   - {fileID: 1327151523}
   m_Father: {fileID: 0}

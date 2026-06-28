@@ -14,14 +14,12 @@ public class DataManager : MonoBehaviour
     private readonly Dictionary<int, TowerData> towerDic = new();
 
     [Header("Tables")]
-    [SerializeField] private TowerChance towerChance;
     [SerializeField] private TowerConfig towerConfig;
 
 #if UNITY_EDITOR
     private void OnValidate()
     {
         towerDatas = CollectDatas<TowerData>("t:TowerData", new[] { "Assets/Datas/Towers" }, _data => _data.ID);
-        towerChance = LoadAsset<TowerChance>();
         towerConfig = LoadAsset<TowerConfig>();
 
         EditorUtility.SetDirty(this);
@@ -74,55 +72,6 @@ public class DataManager : MonoBehaviour
         => towerDic.TryGetValue(_id, out var _data) ? _data : null;
     #endregion
 
-    #region 상점 시스템
-    public bool IsUnlocked(TowerGrade _grade)
-    {
-        if (_grade == 0) return true;
-
-        IReadOnlyList<TowerChance.GradeChance> chances = GetGradeChance(GameManager.Instance.Level);
-
-        for (int i = 0; i < chances.Count; i++)
-        {
-            TowerChance.GradeChance chance = chances[i];
-            if (chance.grade == _grade)
-                return chance.weight > 0;
-        }
-
-        return false;
-    }
-
-    public int GetBestLevel(TowerGrade _grade)
-    {
-        if (_grade == 0) return 0;
-
-        int result = 0;
-        float bestChance = 0f;
-        int maxLevel = GameManager.Instance.MaxLevel;
-
-        for (int level = 1; level <= maxLevel; level++)
-        {
-            IReadOnlyList<TowerChance.GradeChance> chances = GetGradeChance(level);
-
-            int total = 0; int weight = 0;
-
-            for (int i = 0; i < chances.Count; i++)
-            {
-                TowerChance.GradeChance chance = chances[i];
-
-                if (chance.weight > 0) total += chance.weight;
-                if (chance.grade == _grade) weight = chance.weight;
-            }
-
-            float value = total > 0 ? (float)weight / total : 0f;
-
-            if (value > bestChance)
-            { bestChance = value; result = level; }
-        }
-
-        return result;
-    }
-    #endregion
-
     #region SET
     private void SetDictionary()
     {
@@ -155,26 +104,13 @@ public class DataManager : MonoBehaviour
 
     public TowerData GetRandomTower(out TowerGrade _grade)
     {
-        int level = GameManager.Instance.Level;
-        _grade = GetRandomGrade(level);
+        _grade = TowerChance.Instance.GetGrade();
 
-        TowerData result = null;
-        int count = 0;
+        TowerData[] datas = GetTowerDatas(_grade);
+        if (datas.Length <= 0) return default;
 
-        for (int i = 0; i < towerDatas.Length; i++)
-        {
-            TowerData data = towerDatas[i];
-            if (data == null || !data.HasGrade(_grade)) continue;
-
-            if (Random.Range(0, ++count) == 0)
-                result = data;
-        }
-
-        return result;
+        return datas[Random.Range(0, datas.Length)];
     }
-
-    public IReadOnlyList<TowerChance.GradeChance> GetGradeChance(int _level) => towerChance.GetGradeChance(_level);
-    public TowerGrade GetRandomGrade(int _level) => towerChance.GetGrade(_level);
 
     public Color GetTowerColor(TowerGrade _grade) => towerConfig.GetColor(_grade);
 

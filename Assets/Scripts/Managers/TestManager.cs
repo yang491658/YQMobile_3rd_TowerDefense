@@ -255,81 +255,18 @@ public class TestManager : MonoBehaviour
         AutoMerge();
         if (Mode == TestMode.None)
         {
-            if (!DataManager.Instance.IsUnlocked(RefGrade))
-            {
-                if (GameManager.Instance.BuyExp()) return;
-                if (TryPurchase(0, 0)) return;
-                return;
-            }
-
-            int level = GameManager.Instance.Level;
-            int best = DataManager.Instance.GetBestLevel(RefGrade);
-
-            if (level < best)
-            {
-                TowerSlot slot = TowerStore.Instance?.AutoSlot(RefID, RefGrade);
-                if (slot != null)
-                    TryPurchase(RefID, RefGrade, slot);
-                else
-                    GameManager.Instance?.BuyExp();
-
-                return;
-            }
-
-            TowerSlot target = TowerStore.Instance?.AutoSlot(RefID, RefGrade);
-            if (target != null)
-            {
-                if (EntityManager.Instance.HasEmptyField())
-                    TryPurchase(RefID, RefGrade, target);
-                else if (TrySell(RefID, RefGrade, target))
-                    TryPurchase(RefID, RefGrade, target);
-                else
-                    MergeRandom();
-
-                return;
-            }
         }
         else TestPlay();
     }
 
-    private bool TryPurchase(int _id, TowerGrade _grade, TowerSlot _slot = null)
+    private bool TryBuy(int _id, TowerGrade _grade, TowerSlot _slot = null)
     {
-        if (GameManager.Instance.EnoughGold())
-        {
-            if (EntityManager.Instance.HasEmptyField())
-                return TowerStore.Instance.AutoPurchase(_id, _grade, _slot);
-            else MergeRandom();
-        }
-
-        return false;
+        return default;
     }
 
     private bool TrySell(int _id, TowerGrade _grade, TowerSlot _slot = null)
     {
-        if (_slot == null) return false;
-
-        List<Tower> towers = EntityManager.Instance?.GetTowers();
-        if (towers.Count == 0) return false;
-
-        Tower target = null;
-        for (int i = 0; i < towers.Count; i++)
-        {
-            Tower tower = towers[i];
-            if (tower == null || tower.IsDragging) continue;
-            if (_id != 0 && tower.ID == _id
-                && (_grade == 0 || tower.Grade == _grade)) continue;
-
-            if (target == null
-                || tower.Grade < target.Grade
-                || tower.Grade == target.Grade && tower.Rank < target.Rank)
-                target = tower;
-        }
-        if (target == null) return false;
-        if (target.Grade >= _slot.Grade) return false;
-
-        target.Sell();
-
-        return true;
+        return default;
     }
 
     private void TestPlay()

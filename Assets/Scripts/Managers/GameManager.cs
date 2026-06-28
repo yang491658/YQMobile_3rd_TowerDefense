@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Level")]
     [SerializeField][Min(1)] private int level = 1;
-    [SerializeField][Min(1)] private int maxLevel = 10;
+    [SerializeField][Min(1)] private int maxLevel = 20;
     public event System.Action<int> OnChangeLevel;
 
     [Header("Gold")]
@@ -242,11 +242,12 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region 레벨
-    public void LevelUp(int _level = 1)
+    public void LevelUp()
     {
         if (level >= maxLevel) return;
 
-        level = Mathf.Min(level + _level, maxLevel);
+        level = Mathf.Min(level + 1, maxLevel);
+        TowerChance.Instance?.SetChance(level);
         OnChangeLevel?.Invoke(level);
 
         needExp = NeedExp;

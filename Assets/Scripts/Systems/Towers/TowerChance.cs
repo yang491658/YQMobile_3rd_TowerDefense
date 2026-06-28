@@ -1,200 +1,156 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "TowerChance", menuName = "Table/Tower/Chance", order = 51)]
-public class TowerChance : ScriptableObject
+public class TowerChance : MonoBehaviour
 {
+    public static TowerChance Instance { private set; get; }
+
     [System.Serializable]
-    public class GradeChance
+    public sealed class Weight
     {
         public TowerGrade grade;
-        public int weight;
-    }
+        [SerializeField] private Vector2Int level;
 
-    [System.Serializable]
-    public class LevelChanceRow
-    {
-        public int level;
-        public List<GradeChance> gradeChances = new();
-    }
+        public int Min => level.x;
+        public int Max => level.y;
+        public int Add => DataManager.Instance.GetGradeStat(grade) * 10;
 
-    [SerializeField] private List<LevelChanceRow> levels = new();
-    private readonly Dictionary<int, LevelChanceRow> levelDic = new();
-
-#if UNITY_EDITOR
-    [SerializeField] private TextAsset csv;
-
-    private void OnValidate()
-    {
-        if (csv != null)
-            ApplyCSV(csv);
-    }
-
-    private void ApplyCSV(TextAsset _csv)
-    {
-        string[] lines = _csv.text.Split('\n');
-        string[] header = lines[0].Trim().Split(',');
-
-        int columnCount = header.Length;
-        TowerGrade[] columnGrades = new TowerGrade[columnCount];
-
-        for (int i = 1; i < columnCount; i++)
+        public Weight(TowerGrade _grade, int _min, int _max)
         {
-            string name = header[i].Trim();
-            if (name.Length == 0) continue;
-
-            TowerGrade grade = (TowerGrade)System.Enum.Parse(typeof(TowerGrade), name, true);
-            columnGrades[i] = grade;
+            grade = _grade;
+            level.x = _min;
+            level.y = _max;
         }
 
-        int maxLevel = 0;
-        for (int i = 1; i < lines.Length; i++)
+        public bool Contains(int _level)
         {
-            string line = lines[i].Trim();
-            if (line.Length == 0) continue;
+            if (Min <= 0 && Max <= 0) return false;
+            if (Min > 0 && _level < Min) return false;
+            if (Max > 0 && _level > Max) return false;
 
-            string[] parts = line.Split(',');
-            int level = int.Parse(parts[0]);
-            if (level > maxLevel) maxLevel = level;
-        }
-
-        BuildLevel(maxLevel);
-
-        for (int i = 1; i < lines.Length; i++)
-        {
-            string line = lines[i].Trim();
-            if (line.Length == 0) continue;
-
-            string[] parts = line.Split(',');
-            int level = int.Parse(parts[0]);
-
-            LevelChanceRow row = levelDic[level];
-
-            for (int col = 1; col < columnCount; col++)
-            {
-                if (col >= parts.Length) break;
-
-                string v = parts[col].Trim();
-                if (v.Length == 0) continue;
-
-                TowerGrade grade = columnGrades[col];
-                if (grade == 0) continue;
-
-                int weight = int.Parse(v);
-
-                for (int g = 0; g < row.gradeChances.Count; g++)
-                {
-                    if (row.gradeChances[g].grade == grade)
-                    {
-                        row.gradeChances[g].weight = weight;
-                        break;
-                    }
-                }
-            }
+            return true;
         }
     }
 
-    private void BuildLevel(int _max)
+    [Header("Role")]
+    [SerializeField] private Weight normal = new(TowerGrade.Normal, 0, 0);
+    [SerializeField] private Weight rare = new(TowerGrade.Rare, 2, 5);
+    [SerializeField] private Weight epic = new(TowerGrade.Epic, 4, 9);
+    [SerializeField] private Weight unique = new(TowerGrade.Unique, 8, 17);
+    [SerializeField] private Weight legend = new(TowerGrade.Legend, 16, 0);
+    private Weight[] weights;
+
+    [Header("Chance")]
+    [SerializeField] private List<int> currents = new();
+    [SerializeField] private List<float> chances = new();
+    private SortedDictionary<TowerGrade, float> chanceDic = new();
+
+    private void Awake()
     {
-        TowerGrade[] grades = (TowerGrade[])System.Enum.GetValues(typeof(TowerGrade));
-        List<LevelChanceRow> newLevels = new List<LevelChanceRow>(_max);
-
-        for (int level = 1; level <= _max; level++)
+        if (Instance != null && Instance != this)
         {
-            LevelChanceRow row = null;
-
-            for (int i = 0; i < levels.Count; i++)
-            {
-                if (levels[i].level == level)
-                { row = levels[i]; break; }
-            }
-
-            if (row == null)
-            {
-                row = new LevelChanceRow();
-                row.level = level;
-            }
-
-            for (int i = row.gradeChances.Count - 1; i >= 0; i--)
-            {
-                GradeChance gc = row.gradeChances[i];
-                if (gc.grade == TowerGrade.Temp)
-                    row.gradeChances.RemoveAt(i);
-            }
-
-            for (int i = 0; i < grades.Length; i++)
-            {
-                TowerGrade grade = grades[i];
-                if (grade == TowerGrade.Temp) continue;
-
-                bool found = false;
-                for (int j = 0; j < row.gradeChances.Count; j++)
-                {
-                    if (row.gradeChances[j].grade == grade)
-                    { found = true; break; }
-                }
-
-                if (!found)
-                    row.gradeChances.Add(new GradeChance { grade = grade, weight = 0 });
-            }
-
-            newLevels.Add(row);
+            Destroy(gameObject);
+            return;
         }
 
-        newLevels.Sort((_a, _b) => _a.level.CompareTo(_b.level));
-        levels = newLevels;
+        Instance = this;
 
-        SetDictionary();
+        Init();
     }
-#endif
 
-    private void OnEnable()
+    private void Init()
     {
-        SetDictionary();
+        weights = new Weight[] { normal, rare, epic, unique, legend };
+
+        currents.Clear();
+        chances.Clear();
+        chanceDic.Clear();
+
+        for (int i = 0; i < weights.Length; i++)
+        {
+            currents.Add(0);
+            chances.Add(0);
+            chanceDic[weights[i].grade] = 0;
+        }
     }
 
     #region SET
-    private void SetDictionary()
+    public void ResetChance()
     {
-        levelDic.Clear();
-        for (int i = 0; i < levels.Count; i++)
+        for (int i = 0; i < weights.Length; i++)
         {
-            LevelChanceRow row = levels[i];
-            levelDic[row.level] = row;
+            if (weights[i].grade == normal.grade)
+                currents[i] = 100;
+            else
+                currents[i] = 0;
+        }
+
+        for (int i = 1; i <= GameManager.Instance?.Level; i++)
+            SetChance(i);
+    }
+
+    public void SetChance(int _level)
+    {
+        int gradeCount = weights.Length;
+        for (int i = 0; i < gradeCount; i++)
+        {
+            Weight weight = weights[i];
+
+            if (!weight.Contains(_level)) continue;
+
+            currents[i] += weight.Add;
+        }
+
+        int totalWeight = 0;
+        for (int i = 0; i < gradeCount; i++)
+        {
+            if (!IsValid(weights[i].grade)) continue;
+
+            totalWeight += currents[i];
+        }
+
+        for (int i = 0; i < gradeCount; i++)
+        {
+            TowerGrade grade = weights[i].grade;
+
+            chanceDic[grade] = totalWeight > 0 && IsValid(grade)
+                ? (float)currents[i] / totalWeight * 100f
+                : 0f;
+
+            chances[i] = chanceDic[grade];
         }
     }
     #endregion
 
     #region GET
-    public TowerGrade GetGrade(int _level)
+    public bool IsValid(TowerGrade _grade)
     {
-        List<GradeChance> gradeChances = levelDic[_level].gradeChances;
-
-        int totalWeight = 0;
-        for (int i = 0; i < gradeChances.Count; i++)
+        for (int i = 0; i < weights.Length; i++)
         {
-            int w = gradeChances[i].weight;
-            if (w > 0) totalWeight += w;
+            if (weights[i].grade != _grade) continue;
+            if (currents[i] <= 0) return false;
+
+            return DataManager.Instance.GetTowerDatas(_grade).Length > 0;
         }
 
-        if (totalWeight <= 0)
-            return TowerGrade.Temp;
+        return false;
+    }
 
-        int roll = Random.Range(0, totalWeight);
-        int acc = 0;
+    public TowerGrade GetGrade()
+    {
+        float roll = Random.Range(0f, 100f);
+        float acc = 0f;
 
-        for (int i = 0; i < gradeChances.Count; i++)
+        for (int i = 0; i < weights.Length; i++)
         {
-            GradeChance gc = gradeChances[i];
-            if (gc.weight <= 0) continue;
-
-            acc += gc.weight;
-            if (roll < acc) return gc.grade;
+            acc += chances[i];
+            if (roll < acc) return weights[i].grade;
         }
 
         return TowerGrade.Temp;
     }
 
-    public IReadOnlyList<GradeChance> GetGradeChance(int _level) => levelDic[_level].gradeChances;
+    public float GetChance(TowerGrade _grade) => chanceDic.TryGetValue(_grade, out float chance) ? chance : 0f;
+    public IReadOnlyDictionary<TowerGrade, float> GetChances() => chanceDic;
     #endregion
 }

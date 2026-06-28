@@ -329,6 +329,7 @@ public class EntityManager : MonoBehaviour
         monsters.Clear();
         towerDic.Clear();
 
+        TowerChance.Instance?.ResetChance();
         TowerStore.Instance?.ResetStore();
         MonsterWave.Instance?.StopWave();
 

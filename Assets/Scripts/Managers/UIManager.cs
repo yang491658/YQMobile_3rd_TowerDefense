@@ -599,7 +599,7 @@ public class UIManager : MonoBehaviour
         exp.btn.gameObject.SetActive(!isMax);
         levelText.text = isMax ? "Lv.MAX" : $"Lv.{_level}";
 
-        UpdateChance(_level);
+        UpdateChance();
     }
 
     private void UpdateGold(int _gold, int _needGold)
@@ -622,27 +622,15 @@ public class UIManager : MonoBehaviour
         loanImage.SetActive(_gold < 0);
     }
 
-    private void UpdateChance(int _level)
+    private void UpdateChance()
     {
-        var rows = DataManager.Instance?.GetGradeChance(_level);
-
-        int index = 0;
-        foreach (TowerGrade grade in System.Enum.GetValues(typeof(TowerGrade)))
+        int i = -1;
+        foreach (KeyValuePair<TowerGrade, float> chance in TowerChance.Instance?.GetChances())
         {
-            if (grade == TowerGrade.Temp) continue;
-            if (index >= chanceText.Length) break;
+            if (++i >= chanceText.Length) return;
 
-            int weight = 0;
-            for (int j = 0; j < rows.Count; j++)
-            {
-                if (rows[j].grade == grade)
-                { weight = rows[j].weight; break; }
-            }
-
-            chanceText[index].text = $"{weight}%";
-            chanceText[index].color = DataManager.Instance.GetTowerColor(grade);
-
-            index++;
+            chanceText[i].text = $"{chance.Value:0}%";
+            chanceText[i].color = DataManager.Instance.GetTowerColor(chance.Key);
         }
     }
 
@@ -716,7 +704,7 @@ public class UIManager : MonoBehaviour
 
     public void OnClickOkay()
     {
-        var action = confirmAction;
+        System.Action action = confirmAction;
         OpenConfirm(false);
         action?.Invoke();
     }

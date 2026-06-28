@@ -139,11 +139,7 @@ public class PoolManager : MonoBehaviour
             pool.Add(key, stack);
         }
 
-        int alive = 0;
-        foreach (var o in stack)
-            if (o != null) alive++;
-
-        int need = _count - alive;
+        int need = _count - GetAlive(stack);
         if (need <= 0) return;
 
         for (int i = 0; i < need; i++)
@@ -192,11 +188,7 @@ public class PoolManager : MonoBehaviour
             {
                 made.TryGetValue(key, out int activeCount);
 
-                int waitCount = 0;
-                foreach (var o in stack)
-                    if (o != null) waitCount++;
-
-                if (activeCount + waitCount >= pLimit.limit)
+                if (activeCount + GetAlive(stack) >= pLimit.limit)
                     return null;
             }
 
@@ -244,10 +236,7 @@ public class PoolManager : MonoBehaviour
 
         if (policy.TryGetValue(key, out var p) && p.keep > 0)
         {
-            int alive = 0;
-            foreach (var o in stack) if (o != null) alive++;
-
-            if (alive >= p.keep)
+            if (GetAlive(stack) >= p.keep)
             {
                 origin.Remove(id);
                 hook.Remove(id);
@@ -282,6 +271,16 @@ public class PoolManager : MonoBehaviour
     #endregion
 
     #region 유틸
+    private int GetAlive(Stack<GameObject> _stack)
+    {
+        int alive = 0;
+
+        foreach (GameObject obj in _stack)
+            if (obj != null) alive++;
+
+        return alive;
+    }
+
     private Policy GetPolicy(GameObject _prefab)
     {
         if (_prefab.TryGetComponent(out Monster _)) return monsterPolicy;
@@ -290,7 +289,7 @@ public class PoolManager : MonoBehaviour
         if (_prefab.TryGetComponent(out ViewEffect _)) return effectPolicy;
         if (_prefab.TryGetComponent(out TextEffect _)) return effectPolicy;
 
-        return null;
+        return default;
     }
 
     private Transform GetParent(GameObject _obj)
