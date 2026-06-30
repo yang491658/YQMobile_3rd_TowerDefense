@@ -1,4 +1,8 @@
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TowerStore : MonoBehaviour
 {
@@ -6,26 +10,31 @@ public class TowerStore : MonoBehaviour
 
     [Header("Slot")]
     [SerializeField] private TowerSlot origin;
-    [Space]
-    [SerializeField][Min(0)] private int count = 7;
-    [SerializeField] private TowerSlot[] slots;
+    [SerializeField][Min(0)] private int count = 6;
+    [SerializeField] private List<TowerSlot> slots = new();
+    private Coroutine slotRoutine;
 
-    [Header("Move")]
-    [SerializeField][Min(0f)] private float time = 10f;
-    [SerializeField] private RectTransform enter;
-    [SerializeField] private RectTransform exit;
+    public bool IsAuto { private set; get; } = false;
 
-    public bool IsMoving { private set; get; }
+    [Header("UI")]
+    [SerializeField] private RectTransform slotTrans;
+    [SerializeField] private Button buyBtn;
+    [SerializeField] private Button autoBtn;
+    [SerializeField] private TextMeshProUGUI autoBtnText;
 
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        if (enter == null)
-            enter = transform.Find("Enter")?.GetComponent<RectTransform>();
-        if (exit == null)
-            exit = transform.Find("Exit")?.GetComponent<RectTransform>();
         if (origin == null)
             origin = GetComponentInChildren<TowerSlot>();
+        if (slotTrans == null)
+            slotTrans = GameObject.Find("Slots")?.GetComponent<RectTransform>();
+        if (buyBtn == null)
+            buyBtn = GameObject.Find("BuyBtn")?.GetComponent<Button>();
+        if (autoBtn == null)
+            autoBtn = GameObject.Find("AutoBtn")?.GetComponent<Button>();
+        if (autoBtnText == null)
+            autoBtnText = GameObject.Find("AutoBtn/AutoBtnText")?.GetComponent<TextMeshProUGUI>();
     }
 #endif
 
@@ -41,120 +50,138 @@ public class TowerStore : MonoBehaviour
 
     private void Update()
     {
-        if (IsMoving)
-            MoveSlot();
+        UpdateBtn();
+        UpdateSlot();
+
+        if (IsAuto)
+            OnClickBuy();
     }
 
     #region 상점
-    public void ResetStore()
+    private void UpdateBtn()
     {
-        IsMoving = false;
+        buyBtn.interactable = CanBuy;
 
-        for (int i = 0; i < slots.Length; i++)
-            Destroy(slots[i].gameObject);
-
-        slots = new TowerSlot[0];
-
-        InitStore();
+        autoBtn.image.color = IsAuto ? Color.white : new Color(Color.gray.r, Color.gray.g, Color.gray.b, 0.35f);
+        autoBtnText.color = IsAuto ? Color.red : Color.black;
     }
 
-    private void InitStore()
+    public void ResetStore()
     {
-        origin.gameObject.SetActive(false);
+        IsAuto = false;
 
-        slots = new TowerSlot[count];
-
-        Vector2 start = enter.anchoredPosition;
-        Vector2 end = exit.anchoredPosition;
-
-        int len = slots.Length;
-        for (int i = 0; i < len; i++)
+        if (slotRoutine != null)
         {
-            TowerSlot slot = Instantiate(origin, transform);
-            slot.gameObject.SetActive(true);
-            slot.Init();
-            slot.Move(Vector2.Lerp(start, end, (float)i / len));
-
-            slots[i] = slot;
+            StopCoroutine(slotRoutine);
+            slotRoutine = null;
         }
 
-        IsMoving = true;
+        foreach (TowerSlot slot in slots)
+            Destroy(slot.gameObject);
+
+        origin.gameObject.SetActive(false);
+        slots.Clear();
     }
     #endregion
 
     #region 슬롯
-    private void MoveSlot()
+    private void UpdateSlot()
     {
-        Vector2 start = enter.anchoredPosition;
-        Vector2 target = exit.anchoredPosition;
-        float distance = Vector2.Distance(start, target);
-        float delta = distance / time * Time.deltaTime;
+        if (IsMoving) return;
 
-        for (int i = 0; i < slots.Length; i++)
+        for (int i = slots.Count - 1; i >= 0; i--)
+            if (slots[i] == null)
+                slots.RemoveAt(i);
+
+        if (slots.Count >= count) return;
+
+        slotRoutine = StartCoroutine(SlotCoroutine());
+    }
+
+    private IEnumerator SlotCoroutine()
+    {
+        while (slots.Count < count)
         {
-            TowerSlot slot = slots[i];
-            Vector2 pos = slot.Pos;
-            float remain = delta;
+            TowerSlot slot = GenerateSlot();
+            SortSlot();
 
-            while (remain > 0f)
-            {
-                float toExit = Vector2.Distance(pos, target);
+            float size = slotTrans.rect.height;
+            float limit = -slotTrans.rect.width * 0.5f + size * 0.5f;
+            RectTransform rect = slot.transform as RectTransform;
 
-                if (remain < toExit)
-                {
-                    pos = Vector2.MoveTowards(pos, target, remain);
-                    remain = 0f;
-                }
-                else
-                {
-                    remain -= toExit;
-                    slot.Reroll();
-                    pos = start;
-
-                    if (distance <= 0f)
-                    { remain = 0f; break; }
-                }
-            }
-
-            slot.Move(pos);
+            while (rect.anchoredPosition.x < limit)
+                yield return null;
         }
+
+        slotRoutine = null;
+    }
+
+    private TowerSlot GenerateSlot()
+    {
+        float size = slotTrans.rect.height;
+
+        Vector3 worldPos = new Vector3(AutoCamera.WorldRect.xMin, 0f, 0f);
+        Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(Camera.main, worldPos);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(slotTrans, screenPos, null, out Vector2 createPos);
+
+        TowerSlot slot = Instantiate(origin, slotTrans);
+        slot.gameObject.SetActive(true);
+        slot.SetSlot(size, new Vector2(createPos.x - size, 0f));
+
+        slots.Add(slot);
+
+        return slot;
+    }
+
+    private void SortSlot()
+    {
+        for (int i = slots.Count - 1; i >= 0; i--)
+            if (slots[i] == null)
+                slots.RemoveAt(i);
+
+        float size = slotTrans.rect.height;
+        float width = slotTrans.rect.width;
+        float start = width * 0.5f - size * 0.5f;
+        float end = -width * 0.5f + size * 0.5f;
+
+        for (int i = 0; i < slots.Count; i++)
+            slots[i].SetTarget(new Vector2(Mathf.Lerp(start, end, (float)i / (count - 1)), 0f));
     }
     #endregion
 
-#if TEST_Manager
-    #region 자동 구매
-    public TowerSlot AutoSlot(int _id, TowerGrade _grade)
+    #region 클릭
+    public TowerSlot RandomSlot()
     {
         TowerSlot result = null;
-
         int match = 0;
-        for (int i = 0; i < slots.Length; i++)
+
+        foreach (TowerSlot slot in slots)
         {
-            TowerSlot slot = slots[i];
+            if (slot == null || !slot.CanBuyTower) continue;
 
-            if (slot.IsComplete) continue;
-            if (_id != 0 && slot.ID != _id) continue;
-            if (_grade != 0 && slot.Grade != _grade) continue;
-
-            match++;
-            if (Random.Range(0, match) == 0)
+            if (Random.Range(0, ++match) == 0)
                 result = slot;
         }
 
         return result;
     }
 
-    public bool AutoPurchase(int _id, TowerGrade _grade, TowerSlot _slot = null)
+    public void OnClickBuy()
     {
-        TowerSlot slot = _slot != null ? _slot : AutoSlot(_id, _grade);
-        if (slot == null) return false;
+        if (!CanBuy) return;
 
-        if (EntityManager.Instance?.SpawnTower(slot.ID, slot.Grade) == null)
-            return false;
+        TowerSlot slot = RandomSlot();
+        if (slot == null) return;
 
-        slot.Complete();
-        return true;
+        if (slot.BuyTower())
+            slot.Remove();
     }
+
+    public void OnClickAuto() => IsAuto = !IsAuto;
     #endregion
-#endif
+
+    #region 프로퍼티
+    public bool CanBuy => GameManager.Instance.EnoughGold() && EntityManager.Instance.HasEmptyField();
+    public bool IsMoving => slotRoutine != null;
+    #endregion
 }

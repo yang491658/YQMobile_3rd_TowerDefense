@@ -43,7 +43,7 @@ public class TowerChance : MonoBehaviour
     [Header("Chance")]
     [SerializeField] private List<int> currents = new();
     [SerializeField] private List<float> chances = new();
-    private SortedDictionary<TowerGrade, float> chanceDic = new();
+    private readonly SortedDictionary<TowerGrade, float> chanceDic = new();
 
     private void Awake()
     {

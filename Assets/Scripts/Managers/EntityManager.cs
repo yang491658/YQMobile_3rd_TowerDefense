@@ -123,7 +123,7 @@ public class EntityManager : MonoBehaviour
     #endregion
 
     #region 타워
-    public Tower SpawnTower(int _id, TowerGrade _grade, int _rank = 1, Vector3? _pos = null, bool _useGold = true)
+    public Tower SpawnTower(int _id, TowerGrade _grade, int _rank = 1, Vector3? _pos = null, bool _useGold = true, float _time = 0f)
     {
         TowerData data = null;
 
@@ -153,7 +153,7 @@ public class EntityManager : MonoBehaviour
             .GetComponent<Tower>();
 
         tower.SetTower(data, _grade, _rank);
-        tower.transform.localScale = map.localScale;
+        tower.Generate(map.localScale, _time);
         towers.Add(tower);
         towerDic[tower] = GetCell(pos);
 

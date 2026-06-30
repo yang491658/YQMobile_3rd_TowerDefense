@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -152,6 +153,38 @@ public class Tower : Entity
     #endregion
 
     #region 조작
+    public void Generate(Vector3 _scale, float _time = 0f)
+    {
+        for (int i = 0; i < skills.Count; i++)
+            skills[i].OnGenerate(this);
+
+        UpdateStat();
+
+        if (_time <= 0f)
+        {
+            transform.localScale = _scale;
+            return;
+        }
+
+        StartCoroutine(GenerateCoroutine(_scale, _time));
+    }
+
+    private IEnumerator GenerateCoroutine(Vector3 _scale, float _time = 0f)
+    {
+        transform.localScale = Vector3.zero;
+
+        float timer = 0f;
+        while (timer < _time)
+        {
+            timer += Time.deltaTime;
+            transform.localScale = Vector3.Lerp(Vector3.zero, _scale, timer / _time);
+
+            yield return null;
+        }
+
+        transform.localScale = _scale;
+    }
+
     public void SetDrag(Image _outline, Image _symbol)
     {
         _outline.sprite = outlineSR.sprite;
@@ -467,11 +500,6 @@ public class Tower : Entity
         buff.Clear();
 
         SetRank(_rank);
-
-        for (int i = 0; i < skills.Count; i++)
-            skills[i].OnGenerate(this);
-
-        UpdateStat();
     }
 
     public void SetRank(int _rank)
