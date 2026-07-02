@@ -333,11 +333,7 @@ public class PoolManager : MonoBehaviour
             if (!policy.TryGetValue(kv.Key, out var p) || p == null)
                 continue;
 
-            int alive = 0;
-            foreach (var o in kv.Value)
-                if (o != null) alive++;
-
-            p.wait = alive;
+            p.wait = GetAlive(kv.Value);
         }
 
         monsterPolicy.peak = Mathf.Max(monsterPolicy.active, monsterPolicy.peak);

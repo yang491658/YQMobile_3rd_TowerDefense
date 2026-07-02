@@ -4,13 +4,17 @@ using UnityEngine.UI;
 
 public abstract class TowerSkill : ScriptableObject
 {
-    public int ID;
-    protected Coroutine cooldownRoutine;
+    [SerializeField] private int id;
+    private Coroutine cooldownRoutine;
+
+    #region 프로퍼티
+    public int ID => id;
+    protected bool IsCooldown => cooldownRoutine != null;
+    #endregion
 
 #if UNITY_EDITOR
     private void OnValidate()
-        => ID = ((CreateAssetMenuAttribute)System.Attribute.GetCustomAttribute(
-            GetType(), typeof(CreateAssetMenuAttribute))).order;
+        => id = ((CreateAssetMenuAttribute)System.Attribute.GetCustomAttribute(GetType(), typeof(CreateAssetMenuAttribute))).order;
 
     public virtual ValueType[] GetValues() => default;
 #endif
@@ -38,8 +42,6 @@ public abstract class TowerSkill : ScriptableObject
     public virtual void OnSell(Tower _tower) { }
 
     public virtual void OnDespawn(Tower _tower) { }
-
-    protected bool IsCooldown => cooldownRoutine != null;
 
     protected void StartCooldown(Tower _tower, float _cooldown)
     {

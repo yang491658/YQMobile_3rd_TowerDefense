@@ -106,10 +106,19 @@ public class DataManager : MonoBehaviour
     {
         _grade = TowerChance.Instance.GetGrade();
 
-        TowerData[] datas = GetTowerDatas(_grade);
-        if (datas.Length <= 0) return default;
+        int count = 0;
+        TowerData result = null;
 
-        return datas[Random.Range(0, datas.Length)];
+        for (int i = 0; i < towerDatas.Length; i++)
+        {
+            TowerData data = towerDatas[i];
+            if (data == null || !data.HasGrade(_grade)) continue;
+
+            if (Random.Range(0, ++count) == 0)
+                result = data;
+        }
+
+        return result;
     }
 
     public Color GetTowerColor(TowerGrade _grade) => towerConfig.GetColor(_grade);

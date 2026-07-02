@@ -437,14 +437,11 @@ public class UIManager : MonoBehaviour
         ResetSlider(ref life);
         ResetSlider(ref exp);
 
-        UpdatePlayTime();
         UpdateScore(GameManager.Instance.Score);
-
-        UpdateStore(false);
         UpdateLife(GameManager.Instance.Life, GameManager.Instance.MaxLife);
         UpdateExp(GameManager.Instance.Exp, GameManager.Instance.NeedExp);
         UpdateLevel(GameManager.Instance.Level);
-        UpdateGold(GameManager.Instance.Gold, GameManager.Instance.NeedGold);
+        UpdateStore(false);
         UpdateDrag(null);
 
         OpenUI(false);
@@ -549,22 +546,6 @@ public class UIManager : MonoBehaviour
         _ui.routine = StartCoroutine(FlashCoroutine(_ui));
     }
 
-    public bool IsStore(Vector3 _pos)
-    {
-        Camera cam = Camera.main;
-        Vector3 pos = cam.WorldToScreenPoint(_pos);
-        return RectTransformUtility.RectangleContainsScreenPoint(playerUI, pos);
-    }
-
-    public void UpdateStore(bool _on, int _gold = 0)
-    {
-        onStore = _on;
-        storeGold = _gold;
-        storeImage.color = onStore ? Color.cyan : storeColor;
-
-        UpdateGold(GameManager.Instance.Gold, GameManager.Instance.NeedGold);
-    }
-
     private void UpdateLife(int _life, int _maxLife)
     {
         int prev = life.prev;
@@ -620,6 +601,22 @@ public class UIManager : MonoBehaviour
 
         goldImage.SetActive(_gold >= 0);
         loanImage.SetActive(_gold < 0);
+    }
+
+    public bool IsStore(Vector3 _pos)
+    {
+        Camera cam = Camera.main;
+        Vector3 pos = cam.WorldToScreenPoint(_pos);
+        return RectTransformUtility.RectangleContainsScreenPoint(playerUI, pos);
+    }
+
+    public void UpdateStore(bool _on, int _gold = 0)
+    {
+        onStore = _on;
+        storeGold = _gold;
+        storeImage.color = onStore ? Color.cyan : storeColor;
+
+        UpdateGold(GameManager.Instance.Gold, GameManager.Instance.NeedGold);
     }
 
     private void UpdateChance()

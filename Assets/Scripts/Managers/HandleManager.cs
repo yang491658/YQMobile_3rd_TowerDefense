@@ -270,10 +270,7 @@ public class HandleManager : MonoBehaviour
 
         select.transform.position = _current + offset;
 
-        bool isStore = UIManager.Instance.IsStore(_current);
-        int storeGold = GameManager.Instance.GetSellGold(select);
-
-        UIManager.Instance?.UpdateStore(isStore, storeGold);
+        UIManager.Instance?.UpdateStore(UIManager.Instance.IsStore(_current), GameManager.Instance.GetSellGold(select));
         UIManager.Instance?.UpdateDrag(select, select.transform.position);
     }
 
