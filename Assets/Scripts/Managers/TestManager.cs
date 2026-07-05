@@ -58,10 +58,8 @@ public class TestManager : MonoBehaviour
     [Header("Sound Test")]
     [SerializeField] private bool onPauseBgm = false;
 
-    [Header("Test Text")]
-    [SerializeField] private TextMeshProUGUI testText;
-
     [Header("Test UI")]
+    [SerializeField] private TextMeshProUGUI testText;
     [SerializeField] private GameObject testUI;
     [Space]
     [SerializeField] private SliderConfig gameSpeed = new(1, 1, 20, "배속 × {0}");
@@ -233,7 +231,7 @@ public class TestManager : MonoBehaviour
         #endregion
     }
 
-    #region 자동 테스트
+    #region 자동 플레이 + 테스트 모드
     public void SetAuto(bool _on = true)
     {
         IsAuto = _on;
@@ -245,50 +243,6 @@ public class TestManager : MonoBehaviour
         {
             StopCoroutine(autoRoutine);
             autoRoutine = null;
-        }
-    }
-
-    private void AutoPlay()
-    {
-        playTime += Time.deltaTime;
-
-        AutoMerge();
-        if (Mode == TestMode.None)
-        {
-        }
-        else TestPlay();
-    }
-
-    private bool TryBuy(int _id, TowerGrade _grade, TowerSlot _slot = null)
-    {
-        return default;
-    }
-
-    private bool TrySell(int _id, TowerGrade _grade, TowerSlot _slot = null)
-    {
-        return default;
-    }
-
-    private void TestPlay()
-    {
-        int testCount = 5;
-
-        switch (Mode)
-        {
-            case TestMode.Wave:
-                //if (EntityManager.Instance?.GetTowerCount(RefID) < testCount)
-                //    EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, _useGold: false);
-                //SyncBasic();
-                break;
-
-            case TestMode.Solo:
-                //MonsterWave.Instance?.StopWave();
-                //if (EntityManager.Instance?.GetTowerCount(RefID) < testCount)
-                //    EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, _useGold: false);
-                //if (EntityManager.Instance?.GetMonsterCount() == 0)
-                //    EntityManager.Instance?.SpawnBoss();
-                //SyncBasic();
-                break;
         }
     }
 
@@ -314,11 +268,46 @@ public class TestManager : MonoBehaviour
         autoRoutine = null;
     }
 
+    private void AutoPlay()
+    {
+        playTime += Time.deltaTime;
+
+        AutoMerge();
+        if (Mode == TestMode.None)
+        {
+        }
+        else TestPlay();
+    }
+
+    private bool TryBuy(int _id, TowerGrade _grade, TowerSlot _slot = null)
+    {
+        return default;
+    }
+
+    private bool TrySell(int _id, TowerGrade _grade, TowerSlot _slot = null)
+    {
+        return default;
+    }
+
     private void ToggleMode(TestMode _mode)
     {
         Mode = Mode == _mode ? TestMode.None : _mode;
         OnClickReset();
         GameManager.Instance?.Replay();
+    }
+
+    private void TestPlay()
+    {
+        int testCount = 5;
+
+        switch (Mode)
+        {
+            case TestMode.Wave:
+                break;
+
+            case TestMode.Solo:
+                break;
+        }
     }
 
     private void AutoMerge()
@@ -521,9 +510,6 @@ public class TestManager : MonoBehaviour
         _config.slider.onValueChanged.AddListener(_action);
     }
 
-    private int ChangeSlider(float _value, SliderConfig _config)
-        => Mathf.Clamp(Mathf.RoundToInt(_value), _config.minValue, _config.maxValue);
-
     private void ApplySlider(ref SliderConfig _config, float _value, System.Action<int> _afterAction = null)
     {
         int value = ChangeSlider(_value, _config);
@@ -538,6 +524,9 @@ public class TestManager : MonoBehaviour
         _afterAction?.Invoke(_config.value);
     }
 
+    private int ChangeSlider(float _value, SliderConfig _config)
+        => Mathf.Clamp(Mathf.RoundToInt(_value), _config.minValue, _config.maxValue);
+
     private void UpdateSliderUI(SliderConfig _config)
     {
         _config.TMP.text = string.IsNullOrEmpty(_config.format)
@@ -546,8 +535,13 @@ public class TestManager : MonoBehaviour
         _config.slider.SetValueWithoutNotify(_config.value);
     }
 
-    private void ChangeGameSpeed(float _value)
-        => ApplySlider(ref gameSpeed, _value, _v => GameManager.Instance?.SetSpeed(_v, true));
+    private void UpdateTestText()
+    {
+        testText.text =
+            $"Tower : {EntityManager.Instance?.GetTowerCount()}\n" +
+            $"Monster : {EntityManager.Instance?.GetMonsterCount()}\n" +
+            $"Others : {PoolManager.Instance?.OtherCount}";
+    }
 
     private void UpdateTestUI()
     {
@@ -623,6 +617,9 @@ public class TestManager : MonoBehaviour
     #endregion
 
     #region 테스트 UI_추가
+    private void ChangeGameSpeed(float _value)
+        => ApplySlider(ref gameSpeed, _value, _v => GameManager.Instance?.SetSpeed(_v, true));
+
     private void ChangeRefTower(float _value)
     {
         ApplySlider(ref refTower, _value, _v =>
@@ -649,14 +646,6 @@ public class TestManager : MonoBehaviour
     }
 
     private void ChangeRefRank(float _value) => ApplySlider(ref refRank, _value);
-
-    private void UpdateTestText()
-    {
-        testText.text =
-            $"Tower : {EntityManager.Instance?.GetTowerCount()}\n" +
-            $"Monster : {EntityManager.Instance?.GetMonsterCount()}\n" +
-            $"Others : {PoolManager.Instance?.OtherCount}";
-    }
 
     private string TowerText()
     {

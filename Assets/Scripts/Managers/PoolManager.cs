@@ -13,7 +13,7 @@ public class PoolManager : MonoBehaviour
     public static PoolManager Instance { private set; get; }
 
     [System.Serializable]
-    private class Policy
+    private sealed class Policy
     {
         [Min(0)] public int prewarm;
         [Min(0)] public int limit;
