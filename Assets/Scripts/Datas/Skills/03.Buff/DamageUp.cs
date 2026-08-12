@@ -50,17 +50,14 @@ public class DamageUp : TowerSkill
             Tower target = targets[i];
             if (currents.Contains(target)) continue;
 
-            TowerBuff buff = target.Buff;
-            buff.RemoveStat(_tower, TowerBuff.SubType.Damage);
+            target.Buff.RemoveStat(_tower, TowerBuff.SubType.Damage);
 
             targets.RemoveAt(i);
         }
 
         foreach (Tower target in currents)
         {
-            TowerBuff buff = target.Buff;
-
-            buff.ApplyStat(_tower, TowerBuff.SubType.Damage, factor, 0f, TowerBuff.ApplyType.Refresh);
+            target.Buff.ApplyStat(_tower, TowerBuff.SubType.Damage, factor, 0f, TowerBuff.ApplyType.Refresh);
 
             if (!targets.Contains(target))
                 targets.Add(target);
@@ -85,12 +82,7 @@ public class DamageUp : TowerSkill
     private void ClearBuff(Tower _tower)
     {
         for (int i = targets.Count - 1; i >= 0; i--)
-        {
-            Tower target = targets[i];
-            TowerBuff buff = target.Buff;
-
-            buff.RemoveStat(_tower, TowerBuff.SubType.Damage);
-        }
+            targets[i].Buff.RemoveStat(_tower, TowerBuff.SubType.Damage);
 
         targets.Clear();
         currents.Clear();

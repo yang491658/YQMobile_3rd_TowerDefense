@@ -39,7 +39,7 @@ public struct SliderConfig
     }
 }
 
-public enum TestMode { None, Wave, Solo }
+public enum TestMode { None, Wave, Solo, Tower }
 
 public class TestManager : MonoBehaviour
 {
@@ -55,9 +55,6 @@ public class TestManager : MonoBehaviour
 
     public bool IsAuto { private set; get; } = false;
 
-    [Header("Sound Test")]
-    [SerializeField] private bool onPauseBgm = false;
-
     [Header("Test UI")]
     [SerializeField] private TextMeshProUGUI testText;
     [SerializeField] private GameObject testUI;
@@ -71,6 +68,7 @@ public class TestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI value10Num;
     [Space]
     [SerializeField] private SliderConfig refTower = new(0, 0, 0, "기준 타워 : {0}");
+    private Tower testTower;
     [SerializeField] private SliderConfig refGrade = new(0, 0, 0, "기준 등급 : {0}");
     [SerializeField] private SliderConfig refRank = new(3, 0, 0, "기준 랭크 : {0}");
 
@@ -147,40 +145,12 @@ public class TestManager : MonoBehaviour
         #endregion
 
         #region 사운드 매니저
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            onPauseBgm = !onPauseBgm;
-            SoundManager.Instance?.PauseSound(onPauseBgm);
-        }
+        if (Input.GetKeyDown(KeyCode.B)) SoundManager.Instance?.PauseSound(!AudioListener.pause);
         if (Input.GetKeyDown(KeyCode.M)) SoundManager.Instance?.ToggleBGM();
         if (Input.GetKeyDown(KeyCode.N)) SoundManager.Instance?.ToggleSFX();
         #endregion
 
         #region 엔티티 매니저
-        for (int i = 1; i <= 10; i++)
-        {
-            KeyCode key = i == 10 ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha0 + i);
-            int digit = i == 10 ? 0 : i;
-
-            if (Input.GetKeyDown(key))
-            {
-                bool isShift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-
-                int current = refTower.value;
-                int prefix = current / 100;
-                int tens = (current / 10) % 10;
-                int ones = current % 10;
-
-                if (isShift) tens = digit;
-                else ones = digit;
-
-                int newValue = prefix * 100 + tens * 10 + ones;
-
-                ChangeRefTower(newValue);
-                break;
-            }
-        }
-
         if (Input.GetKey(KeyCode.T))
         {
             Vector3 pos = Input.mousePosition;
@@ -221,11 +191,29 @@ public class TestManager : MonoBehaviour
             ChangeGameSpeed(Mathf.Approximately(GameManager.Instance.Speed, gameSpeed.minValue)
                 ? GameManager.Instance.MaxSpeed
                 : gameSpeed.minValue);
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) ChangeRefTower(refTower.value - 1);
-        if (Input.GetKeyDown(KeyCode.RightArrow)) ChangeRefTower(refTower.value + 1);
+
+        bool isShift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+            if (!isShift) ChangeRefTower(refTower.value - 1);
+            else ChangeRefGrade(refGrade.value - 1);
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+            if (!isShift) ChangeRefTower(refTower.value + 1);
+            else ChangeRefGrade(refGrade.value + 1);
+
+        for (int i = 1; i <= Tower.MaxRank; i++)
+        {
+            KeyCode key = (KeyCode)((int)KeyCode.Alpha0 + i);
+
+            if (Input.GetKeyDown(key))
+            {
+                ChangeRefRank(i);
+                break;
+            }
+        }
 
         if (Input.GetKeyDown(KeyCode.J)) ToggleMode(TestMode.Wave);
         if (Input.GetKeyDown(KeyCode.K)) ToggleMode(TestMode.Solo);
+        if (Input.GetKeyDown(KeyCode.L)) ToggleMode(TestMode.Tower);
 
         UpdateTestText();
         #endregion
@@ -275,18 +263,72 @@ public class TestManager : MonoBehaviour
         AutoMerge();
         if (Mode == TestMode.None)
         {
+            if (!TowerChance.Instance.IsValid(RefGrade))
+            {
+                if (GameManager.Instance.BuyExp()) return;
+                if (TryBuy(0, 0)) return;
+                return;
+            }
+
+            int level = GameManager.Instance.Level;
+            int best = TowerChance.Instance.GetBestLevel(RefGrade);
+
+            if (level < best)
+            {
+                if (TryBuy(RefID, RefGrade)) return;
+                if (GameManager.Instance.BuyExp()) return;
+                return;
+            }
+
+            if (TryBuy(0, 0)) return;
+            if (!EntityManager.Instance.HasEmptyField())
+            {
+                if (TrySell(RefID, RefGrade)) return;
+                else MergeRandom();
+            }
+            return;
         }
         else TestPlay();
     }
 
-    private bool TryBuy(int _id, TowerGrade _grade, TowerSlot _slot = null)
+    private bool TryBuy(int _id, TowerGrade _grade)
     {
-        return default;
+        if (TowerStore.Instance.CanBuy
+            && TowerStore.Instance.HasSlot(_id, _grade))
+        {
+            TowerStore.Instance?.OnClickBuy();
+            return true;
+        }
+        return false;
     }
 
-    private bool TrySell(int _id, TowerGrade _grade, TowerSlot _slot = null)
+    private bool TrySell(int _id, TowerGrade _grade)
     {
-        return default;
+        if (_id <= 0 && _grade <= 0) return false;
+
+        List<Tower> towers = EntityManager.Instance?.GetTowers();
+        if (towers == null) return false;
+
+        Tower target = null;
+        for (int i = 0; i < towers.Count; i++)
+        {
+            Tower tower = towers[i];
+            if (tower == null || tower.IsDragging) continue;
+            if (_id > 0 && tower.ID == _id && (_grade <= 0 || tower.Grade == _grade)) continue;
+            if (_id <= 0 && _grade > 0 && tower.Grade == _grade) continue;
+
+            if (target == null || tower.Grade < target.Grade)
+                target = tower;
+            else if (tower.Grade == target.Grade && tower.Rank < target.Rank)
+                target = tower;
+        }
+
+        if (target != null)
+        {
+            target.Sell();
+            return true;
+        }
+        return false;
     }
 
     private void ToggleMode(TestMode _mode)
@@ -303,9 +345,23 @@ public class TestManager : MonoBehaviour
         switch (Mode)
         {
             case TestMode.Wave:
+                if (EntityManager.Instance?.GetTowerCount(RefID) < testCount)
+                    EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, _useGold: false);
+                SyncBasic();
                 break;
 
             case TestMode.Solo:
+                MonsterWave.Instance?.StopWave();
+                if (EntityManager.Instance?.GetTowerCount(RefID) < testCount)
+                    EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, _useGold: false);
+                if (EntityManager.Instance?.GetMonsterCount() == 0)
+                    EntityManager.Instance?.SpawnBoss();
+                SyncBasic();
+                break;
+
+            case TestMode.Tower:
+                if (testTower == null)
+                    testTower = EntityManager.Instance?.SpawnTower(RefID, RefGrade, refRank.value, _useGold: false);
                 break;
         }
     }
@@ -537,10 +593,17 @@ public class TestManager : MonoBehaviour
 
     private void UpdateTestText()
     {
-        testText.text =
-            $"Tower : {EntityManager.Instance?.GetTowerCount()}\n" +
-            $"Monster : {EntityManager.Instance?.GetMonsterCount()}\n" +
-            $"Others : {PoolManager.Instance?.OtherCount}";
+        if (Mode != TestMode.Tower)
+            testText.text =
+                $"타워 : {EntityManager.Instance?.GetTowerCount()}\n" +
+                $"몬스터: {EntityManager.Instance?.GetMonsterCount()}\n" +
+                $"기타 : {PoolManager.Instance?.OtherCount}";
+        else if (testTower != null)
+            testText.text =
+                $"공격 : {testTower.Damage}\n" +
+                $"공속 : {testTower.Speed}\n" +
+                $"치확 : {testTower.Chance}\n" +
+                $"치피 : {testTower.Critical}";
     }
 
     private void UpdateTestUI()
@@ -696,6 +759,8 @@ public class TestManager : MonoBehaviour
             StopCoroutine(autoRoutine);
             autoRoutine = null;
         }
+
+        testTower = null;
 
         UpdateTestUI();
     }

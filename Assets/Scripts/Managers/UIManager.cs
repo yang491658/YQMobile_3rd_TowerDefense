@@ -486,6 +486,15 @@ public class UIManager : MonoBehaviour
 
     private void UpdateWave()
     {
+#if TEST_Manager
+        if (TestManager.Instance?.Mode == TestMode.Wave
+            || TestManager.Instance?.Mode == TestMode.Solo)
+        {
+            waveUI.SetActive(false);
+            return;
+        }
+#endif
+
         if (!MonsterWave.Instance.IsRunning)
         {
             waveUI.SetActive(false);
@@ -495,8 +504,8 @@ public class UIManager : MonoBehaviour
 
         MonsterWave.Instance.GetPhaseValue(out Color color, out float value, out float maxValue, out string text);
         wave.fill.color = color;
-        wave.slider.value = value;
         wave.slider.maxValue = maxValue;
+        wave.slider.value = value;
 
         bool onText = !string.IsNullOrEmpty(text);
         wave.text.gameObject.SetActive(onText);

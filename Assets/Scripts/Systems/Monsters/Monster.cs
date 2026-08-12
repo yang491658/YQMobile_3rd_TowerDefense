@@ -138,7 +138,12 @@ public class Monster : Pooling
 
         int damage = debuff.CalcAmplified(_damage);
 
-        SetHealth(health - damage);
+#if TEST_Manager
+        TestManager.Instance?.AddDamage(damage);
+
+        if (TestManager.Instance?.Mode != TestMode.Solo)
+#endif
+            SetHealth(health - damage);
         CreateDamage(damage, _type);
 
         if (health <= 0) Die();
@@ -185,7 +190,10 @@ public class Monster : Pooling
 
     protected virtual void OnGoal()
     {
-        GameManager.Instance?.LifeDown();
+#if TEST_Manager
+        if (TestManager.Instance?.Mode != TestMode.Tower)
+#endif
+            GameManager.Instance?.LifeDown();
         GameManager.Instance?.GoldDown(gold / 10, true);
         EntityManager.Instance?.DespawnMonster(this);
     }

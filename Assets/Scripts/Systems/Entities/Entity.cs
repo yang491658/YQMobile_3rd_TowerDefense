@@ -3,9 +3,9 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer), typeof(Collider2D), typeof(Rigidbody2D))]
 public class Entity : MonoBehaviour
 {
-    protected SpriteRenderer sr;
-    protected Collider2D col;
-    protected Rigidbody2D rb;
+    private SpriteRenderer sr;
+    private Collider2D col;
+    private Rigidbody2D rb;
 
     protected virtual void Awake()
     {

@@ -29,7 +29,10 @@ public class Boss : Monster
 
     protected override void OnGoal()
     {
-        GameManager.Instance?.GameOver();
+#if TEST_Manager
+        if (TestManager.Instance?.Mode != TestMode.Tower)
+#endif
+            GameManager.Instance?.GameOver();
     }
 
     private IEnumerator RewardCoroutine(int _reward)

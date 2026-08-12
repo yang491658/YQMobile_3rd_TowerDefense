@@ -127,13 +127,30 @@ public class TowerChance : MonoBehaviour
     {
         for (int i = 0; i < weights.Length; i++)
         {
-            if (weights[i].grade != _grade) continue;
+            if (_grade > 0 && weights[i].grade != _grade) continue;
             if (currents[i] <= 0) return false;
 
             return DataManager.Instance?.GetTowerDatas(_grade).Length > 0;
         }
 
         return false;
+    }
+
+    public int GetBestLevel(TowerGrade _grade)
+    {
+        int bestLevel = 0;
+        float bestChance = 0f;
+
+        for (int i = 1; i <= GameManager.Instance?.MaxLevel; i++)
+        {
+            float chance = GetChance(_grade, i);
+            if (chance <= bestChance) continue;
+
+            bestChance = chance;
+            bestLevel = i;
+        }
+
+        return bestLevel;
     }
 
     public TowerGrade GetGrade()
@@ -151,6 +168,32 @@ public class TowerChance : MonoBehaviour
     }
 
     public float GetChance(TowerGrade _grade) => chanceDic.TryGetValue(_grade, out float chance) ? chance : 0f;
+    public float GetChance(TowerGrade _grade, int _level)
+    {
+        int targetWeight = 0;
+        int totalWeight = 0;
+
+        for (int i = 0; i < weights.Length; i++)
+        {
+            Weight weight = weights[i];
+            int current = weight.grade == normal.grade ? 100 : 0;
+
+            for (int j = 1; j <= _level; j++)
+                if (weight.Contains(j))
+                    current += weight.Add;
+
+            if (current <= 0) continue;
+            if (!(DataManager.Instance?.GetTowerDatas(weight.grade).Length > 0)) continue;
+
+            totalWeight += current;
+
+            if (weight.grade == _grade)
+                targetWeight = current;
+        }
+
+        return totalWeight > 0 ? (float)targetWeight / totalWeight * 100f : 0f;
+    }
+
     public IReadOnlyDictionary<TowerGrade, float> GetChances() => chanceDic;
     #endregion
 }

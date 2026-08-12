@@ -77,14 +77,15 @@ public class TowerStore : MonoBehaviour
         }
 
         foreach (TowerSlot slot in slots)
-            Destroy(slot.gameObject);
+            if (slot != null)
+                Destroy(slot.gameObject);
 
         origin.gameObject.SetActive(false);
         slots.Clear();
     }
     #endregion
 
-    #region 슬롯
+    #region 슬롯_내부 호출
     private void UpdateSlot()
     {
         if (IsMoving) return;
@@ -149,8 +150,8 @@ public class TowerStore : MonoBehaviour
     }
     #endregion
 
-    #region 클릭
-    public TowerSlot RandomSlot()
+    #region 슬롯_외부 호출
+    public TowerSlot GetSlot(int _id, TowerGrade _grade)
     {
         TowerSlot result = null;
         int match = 0;
@@ -158,6 +159,8 @@ public class TowerStore : MonoBehaviour
         foreach (TowerSlot slot in slots)
         {
             if (slot == null || !slot.CanBuyTower) continue;
+            if (_id > 0 && slot.ID != _id) continue;
+            if (_grade > 0 && slot.Grade != _grade) continue;
 
             if (Random.Range(0, ++match) == 0)
                 result = slot;
@@ -165,7 +168,12 @@ public class TowerStore : MonoBehaviour
 
         return result;
     }
+    public TowerSlot RandomSlot() => GetSlot(0, 0);
 
+    public bool HasSlot(int _id, TowerGrade _grade) => GetSlot(_id, _grade) != null;
+    #endregion
+
+    #region 클릭
     public void OnClickBuy()
     {
         if (!CanBuy) return;

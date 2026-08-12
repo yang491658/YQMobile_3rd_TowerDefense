@@ -330,6 +330,14 @@ public class HandleManager : MonoBehaviour
             tower.RankUp();
     }
 
+    private void OnWheelUp(Vector3 _pos)
+    {
+    }
+
+    private void OnWheelDown(Vector3 _pos)
+    {
+    }
+
     private void AddClick(Vector3 _pos, Color _color)
     {
         marks.Add(_pos);

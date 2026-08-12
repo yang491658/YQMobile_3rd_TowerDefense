@@ -119,7 +119,7 @@ public class EntityManager : MonoBehaviour
             : Vector3.positiveInfinity;
     }
 
-    public bool HasEmptyField() => PickRandom(out _);
+    public bool HasEmptyField() => towerDic.Count < fields.Count;
     #endregion
 
     #region 타워

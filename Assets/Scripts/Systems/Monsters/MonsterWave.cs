@@ -81,7 +81,12 @@ public class MonsterWave : MonoBehaviour
         IsPause = false;
 
         normalTimer = normalTime;
-        spawnDelay = spawnRange.y;
+#if TEST_Manager
+        if (TestManager.Instance?.Mode == TestMode.Tower)
+            spawnDelay = spawnRange.x;
+        else
+#endif
+            spawnDelay = spawnRange.y;
         spawnTimer = 0f;
         spawnDecrease = (normalTime - spawnPeak) / (spawnRange.y - spawnRange.x);
 
@@ -124,8 +129,17 @@ public class MonsterWave : MonoBehaviour
             spawnTimer = spawnDelay;
         }
 
-        if (spawnDelay > spawnRange.x)
-            spawnDelay = Mathf.Max(spawnDelay - _deltaTime / spawnDecrease, spawnRange.x);
+#if TEST_Manager
+        if (TestManager.Instance?.Mode == TestMode.Tower)
+            spawnDelay = spawnRange.x;
+        else
+#endif
+            if (spawnDelay > spawnRange.x)
+                spawnDelay = Mathf.Max(spawnDelay - _deltaTime / spawnDecrease, spawnRange.x);
+
+#if TEST_Manager
+        if (TestManager.Instance?.Mode == TestMode.Wave) return;
+#endif
 
         normalTimer -= _deltaTime;
         if (normalTimer > 0f) return;
